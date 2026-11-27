@@ -29,7 +29,7 @@ window.ROADMAP = [
     parts: [
       { id: "s2.cache", title: "Đọc nhanh hơn với cache", topics: ["caching", "dist-cache"] },
       { id: "s2.split", title: "Chia dữ liệu ra nhiều máy", topics: ["sharding", "consistent-hashing"] },
-      { id: "s2.consistency", title: "Nhất quán & sao chép", topics: ["cap"] },
+      { id: "s2.consistency", title: "Nhất quán & sao chép", topics: ["cap", "replication"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
   { id: "s3", title: "Bất đồng bộ & phối hợp", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và chống tranh chấp giữa nhiều máy.",

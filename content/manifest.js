@@ -40,6 +40,7 @@
     "content/topics/sd/redis.js",
     "content/topics/sd/tech-cheatsheet.js",
     "content/topics/sd/bigdata-ds.js",
+    "content/topics/sd/replication.js",
     "content/topics/sd/resilience.js",
     "content/topics/sd/idempotency.js",
     "content/topics/lld/lld-delivery.js",
