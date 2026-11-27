@@ -14,6 +14,13 @@ BK.topic({
     idea: "Coi event là một phần của dữ liệu nghiệp vụ: ghi nó vào bảng `outbox` cùng transaction. Một relay đọc outbox (quét định kỳ, hoặc đọc log thay đổi của DB như Debezium) và publish. Relay gửi lại được bao nhiêu lần cũng được; consumer dedupe theo id của event.",
     tradeoff: "Thêm một bảng, một tiến trình relay (hoặc cả hạ tầng CDC: Kafka Connect, replication slot) phải vận hành và giám sát. Event tới consumer trễ hơn publish trực tiếp một chút, và có thể trùng. Outbox chỉ giải chuyện ghi tin cậy, không giải chuyện các service khác xử lý đúng.",
   },
+  diagrams: [
+    {
+      src: "content/svg/outbox-cdc-pipeline.svg",
+      caption: "Bảng nghiệp vụ và bảng outbox được ghi trong một transaction; Debezium đọc WAL qua replication slot, Outbox Event Router lấy aggregatetype làm topic, aggregateid làm key, id làm header, rồi Kafka đưa event tới các consumer. Slot giữ WAL tới khi được đọc, và có thể gửi lại thay đổi sau crash.",
+      source: "https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html",
+    },
+  ],
   table: {
     head: ["Thứ tự ghi", "Crash ở giữa thì sao", "Kết quả"],
     rows: [

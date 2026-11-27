@@ -14,6 +14,13 @@ BK.topic({
     idea: "Coi mỗi phụ thuộc là thứ có thể chậm hoặc chết bất cứ lúc nào. Giới hạn **thời gian** chờ (timeout, deadline), **số lần** thử lại (retry budget), **tài nguyên** dành cho một phụ thuộc (bulkhead), và **lượng việc** nhận vào (load shedding). Khi phụ thuộc hỏng hẳn thì ngừng gọi một lúc (circuit breaker) và trả phương án dự phòng.",
     tradeoff: "Timeout ngắn quá thì cắt cả request sắp xong; retry ít quá thì lỗi thoáng qua thành lỗi với user; breaker nhạy quá thì tự gây downtime. Mọi ngưỡng phải chỉnh theo số liệu đo được (latency percentile, tỉ lệ lỗi), và retry chỉ an toàn khi thao tác idempotent.",
   },
+  diagrams: [
+    {
+      src: "content/svg/resilience-circuit-breaker.svg",
+      caption: "Circuit breaker: Closed đếm lỗi theo khoảng thời gian, vượt ngưỡng thì sang Open và bật timer; hết timer sang Half-open cho vài request thử; đủ số lần thành công liên tiếp thì về Closed, một lần lỗi thì quay lại Open và bật lại timer.",
+      source: "https://learn.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker",
+    },
+  ],
   table: {
     head: ["Cơ chế", "Chặn được gì", "Cài thế nào"],
     rows: [

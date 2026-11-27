@@ -14,6 +14,13 @@ BK.topic({
     idea: "Đo từ góc nhìn user (tỉ lệ request thành công, latency percentile), đặt mục tiêu (SLO) và cảnh báo khi mục tiêu bị đe doạ. Gắn một **trace id** vào mỗi request và truyền qua mọi service để dựng lại đường đi. Log có cấu trúc, mang cùng trace id, để nhảy từ trace sang log của đúng request đó.",
     tradeoff: "Telemetry tốn tiền: lưu trữ, băng thông, CPU để ghi. Phải chọn: sampling trace (không giữ mọi trace), giới hạn label của metric (cardinality), mức log và thời gian lưu. SLO quá chặt thì team không bao giờ được ra tính năng; quá lỏng thì user chịu trận trước khi ai đó biết.",
   },
+  diagrams: [
+    {
+      src: "content/svg/observability-trace-waterfall.svg",
+      caption: "Trace waterfall của một request qua 4 service: mỗi span có cha, thanh ngang cho thấy thời gian nằm ở đâu và gọi tuần tự hay song song. Header traceparent giữ nguyên trace-id, còn parent-id đổi thành span của bên gọi ở mỗi chặng.",
+      source: "https://github.com/w3c/trace-context/blob/main/spec/20-http_request_header_format.md",
+    },
+  ],
   table: {
     head: ["Tín hiệu", "Trả lời câu hỏi", "Đặc điểm", "Dùng sai thì"],
     rows: [

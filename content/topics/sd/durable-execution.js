@@ -14,6 +14,13 @@ BK.topic({
     idea: "Engine (Temporal, AWS Step Functions, Lambda durable functions) lưu lại mọi bước đã xong. Code workflow chỉ điều phối; việc có side effect nằm trong activity được engine retry theo policy. \"Chờ 7 ngày\" là một timer bền: không giữ thread hay máy nào. Saga viết bằng `try/catch` ngay trong workflow.",
     tradeoff: "Thêm một hệ thống phải vận hành (hoặc phụ thuộc dịch vụ managed). Code workflow chịu ràng buộc determinism, và đổi code khi còn workflow đang chạy cần versioning, đây là cái giá vận hành lớn nhất. History dài thì replay chậm, phải Continue-As-New. Activity vẫn at-least-once nên lời gọi ra ngoài vẫn cần idempotency key.",
   },
+  diagrams: [
+    {
+      src: "content/svg/durable-execution-three-ways.svg",
+      caption: "Cùng một quy trình, worker chết sau bước trừ tiền: queue + bảng + cron để đơn kẹt ở một status và cần code khôi phục viết tay; saga choreography rải trạng thái ở từng service; workflow engine ghi event history, worker khác replay code, lấy kết quả charge từ history rồi đi tiếp.",
+      source: "https://docs.temporal.io/workflow-execution/event",
+    },
+  ],
   table: {
     head: ["Cách làm", "Trạng thái nằm ở đâu", "Hợp khi", "Đau ở đâu"],
     rows: [
