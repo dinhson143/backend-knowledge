@@ -512,7 +512,7 @@
   /* ───────────── Custom: Kafka consumer group ───────────── */
   function mountKafkaGroup(root, sim) {
     const P = 4, KEYS = ["user-1", "user-2", "user-3", "user-4", "user-5", "user-6"];
-    const KC = ["#3b7ff5", "#14a37f", "#e08a00", "#d64545", "#8b5cf6", "#0ea5b7"];
+    const KC = ["#2563eb", "#0f7a60", "#b45f00", "#c53030", "#7c3aed", "#0e7490"]; // chữ trắng trên ô ≥4.5:1
     const part = (k) => hash(k) % P;
     let logs, committed, consumers, next, auto, timer, msg, rr;
     root.classList.add("sim");

@@ -145,6 +145,7 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: 280px; z-index: 30; transform: translateX(-100%); visibility: hidden; transition: transform .2s, visibility .2s; }
   /* đóng: visibility ẩn khỏi thứ tự Tab; mở: bóng phủ làm nền mờ */
   .sidebar.open { transform: none; visibility: visible; box-shadow: 0 0 0 100vmax rgba(0,0,0,.45); }
+  .sidebar.open ~ main { pointer-events: none; } /* chạm nền mờ chỉ đóng sidebar, không bấm nhầm link bên dưới */
   main { padding: 20px 16px 60px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .topbar { gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
