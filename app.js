@@ -467,6 +467,9 @@
       <p class="lead">${total} từ viết tắt. Ở mọi trang, rê chuột hoặc chạm vào từ gạch chấm để xem nghĩa.</p>
       <input id="glFilter" class="gl-filter" type="search" aria-label="Lọc thuật ngữ" placeholder="Lọc: LRU, TTL, Kafka…" autocomplete="off">
       <div id="glList"></div>`;
+    // Từ khoá truyền từ kết quả tìm kiếm (trong bộ nhớ, không thêm route)
+    const q0 = glPrefill;
+    glPrefill = "";
     const render = (q) => {
       const n = q.trim().toLowerCase();
       $("#glList").innerHTML = (window.GLOSSARY || []).map((g) => {
@@ -477,7 +480,8 @@
         </tbody></table></div>`;
       }).join("") || `<div class="empty">Không có thuật ngữ khớp.</div>`;
     };
-    render("");
+    $("#glFilter").value = q0;
+    render(q0);
     $("#glFilter").addEventListener("input", (e) => render(e.target.value));
   }
 
@@ -489,17 +493,31 @@
     const textOf = (t) => [t.title, txt(t.tldr), ...(t.points || []).map(txt), ...(t.tips || []).map(txt),
       ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flatMap(cellsOf)]),
       ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || []).map(txt)]), ...(t.cards || []).flat()];
-    const hits = ORDER.map((t) => ({ href: `#/t/${t.id}`, title: t.title, where: t.stage.title, m: textOf(t).filter((s) => s.toLowerCase().includes(needle)) }))
-      .concat(PROBLEMS.map((p) => ({ href: `#/p/${p.id}`, title: p.title, where: "Bài luyện", m: [p.title, p.summary, ...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])].filter((s) => s.toLowerCase().includes(needle)) })))
-      .filter((x) => x.m.length);
+    // A8: chủ đề, bài, mô phỏng, thuật ngữ. Xếp hạng: khớp tiêu đề (0) > khớp tóm tắt (1) > khớp thân (2); cùng hạng giữ thứ tự gốc
+    const has = (s) => !!s && s.toLowerCase().includes(needle);
+    const hit = (type, href, title, where, head, lead, body, gl) => {
+      const m = [...new Set([lead, ...body])].filter((s) => s !== title && has(s));
+      // Chỉ khớp tiêu đề thì hiện tóm tắt (với thuật ngữ: nghĩa) làm đoạn trích
+      return (m.length || has(head)) && { type, href, title, where, m: m.length ? m : [lead].filter(Boolean), gl, rank: has(head) ? 0 : has(lead) ? 1 : 2 };
+    };
+    const stageLabel = (s) => `${s.parallel ? "Song song" : `Giai đoạn ${stageNum(s)}`} · ${s.title}`;
+    const hits = [
+      ...ORDER.map((t) => hit("Chủ đề", `#/t/${t.id}`, t.title, stageLabel(t.stage), t.title, txt(t.tldr), textOf(t))),
+      ...PROBLEMS.map((p) => hit("Bài", `#/p/${p.id}`, p.title, LEVELS[p.level], p.title, p.summary, [...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])])),
+      ...SIMS.map((s) => hit("Mô phỏng", `#/sim/${s.id}`, s.title, byId[s.topics[0]] ? byId[s.topics[0]].title : "", s.title, s.scenario, [s.context])),
+      ...Object.values(GL).map((g) => hit("Thuật ngữ", "#/glossary", `${g.k} · ${g.full}`, g.group, `${g.k} ${g.full}`, g.vi, [g.ex], g.k)),
+    ].filter(Boolean).sort((a, b) => a.rank - b.rank);
     // Bỏ tooltip trong kết quả tìm kiếm và chỉ tô sáng phần chữ, không đụng vào thẻ HTML
     const hl = (s) => plain(s.replace(/^[+!] /, "")).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1")
       .replace(new RegExp(`(${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(?![^<]*>)`, "gi"), "<mark>$1</mark>");
     main.innerHTML = `<h1>Kết quả cho “${esc(q)}”</h1><p class="lead">${hits.length} kết quả</p>
-      ${hits.map((x) => `<a class="panel search-hit" href="${x.href}">
-        <div class="t">${esc(x.title)} <span class="s">· ${esc(x.where)}</span></div>
+      ${hits.map((x) => `<a class="panel search-hit" href="${x.href}"${x.gl ? ` data-gl="${esc(x.gl)}"` : ""}>
+        <div class="t"><span class="type-badge">${x.type}</span>${esc(x.title)} <span class="s">· ${esc(x.where)}</span></div>
         <div class="s">${x.m.slice(0, 2).map(hl).join(" · ")}</div></a>`).join("") || `<div class="empty">Không tìm thấy “${esc(q)}”.<br>Thử từ khoá ngắn hơn hoặc tên tiếng Anh (vd. <a href="#/search/cache">cache</a>, <a href="#/search/kafka">kafka</a>), hoặc tra từ viết tắt ở <a href="#/glossary">Thuật ngữ</a>.</div>`}`;
   }
+
+  let glPrefill = "";
+  main.addEventListener("click", (e) => { const a = e.target.closest("[data-gl]"); if (a) glPrefill = a.dataset.gl; });
 
   // ── Router ──
   function route() {
@@ -526,7 +544,11 @@
   $("#search").addEventListener("input", (e) => {
     clearTimeout(searchTimer);
     const v = e.target.value.trim();
-    searchTimer = setTimeout(() => { location.hash = v ? `#/search/${encodeURIComponent(v)}` : "#/"; }, 200);
+    searchTimer = setTimeout(() => {
+      const h = v ? `#/search/${encodeURIComponent(v)}` : "#/";
+      // Đang ở trang tìm kiếm thì thay mục lịch sử: Back đưa về trang trước khi tìm, không đi qua từng lần gõ
+      if (location.hash.startsWith("#/search/")) location.replace(h); else location.hash = h;
+    }, 200);
   });
 
   route();

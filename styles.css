@@ -139,6 +139,7 @@ a.btn { display: inline-block; text-align: center; }
 .search-hit { display: block; padding: 12px 16px; margin-bottom: 8px; }
 .search-hit .t { font-weight: 600; color: var(--text); }
 .search-hit .s { font-size: 13px; color: var(--muted); }
+.type-badge { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 8px; margin-right: 8px; border-radius: 10px; background: var(--surface-2); color: var(--muted); vertical-align: 1px; }
 mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
 
 /* ── Mobile ── */
@@ -307,6 +308,7 @@ pre.api { margin: 0; padding: 14px 16px; background: var(--surface); border: 1px
 .rm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; cursor: pointer; list-style: none; }
 .rm-head::-webkit-details-marker { display: none; }
 .rm-title { font-weight: 650; font-size: 16px; }
+.rm-head > .muted { white-space: nowrap; }
 .rm-head > .muted::after { content: " ▸"; }
 .rm-body[open] > .rm-head > .muted::after { content: " ▾"; }
 .rm-body[open] > .rm-head { margin-bottom: 4px; }
