@@ -53,6 +53,7 @@ window.ROADMAP = [
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn giải thích được container, Kubernetes và chọn nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
       { id: "cloud.basics", title: "Container cơ bản", topics: ["container-basics", "dockerfile"] },
+      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core"] },
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
     ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
