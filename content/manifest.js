@@ -56,6 +56,7 @@
     "content/topics/dsa/bigo.js",
     "content/topics/dsa/ds.js",
     "content/topics/dsa/algo.js",
+    "content/topics/cs/os-process-lifecycle.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
@@ -104,6 +105,7 @@
     "content/sims/tdd-codewalk.js",
     "content/sims/token-bucket.js",
     "content/sims/binary-search.js",
+    "content/sims/fork-exec.js",
     "content/roadmap.js",
     // engine + app luôn nạp cuối
     "engine/diagrams.js",

@@ -175,6 +175,8 @@ window.GLOSSARY = [
     ["SSD", "Solid State Drive", "Ổ lưu trữ flash, nhanh hơn HDD nhiều lần."],
     ["HDD", "Hard Disk Drive", "Ổ đĩa quay cơ học; đọc ngẫu nhiên chậm, đọc tuần tự tạm được."],
     ["OS", "Operating System", "Hệ điều hành."],
+    ["PID", "Process ID", "Số định danh của một process; `getpid()` trả về nó. Thread trong cùng process có chung PID."],
+    ["COW", "Copy-On-Write", "Hai bên dùng chung một trang nhớ chỉ đọc; bên nào ghi thì mới chép riêng trang đó. `fork()` dùng cách này."],
     ["OOM", "Out Of Memory", "Hết bộ nhớ — tiến trình/container bị kill."],
     ["GC", "Garbage Collection", "Runtime tự dọn bộ nhớ không dùng; có thể làm chương trình dừng (pause) tạm thời."],
     ["UI", "User Interface", "Giao diện người dùng."],
