@@ -51,15 +51,15 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Load Balancer / Load Balancing | load balancer (thiết bị), load balancing (việc); L4, L7 | chia request cho nhiều server | "Cân bằng tải" | `lb-gateway-cdn` |
 | API Gateway | API Gateway | cửa vào duy nhất: auth, rate limit, routing | "Cổng API" | `lb-gateway-cdn` |
 | CDN | CDN (glossary) | mạng máy chủ biên cache nội dung gần user | "Mạng phân phối nội dung" | `lb-gateway-cdn` |
-| Authentication / Authorization | authentication (authn), authorization (authz) | xác thực (là ai) / phân quyền (được làm gì) | "Xác thực & phân quyền" | `auth` (sắp viết) |
+| Authentication / Authorization | authentication (authn), authorization (authz) | xác thực (là ai) / phân quyền (được làm gì) | "Xác thực & phân quyền" | `auth` |
 | Rate Limiting | rate limiting (việc), rate limiter (thành phần); token bucket, sliding window | giới hạn số request mỗi khoảng thời gian | "Giới hạn tốc độ", "Giới hạn tần suất" | `rate-limiter` (problem) |
 | **Database** | | | | |
 | Data Modeling | Data Modeling | đi từ requirement tới bảng, khoá, quan hệ | "Mô hình hoá dữ liệu", "Mô hình dữ liệu" | `data-modeling` |
 | Database Indexing | index (số nhiều: indexes); B-Tree, composite index | cấu trúc phụ giúp tìm dòng không phải quét cả bảng | "Chỉ mục", "Lập chỉ mục" | `indexing` |
 | Transaction | transaction; ACID | nhóm thao tác chạy trọn hoặc không chạy gì | "Giao dịch" (khi nói về DB) | `db-isolation-anomalies` |
 | Isolation Level | isolation level; Read Committed, Repeatable Read, Serializable | transaction thấy gì từ transaction chạy đồng thời | "Mức cô lập" | `db-isolation-anomalies` |
-| Database Locking | optimistic lock, pessimistic lock; `SELECT … FOR UPDATE` | khoá dòng trong một database | "Khoá lạc quan", "Khoá bi quan" | `db-locking` (sắp viết) |
-| Query Tuning | query plan, `EXPLAIN` | đọc kế hoạch thực thi và sửa truy vấn chậm | "Tối ưu truy vấn" | `db-query-tuning` (sắp viết) |
+| Database Locking | optimistic lock, pessimistic lock; `SELECT … FOR UPDATE` | khoá dòng trong một database | "Khoá lạc quan", "Khoá bi quan" | `db-locking` |
+| Query Tuning | query plan, `EXPLAIN` | đọc kế hoạch thực thi và sửa truy vấn chậm | "Tối ưu truy vấn" | `db-query-tuning` |
 | **Scale dữ liệu** | | | | |
 | Caching | caching (việc), cache (nơi lưu); cache-aside, write-through, write-around, write-back | giữ bản sao dữ liệu hay đọc ở chỗ nhanh hơn | "Bộ nhớ đệm", "Bộ đệm" | `caching` |
 | Cache Stampede | cache stampede; single flight | nhiều request cùng miss một key và cùng đập vào DB | "Dồn cache" | `caching` |
@@ -76,8 +76,8 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Network Partition | network partition | mạng giữa các node bị đứt, hai phía không thấy nhau | "Phân vùng mạng", "Mạng chia cắt" | `cap` |
 | CAP / PACELC | CAP, PACELC (glossary) | khi partition phải chọn C hay A; khi không partition chọn latency hay C | "Định lý CAP" | `cap` |
 | Fault Tolerance | fault tolerance | hệ chạy tiếp khi một thành phần hỏng | "Khả năng chịu lỗi" | `replication` |
-| Multi-region | multi-region; RPO, RTO | chạy hệ thống trên nhiều region | "Đa vùng" | `multi-region` (sắp viết) |
-| Distributed ID Generation | Snowflake, UUIDv7 | sinh id duy nhất không cần điểm trung tâm | "Sinh ID phân tán" | `id-generation` (sắp viết) |
+| Multi-region | multi-region; RPO, RTO | chạy hệ thống trên nhiều region | "Đa vùng" | `multi-region` |
+| Distributed ID Generation | Snowflake, UUIDv7 | sinh id duy nhất không cần điểm trung tâm | "Sinh ID phân tán" | `id-generation` |
 | **Async & Coordination** | | | | |
 | Async Processing | async (tính từ); asynchronous processing | request trả lời ngay, việc chậm chạy sau qua queue/worker | "Bất đồng bộ", "Xử lý bất đồng bộ" | `queue` |
 | Message Queue | message queue, queue; producer, consumer, DLQ | hàng đợi message giữa producer và consumer | "Hàng đợi", "Hàng đợi tin nhắn" | `queue` |
@@ -93,7 +93,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Idempotency | idempotency (danh từ), idempotent (tính từ); idempotency key | làm lại nhiều lần cho cùng kết quả như một lần | "Luỹ đẳng", "Lũy đẳng", "Tính bất biến khi lặp" | `idempotency` |
 | Contention | contention | nhiều bên cùng tranh một tài nguyên | "Tranh chấp tài nguyên", "Tranh chấp" | `dist-lock` |
 | Distributed Lock | distributed lock; TTL, lease, fencing token, Redlock | khoá tài nguyên xuyên nhiều máy | "Khoá phân tán", "Khóa phân tán" | `dist-lock` |
-| Consensus / Leader Election | consensus, leader election; Raft, quorum | các node thống nhất một giá trị hoặc một leader | "Đồng thuận", "Bầu leader", "Bầu chọn leader" | `consensus` (sắp viết) |
+| Consensus / Leader Election | consensus, leader election; Raft, quorum | các node thống nhất một giá trị hoặc một leader | "Đồng thuận", "Bầu leader", "Bầu chọn leader" | `consensus` |
 | Multi-step Processes | workflow; saga, orchestration, choreography, compensation | quy trình nhiều bước qua nhiều service | "Quy trình nhiều bước", "Điều phối dịch vụ" | `durable-execution` |
 | Transactional Outbox / CDC | outbox, CDC (glossary); dual write | ghi DB và phát event trong cùng một transaction | "Hộp thư đi" | `outbox-cdc` |
 | Durable Execution | Durable Execution; event history, replay | quy trình nhiều bước sống qua crash nhờ ghi lại lịch sử | "Thực thi bền" | `durable-execution` |
@@ -101,10 +101,10 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Blob Storage | blob storage, object storage; presigned URL, multipart upload | kho file lớn ngoài database | "Kho đối tượng" | `blob` |
 | Full-text Search | full-text search; inverted index | tìm kiếm theo từ trong văn bản | "Tìm kiếm toàn văn" | `search` |
 | Probabilistic Data Structures | Bloom filter, Count-Min Sketch, HyperLogLog | cấu trúc đổi một ít sai số lấy bộ nhớ rất nhỏ | "Cấu trúc dữ liệu xác suất" | `bigdata-ds` |
-| Vector Search | vector search; embedding, ANN | tìm theo độ tương đồng | "Tìm kiếm vector" | `vector-search` (sắp viết) |
+| Vector Search | vector search; embedding, ANN | tìm theo độ tương đồng | "Tìm kiếm vector" | `vector-search` |
 | **Vận hành** | | | | |
 | Observability | observability; log, metric, trace; SLI, SLO, SLA | đo và lần theo hệ thống đang chạy | "Quan sát hệ thống", "Khả năng quan sát", "Giám sát hệ thống" | `observability` |
-| Zero-downtime Deployment | zero-downtime deployment; rolling, blue/green, canary, feature flag | deploy mà không ngừng phục vụ | "Triển khai an toàn", "Triển khai không gián đoạn" | `deployment-safety` (sắp viết) |
+| Zero-downtime Deployment | zero-downtime deployment; rolling, blue/green, canary, feature flag | deploy mà không ngừng phục vụ | "Triển khai an toàn", "Triển khai không gián đoạn" | `deployment-safety` |
 | **Nền tảng CS** | | | | |
 | Process | process; PID, fork, exec | chương trình đang chạy, có không gian địa chỉ riêng | "Tiến trình" | `os-process-lifecycle` |
 | Thread | thread; single-thread, multi-thread | luồng thực thi trong một process, dùng chung bộ nhớ | "Đa luồng", "Đơn luồng", "Luồng thực thi" | `thr-thread-vs-process` |
@@ -135,7 +135,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
 | Event-driven Architecture | event-driven | service giao tiếp bằng event | "Kiến trúc hướng sự kiện" | `system-architecture` |
 | Clean Code | clean code | code dễ đọc, dễ đổi | "Code sạch" | (chặng sắp có) |
-| Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` (sắp viết) |
+| Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` |
 | **Python** | | | | |
 | Mutability | mutable, immutable; identity, aliasing | object sửa được tại chỗ hay không; nhiều tên cùng trỏ một object | "Tính khả biến", "Tính bất biến" | `py-object-model` |
 | Data Model / Dunder Method | data model, special method, dunder method (`__eq__`, `__hash__`…) | method hai gạch dưới mà interpreter gọi ngầm cho `len()`, `==`, `for`… | "Phương thức đặc biệt", "Phương thức ma thuật" | `py-data-model` |
