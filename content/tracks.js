@@ -42,3 +42,6 @@ BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding 
 BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });
 BK.section({ id: "code-clean", track: "code", title: "Clean Code" });
 BK.section({ id: "code-testing", track: "code", title: "Kiểm thử & debug" });
+
+BK.track({ id: "py", title: "Python", subtitle: "Ngôn ngữ cốt lõi · CPython · Python cho backend" });
+BK.section({ id: "py-core", track: "py", title: "Ngôn ngữ cốt lõi" });

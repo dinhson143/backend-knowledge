@@ -136,6 +136,13 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Event-driven Architecture | event-driven | service giao tiếp bằng event | "Kiến trúc hướng sự kiện" | `system-architecture` |
 | Clean Code | clean code | code dễ đọc, dễ đổi | "Code sạch" | (chặng sắp có) |
 | Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` (sắp viết) |
+| **Python** | | | | |
+| Mutability | mutable, immutable; identity, aliasing | object sửa được tại chỗ hay không; nhiều tên cùng trỏ một object | "Tính khả biến", "Tính bất biến" | `py-object-model` |
+| Data Model / Dunder Method | data model, special method, dunder method (`__eq__`, `__hash__`…) | method hai gạch dưới mà interpreter gọi ngầm cho `len()`, `==`, `for`… | "Phương thức đặc biệt", "Phương thức ma thuật" | `py-data-model` |
+| Closure / Late Binding | closure, free variable, late binding; LEGB | hàm con nhớ biến của hàm ngoài; biến được đọc lúc gọi, không lúc tạo | "Bao đóng", "Ràng buộc muộn" | `py-scope-closures` |
+| Iterator / Generator | iterator, iterable, generator, `yield`, generator expression | đối tượng trả từng phần tử khi được hỏi; hàm có `yield` tạm dừng và chạy tiếp | "Bộ lặp", "Hàm sinh", "Trình sinh" | `py-iterators-generators` |
+| Decorator | decorator (Python, PEP 318) | hàm nhận một hàm và trả hàm thay thế, viết bằng `@` | "Hàm trang trí", "Bộ trang trí" | `py-decorators` |
+| Context Manager | context manager, `with`; `__enter__`/`__exit__` | object lo việc mở/đóng resource quanh một khối code | "Trình quản lý ngữ cảnh", "Quản lý ngữ cảnh" | `py-context-managers` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật

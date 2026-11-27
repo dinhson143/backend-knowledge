@@ -64,6 +64,10 @@ window.ROADMAP = [
       { id: "code.clean", title: "Clean Code", topics: ["code-clean-naming", "code-error-handling"] },
       { id: "code.testing", title: "Kiểm thử & debug", topics: ["code-testing-fundamentals", "code-debugging"] },
     ] },
+  { id: "py", title: "Python", goal: "Học xong bạn giải thích được Python chạy code thế nào, viết Python đúng idiom và trả lời được câu hỏi về GIL, asyncio, framework backend.", parallel: true,
+    parts: [
+      { id: "py.core", title: "Ngôn ngữ cốt lõi", topics: ["py-object-model", "py-builtin-types-complexity", "py-data-model", "py-scope-closures", "py-iterators-generators", "py-decorators", "py-context-managers", "py-pitfalls"] },
+    ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [
       { id: "beh.stories", title: "Câu chuyện của bạn", topics: ["beh-star-stories", "beh-common-questions", "beh-project-deep-dive"] },
