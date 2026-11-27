@@ -71,6 +71,7 @@
     "content/topics/dsa/ds.js",
     "content/topics/dsa/algo.js",
     "content/topics/dsa/dsa-trees.js",
+    "content/topics/dsa/dsa-two-pointers.js",
     "content/topics/cs/os-process-lifecycle.js",
     "content/topics/cs/thr-thread-vs-process.js",
     "content/topics/cs/os-context-switch.js",
