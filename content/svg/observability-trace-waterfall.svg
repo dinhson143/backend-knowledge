@@ -57,7 +57,7 @@
 
   <!-- traceparent -->
   <text class="h" x="20" y="304">traceparent trên từng chặng</text>
-  <text class="code" x="226" y="304"><tspan style="fill:#64748b">version</tspan>-<tspan style="fill:#1d4ed8">trace-id</tspan>-<tspan style="fill:#b45309">parent-id</tspan>-<tspan style="fill:#0f7a5f">flags</tspan></text>
+  <text class="code" x="226" y="304"><tspan style="fill:#64748b">version</tspan>-<tspan style="fill:#1d4ed8">traceid</tspan>-<tspan style="fill:#b45309">parentid</tspan>-<tspan style="fill:#0f7a5f">flags</tspan></text>
 
   <text class="s" x="20" y="332">gateway → order</text>
   <text class="code" x="150" y="332"><tspan style="fill:#64748b">00</tspan>-<tspan style="fill:#1d4ed8">0af7651916cd43dd8448eb211c80319c</tspan>-<tspan style="fill:#b45309">b7ad6b7169203331</tspan>-<tspan style="fill:#0f7a5f">01</tspan></text>

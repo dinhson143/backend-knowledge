@@ -17,7 +17,7 @@ BK.topic({
   diagrams: [
     {
       src: "content/svg/net-url-to-page-rtt.svg",
-      caption: "Kết nối HTTPS mới cần 3 RTT tới byte HTML đầu tiên với TCP + TLS 1.3, 4 RTT với TLS 1.2, 2 RTT với QUIC (gộp bắt tay transport và TLS 1.3), 1 RTT với QUIC 0-RTT khi đã từng kết nối. Sau đó trình duyệt dựng DOM và CSSOM, render tree, layout, paint, composite.",
+      caption: "Chưa tính DNS, kết nối HTTPS mới cần 3 RTT tới byte HTML đầu tiên với TCP + TLS 1.3, 4 RTT với TLS 1.2, 2 RTT với QUIC (gộp bắt tay transport và TLS 1.3), 1 RTT với QUIC 0-RTT khi đã từng kết nối. Sau đó trình duyệt dựng DOM và CSSOM, render tree, layout, paint, composite.",
       source: "https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work",
     },
   ],

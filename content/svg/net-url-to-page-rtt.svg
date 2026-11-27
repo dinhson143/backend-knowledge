@@ -7,6 +7,7 @@
       .tcp { fill: #eef2f7; stroke: #94a3b8; stroke-width: 1.2; }
       .tls { fill: #dbe7fd; stroke: #3b7ff5; stroke-width: 1.2; }
       .http { fill: #fff3db; stroke: #e08a00; stroke-width: 1.2; }
+      .dns { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 4 3; }
       .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
       .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
       .e { font-size: 12.5px; fill: #1f2937; }
@@ -20,7 +21,7 @@
   <rect x="1" y="1" width="758" height="438" rx="14" fill="#ffffff" stroke="#d6dde6"/>
 
   <text class="h" x="20" y="30">Kết nối HTTPS mới: bao nhiêu vòng mạng (RTT) trước byte HTML đầu tiên</text>
-  <text class="s" x="20" y="48">Chưa tính DNS (0 RTT nếu đã cache) và thời gian server xử lý. 1 RTT = một lượt đi và về tới server.</text>
+  <text class="s" x="20" y="48">Ô DNS nét đứt: 0 RTT nếu đã cache, nhiều RTT nếu phải hỏi đủ chuỗi. Ô cam: gửi GET, server xử lý, byte đầu về.</text>
 
   <!-- trục: 0..4 RTT → x 230..670 -->
   <path d="M230,72 L670,72" stroke="#94a3b8" stroke-width="1"/>
@@ -32,6 +33,7 @@
   <!-- TCP + TLS 1.3 -->
   <text class="e" x="20" y="96">TCP + TLS 1.3</text>
   <text class="s" x="20" y="111">HTTP/1.1, HTTP/2</text>
+  <rect class="dns" x="180" y="86" width="46" height="28" rx="4"/><text class="sc" x="203" y="104">DNS</text>
   <rect class="tcp" x="230" y="86" width="110" height="28" rx="4"/><text class="c" x="285" y="104">TCP</text>
   <rect class="tls" x="340" y="86" width="110" height="28" rx="4"/><text class="c" x="395" y="104">TLS 1.3</text>
   <rect class="http" x="450" y="86" width="110" height="28" rx="4"/><text class="c" x="505" y="104">GET → byte đầu</text>
@@ -40,6 +42,7 @@
   <!-- TCP + TLS 1.2 -->
   <text class="e" x="20" y="140">TCP + TLS 1.2</text>
   <text class="s" x="20" y="155">bắt tay TLS 2 RTT</text>
+  <rect class="dns" x="180" y="130" width="46" height="28" rx="4"/><text class="sc" x="203" y="148">DNS</text>
   <rect class="tcp" x="230" y="130" width="110" height="28" rx="4"/><text class="c" x="285" y="148">TCP</text>
   <rect class="tls" x="340" y="130" width="220" height="28" rx="4"/><text class="c" x="450" y="148">TLS 1.2</text>
   <rect class="http" x="560" y="130" width="110" height="28" rx="4"/><text class="c" x="615" y="148">GET → byte đầu</text>
@@ -48,6 +51,7 @@
   <!-- QUIC -->
   <text class="e" x="20" y="184">QUIC (HTTP/3)</text>
   <text class="s" x="20" y="199">transport + TLS 1.3 gộp</text>
+  <rect class="dns" x="180" y="174" width="46" height="28" rx="4"/><text class="sc" x="203" y="192">DNS</text>
   <rect class="tls" x="230" y="174" width="110" height="28" rx="4"/><text class="c" x="285" y="192">QUIC + TLS</text>
   <rect class="http" x="340" y="174" width="110" height="28" rx="4"/><text class="c" x="395" y="192">GET → byte đầu</text>
   <text class="t" x="462" y="193">2 RTT</text>
@@ -55,6 +59,7 @@
   <!-- QUIC 0-RTT -->
   <text class="e" x="20" y="228">QUIC 0-RTT</text>
   <text class="s" x="20" y="243">đã từng kết nối tới server</text>
+  <rect class="dns" x="180" y="218" width="46" height="28" rx="4"/><text class="sc" x="203" y="236">DNS</text>
   <rect class="http" x="230" y="218" width="110" height="28" rx="4"/><text class="c" x="285" y="236">GET gửi ngay</text>
   <text class="t" x="352" y="237">1 RTT</text>
   <text class="lr" x="400" y="237">dữ liệu 0-RTT có thể bị replay</text>
