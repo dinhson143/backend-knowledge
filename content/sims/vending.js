@@ -1,0 +1,25 @@
+BK.sim({
+  id: "vending",
+  custom: "vending",
+  title: "State pattern: máy bán hàng",
+  topics: ["patterns-gof"],
+  scenario: "Bấm các nút để chuyển trạng thái. Máy từ chối hành động không hợp lệ ở trạng thái hiện tại.",
+  initial: "Idle",
+  stock: 2,
+  states: { Idle: [150, 80], HasCoin: [520, 80], Dispensing: [520, 235], SoldOut: [150, 235] },
+  actions: [
+    ["insertCoin", "Bỏ xu"],
+    ["select", "Chọn món"],
+    ["refund", "Hoàn xu"],
+    ["take", "Lấy hàng"],
+    ["restock", "Nạp hàng"],
+  ],
+  transitions: [
+    { from: "Idle", to: "HasCoin", on: "insertCoin", label: "insertCoin", bend: -22 },
+    { from: "HasCoin", to: "Idle", on: "refund", label: "refund", bend: -22 },
+    { from: "HasCoin", to: "Dispensing", on: "select", label: "select", bend: 0, stock: -1 },
+    { from: "Dispensing", to: "Idle", on: "take", label: "take (còn hàng)", bend: 0, when: "stock" },
+    { from: "Dispensing", to: "SoldOut", on: "take", label: "take (hết hàng)", bend: 0, when: "empty" },
+    { from: "SoldOut", to: "Idle", on: "restock", label: "restock", bend: 0, restock: 3 },
+  ],
+});

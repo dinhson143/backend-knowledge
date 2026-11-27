@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Kafka: producer ghi vào topic 3 partition, hai consumer group đọc độc lập</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#14a37f"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .cell { fill: #eef2f7; stroke: #94a3b8; }
+      .new { fill: #fff3db; stroke: #e08a00; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .o { font-size: 11px; fill: #334155; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="388" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Producer -->
+  <rect class="box" x="20" y="150" width="124" height="52" rx="10"/>
+  <text class="h" x="82" y="172" text-anchor="middle">Producer</text>
+  <text class="s" x="82" y="190" text-anchor="middle">key = user_id</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M144,170 C180,150 200,100 232,95"/>
+    <path d="M144,176 L194,176"/>
+    <path d="M144,182 C170,200 176,250 194,255"/>
+  </g>
+  <text class="s" x="82" y="222" text-anchor="middle">partition =</text>
+  <text class="s" x="82" y="238" text-anchor="middle">hash(key) mod 3</text>
+
+  <!-- Topic -->
+  <rect class="grp" x="186" y="36" width="300" height="276" rx="12"/>
+  <text class="h" x="200" y="58">Topic orders · 3 partition</text>
+  <g>
+    <text class="h" x="200" y="100">P0</text>
+    <rect class="cell" x="236" y="80" width="30" height="30"/><rect class="cell" x="266" y="80" width="30" height="30"/><rect class="cell" x="296" y="80" width="30" height="30"/><rect class="cell" x="326" y="80" width="30" height="30"/><rect class="cell" x="356" y="80" width="30" height="30"/><rect class="new" x="386" y="80" width="30" height="30"/>
+    <text class="o" x="251" y="99">0</text><text class="o" x="281" y="99">1</text><text class="o" x="311" y="99">2</text><text class="o" x="341" y="99">3</text><text class="o" x="371" y="99">4</text><text class="o" x="401" y="99">5</text>
+    <text class="s" x="236" y="126">leader ở broker 1 · offset tăng dần</text>
+  </g>
+  <g>
+    <text class="h" x="200" y="180">P1</text>
+    <rect class="cell" x="236" y="160" width="30" height="30"/><rect class="cell" x="266" y="160" width="30" height="30"/><rect class="cell" x="296" y="160" width="30" height="30"/><rect class="new" x="326" y="160" width="30" height="30"/>
+    <text class="o" x="251" y="179">0</text><text class="o" x="281" y="179">1</text><text class="o" x="311" y="179">2</text><text class="o" x="341" y="179">3</text>
+    <text class="s" x="236" y="206">leader ở broker 2</text>
+  </g>
+  <g>
+    <text class="h" x="200" y="260">P2</text>
+    <rect class="cell" x="236" y="240" width="30" height="30"/><rect class="cell" x="266" y="240" width="30" height="30"/><rect class="cell" x="296" y="240" width="30" height="30"/><rect class="cell" x="326" y="240" width="30" height="30"/><rect class="new" x="356" y="240" width="30" height="30"/>
+    <text class="o" x="251" y="259">0</text><text class="o" x="281" y="259">1</text><text class="o" x="311" y="259">2</text><text class="o" x="341" y="259">3</text><text class="o" x="371" y="259">4</text>
+    <text class="s" x="236" y="286">leader ở broker 3</text>
+  </g>
+  <text class="s" x="200" y="304">ô cam = message mới nhất (append vào cuối log)</text>
+
+  <!-- Group billing -->
+  <rect class="grp" x="526" y="36" width="216" height="140" rx="12"/>
+  <text class="h" x="540" y="58">Group billing</text>
+  <rect class="box" x="546" y="72" width="178" height="36" rx="8"/>
+  <text class="t" x="560" y="95">C1 ← P0, P1</text>
+  <rect class="box" x="546" y="120" width="178" height="36" rx="8"/>
+  <text class="t" x="560" y="143">C2 ← P2</text>
+
+  <!-- Group analytics -->
+  <rect class="grp" x="526" y="196" width="216" height="116" rx="12"/>
+  <text class="h" x="540" y="218">Group analytics</text>
+  <rect class="box" x="546" y="232" width="178" height="36" rx="8"/>
+  <text class="t" x="560" y="255">C3 ← P0, P1, P2</text>
+  <text class="s" x="546" y="292">đọc lại cùng dữ liệu, offset riêng</text>
+
+  <g stroke="#3b7ff5" stroke-width="1.4" fill="none" marker-end="url(#b)">
+    <path d="M420,95 C480,95 500,88 544,88"/>
+    <path d="M360,175 C460,175 490,96 544,92"/>
+    <path d="M390,255 C470,255 490,140 544,138"/>
+  </g>
+  <g stroke="#14a37f" stroke-width="1.4" fill="none" stroke-dasharray="5 4" marker-end="url(#g)">
+    <path d="M420,100 C480,110 500,240 544,246"/>
+    <path d="M360,180 C450,190 490,248 544,250"/>
+    <path d="M390,260 C470,262 500,256 544,254"/>
+  </g>
+
+  <text class="t" x="20" y="340">Cùng key → cùng partition → thứ tự được giữ theo key (không có thứ tự chung giữa các partition).</text>
+  <text class="t" x="20" y="362">Trong một group, mỗi partition chỉ giao cho một consumer; các group đọc độc lập, mỗi group giữ offset riêng.</text>
+</svg>

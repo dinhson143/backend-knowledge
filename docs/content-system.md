@@ -4,6 +4,8 @@ Tài liệu này rút từ kinh nghiệm xây một site học khác có quy mô
 
 Đọc file này trước khi thêm hoặc dời nội dung. `CLAUDE.md` mô tả code đang chạy thế nào; file này nói nội dung nên được tổ chức ra sao và lộ trình chuyển sang cách đó.
 
+> **Trạng thái (2026-11-27):** lộ trình §5 đã làm xong, bố cục §3 là bố cục đang chạy. Những chỗ code khác với tài liệu này được ghi trong `docs/decisions.md` (D4–D11).
+
 ## 1. Vấn đề hiện tại
 
 | Triệu chứng | Nguyên nhân |
@@ -32,6 +34,7 @@ content/
   manifest.js         danh sách file nội dung theo thứ tự nạp (nguồn duy nhất)
   roadmap.js          ROADMAP: giai đoạn → danh sách topic id
   glossary.js
+  tracks.js           BK.track / BK.section
   _TEMPLATE.js        mẫu một chủ đề, copy để bắt đầu
   topics/
     sd/               mỗi track một thư mục (id track)
@@ -42,7 +45,9 @@ content/
   problems/
     bitly.js          mỗi bài một file: đề, HLD sim, vì sao
   sims/
-    cache-aside.js    sim dùng chung giữa nhiều chủ đề
+    cache-aside.js    mọi sim nằm ở đây, kể cả sim chỉ một chủ đề dùng (D8)
+  svg/
+    kafka-topic-partitions.svg   sơ đồ tĩnh, tham chiếu bằng diagrams: [{ src, caption }]
 engine/
   diagrams.js         engine mô phỏng (mountSim), không chứa kịch bản
 scripts/
@@ -76,7 +81,7 @@ BK.topic({
 });
 ```
 
-`BK` là một registry nhỏ đặt ở đầu `app.js` hoặc trong `content/manifest.js`, gồm `BK.topic`, `BK.problem`, `BK.sim`, `BK.track`, `BK.section`. Mỗi hàm chỉ push vào một mảng và báo lỗi khi trùng id. Thứ tự hiển thị lấy từ `roadmap.js` và trường `section`, không phụ thuộc thứ tự nạp file.
+`BK` là một registry nhỏ đặt trong `content/manifest.js` (D4), gồm `BK.topic`, `BK.problem`, `BK.sim`, `BK.track`, `BK.section`. Mỗi hàm chỉ push vào một mảng và báo lỗi khi trùng id. Thứ tự hiển thị lấy từ `roadmap.js` và trường `section`, không phụ thuộc thứ tự nạp file. Ngoại lệ: thứ tự sim và problem trong manifest là thứ tự hiển thị (D6).
 
 ### Manifest và loader (không build)
 
@@ -97,7 +102,7 @@ for (const f of FILES) {
 }
 ```
 
-`app.js` được nạp cuối cùng qua cùng loader, hoặc chờ sự kiện `load`. `scripts/check.mjs` báo lỗi khi có file trong `content/` mà không có trong manifest, và ngược lại.
+`app.js` và `engine/diagrams.js` được nạp cuối cùng qua cùng loader; `index.html` chỉ có một thẻ `<script src="content/manifest.js">`. `scripts/check.mjs` báo lỗi khi có file trong `content/` mà không có trong manifest, và ngược lại.
 
 ## 4. Kiểm tra: làm việc này đầu tiên
 
@@ -108,13 +113,15 @@ Trước khi dời bất kỳ nội dung nào, viết `scripts/check.mjs`. Scrip
 | Id duy nhất cho topic, problem, sim, section | Hai file trùng id, cái sau đè cái trước |
 | Mọi tham chiếu đều tồn tại (`ROADMAP.topics`, `related`, `sims`, `topics`) | Link chết, chủ đề rơi vào giai đoạn "Khác" |
 | Mọi chủ đề có trong `ROADMAP` | Chủ đề mồ côi |
-| (Bố cục cũ) chỉ số của `WHY`/`PWHY`/`SIM_DETAIL` nằm trong phạm vi, **và `key` là tiền tố của chuỗi gốc ở đúng chỉ số đó** | Giải thích bị lệch sau khi chèn hoặc xoá một ý. Trường `key` đã có sẵn, chỉ cần so sánh. |
+| *(Đã bỏ ở bước 5 cùng bố cục cũ)* chỉ số của `WHY`/`PWHY`/`SIM_DETAIL` nằm trong phạm vi, **và `key` là tiền tố của chuỗi gốc ở đúng chỉ số đó** | Giải thích bị lệch sau khi chèn hoặc xoá một ý. Trường `key` đã có sẵn, chỉ cần so sánh. |
 | Markup inline chỉ có `**…**` và `` `…` ``, không có backtick hay `**` lẻ | Hiển thị vỡ |
 | Tiền tố của `points` chỉ là `"+ "`, `"! "` hoặc không có | Badge sai |
 | Không có chữ tiếng Việt viết không dấu trong văn bản hiển thị (danh sách từ hay gặp: `khong`, `duoc`, `nguoi`…) | Mất dấu do copy hoặc agent |
 | Sim: mọi `msgs[from,to]` đều là node id có thật, `kind` thuộc `req, ok, err, warn` | Mũi tên chỉ vào node không tồn tại |
 | Kích thước mỗi file nội dung không quá ~40 KB | Dấu hiệu nên tách chủ đề |
 | Manifest khớp với các file trong `content/` | Quên đăng ký file mới |
+| File nằm đúng `content/topics/<track>/<id>.js` (problem, sim tương tự); `section` thuộc đúng `track` | File đặt nhầm chỗ, id khác tên file |
+| `diagrams[].src` trỏ tới file có thật trong `content/svg/` (so cả hoa/thường); mọi SVG đều được tham chiếu; SVG có `xmlns`, `viewBox`, nền trắng | Ảnh vỡ trên GitHub Pages, SVG mồ côi, sơ đồ chìm trong theme tối |
 
 Chạy `node scripts/check.mjs` sau **mọi** lần sửa nội dung, trước khi commit. Nên đặt nó thành pre-commit hook hoặc bước GitHub Actions trước khi deploy Pages. Script thoát với mã 1 khi có lỗi và in `file:đường-dẫn → lỗi`.
 
@@ -134,11 +141,12 @@ Kinh nghiệm: mỗi lần review phát hiện một loại lỗi mới, thêm m
 ## 6. Quy trình viết nội dung
 
 - **Bắt đầu từ mẫu**: copy `content/_TEMPLATE.js`. Mẫu ghi chú từng trường: trường nào bắt buộc, trường nào tuỳ chọn, giới hạn độ dài.
-- **Chi tiết đúng nằm ở nguồn chính thức** (tài liệu của Kafka, Redis, AWS…). Khi nêu một con số hay một hành vi, ghi URL nguồn vào trường `src`. Không ghi giá tiền vì giá thay đổi.
+- **Chi tiết đúng nằm ở nguồn chính thức** (tài liệu của Kafka, Redis, AWS…). Khi nêu một con số hay một hành vi, ghi URL nguồn ngay trong câu (trong `t`, `why`, `detail`…), vì app chưa có trường `src` riêng để hiển thị (D31). Sơ đồ SVG thì dùng `source` của `diagrams`. Không ghi giá tiền vì giá thay đổi.
 - **Một khái niệm, một thuật ngữ.** Chọn một cách gọi và dùng xuyên suốt. Thêm từ viết tắt vào `glossary.js`, không giải thích lại trong từng chủ đề.
 - **"Vì sao" nói về cơ chế, không lặp lại ý.** Câu mẫu: "X xảy ra vì Y; nếu không có Y thì Z". Mỗi câu "vì sao" nên trả lời được câu hỏi "nếu bỏ đi thì hỏng gì?".
 - **Link, đừng viết lại.** Hai chủ đề cùng cần một ý thì một chủ đề giữ nội dung, chủ đề kia link sang bằng `related`.
 - **Thư mục mới = track mới.** Thêm `BK.track({ id, title })`, tạo `content/topics/<id>/`, thêm các giai đoạn vào `roadmap.js`, rồi chạy kiểm tra.
+- **Sơ đồ tĩnh = một file SVG.** Khi một hình vẽ cố định giải thích tốt hơn chữ (không cần tương tác như sim), vẽ `content/svg/<tên>.svg` và thêm `diagrams: [{ src, caption, source? }]` vào topic hoặc problem. App hiển thị bằng `<img>` vì `fetch` bị chặn trên `file://`. Ảnh trong `<img>` không nhận theme của trang, nên mỗi SVG tự vẽ nền trắng bo góc và dùng chữ màu tối (D11). Cách vẽ chi tiết ở cuối `content/_TEMPLATE.js`. `check.mjs` báo lỗi khi file không tồn tại, hoặc khi có SVG không ai tham chiếu.
 
 ## 7. Quy trình làm việc của dự án
 
