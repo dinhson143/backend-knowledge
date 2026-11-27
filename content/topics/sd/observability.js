@@ -6,7 +6,7 @@ BK.topic({
   goal: "Đặt SLO, đo p99 và lần theo một request qua nhiều service",
   needs: ["numbers", "system-architecture"],
   tldr: {
-    t: "**Metric** trả lời \"có vấn đề không\", **trace** trả lời \"chậm ở đâu\", **log** trả lời \"chuyện gì đã xảy ra\". **SLI** là con số đo được, **SLO** là mục tiêu cho SLI, **SLA** là cam kết có hậu quả. **Error budget** (1 − SLO) quyết định khi nào được ra tính năng nhanh, khi nào phải dừng lại sửa độ ổn định.",
+    t: "**Observability** (nhìn được bên trong hệ thống đang chạy): **metric** trả lời \"có vấn đề không\", **trace** trả lời \"chậm ở đâu\", **log** trả lời \"chuyện gì đã xảy ra\". **SLI** là con số đo được, **SLO** là mục tiêu cho SLI, **SLA** là cam kết có hậu quả. **Error budget** (1 − SLO) quyết định khi nào được ra tính năng nhanh, khi nào phải dừng lại sửa độ ổn định.",
     why: "Ba tín hiệu có chi phí và độ chi tiết khác nhau: metric rẻ và gộp được nên dùng để phát hiện và cảnh báo; trace đắt hơn nhưng nối các service lại theo một request; log chi tiết nhất và đắt nhất khi lưu lâu. Dùng sai loại (đếm lỗi bằng cách grep log, báo động theo từng dòng log) thì hoặc tốn kém, hoặc chậm phát hiện.",
   },
   story: {

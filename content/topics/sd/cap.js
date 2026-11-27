@@ -6,7 +6,7 @@ BK.topic({
   goal: "Chọn consistency hay availability cho từng phần dữ liệu khi có network partition",
   needs: ["sharding"],
   tldr: {
-    t: "Khi có network partition (luôn phải chấp nhận P), chọn Consistency hoặc Availability. Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",
+    t: "Khi có **network partition** (mạng giữa các node bị đứt; luôn phải chấp nhận P), chọn **Consistency** (mọi node trả cùng dữ liệu mới nhất) hoặc **Availability** (node nào còn sống cũng trả lời). Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",
     why: "P không phải lựa chọn: trong hệ nhiều máy, mạng đứt chắc chắn xảy ra, nên câu hỏi thật chỉ còn C hay A lúc đứt mạng. **Availability** là mặc định vì đa số dữ liệu (feed, like, profile) cũ vài giây không hại ai; còn đặt vé hay tồn kho mà đọc dữ liệu cũ là bán trùng, thiệt hại tiền thật → phải chấp nhận từ chối request.",
   },
   story: {

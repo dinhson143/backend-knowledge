@@ -6,7 +6,7 @@ BK.topic({
   goal: "Khoá tài nguyên xuyên nhiều máy an toàn với TTL và fencing token",
   needs: ["redis", "cap"],
   tldr: {
-    t: "Khoá tài nguyên xuyên nhiều server, thường bằng Redis (`SET key NX PX ttl`) hoặc DB (`SELECT ... FOR UPDATE`). Mọi lock có TTL (kể cả Redlock) không an toàn khi process pause → resource phải kiểm tra fencing token.",
+    t: "Nhiều server cùng tranh một tài nguyên (**contention**) thì cần khoá xuyên nhiều server, thường bằng Redis (`SET key NX PX ttl`) hoặc DB (`SELECT ... FOR UPDATE`). Mọi lock có TTL (kể cả Redlock) không an toàn khi process pause → resource phải kiểm tra fencing token.",
     why: "Chỉ một client thắng, vì `SET key NX PX ttl` chỉ thành công khi key chưa tồn tại và Redis chạy lệnh tuần tự; `FOR UPDATE` thì dựa vào row lock của DB. Mọi lock dựa trên TTL (Redlock hay một node) đều giả định holder xong việc trước khi hết hạn — GC pause hay network delay phá giả định đó, nên resource phải tự kiểm tra bằng **fencing token**.",
   },
   story: {

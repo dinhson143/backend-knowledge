@@ -6,7 +6,7 @@ BK.topic({
   goal: "Đặt timeout, retry có jitter, circuit breaker để lỗi không lan dây chuyền",
   needs: ["api-design", "queue"],
   tldr: {
-    t: "Mọi lời gọi qua mạng cần **timeout**. Chỉ **retry** lỗi tạm thời của thao tác idempotent, có **exponential backoff + jitter**, giới hạn số lần và chỉ retry ở **một tầng**. Phụ thuộc đang chết thì **circuit breaker** ngắt nhanh. Quá tải thì **load shedding**: từ chối sớm thay vì xếp hàng tới chết.",
+    t: "**Resilience** (lỗi của một phụ thuộc không kéo cả hệ thống sập theo): mọi lời gọi qua mạng cần **timeout**. Chỉ **retry** lỗi tạm thời của thao tác idempotent, có **exponential backoff + jitter**, giới hạn số lần và chỉ retry ở **một tầng**. Phụ thuộc đang chết thì **circuit breaker** ngắt nhanh. Quá tải thì **load shedding**: từ chối sớm thay vì xếp hàng tới chết.",
     why: "Sự cố lan dây chuyền (cascading failure) là lỗi lớn dần nhờ vòng phản hồi dương: phụ thuộc chậm → thread chờ → pool cạn → service gọi nó cũng chậm → client retry → tải tăng thêm (https://sre.google/sre-book/addressing-cascading-failures/). Mỗi cơ chế ở đây cắt một mắt xích của vòng đó: timeout trả lại thread, giới hạn retry chặn nhân tải, breaker cho phụ thuộc thời gian hồi phục, shedding giữ phần việc đã nhận vẫn xong kịp.",
   },
   story: {
