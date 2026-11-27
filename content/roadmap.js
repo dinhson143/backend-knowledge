@@ -53,7 +53,7 @@ window.ROADMAP = [
     ] },
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [
-      { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication"] },
+      { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication", "code-language-choice"] },
     ] },
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn chọn được nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
