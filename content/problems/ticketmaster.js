@@ -30,7 +30,7 @@ BK.problem({
     "GET /events/{id}",
     "GET /events/search?q&city&date",
     "POST /bookings/reserve { ticketIds }",
-    "PUT /bookings/confirm { bookingId, paymentDetails }",
+    "PUT /bookings/confirm { bookingId, paymentMethodId }",
   ],
   hldWhy: "**Waiting Room** đứng trước gateway để admit theo đợt, giữ lượng request tới backend trong ngưỡng chịu được — vì lúc mở bán có thể 10M user ập vào. Tách **Search Service** + **Elasticsearch** khỏi **Event Service**: search full-text cần inverted index mà Postgres làm kém, và tải đọc gấp ~100 lần ghi không được ảnh hưởng tới luồng đặt vé. **Booking Service** đi với **Postgres** vì đặt vé cần transaction và strong consistency (không bán trùng ghế). **Redis lock** giữ ghế tạm có TTL: lock tự hết hạn khi user bỏ ngang, không phải giữ transaction DB dài; **Stripe** xử lý thẻ để hệ thống không phải gánh PCI DSS.",
   hld: {
@@ -125,7 +125,7 @@ BK.problem({
               ["booking", "stripe", "PaymentIntent $250"],
               ["stripe", "booking", "webhook: succeeded", "ok"],
             ],
-            detail: "Booking tạo **PaymentIntent** $250 trên Stripe (kèm idempotency key để retry không trừ tiền hai lần) khi user xác nhận. Kết quả cuối lấy từ **webhook** Stripe gọi về server, không từ redirect của client — client có thể mất mạng hay đóng tab ngay sau khi trả tiền, còn webhook thì Stripe retry tới khi nhận được. Rủi ro cần nghĩ tới: thanh toán chậm quá 10 phút, lock đã hết và người khác đã giữ A1 — bước tiếp theo sẽ phát hiện và phải refund.",
+            detail: "Booking tạo **PaymentIntent** $250 trên Stripe (kèm idempotency key để retry không trừ tiền hai lần) khi user xác nhận. Kết quả cuối lấy từ **webhook** Stripe gọi về server, không từ redirect của client — client có thể mất mạng hay đóng tab ngay sau khi trả tiền, còn webhook thì Stripe retry với exponential backoff tới 3 ngày (https://docs.stripe.com/webhooks). Rủi ro cần nghĩ tới: thanh toán chậm quá 10 phút, lock đã hết và người khác đã giữ A1 — bước tiếp theo sẽ phát hiện và phải refund.",
           },
           {
             note: "Ghi DB bằng **conditional update** trong transaction, rồi xoá lock.",

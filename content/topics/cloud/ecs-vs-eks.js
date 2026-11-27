@@ -20,8 +20,8 @@ BK.topic({
         why: "EKS dùng được mọi công cụ viết cho Kubernetes, vì nó chạy Kubernetes upstream được CNCF chứng nhận; ECS là API độc quyền của AWS nên chỉ dùng được công cụ hỗ trợ API của AWS.",
       },
       {
-        cells: ["Phí control plane", "0", "~$0.10/giờ mỗi cluster (~$73/tháng)"],
-        why: "EKS tính $0.10 × 730 giờ ≈ $73/tháng/cluster, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên.",
+        cells: ["Phí control plane", "Không tính", "Tính theo giờ cho mỗi cluster, cao hơn khi version Kubernetes đã sang extended support"],
+        why: "EKS tính phí control plane cho từng cluster chạy cả tháng dù không có workload, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên. Giá hiện hành: https://aws.amazon.com/eks/pricing/ và https://aws.amazon.com/ecs/pricing/",
       },
       {
         cells: ["Độ khó học", "Thấp: task, service, cluster", "Cao: pod, service, ingress, RBAC, Helm, CRD…"],
@@ -34,10 +34,10 @@ BK.topic({
       {
         cells: [
           "Compute",
-          "Fargate, EC2, ECS Anywhere",
+          "Fargate, EC2, ECS Managed Instances, ECS Anywhere",
           "Managed/self-managed node, Fargate, Auto Mode, hybrid nodes",
         ],
-        why: "EKS có nhiều cách cung cấp node hơn, kể cả hybrid nodes cho máy on-prem gia nhập cluster, vì nó kế thừa mô hình node của Kubernetes. ECS Anywhere cũng chạy được task trên máy ngoài AWS, nhưng control plane vẫn ở AWS.",
+        why: "EKS có nhiều cách cung cấp node hơn, kể cả hybrid nodes cho máy on-prem gia nhập cluster, vì nó kế thừa mô hình node của Kubernetes. ECS Anywhere cũng chạy được task trên máy ngoài AWS, nhưng control plane vẫn ở AWS. ECS Managed Instances là bản tương ứng của EKS Auto Mode: dùng được mọi loại EC2 (GPU, Arm) mà AWS lo cấp máy và vá OS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ManagedInstances.html).",
       },
       {
         cells: ["Tính di động", "Gắn với AWS", "Manifest chạy được trên GKE, AKS, on-prem"],

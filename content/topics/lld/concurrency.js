@@ -22,7 +22,7 @@ BK.topic({
       {
         cells: [
           "Semaphore",
-          "Giới hạn N thread cùng truy cập (connection pool, rate limit)",
+          "Giới hạn N thread cùng truy cập (connection pool, giới hạn số việc chạy đồng thời)",
           "`threading.Semaphore(n)`",
         ],
         why: "Semaphore khác lock ở chỗ cho **N thread** cùng vào, không chỉ một. Ví dụ DB chỉ chịu được 10 connection → semaphore khởi tạo 10 permit; thread thứ 11 bị block tới khi có thread `release()`.",
@@ -40,7 +40,7 @@ BK.topic({
     },
     {
       t: "+ **Coordination** — cho các thread chờ và báo nhau: producer–consumer, blocking queue, condition variable, thread pool.",
-      why: "Producer và consumer chạy khác tốc độ → cần cơ chế cho bên nhanh chờ bên chậm, thay vì mất dữ liệu hay quay vòng vô ích. Blocking queue gói sẵn lock + condition: `put()` tự chờ khi đầy, `take()` tự chờ khi rỗng.",
+      why: "Producer và consumer chạy khác tốc độ → cần cơ chế cho bên nhanh chờ bên chậm, thay vì mất dữ liệu hay quay vòng vô ích. Blocking queue gói sẵn lock + condition: `put()` tự chờ khi đầy, `get()` tự chờ khi rỗng (`queue.Queue` của Python — https://docs.python.org/3/library/queue.html; Java `BlockingQueue` gọi là `put()`/`take()`).",
     },
     {
       t: "+ **Scarcity** — chia tài nguyên có hạn: semaphore, connection pool, rate limiting, backpressure.",

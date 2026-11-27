@@ -80,7 +80,7 @@ BK.sim({
           set: { t1: "v1 · CPU 55%", t2: "v1 · CPU 54%", t3: "v1 · CPU 52%", alb: "targets: 3" },
           good: ["t1", "t2", "t3"],
           lesson: "Fargate: chỉ cần scale số task. Trên EC2 còn phải scale máy qua capacity provider.",
-          detail: "CPU mỗi task về khoảng 52–55%, dưới target 70%: Task #3 vào target group, pass health check, và ALB chia đều cùng tổng tải cho 3 target thay vì 2. Khi tải giảm, target tracking **scale-in chậm hơn** scale-out (cooldown dài hơn, cần nhiều datapoint thấp hơn) để tránh thêm-bớt liên tục. Trên ECS chạy EC2, task mới có thể nằm `PENDING` vì cluster hết chỗ — lúc đó cần **capacity provider** với managed scaling để thêm instance, đúng lớp thứ hai mà Fargate đã bỏ đi.",
+          detail: "CPU mỗi task về khoảng 52–55%, dưới target 70%: Task #3 vào target group, pass health check, và ALB chia đều cùng tổng tải cho 3 target thay vì 2. Khi tải giảm, target tracking **scale-in chậm hơn** scale-out (cooldown dài hơn, cần nhiều datapoint thấp hơn) để tránh thêm-bớt liên tục. Trên ECS chạy EC2, task mới nằm `PROVISIONING` chờ capacity provider thêm máy (không có capacity provider thì đặt task thất bại) vì cluster hết chỗ — lúc đó cần **capacity provider** với managed scaling để thêm instance, đúng lớp thứ hai mà Fargate đã bỏ đi.",
         },
       ],
     },

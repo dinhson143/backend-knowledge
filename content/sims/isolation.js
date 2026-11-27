@@ -29,7 +29,7 @@ BK.sim({
           note: "T2 lỗi và **ROLLBACK**.",
           msgs: [["T2", "db", "ROLLBACK", "err"]],
           set: { db: "balance=100" },
-          detail: "T2 gặp lỗi (vi phạm constraint, deadlock, hoặc app chủ động huỷ) và `ROLLBACK`; DB dùng undo log khôi phục row về `balance=100`. Từ góc nhìn DB, số 0 **chưa bao giờ tồn tại**.",
+          detail: "T2 gặp lỗi (vi phạm constraint, deadlock, hoặc app chủ động huỷ) và `ROLLBACK`; DB khôi phục row (InnoDB dùng undo log; PostgreSQL không có undo log, chỉ đánh dấu transaction là aborted nên phiên bản mới bị bỏ qua) về `balance=100`. Từ góc nhìn DB, số 0 **chưa bao giờ tồn tại**.",
         },
         {
           note: "T1 đã ra quyết định dựa trên số 0 **chưa từng tồn tại**.",
@@ -71,7 +71,7 @@ BK.sim({
           note: "T1 đọc số dư lần 1 và giữ **snapshot**.",
           msgs: [["T1", "db", "SELECT balance"], ["db", "T1", "100", "ok"]],
           set: { T1: "lần 1: 100" },
-          detail: "T1 `SELECT balance` lần đầu, nhận 100, và DB tạo **một snapshot cho cả transaction** (trong PostgreSQL và MySQL InnoDB, snapshot chốt ở câu lệnh đọc đầu tiên). Mọi lần đọc sau của T1 đều nhìn qua snapshot này.",
+          detail: "T1 `SELECT balance` lần đầu, nhận 100, và DB tạo **một snapshot cho cả transaction** (trong PostgreSQL và MySQL InnoDB, snapshot chốt ở câu lệnh đầu tiên sau BEGIN (PostgreSQL) hoặc câu đọc nhất quán đầu tiên (InnoDB)). Mọi lần đọc sau của T1 đều nhìn qua snapshot này.",
         },
         {
           note: "T2 trừ 50 và COMMIT.",

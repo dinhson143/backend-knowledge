@@ -33,7 +33,7 @@ BK.problem({
     title: "HLD — News Feed",
     h: 380,
     scenario: "Fan-out on write cho user thường (precompute feed trong Redis), fan-out on read cho celebrity.",
-    context: "**Post Service** lưu bài vào **Posts DB** (DynamoDB) và chỉ phát event, không tự fan-out. **Fan-out Worker** đọc event từ **Kafka**, hỏi **Follow DB** danh sách follower rồi đẩy post id vào **Feed Cache** (Redis list `feed:<userId>`) của từng người. Khi đọc, **Feed Service** chỉ lấy list id đã tính sẵn rồi batch-get nội dung. Theo dõi dòng chữ dưới Feed Cache (bao nhiêu feed đã có bài) và dưới Fan-out Worker (worker fan-out hay bỏ qua).",
+    context: "**Post Service** lưu bài vào **Posts DB** (DynamoDB) và chỉ phát event, không tự fan-out. **Fan-out Worker** đọc event từ **Kafka**, hỏi **Follow DB** danh sách follower rồi đẩy post id vào **Feed Cache** (Redis sorted set `feed:<userId>`, score = thời điểm đăng) của từng người. Khi đọc, **Feed Service** chỉ lấy list id đã tính sẵn rồi batch-get nội dung. Theo dõi dòng chữ dưới Feed Cache (bao nhiêu feed đã có bài) và dưới Fan-out Worker (worker fan-out hay bỏ qua).",
     nodes: [
       { id: "author", x: 80, y: 80, label: "Author" },
       { id: "reader", x: 80, y: 300, label: "Reader" },
@@ -85,15 +85,15 @@ BK.problem({
             msgs: [
               {
                 par: [
-                  ["worker", "cache", "LPUSH feed:u1", "ok"],
-                  ["worker", "cache", "LPUSH feed:u2", "ok"],
+                  ["worker", "cache", "ZADD feed:u1", "ok"],
+                  ["worker", "cache", "ZADD feed:u2", "ok"],
                   ["worker", "cache", "… ×500", "ok"],
                 ],
               },
             ],
             set: { cache: "500 feed có post#88" },
             lesson: "Fan-out on write: tốn công lúc ghi, đổi lại đọc feed cực nhanh.",
-            detail: "Worker ghi post id 88 vào feed của cả 500 follower: chạy song song `LPUSH feed:u1 88`, `LPUSH feed:u2 88`…, thường gom bằng Redis pipeline để giảm round-trip. Mỗi list chỉ chứa **post id**, không chứa nội dung → sửa nội dung bài không phải cập nhật 500 chỗ. Sau mỗi LPUSH nên kèm `LTRIM feed:uX 0 799` để feed chỉ giữ vài trăm id mới nhất, tránh Redis phình vô hạn. Cái giá: 1 bài = 500 lần ghi; đổi lại lúc đọc không phải tính gì — số lần đọc feed lớn hơn số lần đăng bài hàng trăm lần, nên dồn công sang lúc ghi là đáng.",
+            detail: "Worker ghi post id 88 vào feed của cả 500 follower: chạy song song `ZADD feed:u1 <ts> 88`, `ZADD feed:u2 <ts> 88`… (score = thời điểm đăng), thường gom bằng Redis pipeline để giảm round-trip. Mỗi sorted set chỉ chứa **post id**, không chứa nội dung → sửa nội dung bài không phải cập nhật 500 chỗ. Sau mỗi ZADD nên kèm `ZREMRANGEBYRANK feed:uX 0 -801` để feed chỉ giữ 800 id mới nhất, tránh Redis phình vô hạn. Cái giá: 1 bài = 500 lần ghi; đổi lại lúc đọc không phải tính gì — số lần đọc feed lớn hơn số lần đăng bài hàng trăm lần, nên dồn công sang lúc ghi là đáng.",
           },
         ],
       },
@@ -103,12 +103,12 @@ BK.problem({
           {
             note: "Reader mở app.",
             msgs: [["reader", "feed", "GET /feed?limit=20"]],
-            detail: "Client gọi `GET /feed?limit=20` khi reader mở app; instance Feed Service nào cũng xử lý được vì service stateless. Request không cần biết reader follow ai — danh sách đó đã được “nướng sẵn” thành list trong Redis ở bước fan-out.",
+            detail: "Client gọi `GET /feed?limit=20` khi reader mở app; instance Feed Service nào cũng xử lý được vì service stateless. Request không cần biết reader follow ai — danh sách đó đã được “nướng sẵn” thành sorted set trong Redis ở bước fan-out.",
           },
           {
             note: "Lấy 20 post id từ feed precomputed.",
-            msgs: [["feed", "cache", "LRANGE feed:reader"], ["cache", "feed", "[88, 85, 71…]", "ok"]],
-            detail: "Feed Service lấy 20 post id mới nhất `[88, 85, 71…]` bằng `LRANGE feed:reader 0 19`, dưới 1ms. Id đã sắp sẵn theo thời gian vì LPUSH luôn chèn vào đầu list, và lệnh chỉ là O(K) trên RAM. Không có feed precomputed thì server phải lấy danh sách hàng trăm người reader follow, query bài mới của từng người rồi merge-sort — chậm và tốn DB đúng trên đường nóng nhất hệ thống.",
+            msgs: [["feed", "cache", "ZRANGE feed:reader REV"], ["cache", "feed", "[88, 85, 71…]", "ok"]],
+            detail: "Feed Service lấy 20 post id mới nhất `[88, 85, 71…]` bằng `ZRANGE feed:reader +inf -inf BYSCORE REV LIMIT 0 20`, dưới 1ms. Id đã sắp sẵn theo thời gian vì score là timestamp, và lệnh chỉ là O(log N + K) trên RAM. Không có feed precomputed thì server phải lấy danh sách hàng trăm người reader follow, query bài mới của từng người rồi merge-sort — chậm và tốn DB đúng trên đường nóng nhất hệ thống.",
           },
           {
             note: "Batch-get nội dung bài, trả kèm **cursor** cho trang sau.",
@@ -118,7 +118,7 @@ BK.problem({
               ["feed", "reader", "200 + cursor", "ok"],
             ],
             lesson: "Đọc feed = 1 lần đọc list + 1 batch get, thường < 100ms.",
-            detail: "Feed Service lấy nội dung 20 bài bằng một `BatchGet` 20 key sang Posts DB (DynamoDB cho tối đa 100 key mỗi lần), thay vì 20 request lẻ. Kết quả kèm **cursor** (ví dụ id hoặc timestamp của bài cuối) để trang sau đọc tiếp; dùng cursor thay vì offset để không lặp/sót bài khi có bài mới chèn vào đầu feed giữa hai lần cuộn. Tổng cộng 1 lần đọc Redis + 1 batch get, thường dưới 100ms. Bài đã bị xoá thì batch get không trả về, Feed Service lọc bỏ id đó.",
+            detail: "Feed Service lấy nội dung 20 bài bằng một `BatchGet` 20 key sang Posts DB (DynamoDB cho tối đa 100 key mỗi lần), thay vì 20 request lẻ. Kết quả kèm **cursor** (score/timestamp của bài cuối) để trang sau đọc tiếp bằng `ZRANGE feed:reader (<ts_cuối> -inf BYSCORE REV LIMIT 0 20` — sorted set tìm được theo giá trị score, còn LIST chỉ đọc theo vị trí nên bài mới chèn vào đầu sẽ làm lệch trang; dùng cursor thay vì offset để không lặp/sót bài khi có bài mới chèn vào đầu feed giữa hai lần cuộn. Tổng cộng 1 lần đọc Redis + 1 batch get, thường dưới 100ms. Bài đã bị xoá thì batch get không trả về, Feed Service lọc bỏ id đó.",
           },
         ],
       },
@@ -134,7 +134,7 @@ BK.problem({
               ["post", "kafka", "PostCreated #90"],
               ["kafka", "worker", "#90"],
             ],
-            detail: "Celebrity có 100M follower đăng `post#90`, và luồng ghi vẫn y hệt: lưu Posts DB, phát `PostCreated #90` vào Kafka, worker nhận event. Nếu fan-out như user thường, một bài sinh **100M lần LPUSH**: dù 1M lệnh/s cũng mất gần 2 phút mới phát hết, chiếm toàn bộ năng lực worker và Redis, kéo trễ feed của mọi user khác (**hot key / thundering write**). Phần lớn trong 100M người đó không mở app trong ngày → phần lớn lần ghi là lãng phí.",
+            detail: "Celebrity có 100M follower đăng `post#90`, và luồng ghi vẫn y hệt: lưu Posts DB, phát `PostCreated #90` vào Kafka, worker nhận event. Nếu fan-out như user thường, một bài sinh **100M lần ZADD**: dù 1M lệnh/s cũng mất gần 2 phút mới phát hết, chiếm toàn bộ năng lực worker và Redis, kéo trễ feed của mọi user khác (**hot key / thundering write**). Phần lớn trong 100M người đó không mở app trong ngày → phần lớn lần ghi là lãng phí.",
           },
           {
             note: "Worker thấy cờ `celebrity` → **bỏ qua fan-out**.",
@@ -145,12 +145,12 @@ BK.problem({
             note: "Lúc đọc: lấy feed precomputed **và** bài mới của các celebrity reader follow, rồi merge.",
             msgs: [
               ["reader", "feed", "GET /feed"],
-              { par: [["feed", "cache", "LRANGE feed"], ["feed", "posts", "posts của celeb"]] },
+              { par: [["feed", "cache", "ZRANGE feed"], ["feed", "posts", "posts của celeb"]] },
               { par: [["cache", "feed", "ids", "ok"], ["posts", "feed", "post#90", "ok"]] },
               ["feed", "reader", "merged feed", "ok"],
             ],
             lesson: "Hybrid: user thường fan-out on write, celebrity fan-out on read.",
-            detail: "Feed Service merge hai nguồn theo timestamp khi reader gọi `GET /feed`. Nó chạy **song song**: `LRANGE feed` lấy phần precomputed, và query Posts DB lấy bài mới của các celebrity mà reader follow (cần index theo authorId + thời gian); hai kết quả (`ids` và `post#90`) về cùng lúc rồi ghép thành feed hoàn chỉnh. Chi phí dời sang lúc đọc, nhưng chỉ cho số ít celebrity mỗi user follow (thường vài chục), và bài celebrity được đọc cực nhiều nên cache rất hiệu quả. Đây là **hybrid**: user thường fan-out on write, celebrity fan-out on read.",
+            detail: "Feed Service merge hai nguồn theo timestamp khi reader gọi `GET /feed`. Nó chạy **song song**: `ZRANGE feed … REV` lấy phần precomputed, và query Posts DB lấy bài mới của các celebrity mà reader follow (cần index theo authorId + thời gian); hai kết quả (`ids` và `post#90`) về cùng lúc rồi ghép thành feed hoàn chỉnh. Chi phí dời sang lúc đọc, nhưng chỉ cho số ít celebrity mỗi user follow (thường vài chục), và bài celebrity được đọc cực nhiều nên cache rất hiệu quả. Đây là **hybrid**: user thường fan-out on write, celebrity fan-out on read.",
           },
         ],
       },

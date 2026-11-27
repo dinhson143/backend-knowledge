@@ -23,7 +23,7 @@ BK.sim({
           note: "App ghi vào cache, cache ghi **đồng bộ** xuống DB.",
           msgs: [["app", "cache", "SET price=99"], ["cache", "db", "write price=99"]],
           set: { cache: "price=99", db: "price=99" },
-          detail: "Sau bước này cả hai node đều `price=99`: với write-through, app ghi vào cache và lớp cache **ghi đồng bộ** tiếp xuống DB trong cùng một thao tác. Một số hệ như DynamoDB DAX hoặc cache trong ORM làm vậy; với Redis thường thì chính app ghi cả hai liên tiếp. Request của admin vẫn đang treo, chưa được trả lời.",
+          detail: "Sau bước này cả hai node đều `price=99`: với write-through, app ghi qua lớp cache và lớp cache **ghi đồng bộ** xuống DB trước, DB ghi xong mới cập nhật bản trong cache — DB lỗi thì cache không giữ giá trị chưa từng được lưu. DynamoDB DAX làm theo thứ tự này (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html); với Redis thường thì chính app ghi DB rồi ghi cache liên tiếp. Request của admin vẫn đang treo, chưa được trả lời.",
         },
         {
           note: "Nhất quán vì chỉ trả lời khi DB đã xác nhận; đổi lại ghi chậm hơn.",
@@ -50,9 +50,9 @@ BK.sim({
         },
         {
           note: "Cache còn giá cũ → phải **DEL** key (hoặc chờ TTL ngắn hết hạn).",
-          msgs: [["app", "cache", "DEL price", "warn"]],
+          msgs: [["app", "cache", "DEL price", "warn"], ["app", "client", "200 · ~25ms", "ok"]],
           set: { cache: "(trống)" },
-          detail: "App gửi `DEL price` (mũi tên vàng) để xoá khoảng lệch — cache giờ `(trống)`. Không chủ động xoá thì cách duy nhất còn lại là TTL ngắn và chấp nhận giá cũ tồn tại tới khi hết hạn. Admin được trả lời ngay sau khi DB commit, nên latency ghi chỉ bằng ghi DB, không tốn thêm chi phí ghi cache.",
+          detail: "App gửi `DEL price` (mũi tên vàng) để xoá khoảng lệch — cache giờ `(trống)`. Không chủ động xoá thì cách duy nhất còn lại là TTL ngắn và chấp nhận giá cũ tồn tại tới khi hết hạn. Admin được trả lời sau khi DB commit và lệnh `DEL` xong, nên latency ghi ≈ ghi DB + một lệnh `DEL` rẻ, không tốn thêm chi phí ghi giá trị vào cache.",
         },
         {
           note: "Lần đọc tới MISS và nạp giá 99 từ DB.",

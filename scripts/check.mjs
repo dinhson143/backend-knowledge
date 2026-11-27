@@ -114,6 +114,8 @@ for (const s of Object.values(sims)) {
 
 // ── Văn bản hiển thị: markup inline, tiền tố points, chữ không dấu ──
 const NO_DIACRITICS = /\b(khong|duoc|nguoi|nhieu|truoc|chung ta|tuong|thuc hien|du lieu|he thong)\b/i;
+// Giá dịch vụ (luật: không ghi giá). Số tiền trong kịch bản ("charge $50") vẫn được; giá theo đơn vị thì không.
+const PRICE = /\$\s?\d[\d.,]*\s*(\/|mỗi|per\b)|≈\s*\$\d/i;
 // files/run = code; còn lại là id, toạ độ, đường dẫn
 const CODE_KEYS = new Set(["files", "run", "id", "x", "y", "w", "h", "src"]);
 function walk(file, v, path) {
@@ -123,6 +125,7 @@ function walk(file, v, path) {
     const prose = v.replace(/`[^`]*`/g, "");
     if ((prose.match(/\*\*/g) || []).length % 2) at(file, path, "** lẻ");
     if (NO_DIACRITICS.test(prose)) at(file, path, `chữ không dấu: "${prose.match(NO_DIACRITICS)[0]}"`);
+    if (PRICE.test(prose)) at(file, path, `có giá tiền "${prose.match(PRICE)[0]}" — không ghi giá, trỏ tới trang giá chính thức`);
     return;
   }
   if (Array.isArray(v)) return v.forEach((x, i) => walk(file, x, `${path}[${i}]`));

@@ -25,17 +25,17 @@ BK.topic({
         why: "Singleton đảm bảo mọi nơi dùng cùng một object. Connection pool hay logger tốn tài nguyên và cần trạng thái chung (số connection đang mở) → nhiều instance sẽ vượt giới hạn connection của DB hoặc ghi log lẫn lộn.",
       },
       {
-        cells: ["Creational", "Builder", "Tạo object phức tạp từng bước, không lo thứ tự", "Tạo Pizza, HTTP request"],
-        why: "Constructor 10 tham số dễ truyền nhầm thứ tự và buộc truyền cả giá trị không cần → Builder cho set từng field có tên, tới `build()` mới kiểm tra hợp lệ. Object tạo ra có thể immutable vì chỉ được tạo khi đủ dữ liệu.",
+        cells: ["Creational", "Builder (biến thể Bloch)", "Tạo object phức tạp từng bước, không lo thứ tự", "Tạo Pizza, HTTP request"],
+        why: "Đây là Builder kiểu Effective Java (Bloch) hay gặp trong code hiện đại; Builder gốc của GoF có thêm Director điều khiển thứ tự các bước để cùng một quy trình dựng ra nhiều dạng biểu diễn. Constructor 10 tham số dễ truyền nhầm thứ tự và buộc truyền cả giá trị không cần → Builder cho set từng field có tên, tới `build()` mới kiểm tra hợp lệ. Object tạo ra có thể immutable vì chỉ được tạo khi đủ dữ liệu.",
       },
       {
         cells: [
           "Creational",
-          "Factory Method",
+          "! Simple Factory",
           "+ Giao việc chọn class cụ thể cho factory, caller chỉ biết interface",
           "`VehicleFactory.create(type)`",
         ],
-        why: "Caller viết `new Car()` là phụ thuộc thẳng vào class cụ thể → thêm `Truck` phải sửa mọi chỗ tạo xe. Factory gom quyết định “tạo class nào” về một chỗ, caller chỉ nhận `Vehicle`.",
+        why: "Caller viết `new Car()` là phụ thuộc thẳng vào class cụ thể → thêm `Truck` phải sửa mọi chỗ tạo xe. Factory gom quyết định “tạo class nào” về một chỗ, caller chỉ nhận `Vehicle`. `create(type)` với `switch` là Simple Factory; Factory Method của GoF thì để **subclass** override method tạo object (ví dụ `createVehicle()`), nên thêm loại mới là thêm subclass chứ không sửa `switch`.",
       },
       {
         cells: [
@@ -54,6 +54,24 @@ BK.topic({
           "Thêm topping, logging wrapper",
         ],
         why: "Thêm topping bằng subclass gây bùng nổ tổ hợp (`CheesePizza`, `CheeseOlivePizza`…) → Decorator bọc object gốc và cùng implement interface `Pizza`. Mỗi lớp bọc cộng thêm giá, xếp chồng tuỳ ý lúc runtime.",
+      },
+      {
+        cells: [
+          "Structural",
+          "+ Adapter",
+          "Bọc một class có interface khác để nó khớp interface mà client cần",
+          "Tích hợp payment gateway bên thứ ba, legacy API",
+        ],
+        why: "SDK của bên thứ ba có method `makeCharge(cents)` trong khi code của bạn gọi `PaymentProcessor.pay(amount)` → không sửa được SDK, và rải lời gọi SDK khắp nơi thì đổi nhà cung cấp phải sửa mọi chỗ. Adapter implement `PaymentProcessor` và dịch lời gọi sang SDK, đổi nhà cung cấp chỉ cần adapter mới.",
+      },
+      {
+        cells: [
+          "Structural",
+          "+ Composite",
+          "Cây phần–toàn thể: lá và nhóm dùng chung một interface",
+          "File System (file/thư mục), menu lồng nhau",
+        ],
+        why: "Tính dung lượng thư mục mà phải `if (isFolder)` ở mọi chỗ thì code phình theo độ sâu cây → File và Folder cùng implement `getSize()`; Folder cộng `getSize()` của các con. Client gọi một method cho cả lá lẫn nhóm, cây sâu bao nhiêu cũng vậy.",
       },
       {
         cells: [
@@ -76,11 +94,20 @@ BK.topic({
       {
         cells: [
           "Behavioral",
-          "State Machine",
+          "State (state machine)",
           "Quản lý vòng đời nhiều trạng thái, chỉ cho chuyển hợp lệ",
           "Vending machine, Order, Elevator",
         ],
         why: "Cờ `hasCoin`, `isDispensing` dễ rơi vào tổ hợp vô nghĩa (đang trả hàng mà vẫn nhận xu) → State Machine liệt kê trạng thái và chỉ cho chuyển hợp lệ. Mỗi state xử lý event theo cách riêng, trạng thái sai bị chặn ngay.",
+      },
+      {
+        cells: [
+          "Behavioral",
+          "+ Chain of Responsibility",
+          "Chuyển request qua chuỗi handler, mỗi handler xử lý hoặc chuyển tiếp",
+          "Logger theo level, middleware HTTP, duyệt chi tiêu theo cấp",
+        ],
+        why: "Một hàm `if/else` kiểm auth, rate limit, validate rồi mới xử lý thì thêm bước mới phải sửa hàm đó → mỗi bước thành một handler giữ reference tới handler kế tiếp. Thêm, bỏ hay đổi thứ tự bước chỉ là đổi cách nối chuỗi; sender không cần biết ai sẽ xử lý.",
       },
     ],
   },

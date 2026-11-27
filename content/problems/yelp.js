@@ -63,7 +63,7 @@ BK.problem({
           {
             note: "Elasticsearch kết hợp **geo_distance filter** + full-text + category trong một query.",
             msgs: [["search", "es", "geo_distance 2km + match phở"], ["es", "search", "48 quán", "ok"]],
-            detail: "ES trả **48 quán**, xếp hạng kết hợp độ khớp text, khoảng cách và rating. Search Service gửi một query gồm `geo_distance` filter 2km quanh toạ độ user, `match` “phở” trên tên/mô tả/món, và filter category. ES dùng cấu trúc không gian (BKD tree) cho geo_point nên lọc theo khoảng cách nhanh mà không tính khoảng cách tới mọi quán, và dùng inverted index cho text. Làm tương tự trên Postgres bằng `LIKE '%phở%'` + công thức Haversine sẽ phải quét toàn bảng vì không index nào dùng được.",
+            detail: "ES trả **48 quán**, xếp hạng kết hợp độ khớp text, khoảng cách và rating. Search Service gửi một query gồm `geo_distance` filter 2km quanh toạ độ user, `match` “phở” trên tên/mô tả/món, và filter category. ES dùng cấu trúc không gian (BKD tree) cho geo_point nên lọc theo khoảng cách nhanh mà không tính khoảng cách tới mọi quán, và dùng inverted index cho text. Làm tương tự trên Postgres bằng `LIKE '%phở%'` + công thức Haversine sẽ phải quét toàn bảng: wildcard đầu làm B-Tree index vô dụng và công thức Haversine phải tính trên mọi dòng (index trigram `pg_trgm` giúp được phần text nhưng không xếp hạng độ liên quan).",
           },
           {
             note: "Trả danh sách kèm rating đã tính sẵn.",
@@ -128,7 +128,7 @@ BK.problem({
       great: "Elasticsearch geo_point kết hợp text + filter trong một query (hoặc Quadtree/Geohash); dữ liệu ít đổi nên index ổn định.",
       why: {
         bad: "Mỗi search quét toàn bộ dữ liệu, mất hàng giây ở 100M DAU, vì phải tính khoảng cách tới 10M business cho mỗi query.",
-        good: "Geohash/PostGIS index chỉ xét business trong vùng lân cận nên nhanh hơn nhiều. Nhưng kết hợp với full-text search và filter (loại hình, giá, rating) trong Postgres khó tối ưu — query planner thường chỉ dùng tốt được một index.",
+        good: "Geohash/PostGIS index chỉ xét business trong vùng lân cận nên nhanh hơn nhiều. Nhưng kết hợp với full-text search và filter (loại hình, giá, rating) trong Postgres khó tối ưu: planner gộp được nhiều index bằng bitmap AND/OR (https://www.postgresql.org/docs/current/indexes-bitmap-scans.html), nhưng xếp hạng trộn độ liên quan của text với khoảng cách thì không index nào làm sẵn.",
         great: "Một query lọc theo khoảng cách, khớp text và filter cùng lúc rồi ranking, vì Elasticsearch giữ `geo_point` và inverted index trong cùng document. Dữ liệu business ít đổi nên index không phải rebuild liên tục, cache hiệu quả.",
       },
     },

@@ -34,7 +34,7 @@ BK.sim({
       note: "Search `running` → stem thành `run` → tra index một lần → doc1, doc2, không quét toàn bộ.",
       msgs: [["stem", "idx", "lookup run"], ["idx", "stem", "[doc1, doc2]", "ok"]],
       good: ["idx"],
-      lesson: "Inverted index biến full-text search thành phép tra hash map.",
+      lesson: "Inverted index biến full-text search thành phép tra từ điển term (term dictionary).",
       detail: "Tìm `running` trả ngay `[doc1, doc2]`, kể cả doc2 vốn chỉ chứa `runs`. Query phải đi qua **đúng analyzer** đã dùng lúc index — lowercase rồi stem thành `run` — nếu không `running` sẽ không khớp term nào. Index tra `run` một lần (như tra hash map/term dictionary). Chi phí tìm kiếm phụ thuộc độ dài posting list, không phụ thuộc tổng số document; so với `LIKE '%running%'` phải quét từng dòng, đây là khác biệt giữa vài ms và vài phút trên hàng tỷ document.",
     },
   ],

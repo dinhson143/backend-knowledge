@@ -18,11 +18,11 @@ BK.topic({
       {
         cells: [
           "Write-Through",
-          "Ghi cache, cache ghi DB thành công rồi mới trả lời",
+          "Ghi DB thành công rồi cập nhật cache, sau đó mới trả lời",
           "Cache gần như luôn khớp DB",
           "Ghi chậm hơn",
         ],
-        why: "Lần đọc ngay sau luôn thấy giá trị mới, vì request chỉ trả lời khi **cả cache và DB** đã ghi xong. Đổi lại, latency ghi = tổng hai lần ghi tuần tự.",
+        why: "Lần đọc ngay sau luôn thấy giá trị mới, vì request chỉ trả lời khi **cả DB và cache** đã ghi xong. Ghi DB trước: DB lỗi thì cache chưa bị đổi, không có giá trị “ma” trong cache. Đổi lại, latency ghi = tổng hai lần ghi tuần tự. Có lớp cache tự làm việc này (DAX ghi xuống DynamoDB rồi mới nạp cache — https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html).",
       },
       {
         cells: [
@@ -59,7 +59,7 @@ BK.topic({
     },
     {
       t: "**Hot keys** — replicate key nóng lên nhiều node rồi load balance đọc; rate limit traffic bất thường.",
-      why: "Thêm node không giúp gì cho hot key: một key chỉ nằm trên một node, nên mọi request cho key đó dồn vào node ấy dù cluster còn rảnh. Nhân bản key ra nhiều node (hoặc thêm hậu tố như `key#1..#k`) chia lượt đọc ra k node, mỗi node chỉ gánh 1/k tải.",
+      why: "Thêm node không giúp gì cho hot key: một key chỉ nằm trên một node, nên mọi request cho key đó dồn vào node ấy dù cluster còn rảnh. Nhân bản key ra nhiều node (key salting: thêm hậu tố `key#0..N`) chia lượt đọc ra N+1 node, mỗi node chỉ gánh một phần tải.",
     },
     {
       t: "**Cache consistency** — xoá cache sau khi update DB; TTL ngắn nếu chấp nhận stale; chấp nhận eventual consistency cho feed, metrics.",

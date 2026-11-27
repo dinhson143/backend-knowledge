@@ -58,8 +58,8 @@ BK.topic({
       why: "Sau khi chia, mỗi shard là một DB độc lập: tải không còn tự cân bằng, JOIN hay transaction qua hai shard cần phối hợp qua mạng (scatter-gather, 2PC), và không còn transaction ACID cục bộ nào bao trùm toàn bộ dữ liệu để giữ ràng buộc.",
     },
     {
-      t: "**Giải hot spot** — tách shard động (dynamic splitting), compound shard key, cô lập hot key sang shard riêng.",
-      why: "Hot spot sinh ra khi một khoảng key hoặc một key nhận tải quá lớn: dynamic splitting chia khoảng nóng thành hai shard; compound key (ví dụ `user_id + bucket`) trải dữ liệu của một key nóng ra nhiều shard; cô lập hot key thì cho nó một máy riêng để không kéo chậm các key khác.",
+      t: "**Giải hot spot** — tách shard động (dynamic splitting), key salting, cô lập hot key sang shard riêng.",
+      why: "Hot spot sinh ra khi một khoảng key hoặc một key nhận tải quá lớn: dynamic splitting chia khoảng nóng thành hai shard; key salting (shard key thêm hậu tố, ví dụ `user_id#0..N`) trải dữ liệu của một key nóng ra nhiều shard; cô lập hot key thì cho nó một máy riêng để không kéo chậm các key khác.",
     },
     {
       t: "! Hash function **không ngẫu nhiên** — cùng input luôn ra cùng output; chỉ là phân bố trông như đều.",
@@ -85,7 +85,7 @@ BK.topic({
     ],
     [
       "Cách xử lý hot spot khi sharding?",
-      "Dynamic shard splitting, compound shard key, isolate hot key sang shard riêng, key salting.",
+      "Dynamic shard splitting, key salting (`key#0..N`), isolate hot key sang shard riêng.",
     ],
   ],
 });

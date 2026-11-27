@@ -27,7 +27,7 @@ BK.sim({
           detail: "Consumer nhận `order#7` nhưng xử lý lỗi do dữ liệu hỏng (ví dụ thiếu field bắt buộc, parse lỗi), nên trả NACK (hoặc không xoá message để hết visibility timeout). Message **không bị mất**: queue giữ lại và sẽ giao lại sau.",
         },
         {
-          note: "Retry với **exponential backoff**: 1s → 2s → 4s.",
+          note: "Consumer đặt visibility timeout theo **exponential backoff**: 1s → 2s → 4s.",
           msgs: [
             ["queue", "consumer", "retry 1 · 1s", "warn"],
             ["consumer", "queue", "NACK", "err"],
@@ -36,13 +36,13 @@ BK.sim({
             ["queue", "consumer", "retry 3 · 4s", "warn"],
             ["consumer", "queue", "NACK", "err"],
           ],
-          detail: "Queue giao lại với **exponential backoff** — chờ 1s, 2s, 4s giữa các lần — nhưng `order#7` hỏng dữ liệu nên lần nào cũng NACK, retry bao nhiêu cũng vô ích. Backoff hợp với lỗi tạm thời (DB timeout, service bên ngoài 503) vì cho hệ thống phía sau thời gian hồi phục thay vì bị dội retry liên tục. Retry vô hạn thì đây là **poison message**: quay vòng mãi, tốn tài nguyên, và với queue FIFO còn chặn mọi message phía sau.",
+          detail: "Sau mỗi lần lỗi, consumer gọi `ChangeMessageVisibility` đặt visibility timeout 1s, 2s, 4s nên message được giao lại sau khoảng chờ tăng dần — queue như SQS không tự backoff, nó chỉ giao lại khi visibility timeout (mặc định 30s) hết hạn (https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html). Nhưng `order#7` hỏng dữ liệu nên lần nào cũng NACK, retry bao nhiêu cũng vô ích. Backoff hợp với lỗi tạm thời (DB timeout, service bên ngoài 503) vì cho hệ thống phía sau thời gian hồi phục thay vì bị dội retry liên tục. Retry vô hạn thì đây là **poison message**: quay vòng mãi, tốn tài nguyên, và với queue FIFO còn chặn mọi message phía sau.",
         },
         {
-          note: "Quá `maxReceiveCount=3` → chuyển sang **DLQ**, không chặn message sau.",
+          note: "Quá `maxReceiveCount=4` → chuyển sang **DLQ**, không chặn message sau.",
           msgs: [["queue", "dlq", "order#7 (poison)", "err"]],
           set: { dlq: "1 msg · cần điều tra", queue: "depth 0" },
-          detail: "Số lần nhận vượt `maxReceiveCount=3` nên queue chuyển `order#7` sang DLQ và xoá khỏi queue chính; depth về 0. Message không bị vứt đi: nó nằm trong DLQ chờ người điều tra, sửa dữ liệu rồi **redrive** về queue chính. Cần alert khi DLQ > 0, nếu không DLQ thành nơi đơn hàng âm thầm biến mất mà không ai biết. (Sim vẽ 1 lần nhận + 3 retry = 4 lần nhận; với SQS `maxReceiveCount=3` message đã sang DLQ ngay sau lần nhận thứ 3.)",
+          detail: "Số lần nhận vượt `maxReceiveCount=4` (1 lần nhận + 3 retry) nên queue chuyển `order#7` sang DLQ và xoá khỏi queue chính; depth về 0. Message không bị vứt đi: nó nằm trong DLQ chờ người điều tra, sửa dữ liệu rồi **redrive** về queue chính. Cần alert khi DLQ > 0, nếu không DLQ thành nơi đơn hàng âm thầm biến mất mà không ai biết.",
         },
         {
           note: "Message tiếp theo xử lý bình thường.",
@@ -85,10 +85,10 @@ BK.sim({
         },
         {
           note: "Nếu vẫn vượt ngưỡng: giới hạn queue và trả **429** để producer chậm lại.",
-          msgs: [["queue", "producer", "429 slow down", "warn"]],
+          msgs: [["queue", "producer", "429 (gateway) slow down", "warn"]],
           set: { queue: "depth 20k ✓" },
           lesson: "Queue hấp thụ burst; backpressure + autoscale giữ hệ thống không sụp.",
-          detail: "Backlog vẫn vượt ngưỡng thì hệ thống giới hạn kích thước queue và trả **429 Too Many Requests** để producer chậm lại (retry với backoff) — đó là **backpressure**: đẩy tín hiệu quá tải ngược về nguồn thay vì để queue phình vô hạn. Thực tế 429 thường do API/gateway phía trước producer trả, dựa trên depth của queue, vì SQS/Kafka không tự từ chối theo depth. Cái giá: một phần user bị từ chối hoặc phải thử lại, nhưng hệ thống giữ depth quanh 20k và không sập.",
+          detail: "Backlog vẫn vượt ngưỡng thì hệ thống giới hạn kích thước queue và trả **429 Too Many Requests** để producer chậm lại (retry với backoff) — đó là **backpressure**: đẩy tín hiệu quá tải ngược về nguồn thay vì để queue phình vô hạn. Thực tế 429 thường do API/gateway phía trước producer trả, dựa trên depth của queue, vì SQS/Kafka không tự từ chối theo depth. Mũi tên vẽ từ queue cho gọn. Khi 429 hạ tốc độ producer xuống dưới 50k/s (tốc độ consumer), backlog 450k xả dần về khoảng 20k. Cái giá: một phần user bị từ chối hoặc phải thử lại, nhưng hệ thống không sập.",
         },
       ],
     },

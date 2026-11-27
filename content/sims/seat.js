@@ -31,12 +31,12 @@ BK.sim({
           note: "Alice ghi trước: `UPDATE … SET v=2 WHERE v=1` → 1 row.",
           msgs: [["api", "db", "UPDATE WHERE v=1 (Alice)"], ["db", "api", "1 row ✓", "ok"]],
           set: { db: "A1: Alice · v=2" },
-          detail: "Alice thắng: `UPDATE seats SET owner='Alice', v=2 WHERE id='A1' AND v=1` khớp điều kiện `v=1`, nên DB cập nhật **1 row** và tăng version lên 2. Bản thân UPDATE vẫn khoá dòng trong chốc lát, nên hai UPDATE đồng thời luôn chạy tuần tự.",
+          detail: "Alice thắng: `UPDATE seats SET owner='Alice', v=2 WHERE id='A1' AND v=1` khớp điều kiện `v=1`, nên DB cập nhật **1 row** và tăng version lên 2. Bản thân UPDATE vẫn khoá dòng tới khi transaction kết thúc, nên hai UPDATE đồng thời trên cùng dòng luôn chạy tuần tự.",
         },
         {
           note: "Bob ghi `WHERE v=1` → **0 row** vì version đã là 2.",
           msgs: [["api", "db", "UPDATE WHERE v=1 (Bob)"], ["db", "api", "0 rows", "err"]],
-          detail: "Bob cập nhật **0 row**: cùng câu lệnh `WHERE v=1`, nhưng version giờ là 2 nên điều kiện sai. Không có lỗi SQL nào; API phải **kiểm tra số row bị ảnh hưởng** để biết mình thua. Quên kiểm tra là lỗi kinh điển: code coi như đặt thành công và Bob nhận vé ảo.",
+          detail: "Bob cập nhật **0 row** (ở Read Committed, mặc định của PostgreSQL; ở Repeatable Read, PostgreSQL báo lỗi `could not serialize access due to concurrent update` thay vì 0 row — https://www.postgresql.org/docs/current/transaction-iso.html): cùng câu lệnh `WHERE v=1`, nhưng version giờ là 2 nên điều kiện sai. Không có lỗi SQL nào; API phải **kiểm tra số row bị ảnh hưởng** để biết mình thua. Quên kiểm tra là lỗi kinh điển: code coi như đặt thành công và Bob nhận vé ảo.",
         },
         {
           note: "Bob nhận 409, client báo “ghế đã có người đặt”.",
@@ -65,7 +65,7 @@ BK.sim({
           note: "Bob cũng `FOR UPDATE` → bị **block**, phải chờ.",
           msgs: [["api", "db", "FOR UPDATE (Bob)", "warn"]],
           set: { bob: "⏳ chờ lock" },
-          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `lock_wait_timeout`.",
+          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `innodb_lock_wait_timeout` (MySQL, mặc định 50s — https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html); PostgreSQL mặc định `lock_timeout = 0` nên chờ không giới hạn (https://www.postgresql.org/docs/current/runtime-config-client.html).",
         },
         {
           note: "Alice UPDATE và COMMIT → nhả lock.",

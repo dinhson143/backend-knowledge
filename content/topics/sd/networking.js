@@ -39,8 +39,8 @@ BK.topic({
       why: "Cần DNS dịch tên sang IP, vì con người nhớ tên còn mạng chỉ route theo IP. DNS server biết resolver hỏi từ vùng nào → trả IP của datacenter gần nhất, giảm latency mà client không phải đổi gì.",
     },
     {
-      t: "**Ports** — 22 SSH, 80 HTTP, 443 HTTPS (đều TCP).",
-      why: "Port chuẩn hoá để client không cần hỏi trước dịch vụ chạy ở đâu: trình duyệt gõ `https://` là tự nối 443. Cả ba dùng TCP vì SSH và web đều cần dữ liệu đủ, đúng thứ tự — mất một byte là hỏng lệnh hoặc hỏng trang.",
+      t: "! **Ports** — 22 SSH, 80 HTTP, 443 HTTPS (TCP); HTTP/3 chạy QUIC trên UDP (thường cổng 443).",
+      why: "Port chuẩn hoá để client không cần hỏi trước dịch vụ chạy ở đâu: trình duyệt gõ `https://` là tự nối 443. Cả ba dùng TCP vì SSH và web đều cần dữ liệu đủ, đúng thứ tự — mất một byte là hỏng lệnh hoặc hỏng trang. HTTP/3 là ngoại lệ: nó chạy trên QUIC (UDP), QUIC tự đảm bảo đủ và đúng thứ tự cho từng stream, nên một gói mất chỉ chặn stream của nó chứ không chặn cả kết nối như TCP (RFC 9114: https://www.rfc-editor.org/rfc/rfc9114).",
     },
     {
       t: "**TCP** — bắt tay 3 bước, đánh số thứ tự, ACK, mất gói thì gửi lại → tin cậy, có thứ tự.",
@@ -91,7 +91,7 @@ BK.topic({
     ],
     [
       "L4 Load Balancer (NLB) khác L7 (ALB) ra sao?",
-      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu kết nối. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
+      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu request/giây. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
     ],
     [
       "DNS dùng gì trong system design ngoài phân giải tên?",

@@ -76,7 +76,7 @@ BK.topic({
           "Singleton + Chain of Responsibility / Strategy cho appender",
           "Ghi bất đồng bộ (queue), xoay file log",
         ],
-        why: "Logger là Singleton vì mọi module cần ghi vào cùng cấu hình và cùng file. Chain of Responsibility cho message đi qua chuỗi handler theo level; Strategy cho đổi đích ghi (console, file, remote) mà không sửa Logger.",
+        why: "Logger là Singleton vì mọi module cần ghi vào cùng cấu hình và cùng file (hoặc tạo một instance dùng chung rồi inject qua DI để test thay được). Chain of Responsibility cho message đi qua chuỗi handler theo level; Strategy cho đổi đích ghi (console, file, remote) mà không sửa Logger.",
       },
       {
         cells: [

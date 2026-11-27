@@ -4,7 +4,7 @@ BK.topic({
   section: "cloud-containers",
   title: "ECS chi tiết",
   tldr: {
-    t: "ECS là orchestrator container **riêng của AWS**: khai báo Task Definition (image, CPU/RAM, IAM role) và Service (chạy N bản, gắn load balancer); AWS lo control plane và **không tính phí** phần đó. Chạy trên **Fargate** (không quản máy) hoặc **EC2** (tự quản máy). Đơn giản, tích hợp sâu với AWS, nhưng chỉ chạy trên AWS.",
+    t: "ECS là orchestrator container **riêng của AWS**: khai báo Task Definition (image, CPU/RAM, IAM role) và Service (chạy N bản, gắn load balancer); AWS lo control plane và **không tính phí** phần đó. Chạy trên **Fargate** (không quản máy), **EC2** (tự quản máy) hoặc **ECS Managed Instances** (EC2 do AWS chọn, vá và thay định kỳ). Đơn giản, tích hợp sâu với AWS, nhưng chỉ chạy trên AWS.",
     why: "Bạn chỉ trả cho compute, vì ECS là dịch vụ đa tenant do AWS vận hành, không có control plane riêng để tính tiền theo cluster. Tích hợp sâu (IAM role cho task, ALB, CloudWatch) có sẵn vì cùng nhà cung cấp — nhưng chính điều đó khoá bạn vào AWS.",
   },
   story: {
@@ -48,7 +48,7 @@ BK.topic({
               "Task chạy ở đâu: Fargate, Fargate Spot, hoặc EC2 Auto Scaling group",
               "Node group / Karpenter",
             ],
-            why: "Capacity provider tách “chạy ở đâu” khỏi định nghĩa service, vì cùng một service có thể cần chạy trên Fargate, Fargate Spot (rẻ hơn tới ~70% nhưng có thể bị thu hồi) hoặc EC2. Trộn tỉ lệ được bằng base và weight.",
+            why: "Capacity provider tách “chạy ở đâu” khỏi định nghĩa service, vì cùng một service có thể cần chạy trên Fargate, Fargate Spot (rẻ hơn tới 70% nhưng có thể bị thu hồi — https://aws.amazon.com/fargate/pricing/) hoặc EC2. Trộn tỉ lệ được bằng base và weight.",
           },
           {
             cells: [

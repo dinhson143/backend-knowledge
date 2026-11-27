@@ -19,7 +19,7 @@ BK.topic({
     },
     {
       t: "**YAGNI** — You Aren't Gonna Need It: là **công cụ hành động** — cắt tính năng chưa cần.",
-      why: "Viết trước tính năng “để dành cho tương lai” chỉ thêm code phải bảo trì, vì khoảng một nửa số đó không bao giờ được dùng, hoặc tới lúc dùng thì yêu cầu đã khác. YAGNI là hành động cụ thể: gặp ý tưởng “có thể sau này cần” thì cắt.",
+      why: "Viết trước tính năng “để dành cho tương lai” chỉ thêm code phải bảo trì, vì phần lớn tính năng làm trước không mang lại giá trị như dự kiến (Fowler dẫn số liệu chỉ khoảng ⅓ tính năng cải thiện được chỉ số nó nhắm tới — https://martinfowler.com/bliki/Yagni.html), hoặc tới lúc dùng thì yêu cầu đã khác. YAGNI là hành động cụ thể: gặp ý tưởng “có thể sau này cần” thì cắt.",
     },
     {
       t: "**DRY** — Don't Repeat Yourself: logic lặp ở nhiều chỗ thì gom về một chỗ.",

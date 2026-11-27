@@ -18,7 +18,7 @@ BK.topic({
       why: "Số key phải đổi chỗ khi scale chính là chi phí mỗi lần thêm/bớt máy, vì di chuyển dữ liệu tốn băng thông, còn với cache thì key chuyển chỗ = cache miss. Consistent hashing đưa chi phí đó từ gần 100% xuống ~1/N.",
     },
     {
-      t: "**Data imbalance → Virtual nodes** — mỗi server map thành hàng trăm virtual node; càng nhiều vnode càng đều. Lý do: băm trực tiếp server vật lý làm các khoảng trên ring không đều.",
+      t: "**Data imbalance → Virtual nodes** — mỗi server map thành nhiều virtual node; càng nhiều vnode càng đều (Cassandra hiện mặc định `num_tokens: 16`, dùng kèm thuật toán cấp token cân bằng — https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html). Lý do: băm trực tiếp server vật lý làm các khoảng trên ring không đều.",
       why: "Vị trí mỗi server trên ring là ngẫu nhiên, nên với 3 server các khoảng có thể chênh nhau vài lần (một server ôm 50% ring). Băm mỗi server thành vài trăm điểm → mỗi server sở hữu nhiều đoạn nhỏ rải khắp ring, theo luật số lớn tổng các đoạn tiến về 1/N. Thêm nữa, khi một server chết, tải của nó rải ra nhiều server thay vì dồn hết vào một láng giềng.",
     },
     {
@@ -26,12 +26,12 @@ BK.topic({
       why: "Mọi node tự tính được bản sao nằm đâu mà không cần bảng tra cứu, vì key đã có server 「chủ」 xác định trên ring và quy tắc chỉ là đi tiếp theo chiều kim đồng hồ. Server chủ chết thì server kế tiếp vốn đã có bản sao, vừa là chủ mới vừa phục vụ được ngay (dùng vnode thì phải bỏ qua các vnode cùng máy vật lý để bản sao nằm trên máy khác).",
     },
     {
-      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database (Cassandra, DynamoDB): tiến trình nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
+      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database kiểu Dynamo (Cassandra, Riak — ring xuất phát từ paper Dynamo; dịch vụ DynamoDB không cho thấy ring): tiến trình nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
       why: "Consistent hashing chỉ trả lời 「key giờ thuộc ai」, dữ liệu vẫn phải chép qua mạng. Với cache, mất bản sao chỉ là miss → server mới cứ rỗng rồi đầy dần từ DB; với DB, dữ liệu là bản gốc → phải stream sang server mới trong nền, trong lúc đó server cũ vẫn phục vụ để không gián đoạn.",
     },
     {
-      t: "**Hot key** — consistent hashing chia đều **số key** chứ không chia đều **tần suất truy cập**. Key viral (người nổi tiếng) vẫn làm quá tải 1 server → dùng key salting (`hotkey_1`, `hotkey_2`) hoặc local caching.",
-      why: "Một key dù nhận 1M request/s vẫn chỉ có một chủ → server đó quá tải trong khi các server khác rảnh, vì ring chỉ quyết định key nằm ở đâu. Key salting biến một key thành k key (`hotkey_1..k`) ở k vị trí khác nhau trên ring, chia tải ra k server; local cache trong app thì chặn hẳn request trước khi tới server.",
+      t: "**Hot key** — consistent hashing chia đều **số key** chứ không chia đều **tần suất truy cập**. Key viral (người nổi tiếng) vẫn làm quá tải 1 server → dùng key salting (`hotkey#0..N`) hoặc local caching.",
+      why: "Một key dù nhận 1M request/s vẫn chỉ có một chủ → server đó quá tải trong khi các server khác rảnh, vì ring chỉ quyết định key nằm ở đâu. Key salting biến một key thành N+1 key (`hotkey#0..N`) ở N+1 vị trí khác nhau trên ring, chia tải ra nhiều server; local cache trong app thì chặn hẳn request trước khi tới server.",
     },
   ],
   cards: [
@@ -45,7 +45,7 @@ BK.topic({
     ],
     [
       "Khi thêm 1 server vào ring N server, bao nhiêu key bị di chuyển?",
-      "Khoảng K/N key (chỉ đoạn ring mà server mới nhận), so với gần như toàn bộ khi dùng `hash % N`.",
+      "Khoảng K/(N+1) key với N là số server trước khi thêm (chỉ đoạn ring mà server mới nhận), so với gần như toàn bộ khi dùng `hash % N`.",
     ],
   ],
 });

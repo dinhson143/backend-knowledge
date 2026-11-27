@@ -163,9 +163,9 @@ BK.sim({
           text: "Vẫn nhân cả deployable, nhưng module Order đã có ranh giới rõ nên tách ra service được nếu cần.",
         },
         micro: {
-          touch: ["order", "pay", "dbo", "dbp"],
+          touch: ["order", "pay", "inv", "dbo", "dbp", "dbi"],
           score: "good",
-          text: "Chỉ scale Order, Payment và DB của chúng; Inventory, Reco giữ nguyên.",
+          text: "Chỉ scale Order, Payment, Inventory (đặt hàng phải trừ kho) và DB của chúng; Reco giữ nguyên.",
         },
         event: {
           touch: ["order", "pay", "bus"],

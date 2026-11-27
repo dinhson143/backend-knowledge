@@ -36,7 +36,7 @@ BK.topic({
               "Log append-only có thứ tự — đơn vị song song",
               "Số partition = số consumer tối đa xử lý song song trong một group",
             ],
-            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận.",
+            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận. Đây là consumer group cổ điển; share group (“Kafka Queues”, KIP-932, sẵn sàng production từ Kafka 4.2) cho nhiều consumer cùng đọc một partition và ack từng record, đổi lại record trong partition có thể được giao không theo thứ tự, nhất là khi giao lại (https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/ · KIP-932: https://cwiki.apache.org/confluence/display/KAFKA/KIP-932%3A+Queues+for+Kafka).",
           },
           {
             cells: ["Offset", "Vị trí message trong partition (0, 1, 2…)", "Consumer tự giữ offset → đọc lại được"],
@@ -50,7 +50,7 @@ BK.topic({
             cells: [
               "Consumer group",
               "Nhóm consumer chia nhau partition",
-              "Mỗi partition chỉ 1 consumer trong group; group khác đọc độc lập",
+              "Mỗi partition chỉ 1 consumer trong group (consumer group cổ điển); group khác đọc độc lập",
             ],
             why: "Kafka gán partition độc quyền cho một consumer trong group, vì hai consumer cùng group đọc chung một partition sẽ giành nhau message và phá thứ tự. Group khác có offset riêng → analytics và notification đọc cùng topic mà không ảnh hưởng nhau.",
           },
@@ -123,8 +123,8 @@ BK.topic({
           why: "Consumer tự điều tốc theo sức xử lý thay vì bị broker đẩy ngập, vì nó là bên kéo (pull). Offset do consumer commit → thời điểm commit (trước hay sau khi xử lý) quyết định delivery semantics.",
         },
         {
-          t: "**Phân partition** — mỗi partition gán cho đúng 1 consumer trong group; consumer nhiều hơn partition thì dư consumer ngồi chơi.",
-          why: "Số consumer làm việc thực tế bị chặn trên bởi số partition, vì Kafka giữ thứ tự bằng cách cho mỗi partition đúng một người đọc trong group. Muốn scale consumer thì phải có đủ partition từ đầu.",
+          t: "**Phân partition** — mỗi partition gán cho đúng 1 consumer trong group (consumer group cổ điển); consumer nhiều hơn partition thì dư consumer ngồi chơi.",
+          why: "Số consumer làm việc thực tế bị chặn trên bởi số partition (consumer group cổ điển), vì Kafka giữ thứ tự bằng cách cho mỗi partition đúng một người đọc trong group. Muốn scale consumer thì phải có đủ partition từ đầu.",
         },
         {
           t: "**Rebalance** — khi consumer vào, ra hoặc chết (mất heartbeat), group chia lại partition; với protocol cũ (eager), xử lý tạm dừng trong lúc đó. Cooperative rebalancing và protocol mới KIP-848 (Kafka 4.0) chỉ dời những partition cần dời.",
@@ -223,11 +223,11 @@ BK.topic({
         },
         {
           t: "**Poison message** — consumer Kafka không có DLQ sẵn như SQS (Kafka Connect thì có): tự làm retry topic + DLQ topic.",
-          why: "Một message lỗi mãi mà cứ retry tại chỗ sẽ chặn cả partition phía sau, vì consumer xử lý tuần tự theo offset. Kafka không có ack/nack từng message như SQS → phải tự đẩy message lỗi sang retry topic (có delay) rồi DLQ topic, và commit offset để đi tiếp.",
+          why: "Một message lỗi mãi mà cứ retry tại chỗ sẽ chặn cả partition phía sau, vì consumer xử lý tuần tự theo offset. Consumer group cổ điển không có ack/nack từng message như SQS (share group từ Kafka 4.2 thì có, nhưng bỏ thứ tự theo partition) → phải tự đẩy message lỗi sang retry topic (có delay) rồi DLQ topic, và commit offset để đi tiếp.",
         },
         {
           t: "**Consumer chậm** — thêm partition + consumer, hoặc tách việc nặng sang worker pool.",
-          why: "Đã đủ consumer thì phải thêm partition mới scale được, vì số consumer bị giới hạn bởi số partition. Nếu nút cổ chai là xử lý nặng (gọi API, render), tách sang worker pool cho phép song song hơn số partition, đổi lại phải tự quản thứ tự và commit offset.",
+          why: "Đã đủ consumer thì phải thêm partition mới scale được, vì số consumer bị giới hạn bởi số partition (consumer group cổ điển). Nếu nút cổ chai là xử lý nặng (gọi API, render), tách sang worker pool cho phép song song hơn số partition, đổi lại phải tự quản thứ tự và commit offset.",
         },
       ],
     },
@@ -297,7 +297,7 @@ BK.topic({
     ],
     [
       "Có 4 partition và 6 consumer trong cùng group thì sao?",
-      "Chỉ 4 consumer nhận partition, 2 consumer rảnh. Số partition là giới hạn song song của một group.",
+      "Chỉ 4 consumer nhận partition, 2 consumer rảnh. Số partition là giới hạn song song của một consumer group cổ điển (share group từ Kafka 4.2 không bị giới hạn này nhưng không giữ thứ tự).",
     ],
     [
       "acks=1 có thể mất dữ liệu khi nào?",
