@@ -38,10 +38,12 @@ Mỗi dòng gồm vấn đề và **đề xuất mặc định**: nếu người
 | Q22 | Sim `sys-arch-impact` | Scale checkout mà không scale Inventory, dù đặt hàng phải trừ kho. | Thêm Inventory và DB của nó vào phạm vi scale. |
 | Q23 | Sim `realtime` | WebSocket "cần sticky"; nhãn SSE ghi `event:`; "HTTP/2 hết giới hạn kết nối". | Bỏ "sticky" (chỉ cần LB hỗ trợ Upgrade + pub/sub); nhãn `data:`; viết "nới rộng nhiều (số stream đồng thời do hai bên thoả thuận)". |
 | Q24 | Sim `tdd-codewalk` | Giải thích Hypothesis tìm ra 500000 bằng "shrink". Với bug này 500000 là input hỏng duy nhất; reviewer cho rằng Hypothesis tìm ra nhờ thu hằng số từ source (từ bản 6.131), **chưa kiểm chứng**. | Viết trung tính: "Hypothesis thử cả giá trị biên và hằng số trong code, nên trúng 500000"; kiểm changelog trước khi ghi số phiên bản. |
-| Q25 | Engine (`kgroup`, `rplay`, `binary`, `ring`) | Bốn chỗ: crash chưa nhắc `session.timeout.ms` và xử lý lại phần chưa commit; `EVAL` thiếu `numkeys`; điểm bằng nhau xếp khác Redis; cận `⌈log₂n⌉+1`; ring nói key chuyển sang một server dù đang bật vnode. | Sửa chữ trong engine trong một commit riêng (đây là sửa engine, không phải nội dung). |
+| Q25 | Engine (`kgroup`, `rplay`, `binary`, `ring`) | Năm chỗ: crash chưa nhắc `session.timeout.ms` và xử lý lại phần chưa commit; `EVAL` thiếu `numkeys`; điểm bằng nhau xếp khác Redis; cận `⌈log₂n⌉+1`; ring nói key chuyển sang một server dù đang bật vnode. | Sửa chữ trong engine trong một commit riêng (đây là sửa engine, không phải nội dung). |
 | Q26 | Sim nit: `cache-write`, `isolation`, `inverted-index`, `seat` | Write-around thiếu mũi tên `200`; DAX ghi DB trước rồi mới cập nhật cache; undo log chỉ có ở InnoDB; "hash map" nên là "term dictionary"; ghi rõ mức isolation khi Bob nhận "0 row". | Sửa gộp trong một commit. |
-| Q27 | A4 (nit LLD/DSA) | Tám nit nhỏ: O(1) trung bình, Powersort, cycle trong đồ thị vô hướng, `put/get`, Aggregate, YAGNI, nhiều index, Singleton/DI. | Sửa gộp trong một commit. |
+| Q27 | A4 (nit) | Mười nit nhỏ: O(1) trung bình, Powersort, cycle trong đồ thị vô hướng, `put/get`, Aggregate, YAGNI, nhiều index (`yelp`), FAILED quá sớm (`payment`), Stripe webhook retry (`ticketmaster`), Singleton/DI. | Sửa gộp trong một commit. |
 | Q28 | `eks` và chủ đề mới `k8s-core` | Bảng "Object Kubernetes hay dùng" trong `eks` sẽ trùng với `k8s-core` (Phần B, mục 16–20). | Khi có `k8s-core`, `eks` chỉ giữ phần riêng của AWS và link sang `k8s-core`. |
+| Q29 | Hai bảng "ý còn thiếu" (A2 và A4) | Khoảng 24 ý bổ sung vào topic/problem có sẵn (HTTP/2, `202 Accepted`, S3 strong consistency, cache penetration, quorum…). | Làm ở giai đoạn 2, xen kẽ với topic mới; mỗi topic một commit. |
+| Q30 | `kafka` (các câu "mỗi partition một consumer" còn lại), engine `kgroup` | Sau khi có share group, các câu này chỉ đúng với consumer group cổ điển. | Thêm cụm "(consumer group cổ điển)" vào từng câu; không viết lại. |
 
 ### A1. Đã sửa (mỗi loại một commit)
 
@@ -53,7 +55,7 @@ Mỗi dòng gồm vấn đề và **đề xuất mặc định**: nếu người
 | `c6140d1` | Sửa lỗi lập luận, xem 5 mục bên dưới. | |
 | `76fa535` | Đổi tên dòng "State Machine" trong `patterns-gof` thành "State (state machine)" để cùng thuật ngữ với `lld-delivery` và `lld-problems-list`. | Tên pattern theo GoF |
 | `45719f5` | Sửa câu cùng loại với `search` trong `yelp`. Câu cũ "không index nào dùng được" cho `LIKE '%phở%'` mâu thuẫn với đính chính `pg_trgm`. Cùng commit: HTTP/3 "thường dùng UDP 443", vì RFC cho phép chạy trên bất kỳ cổng UDP nào. | https://www.postgresql.org/docs/current/pgtrgm.html · RFC 9114 |
-| (commit sau proposal) | `api-design`: `Retry-After` đi kèm 429 và 503, không đi kèm 408. Câu trước đó gán nó cho cả 408. | RFC 9110 §15.5.9, §15.6.4 · RFC 6585 §4 |
+| `69b36a8` | `api-design`: `Retry-After` đi kèm 429 và 503, không đi kèm 408. Câu trước đó gán nó cho cả 408. | RFC 9110 §15.5.9, §15.6.4 · RFC 6585 §4 |
 | `docs/decisions.md` | Ghi D30: luật `PRICE` trong `check.mjs`. `check.mjs` là file dùng chung, nên các nhánh khác sẽ merge với luật này. | |
 
 Sáu thông tin lỗi thời đã đính chính trong `326571b`:
@@ -81,7 +83,7 @@ Năm lỗi lập luận đã sửa trong `c6140d1`:
 
 ### A2. Cần quyết (chưa sửa)
 
-Các mục dưới đây là lựa chọn thiết kế, cách diễn đạt, hoặc thông tin mới mà người review đưa ra nhưng tôi chưa tự kiểm chứng.
+Các mục dưới đây là lựa chọn thiết kế hoặc cách diễn đạt; phần lớn là nhận định của reviewer, chưa tự kiểm chứng. Riêng sáu khẳng định ở bảng "đã xác minh" cuối mục đã được đối chiếu với trang gốc.
 
 **Đúng một phần, nên sửa câu chữ**
 
@@ -123,7 +125,7 @@ Cả sáu khẳng định đều đúng; không cái nào bị bác bỏ. Hai c�
 
 | Khẳng định | Kết quả | Đã sửa | Nguồn đã mở |
 |---|---|---|---|
-| Kafka share groups (KIP-932) | **Đúng.** Trang phát hành 4.2.0 ghi "Kafka Queues (Share Groups) is now production-ready". | `kafka`: giới hạn các câu "số partition = số consumer tối đa" và "không có ack từng message" về consumer group cổ điển; nêu share group và cái giá là mất thứ tự trong partition. | https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/ |
+| Kafka share groups (KIP-932) | **Đúng.** Trang phát hành 4.2.0 ghi "Kafka Queues (Share Groups) is now production-ready". KIP-932 ghi record trong share-partition "can be delivered out of order", và ack từng record bằng accept/release/reject (đã mở KIP, câu chữ chỉnh ở `35be7ad`). | `kafka`: giới hạn các câu "số partition = số consumer tối đa" và "không có ack từng message" về consumer group cổ điển; nêu share group và cái giá là mất thứ tự trong partition. | https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/ |
 | ECS Managed Instances | **Đúng.** AWS lo cấp máy, vá OS và scale; dùng được mọi loại EC2 (GPU, Arm); mỗi instance sống tối đa 14 ngày. | `ecs` (tldr), `ecs-vs-eks` (dòng Compute). Sim `container-stack` chưa thêm lựa chọn thứ sáu: muốn thêm phải sửa dữ liệu sim, **cần quyết**. | https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ManagedInstances.html |
 | Skip scan | **Đúng.** MySQL có từ 8.0.13; PostgreSQL có từ 18. | `indexing`: card có cùng ngoại lệ với point. | https://dev.mysql.com/doc/refman/8.0/en/range-optimization.html · https://www.postgresql.org/docs/18/release-18.html |
 | Cassandra `num_tokens` mặc định 16 | **Đúng một phần.** `cassandra.yaml` mặc định 16. Câu "4.0 hạ từ 256" chưa thấy trên trang nên không ghi. | `consistent-hashing`: bỏ "hàng trăm virtual node". | https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html |
@@ -140,7 +142,7 @@ Cả sáu khẳng định đều đúng; không cái nào bị bác bỏ. Hai c�
 | `caching` | Cache penetration (negative cache, Bloom filter); race giữa delete và đọc stale |
 | `sharding` | Global secondary index; quy trình resharding |
 | `cap` | Quorum R + W > N; linearizability khác serializability |
-| `streams` | Số consumer trong group ≤ số partition; log compaction |
+| `streams` | Số consumer trong consumer group cổ điển ≤ số partition (share group từ Kafka 4.2 thì không); log compaction |
 | `queue` | SQS visibility timeout; lag là tín hiệu để scale |
 | `dist-lock` | Nhả lock bằng compare-and-delete (Lua); gia hạn lease |
 | `dist-cache` | `maxmemory-policy` mặc định `noeviction`; LRU/LFU của Redis là xấp xỉ |
@@ -844,6 +846,8 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
   - SVG kiến trúc control plane / node.
   - Sim "xoá một pod": controller thấy 2/3 replica → tạo pod mới → scheduler gán node → kubelet chạy pod → EndpointSlice cập nhật.
 - **Nguồn (đã mở)**
+  - https://kubernetes.io/docs/concepts/services-networking/service/ (kiểu Service, selector → EndpointSlice)
+  - https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   - https://kubernetes.io/docs/concepts/overview/components/
   - https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
   - https://kubernetes.io/docs/concepts/services-networking/gateway/
@@ -885,6 +889,8 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
   - https://docs.docker.com/build/building/best-practices/
   - https://docs.docker.com/build/cache/optimize/
   - https://docs.docker.com/build/building/secrets/
+  - https://github.com/GoogleContainerTools/distroless (chỉ có app và runtime, không có shell hay package manager)
+  - https://docs.docker.com/reference/dockerfile/ (đã đọc phần `USER`; phần `HEALTHCHECK` bị cắt khi tải, **chưa trích được**)
 
 ### 19. `k8s-operations` · Chạy ổn định trên Kubernetes: probe, resource, rollout, stateful · **P1**
 
@@ -935,6 +941,9 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
   - Scale StatefulSet từ 3 xuống 2 thì PVC `data-web-2` ra sao?
 - **Sơ đồ / mô phỏng**: sim rolling update 4 replica với `maxSurge=1`, `maxUnavailable=0`, có variant readiness fail ở bản mới (rollout dừng, bản cũ vẫn phục vụ) và variant không có readiness probe (traffic vào pod chưa sẵn sàng).
 - **Nguồn (đã mở)**
+  - https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/
+  - https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/ (công thức `ceil`, CPU tính theo % requests)
+  - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   - https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/
   - https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   - https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
@@ -965,6 +974,8 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Sơ đồ / mô phỏng**: SVG pipeline commit → CI build → scan + SBOM → push (tag + digest) → deploy dev → promote staging → prod.
 - **Nguồn (đã mở)**
   - https://docs.docker.com/build/metadata/attestations/sbom/
+  - https://github.com/opencontainers/distribution-spec/blob/main/spec.md (push/pull manifest theo tag hoặc digest)
+  - https://docs.docker.com/scout/ (sinh SBOM và đối chiếu với cơ sở dữ liệu lỗ hổng; một ví dụ công cụ scan, không bắt buộc)
   - https://github.com/opencontainers/image-spec/blob/main/spec.md (manifest, image index, digest)
   - https://docs.docker.com/build/building/best-practices/ (pin digest, build lại định kỳ)
 
