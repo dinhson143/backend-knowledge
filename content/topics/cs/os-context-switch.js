@@ -37,11 +37,11 @@ BK.topic({
       why: "Kernel chỉ giành lại CPU được khi nó được chạy: hoặc task gọi vào kernel, hoặc phần cứng ngắt định kỳ. Không có timer interrupt thì một vòng lặp vô hạn giữ CPU mãi; timer là thứ bảo đảm OS luôn lấy lại quyền điều khiển (OSTEP, cpu-mechanisms).",
     },
     {
-      t: "**Lưu gì** — thanh ghi đa dụng, PC (lệnh tiếp theo), con trỏ stack; trên kernel stack của task. Với process còn có con trỏ tới bảng trang (trên x86 là thanh ghi CR3).",
+      t: "**Lưu gì** — thanh ghi đa dụng, PC (lệnh tiếp theo), con trỏ stack; trên kernel stack của task. Với process còn có con trỏ tới bảng trang.",
       why: "Đây là toàn bộ trạng thái CPU \"thấy\" của task; khôi phục đủ thì task chạy tiếp như chưa từng bị dừng. Bộ nhớ không phải lưu vì nó vẫn nằm nguyên trong RAM; chỉ cần trỏ lại đúng bảng trang.",
     },
     {
-      t: "**Chi phí trực tiếp** — lmbench năm 1996 đo context switch khoảng 6 µs trên CPU 200 MHz; máy hiện đại 2–3 GHz xuống dưới 1 µs. Con số tuyệt đối không quan trọng bằng tần suất: 100.000 lần/giây × vài µs (gồm cả chi phí gián tiếp) đã là một phần đáng kể của một core.",
+      t: "**Chi phí trực tiếp** — lmbench năm 1996 đo context switch khoảng 6 µs trên CPU 200 MHz; máy hiện đại 2–3 GHz xuống dưới 1 µs. Con số tuyệt đối không quan trọng bằng tần suất: mỗi lần chuyển còn kéo theo chi phí gián tiếp (cache, TLB lạnh) không nằm trong con số đo được, nên khi `cs` lên hàng trăm nghìn mỗi giây thì tổng chi phí đáng kể. Đây là ước lượng định tính; muốn số cụ thể thì đo trên máy của bạn (OSTEP gợi ý cách đo bằng hai process trao đổi qua pipe trên cùng một CPU).",
       why: "Số liệu từ OSTEP, mục \"How long context switches take\" (cpu-mechanisms). OSTEP cũng lưu ý nhiều thao tác của OS phụ thuộc băng thông bộ nhớ, thứ không tăng nhanh như tốc độ CPU, nên CPU mới chưa chắc làm context switch rẻ đi tương ứng.",
     },
     {

@@ -49,12 +49,12 @@ BK.topic({
       why: "Hai loại chênh nhau vài bậc độ lớn vì major fault chờ thiết bị lưu trữ (getrusage(2) — https://man7.org/linux/man-pages/man2/getrusage.2.html). Major fault tăng đột biến trên server là dấu hiệu bộ nhớ không đủ, không phải CPU yếu.",
     },
     {
-      t: "**Swap và latency** — OSTEP tính: RAM cỡ 100 ns, đĩa (HDD) cỡ 10 ms; chỉ cần 10% truy cập phải đi đĩa thì thời gian truy cập trung bình thành khoảng 1 ms, chậm gần 10.000 lần. SSD nhanh hơn HDD nhiều nhưng vẫn chậm hơn RAM hàng trăm lần trở lên.",
+      t: "**Swap và latency** — OSTEP tính: RAM cỡ 100 ns, đĩa (HDD) cỡ 10 ms; chỉ cần 10% truy cập phải đi đĩa thì thời gian truy cập trung bình thành khoảng 1 ms, chậm gần 10.000 lần. Con số đĩa trong ví dụ là của HDD; SSD nhanh hơn nhưng vẫn là thiết bị I/O, nên major fault vẫn đắt hơn hẳn một lần đọc RAM.",
       why: "Chi phí đĩa lớn tới mức một tỉ lệ miss rất nhỏ cũng chi phối toàn bộ (OSTEP, Beyond Physical Memory: Policies — https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys-policy.pdf). Vì vậy service cần latency thấp (Redis, database, Kafka broker) thường tắt hoặc hạn chế swap và cấp đủ RAM; swap chỉ là lưới an toàn chứ không phải RAM rẻ.",
     },
     {
       t: "**Thrashing** — tổng working set của các process lớn hơn RAM: hệ thống liên tục đẩy trang ra rồi nạp lại, CPU gần như rảnh mà không việc gì xong. Linux khi hết cách giải phóng bộ nhớ thì gọi **OOM killer** giết một process tốn nhiều bộ nhớ.",
-      why: "Mỗi process vừa được nạp trang thì trang của process khác bị đẩy ra, nên không ai đủ trang để chạy tiếp (OSTEP, vm-beyondphys-policy, mục Thrashing). OOM killer là cách giải thô: giảm áp lực bộ nhớ ngay nhưng có thể giết đúng service quan trọng (https://docs.kernel.org/mm/page_tables.html). Trong container, vượt memory limit cũng dẫn tới OOM kill.",
+      why: "Mỗi process vừa được nạp trang thì trang của process khác bị đẩy ra, nên không ai đủ trang để chạy tiếp (OSTEP, vm-beyondphys-policy, mục Thrashing). OOM killer là cách giải thô: giảm áp lực bộ nhớ ngay nhưng có thể giết đúng service quan trọng (https://docs.kernel.org/mm/page_tables.html). Trong Kubernetes, container dùng quá memory limit sẽ bị kết thúc với lý do `OOMKilled` (exit code 137) và được kubelet khởi động lại nếu có thể (https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/).",
     },
     {
       t: "**VSZ và RSS** — VSZ (`VmSize`) là tổng không gian ảo đã map, RSS (`VmRSS`) là phần đang thật sự nằm trong RAM. Một process Java hay Go có VSZ hàng chục GB mà RSS vài trăm MB là bình thường.",

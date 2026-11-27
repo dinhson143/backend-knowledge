@@ -53,7 +53,7 @@ BK.topic({
     },
     {
       t: "**PID 1 trong container** — trong container, app của bạn thường chính là PID 1 của PID namespace, nên nó nhận nuôi mọi orphan. App không gọi `wait()` cho con nuôi thì zombie dồn lại; thêm vào đó PID 1 chỉ nhận signal mà nó đã cài handler, nên `SIGTERM` có thể bị bỏ qua.",
-      why: "Kernel coi PID 1 của namespace là init: orphan được gán về nó, và signal từ trong namespace chỉ tới được nếu PID 1 đã đăng ký handler, để tránh vô tình giết init (pid_namespaces(7) — https://man7.org/linux/man-pages/man7/pid_namespaces.7.html). Vì vậy người ta chạy một init nhỏ (như `tini`, hoặc tuỳ chọn `--init` của Docker) làm PID 1 để dọn zombie và chuyển tiếp signal.",
+      why: "Kernel coi PID 1 của namespace là init: orphan được gán về nó, và signal từ trong namespace chỉ tới được nếu PID 1 đã đăng ký handler, để tránh vô tình giết init (pid_namespaces(7) — https://man7.org/linux/man-pages/man7/pid_namespaces.7.html). Vì vậy người ta chạy một init nhỏ làm PID 1: `docker run --init` chạy một init bên trong container để chuyển tiếp signal và dọn process con; bản mặc định là `docker-init`, xây trên `tini` (https://docs.docker.com/reference/cli/docker/container/run/).",
     },
     {
       t: "**Cách dọn con đúng** — gọi `waitpid()` cho mọi con; server có nhiều con thì cài handler `SIGCHLD` và lặp `waitpid(-1, &st, WNOHANG)` tới khi trả 0; hoặc đặt `SIGCHLD` thành `SIG_IGN` nếu không cần exit status.",

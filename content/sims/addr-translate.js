@@ -46,7 +46,7 @@ BK.sim({
           msgs: [["CPU", "PT", "cấp 1 → 2 → 3 → 4"], ["PT", "CPU", "PTE: khung 0x1b07, present", "ok"]],
           set: { PT: "4 lần đọc RAM" },
           bad: ["PT"],
-          detail: "Trên x86-64 với 4 cấp, một lần tra đầy đủ cần 4 lần đọc bộ nhớ trước khi được đọc dữ liệu thật. Linux định nghĩa tới 5 cấp (PGD, P4D, PUD, PMD, PTE), cấp nào kiến trúc không dùng thì bị gộp. Các mục page table cũng có thể nằm trong cache CPU nên không phải lần nào cũng chạm RAM.",
+          detail: "Trên x86-64 Linux hỗ trợ page table 4 cấp (địa chỉ ảo 48 bit) và 5 cấp (57 bit) (https://docs.kernel.org/arch/x86/x86_64/mm.html); với 4 cấp, một lần tra đầy đủ cần 4 lần đọc bộ nhớ trước khi được đọc dữ liệu thật. Linux định nghĩa tới 5 cấp (PGD, P4D, PUD, PMD, PTE), cấp nào kiến trúc không dùng thì bị gộp. Các mục page table cũng có thể nằm trong cache CPU nên không phải lần nào cũng chạm RAM.",
         },
         {
           note: "Nạp bản dịch vào TLB rồi đọc dữ liệu.",
@@ -96,7 +96,7 @@ BK.sim({
           msgs: [["CPU", "K", "page fault", "warn"], ["K", "D", "đọc trang (I/O)"], { par: [["D", "K", "… chờ đĩa …", "warn"], ["K", "RAM", "đẩy trang khác ra"]] }],
           set: { K: "major fault ⏳", D: "đang đọc" },
           bad: ["K", "CPU"],
-          detail: "Đây là **major fault**: thread bị chặn chờ I/O, kernel chạy việc khác trong lúc đó. RAM cỡ 100 ns, đĩa cỡ micro giây (SSD) tới mili giây (HDD), nên một lần fault tốn bằng hàng chục nghìn lần đọc RAM. Nếu RAM thiếu kéo dài, trang vừa đẩy ra lại sớm bị cần: thrashing.",
+          detail: "Đây là **major fault**: thread bị chặn chờ I/O, kernel chạy việc khác trong lúc đó. Theo ví dụ của OSTEP, RAM cỡ 100 ns còn đĩa (HDD) cỡ 10 ms, nên một lần fault phải đọc đĩa tốn bằng hàng chục nghìn lần đọc RAM; SSD nhanh hơn HDD nhưng vẫn là I/O, đắt hơn hẳn RAM. Nếu RAM thiếu kéo dài, trang vừa đẩy ra lại sớm bị cần: thrashing.",
         },
         {
           note: "Trang về RAM, cập nhật PTE, chạy lại lệnh.",
