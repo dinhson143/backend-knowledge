@@ -14,6 +14,10 @@
   STAGES.forEach((s) => s.topics.forEach((id) => (byId[id].stage = s)));
   // Thứ tự đọc: giai đoạn chính trước, nhánh song song sau
   const ORDER = [...STAGES.filter((s) => !s.parallel), ...STAGES.filter((s) => s.parallel)].flatMap((s) => s.topics.map((id) => byId[id]));
+  // Lộ trình chính = topic của mọi giai đoạn không song song (kể cả giai đoạn có bài luyện, B0).
+  // Pager đi trong nhóm: lộ trình chính, hoặc riêng một nhánh song song (A1)
+  const MAIN = ORDER.filter((t) => !t.stage.parallel);
+  const groupOf = (t) => (t.stage.parallel ? t.stage.topics.map((id) => byId[id]) : MAIN);
 
   const SIMS = BK.sims;
   const simById = Object.fromEntries(SIMS.map((s) => [s.id, s]));
@@ -30,6 +34,14 @@
   };
   const done = new Set(store.get("ip.done", []));
   const toggleDone = (key) => { done.has(key) ? done.delete(key) : done.add(key); store.set("ip.done", [...done]); };
+  const isReady = (p) => p.topics.every((id) => done.has(id));
+  // "Học tiếp" (A2): topic chưa nắm đầu tiên của lộ trình chính; xong hết thì bài đủ nền chưa luyện đầu tiên
+  function nextStep() {
+    const t = MAIN.find((x) => !done.has(x.id));
+    if (t) return { href: `#/t/${t.id}`, title: t.title, topic: t };
+    const p = PROBLEMS.find((x) => !done.has(`p:${x.id}`) && isReady(x));
+    return p ? { href: `#/p/${p.id}`, title: p.title, problem: p } : { href: "#/problems", title: "Luyện bài" };
+  }
 
   // ── Theme & mobile menu ──
   const theme = store.get("ip.theme", null);
@@ -156,7 +168,7 @@
     setNav("home", sideKnowledge(null));
     const tDone = ALL.filter((t) => done.has(t.id)).length;
     const pDone = PROBLEMS.filter((p) => done.has(`p:${p.id}`)).length;
-    const nextTopic = ORDER.find((t) => !done.has(t.id));
+    const step = nextStep();
     main.innerHTML = `
       <h1>Lộ trình ôn System Design & Backend</h1>
       <p class="lead">Học theo giai đoạn 1 → 5; Low-Level Design và DSA học song song. Mọi chủ đề dùng chung một khung nên ôn lại nhanh.</p>
@@ -164,7 +176,7 @@
       <div class="kpis kpis-3">
         <div class="panel kpi"><div class="n">${tDone}/${ALL.length}</div><div class="l">Chủ đề đã nắm</div><div class="bar"><i style="width:${pct(tDone, ALL.length)}%"></i></div></div>
         <div class="panel kpi"><div class="n">${pDone}/${PROBLEMS.length}</div><div class="l">Bài đã luyện</div><div class="bar"><i style="width:${pct(pDone, PROBLEMS.length)}%"></i></div></div>
-        <a class="panel kpi kpi-next" href="${nextTopic ? `#/t/${nextTopic.id}` : "#/problems"}"><div class="l">Học tiếp</div><div class="n-sm">${esc(nextTopic ? nextTopic.title : "Luyện bài")} →</div></a>
+        <a class="panel kpi kpi-next" href="${step.href}"><div class="l">Học tiếp</div><div class="n-sm">${esc(step.title)} →</div></a>
       </div>
 
       <div class="method panel">
@@ -206,7 +218,9 @@
     const t = byId[id];
     if (!t) return viewHome();
     setNav("learn", sideKnowledge(id));
-    const i = ORDER.indexOf(t), prev = ORDER[i - 1], next = ORDER[i + 1];
+    const group = groupOf(t), i = group.indexOf(t), prev = group[i - 1], next = group[i + 1];
+    // Cuối nhóm: lộ trình chính sang luyện đề, nhánh song song về trang chủ (không nhảy sang nhánh khác)
+    const end = t.stage.parallel ? { href: "#/", label: "Về lộ trình →" } : { href: "#/problems", label: "Sang luyện đề →" };
     const sims = simsFor(id);
     const related = (t.related || []).map((sid) => simById[sid]).filter(Boolean);
     const probs = problemsFor(id);
@@ -242,7 +256,7 @@
       <div class="topic-actions"><button class="btn ${done.has(id) ? "done" : "primary"}" id="doneBtn">${done.has(id) ? "✓ Đã nắm" : "Đánh dấu đã nắm"}</button></div>
       <div class="pager">
         ${prev ? `<a href="#/t/${prev.id}">← ${esc(prev.title)}</a>` : "<span></span>"}
-        ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="#/problems" style="text-align:right">Sang luyện bài →</a>`}
+        ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="${end.href}" style="text-align:right">${end.label}</a>`}
       </div>`;
     mountAll(sims);
     abbrBox(main.querySelector(".tldr"));
@@ -400,7 +414,8 @@
   function render() {
     const h = decodeURIComponent(location.hash.slice(1) || "/");
     if (h.startsWith("/t/")) return viewTopic(h.slice(3));
-    if (h === "/learn") { location.hash = `#/t/${(ORDER.find((t) => !done.has(t.id)) || ORDER[0]).id}`; return; }
+    // replace: không để lại mục #/learn trong lịch sử, nếu không Back sẽ bị đẩy tới lại
+    if (h === "/learn") { location.replace(nextStep().href); return; }
     if (h === "/problems") return viewProblems();
     if (h.startsWith("/p/")) return viewProblem(h.slice(3));
     if (h === "/sims") return viewSims();
