@@ -67,7 +67,7 @@ BK.problem({
             note: "Kiểm tra trùng impressionId rồi ghi event vào **Kafka** (partition theo adId).",
             msgs: [["click", "kafka", "ClickEvent ad7", "ok"]],
             set: { kafka: "partition 3: ad7" },
-            detail: "Click Processor ghi `ClickEvent ad7` vào Kafka với **key = adId**, sau khi kiểm `x9` chưa được tính (thường `SET NX` với TTL trong Redis); trùng thì bỏ qua, chỉ redirect. Key = adId đưa mọi click của ad7 vào cùng partition 3 và cùng một Flink task → đếm theo ad mà không cần gộp chéo máy. Kafka là log bền, có replication: ghi được là click đã an toàn, dù Flink đang chậm hay đang deploy lại. Rủi ro cần nhớ: ad cực hot dồn hết vào một partition (**hot partition**) — giải bằng cách thêm hậu tố ngẫu nhiên vào key rồi gộp lại sau.",
+            detail: "Click Processor ghi `ClickEvent ad7` vào Kafka với **key = adId**, sau khi kiểm `x9` chưa được tính (thường `SET NX` với TTL trong Redis); trùng thì bỏ qua, chỉ redirect. Nếu ghi Kafka lỗi sau khi đã `SET NX` thì phải xoá key, nếu không lần retry bị coi là trùng và click mất. Key = adId đưa mọi click của ad7 vào cùng partition 3 và cùng một Flink task → đếm theo ad mà không cần gộp chéo máy. Kafka là log bền, có replication: ghi được là click đã an toàn, dù Flink đang chậm hay đang deploy lại. Rủi ro cần nhớ: ad cực hot dồn hết vào một partition (**hot partition**) — giải bằng cách thêm hậu tố ngẫu nhiên vào key rồi gộp lại sau.",
           },
           {
             note: "Trả **302** sang trang advertiser ngay — không chờ xử lý số liệu.",
@@ -79,7 +79,7 @@ BK.problem({
             msgs: [["kafka", "flink", "stream"], ["flink", "olap", "ad7 · 10:01 · 1532", "ok"]],
             set: { flink: "window 10:01", olap: "ad7 10:01 = 1532" },
             lesson: "Raw event vào log bền vững, aggregate bằng stream processing, query trên bảng đã pre-aggregate.",
-            detail: "Flink ghi `ad7 · 10:01 · 1532` vào ClickHouse khi cửa sổ 10:01 đóng. Flink gom click của từng ad vào **tumbling window 1 phút** (cửa sổ không chồng nhau: 10:00–10:01, 10:01–10:02…), đóng cửa sổ theo **event time** và watermark chứ không theo giờ máy chủ → click lúc 10:01:59 đến muộn vài giây vẫn vào đúng phút. Checkpoint của Flink cùng offset Kafka giúp không đếm trùng khi task restart. OLAP chỉ giữ 1 dòng mỗi ad mỗi phút thay vì hàng tỷ click thô.",
+            detail: "Flink ghi `ad7 · 10:01 · 1532` vào ClickHouse khi cửa sổ 10:01 đóng. Flink gom click của từng ad vào **tumbling window 1 phút** (cửa sổ không chồng nhau: 10:00–10:01, 10:01–10:02…), đóng cửa sổ theo **event time** và watermark chứ không theo giờ máy chủ → click lúc 10:01:59 đến muộn vài giây vẫn vào đúng phút. Checkpoint của Flink cùng offset Kafka giúp state không đếm trùng khi task restart; muốn kết quả trong ClickHouse cũng không trùng thì sink phải ghi idempotent (upsert theo khoá `ad · phút`) hoặc commit theo transaction gắn với checkpoint (https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/datastream/overview/). OLAP chỉ giữ 1 dòng mỗi ad mỗi phút thay vì hàng tỷ click thô.",
           },
         ],
       },
@@ -144,7 +144,7 @@ BK.problem({
       great: "Thêm dedupe theo impressionId đã ký + batch reconciliation từ raw S3.",
       why: {
         bad: "App server restart hoặc crash là mất toàn bộ số đếm chưa flush, vì counter nằm trong RAM; nhiều server cũng không đếm nhất quán chung được.",
-        good: "Kafka retention giữ event để replay; Flink checkpoint lưu state + offset nên crash xong khôi phục mà không mất hay đếm trùng trong pipeline. Nhưng click trùng từ nguồn (user bấm hai lần, bot, client retry) đã vào Kafka thành hai event riêng nên vẫn bị đếm.",
+        good: "Kafka retention giữ event để replay; Flink checkpoint lưu state + offset nên crash xong khôi phục mà không mất hay đếm trùng trong pipeline. Exactly-once này chỉ phủ tới sink khi sink ghi idempotent hoặc theo transaction; sink ghi append thường sẽ nhận lại kết quả của các cửa sổ được tính lại sau restart. Nhưng click trùng từ nguồn (user bấm hai lần, bot, client retry) đã vào Kafka thành hai event riêng nên vẫn bị đếm.",
         great: "Flink dedupe theo `impressionId` loại được click lặp và id giả mạo, vì server ký id đó lúc hiển thị ad. Batch reconciliation trên raw S3 tính lại độc lập, lệch với số streaming thì sửa — lớp kiểm tra thứ hai cho dữ liệu tiền.",
       },
     },

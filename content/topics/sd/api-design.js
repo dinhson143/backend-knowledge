@@ -52,7 +52,7 @@ BK.topic({
     },
     {
       t: "**REST bước 4 · Returning Data** — status code + response body.",
-      why: "Status code cho client và hạ tầng biết kết quả mà không cần parse body: 5xx thì retry được, 4xx thì không vì gửi lại vẫn sai. Trả `200` kèm `{\"error\": ...}` làm hỏng retry logic, monitoring và cache.",
+      why: "Status code cho client và hạ tầng biết kết quả mà không cần parse body: 5xx (nhất là 503) là lỗi tạm thời nên retry được, nhưng với POST chỉ an toàn khi có idempotency key; 4xx phần lớn không retry vì gửi lại vẫn sai, trừ 408 và 429 (chờ theo `Retry-After`) — RFC 9110 §15: https://www.rfc-editor.org/rfc/rfc9110#section-15, RFC 6585 §4. Trả `200` kèm `{\"error\": ...}` làm hỏng retry logic, monitoring và cache.",
     },
     {
       t: "**GraphQL · N+1 problem** — GraphQL không biết trước client chọn field nào nên không JOIN sẵn được như REST. Giải pháp: **DataLoader** gom các `venue_id` trong vài ms thành một query `WHERE id IN (...)`.",

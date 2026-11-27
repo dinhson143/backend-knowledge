@@ -22,7 +22,7 @@ BK.topic({
       {
         cells: [
           "Semaphore",
-          "Giới hạn N thread cùng truy cập (connection pool, rate limit)",
+          "Giới hạn N thread cùng truy cập (connection pool, giới hạn số việc chạy đồng thời)",
           "`threading.Semaphore(n)`",
         ],
         why: "Semaphore khác lock ở chỗ cho **N thread** cùng vào, không chỉ một. Ví dụ DB chỉ chịu được 10 connection → semaphore khởi tạo 10 permit; thread thứ 11 bị block tới khi có thread `release()`.",

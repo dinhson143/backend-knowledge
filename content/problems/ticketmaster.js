@@ -30,7 +30,7 @@ BK.problem({
     "GET /events/{id}",
     "GET /events/search?q&city&date",
     "POST /bookings/reserve { ticketIds }",
-    "PUT /bookings/confirm { bookingId, paymentDetails }",
+    "PUT /bookings/confirm { bookingId, paymentMethodId }",
   ],
   hldWhy: "**Waiting Room** đứng trước gateway để admit theo đợt, giữ lượng request tới backend trong ngưỡng chịu được — vì lúc mở bán có thể 10M user ập vào. Tách **Search Service** + **Elasticsearch** khỏi **Event Service**: search full-text cần inverted index mà Postgres làm kém, và tải đọc gấp ~100 lần ghi không được ảnh hưởng tới luồng đặt vé. **Booking Service** đi với **Postgres** vì đặt vé cần transaction và strong consistency (không bán trùng ghế). **Redis lock** giữ ghế tạm có TTL: lock tự hết hạn khi user bỏ ngang, không phải giữ transaction DB dài; **Stripe** xử lý thẻ để hệ thống không phải gánh PCI DSS.",
   hld: {

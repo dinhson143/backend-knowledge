@@ -184,7 +184,7 @@ BK.problem({
       why: {
         bad: "Tài xế nhận hai chuyến: hai instance Matching cùng đọc thấy tài xế rảnh rồi cùng gửi lời mời (check-then-act), cả hai đều nghĩ mình hợp lệ.",
         good: "Transaction + cột status trên DB chặn được hai chuyến cùng gán một tài xế. Nhưng vòng mời kéo dài 10s: giữ transaction/row lock suốt thời gian đó làm DB nghẽn, còn không giữ thì vẫn race giữa lúc mời và lúc accept.",
-        great: "Chỉ một Matching instance giành được lock của tài xế, vì `SET NX` atomic; `EX 10` tự nhả nếu tài xế không phản hồi, không cần dọn dẹp. Conditional update khi accept (`WHERE status='AVAILABLE'`) là chốt cuối, phòng trường hợp lock đã hết hạn.",
+        great: "Chỉ một Matching instance giành được lock của tài xế, vì `SET NX` atomic; `EX 10` tự nhả nếu tài xế không phản hồi, không cần dọn dẹp. Conditional update khi accept (`WHERE status='REQUESTED'` trên ride, cùng transaction kiểm tài xế chưa nhận chuyến khác) là chốt cuối, phòng trường hợp lock đã hết hạn.",
       },
     },
     {
