@@ -19,7 +19,7 @@ BK.topic({
     rows: [
       {
         cells: ["1 · Phân tích URL", "Tách scheme, host, path; có thể nâng `http` lên `https` nếu domain từng gửi HSTS", "Không tốn mạng", "—"],
-        why: "HSTS (`Strict-Transport-Security`, RFC 6797) cho trình duyệt nhớ domain chỉ dùng HTTPS, nên lần sau trình duyệt tự đổi sang `https` mà không cần một vòng redirect `301` từ server.",
+        why: "HSTS (`Strict-Transport-Security`) cho trình duyệt nhớ domain chỉ dùng HTTPS; RFC 6797 §8.3 yêu cầu trình duyệt tự thay scheme thành `https` cho domain đó (https://www.rfc-editor.org/rfc/rfc6797#section-8.3), nên lần sau trình duyệt đổi sang `https` mà không cần một vòng redirect `301` từ server.",
       },
       {
         cells: ["2 · DNS", "Hỏi lần lượt cache trình duyệt → OS → resolver; resolver hỏi root → TLD → authoritative nếu chưa có", "0 RTT nếu có cache; nhiều RTT nếu phải hỏi đủ chuỗi", "TTL của record, cache ở mọi tầng"],
@@ -66,7 +66,7 @@ BK.topic({
     },
     {
       t: "**HTTP/1.1, HTTP/2, HTTP/3** ảnh hưởng tới bước 3–7: HTTP/1.1 cần nhiều kết nối song song để tải nhiều file; HTTP/2 chạy nhiều request trên một kết nối TCP; HTTP/3 chạy trên QUIC (UDP) nên mất gói ở một stream không chặn stream khác.",
-      why: "Trang hiện đại tải hàng chục tới hàng trăm tài nguyên. Số kết nối và cách chúng chia sẻ một đường truyền quyết định các tài nguyên đó chờ nhau tới đâu. Chi tiết nằm ở topic HTTP/1.1, HTTP/2, HTTP/3 (sẽ viết).",
+      why: "Trang hiện đại tải hàng chục tới hàng trăm tài nguyên. Số kết nối và cách chúng chia sẻ một đường truyền quyết định các tài nguyên đó chờ nhau tới đâu.",
     },
   ],
   tips: [
