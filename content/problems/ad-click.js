@@ -4,7 +4,7 @@ BK.problem({
   title: "Ad Click Aggregator",
   hi: "ad-click-aggregator",
   summary: "Ghi nhận hàng chục nghìn click/giây không mất, không đếm trùng; advertiser xem số theo phút.",
-  topics: ["kafka", "streams", "queue", "patterns"],
+  topics: ["kafka", "streams", "queue", "patterns", "idempotency"],
   fr: ["User click quảng cáo → redirect tới trang advertiser", "Advertiser xem số click theo phút / giờ / ngày"],
   nfr: [
     {

@@ -4,7 +4,7 @@ BK.problem({
   title: "Ticket Booking (Ticketmaster)",
   hi: "ticketmaster",
   summary: "Đọc cực nhiều, ghi tranh chấp gay gắt: không bán trùng ghế, chịu được hàng triệu người vào cùng lúc.",
-  topics: ["redis", "patterns", "dist-lock", "search", "cap"],
+  topics: ["redis", "patterns", "dist-lock", "search", "cap", "idempotency", "db-isolation-anomalies"],
   fr: ["Xem chi tiết event và seat map", "Tìm kiếm event", "Đặt vé: giữ ghế → thanh toán → xác nhận"],
   nfr: [
     {

@@ -4,7 +4,7 @@ BK.problem({
   title: "Local Business Search (Yelp)",
   hi: "yelp",
   summary: "Tìm quán theo vị trí + từ khoá trong < 500ms; review mỗi người một lần, rating trung bình luôn đúng.",
-  topics: ["search", "indexing", "patterns"],
+  topics: ["search", "indexing", "patterns", "outbox-cdc"],
   fr: [
     "Tìm business theo vị trí, bán kính, tên, category",
     "Xem chi tiết business và review",
