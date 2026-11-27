@@ -129,6 +129,13 @@ td:first-child { font-weight: 550; }
 .btn:hover { background: var(--surface-2); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btn.done { background: var(--added-soft); border-color: var(--added); color: var(--added); }
+a.btn { display: inline-block; text-align: center; }
+.next-card { margin-top: 32px; border-left: 3px solid var(--accent); }
+.next-card a.chip { color: var(--accent); }
+.next-card .nc-h { margin: 0 0 8px; font-size: 16px; }
+.next-card p { margin: 0 0 8px; }
+.nc-btns { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 10px; }
+.next-card .small + .small { margin-top: 4px; }
 .pager { display: flex; justify-content: space-between; margin-top: 40px; gap: 12px; }
 .pager a { padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 14px; max-width: 48%; }
 
@@ -153,6 +160,9 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   .topbar { position: static; } /* ba hàng dính trên cùng chiếm ~1/4 màn hình khi đọc */
   #search { order: 5; flex: 1 1 100%; margin-left: 0; }
   .face { padding: 28px 20px; }
+  .nc-btns .btn { flex: 1 1 100%; }
+  .pager { flex-direction: column; }
+  .pager a { max-width: none; }
   .face .q { font-size: 18px; }
 }
 

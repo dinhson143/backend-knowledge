@@ -278,7 +278,7 @@
         ${probs.length ? `<div class="apply"><span class="muted">Dùng trong bài:</span> ${probs.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""}
         ${related.length ? `<div class="apply"><span class="muted">Mô phỏng liên quan:</span> ${related.map((s) => `<a class="chip" href="#/sim/${s.id}">${esc(s.title)}</a>`).join("")}</div>` : ""}` : ""}
 
-      <div class="topic-actions"><button class="btn ${done.has(id) ? "done" : "primary"}" id="doneBtn">${done.has(id) ? "✓ Đã nắm" : "Đánh dấu đã nắm"}</button></div>
+      ${nextCard(t, next, end)}
       <div class="pager">
         ${prev ? `<a href="#/t/${prev.id}">← ${esc(prev.title)}</a>` : "<span></span>"}
         ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="${end.href}" style="text-align:right">${end.label}</a>`}
@@ -286,6 +286,32 @@
     mountAll(sims);
     abbrBox(main.querySelector(".tldr"));
     $("#doneBtn").onclick = () => { toggleDone(id); keepPlace(() => viewTopic(id)); };
+    // Một chạm: chỉ THÊM vào done (không đảo), rồi để link chuyển trang
+    $("#goNext").onclick = () => { if (!done.has(id)) { done.add(id); store.set("ip.done", [...done]); } };
+  }
+
+  // Khối "Tiếp theo" cuối trang topic (A4); topic cuối giai đoạn thì thành "Hết giai đoạn" kèm chặng kiểm tra (A5)
+  function nextCard(t, next, end) {
+    const id = t.id, isDone = done.has(id);
+    const lastOfStage = !t.stage.parallel && t.stage.topics[t.stage.topics.length - 1] === id;
+    const ck = lastOfStage ? checkpoint(t.stage) : [];
+    const verb = !next ? end.label.replace(" →", "").toLowerCase()
+      : lastOfStage ? `sang Giai đoạn ${stageNum(next.stage)}: ${next.stage.title}` : "sang bài tiếp";
+    const label = (isDone ? verb[0].toUpperCase() + verb.slice(1) : `✓ Đã nắm, ${verb}`) + " →";
+    // Bài sắp mở: dùng topic này và chỉ còn thiếu tối đa 1 chủ đề khác
+    const soon = problemsFor(id).filter((p) => !done.has(`p:${p.id}`) && missing(p).filter((x) => x !== id).length <= 1).slice(0, 2);
+    return `<section class="panel next-card" aria-labelledby="nextH">
+      <h2 id="nextH" class="nc-h">${lastOfStage ? `Hết giai đoạn ${stageNum(t.stage)} · ${esc(t.stage.title)}` : "Tiếp theo"}</h2>
+      ${ck.length ? `<p class="small">Kiểm tra chặng trước khi đi tiếp (tự làm 15–20 phút mỗi bài):</p>
+        <div class="rm-chips">${ck.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)} · ${LEVELS[p.level]}</a>`).join("")}</div>` : ""}
+      <div class="nc-btns">
+        <a class="btn primary" id="goNext" href="${next ? `#/t/${next.id}` : end.href}">${esc(label)}</a>
+        <button class="btn ${isDone ? "done" : ""}" id="doneBtn" aria-pressed="${isDone}">${isDone ? "✓ Đã nắm" : "Chỉ đánh dấu đã nắm"}</button>
+      </div>
+      ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}</div>` : ""}
+      ${soon.length ? `<div class="small"><span class="muted">Sắp mở:</span> ${soon.map((p) => { const rest = missing(p).filter((x) => x !== id);
+        return `<a href="#/p/${p.id}">${esc(p.title)}</a> · ${LEVELS[p.level]} ${rest.length ? `(còn ${esc(byId[rest[0]].title)})` : "(đủ nền sau bài này)"}`; }).join("; ")}</div>` : ""}
+    </section>`;
   }
 
   // ── Bài luyện ──
