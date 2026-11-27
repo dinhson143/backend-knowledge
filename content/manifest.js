@@ -80,6 +80,7 @@
     "content/topics/cs/thr-green-threads.js",
     "content/topics/cs/io-blocking-models.js",
     "content/topics/cs/os-signals-shutdown.js",
+    "content/topics/cs/conc-race-condition.js",
     "content/topics/code/code-interview-communication.js",
     "content/topics/code/code-language-choice.js",
     "content/problems/bitly.js",
