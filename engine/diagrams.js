@@ -185,6 +185,8 @@
     }
 
     function animate(m, g, my) {
+      // Người dùng giảm chuyển động: bỏ gói tin bay, mũi tên vẫn được vẽ ngay sau đó
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
       const kind = m[3] || "req";
       const pk = el("g", { class: `pk k-${kind}` }, gPk);
       el("circle", { r: 6 }, pk);
