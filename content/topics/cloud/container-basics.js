@@ -166,6 +166,18 @@ BK.topic({
       why: "Container có thể bị xoá và tạo lại bất cứ lúc nào (deploy, node hỏng, autoscale); dữ liệu nằm trong container layer sẽ mất theo.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/container-basics-vm-vs-container.svg",
+      caption: "VM: hypervisor chia phần cứng, mỗi VM boot guest OS với kernel riêng. Container: mọi container dùng chung một kernel của host; mỗi container là process có bộ namespace riêng (PID, mạng, mount…) và bị cgroup giới hạn CPU, RAM, IO.",
+      source: "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/",
+    },
+    {
+      src: "content/svg/container-basics-image-layers.svg",
+      caption: "Image là các layer chỉ đọc, định danh bằng digest, dùng chung giữa các container. Mỗi container có thêm một layer ghi được; sửa file của image thì file được copy lên layer đó (copy-on-write), xoá container là mất layer này.",
+      source: "https://docs.docker.com/engine/storage/drivers/",
+    },
+  ],
   cards: [
     [
       "Vì sao container khởi động nhanh hơn VM?",
