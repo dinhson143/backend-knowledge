@@ -63,7 +63,7 @@ BK.problem({
           {
             note: "Elasticsearch kết hợp **geo_distance filter** + full-text + category trong một query.",
             msgs: [["search", "es", "geo_distance 2km + match phở"], ["es", "search", "48 quán", "ok"]],
-            detail: "ES trả **48 quán**, xếp hạng kết hợp độ khớp text, khoảng cách và rating. Search Service gửi một query gồm `geo_distance` filter 2km quanh toạ độ user, `match` “phở” trên tên/mô tả/món, và filter category. ES dùng cấu trúc không gian (BKD tree) cho geo_point nên lọc theo khoảng cách nhanh mà không tính khoảng cách tới mọi quán, và dùng inverted index cho text. Làm tương tự trên Postgres bằng `LIKE '%phở%'` + công thức Haversine sẽ phải quét toàn bảng vì không index nào dùng được.",
+            detail: "ES trả **48 quán**, xếp hạng kết hợp độ khớp text, khoảng cách và rating. Search Service gửi một query gồm `geo_distance` filter 2km quanh toạ độ user, `match` “phở” trên tên/mô tả/món, và filter category. ES dùng cấu trúc không gian (BKD tree) cho geo_point nên lọc theo khoảng cách nhanh mà không tính khoảng cách tới mọi quán, và dùng inverted index cho text. Làm tương tự trên Postgres bằng `LIKE '%phở%'` + công thức Haversine sẽ phải quét toàn bảng: wildcard đầu làm B-Tree index vô dụng và công thức Haversine phải tính trên mọi dòng (index trigram `pg_trgm` giúp được phần text nhưng không xếp hạng độ liên quan).",
           },
           {
             note: "Trả danh sách kèm rating đã tính sẵn.",
