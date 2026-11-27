@@ -81,6 +81,13 @@ BK.topic({
       why: "List là mảng liền kề → `pop(0)` phải dịch n−1 phần tử còn lại sang trái, O(n), và BFS gọi nó n lần thành O(n²). `deque.popleft()` chỉ dịch con trỏ đầu nên O(1).",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/ds-heap-array.svg",
+      caption: "Min-heap là cây nhị phân hoàn chỉnh lưu trong mảng: con của ô i nằm ở 2i+1 và 2i+2, nên không cần con trỏ, min luôn ở heap[0], và push/pop chỉ đi một đường cao log n.",
+      source: "https://docs.python.org/3/library/heapq.html",
+    },
+  ],
   cards: [
     [
       "Python list lưu phần tử thế nào trong bộ nhớ?",

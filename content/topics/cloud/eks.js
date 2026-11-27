@@ -207,6 +207,13 @@ BK.topic({
       why: "Cần lý do cụ thể mà chỉ Kubernetes có — operator, Helm, chạy đa cloud, hay platform cho nhiều team — vì EKS tốn phí và công vận hành hơn ECS. Không nêu được thì ECS là lựa chọn rẻ hơn.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/eks-control-data-plane.svg",
+      caption: "Control plane (kube-apiserver, etcd, scheduler, controller-manager) do AWS chạy riêng cho mỗi cluster trên 3 AZ; data plane là node EC2 hoặc Fargate trong VPC của bạn, nơi kubelet nhận pod từ API server.",
+      source: "https://docs.aws.amazon.com/eks/latest/userguide/eks-architecture.html",
+    },
+  ],
   cards: [
     [
       "AWS quản lý phần nào của EKS, bạn quản lý phần nào?",
