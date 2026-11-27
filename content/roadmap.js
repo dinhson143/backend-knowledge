@@ -88,7 +88,7 @@ window.ROADMAP = [
       { id: "lld.oop", title: "Khung trả lời & OOP", topics: ["lld-delivery", "oop-pillars"] },
       { id: "lld.principles", title: "Design Principles", topics: ["solid", "principles-other"] },
       { id: "lld.patterns", title: "Design Patterns", topics: ["patterns-gof"] },
-      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list"] },
+      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list", "mc-machine-coding-round"] },
     ] },
   { id: "arch", title: "Kiến trúc & phương pháp", goal: "Học xong bạn giải thích được code phụ thuộc theo hướng nào, khi nào tách service và cách TDD/DDD khớp với nhau.", parallel: true,
     parts: [
