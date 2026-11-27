@@ -114,6 +114,8 @@ for (const s of Object.values(sims)) {
 
 // ── Văn bản hiển thị: markup inline, tiền tố points, chữ không dấu ──
 const NO_DIACRITICS = /\b(khong|duoc|nguoi|nhieu|truoc|chung ta|tuong|thuc hien|du lieu|he thong)\b/i;
+// Giá dịch vụ (luật: không ghi giá). Số tiền trong kịch bản ("charge $50") vẫn được; giá theo đơn vị thì không.
+const PRICE = /\$\s?\d[\d.,]*\s*(\/|mỗi|per\b)|≈\s*\$\d/i;
 // files/run = code; còn lại là id, toạ độ, đường dẫn
 const CODE_KEYS = new Set(["files", "run", "id", "x", "y", "w", "h", "src"]);
 function walk(file, v, path) {
@@ -123,6 +125,7 @@ function walk(file, v, path) {
     const prose = v.replace(/`[^`]*`/g, "");
     if ((prose.match(/\*\*/g) || []).length % 2) at(file, path, "** lẻ");
     if (NO_DIACRITICS.test(prose)) at(file, path, `chữ không dấu: "${prose.match(NO_DIACRITICS)[0]}"`);
+    if (PRICE.test(prose)) at(file, path, `có giá tiền "${prose.match(PRICE)[0]}" — không ghi giá, trỏ tới trang giá chính thức`);
     return;
   }
   if (Array.isArray(v)) return v.forEach((x, i) => walk(file, x, `${path}[${i}]`));
@@ -164,6 +167,15 @@ svgOnDisk.forEach((f) => {
   if (!/<svg[^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/.test(s)) at(f, "", 'thẻ <svg> thiếu xmlns="http://www.w3.org/2000/svg"');
   if (!/<svg[^>]*viewBox=/.test(s)) at(f, "", "thẻ <svg> thiếu viewBox");
   if (!/<rect[^>]*fill="#fff(fff)?"/i.test(s)) at(f, "", 'thiếu rect nền sáng (fill="#ffffff") — xem D11');
+  // CSS của class thắng thuộc tính fill/stroke trên phần tử → màu riêng bị mất, phải dùng style="" (D50)
+  const cls = {};
+  for (const [, sel, body] of (s.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "").matchAll(/([^{}]+)\{([^}]*)\}/g))
+    for (const [, c] of sel.matchAll(/\.([\w-]+)/g)) body.split(";").forEach((p) => (cls[c] ||= new Set()).add(p.split(":")[0].trim()));
+  for (const [tag] of s.matchAll(/<\w+\b[^>]*\bclass="[^"]+"[^>]*>/g)) {
+    const set = tag.match(/class="([^"]+)"/)[1].split(/\s+/).flatMap((c) => [...(cls[c] || [])]);
+    for (const a of ["fill", "stroke", "stroke-width"])
+      if (set.includes(a) && new RegExp(`\\s${a}="`).test(tag)) at(f, "", `thuộc tính ${a}="…" bị CSS của class ghi đè, dùng style="${a}:…": ${tag.slice(0, 80)}`);
+  }
   if (statSync(new URL(f, root)).size > MAX) at(f, "", "SVG > 40 KB");
 });
 if (loaded.at(-1) !== "app.js") at("content/manifest.js", "FILES", "app.js phải là file nạp cuối cùng");

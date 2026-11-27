@@ -40,6 +40,8 @@
     });
     return out;
   }
+  // Chip chọn variant/tab: trạng thái "on" cũng báo cho trình đọc màn hình (chỉ với <button>)
+  const setOn = (c, on) => { c.classList.toggle("on", on); if (c.tagName === "BUTTON") c.setAttribute("aria-pressed", on); };
   let uidSeq = 0;
   function defs(svg) {
     const uid = "s" + ++uidSeq;
@@ -74,13 +76,13 @@
       ${sim.context ? `<details class="sim-context" open><summary>Bối cảnh — cần để ý gì</summary><div>${inline(sim.context)}</div></details>` : ""}
       ${variants.length > 1 ? `<div class="sim-variants">${variants.map((v, k) => `<button class="chip" data-v="${k}">${esc(v.name)}</button>`).join("")}</div>` : ""}
       <div class="sim-stage"></div>
-      <div class="sim-note"></div>
+      <div class="sim-note" aria-live="polite"></div>
       <ol class="sim-log"></ol>
       <div class="sim-ctrl">
-        <button class="btn" data-a="reset" title="Về đầu">⟲</button>
-        <button class="btn" data-a="prev" title="Bước trước">◀</button>
+        <button class="btn" data-a="reset" title="Về đầu" aria-label="Về đầu">⟲</button>
+        <button class="btn" data-a="prev" title="Bước trước" aria-label="Bước trước">◀</button>
         <button class="btn primary" data-a="play">▶ Chạy</button>
-        <button class="btn" data-a="next" title="Bước sau">▶|</button>
+        <button class="btn" data-a="next" title="Bước sau" aria-label="Bước sau">▶|</button>
         <span class="sim-step"></span>
         <select data-a="speed" aria-label="Tốc độ"><option value="0.6">0.5×</option><option value="1" selected>1×</option><option value="1.8">2×</option></select>
       </div>`;
@@ -113,7 +115,7 @@
         n.g = g;
         n.sub = el("text", { class: "sn-s", y: NH / 2 + 16, "text-anchor": "middle" }, g);
       });
-      root.querySelectorAll(".sim-variants .chip").forEach((c) => c.classList.toggle("on", +c.dataset.v === vi));
+      root.querySelectorAll(".sim-variants .chip").forEach((c) => setOn(c, +c.dataset.v === vi));
     }
 
     function state(k) {
@@ -183,6 +185,8 @@
     }
 
     function animate(m, g, my) {
+      // Người dùng giảm chuyển động: bỏ gói tin bay, mũi tên vẫn được vẽ ngay sau đó
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
       const kind = m[3] || "req";
       const pk = el("g", { class: `pk k-${kind}` }, gPk);
       el("circle", { r: 6 }, pk);
@@ -282,7 +286,7 @@
         <button class="btn primary" data-a="add">+ Thêm server</button>
         <button class="btn" data-a="del">− Xoá server</button>
         <button class="btn" data-a="vn"></button>
-        <button class="btn" data-a="reset">⟲</button>
+        <button class="btn" data-a="reset" title="Về đầu" aria-label="Về đầu">⟲</button>
       </div>`;
     const stage = root.querySelector(".ring-stage"), panel = root.querySelector(".ring-panel");
     const points = () => servers.flatMap((s, si) => Array.from({ length: vn }, (_, v) => ({ s, si, a: (hash(`${s.name}#${v}#244`) / 2 ** 32) * 360 }))).sort((p, q) => p.a - q.a);
@@ -346,10 +350,10 @@
     root.addEventListener("click", (e) => {
       const a = e.target.closest("[data-a]")?.dataset.a;
       if (a === "add") change(() => servers.push({ name: `S${next}`, c: PALETTE[(next++ - 1) % PALETTE.length] }),
-        `Thêm **${"S" + next}**: chỉ các key nằm ngay trước nó trên vòng đổi chủ — server khác không bị ảnh hưởng.`);
+        `Thêm **${"S" + next}**: chỉ các key nằm ngay trước các điểm của nó trên vòng đổi chủ (lấy từ server kế sau) — key còn lại giữ nguyên chủ.`);
       if (a === "del") {
         const victim = servers[Math.floor(servers.length / 2)];
-        change(() => (servers = servers.filter((s) => s !== victim)), `Xoá **${victim.name}** (server sập): key của nó chuyển sang server kế tiếp theo chiều kim đồng hồ.`);
+        change(() => (servers = servers.filter((s) => s !== victim)), `Xoá **${victim.name}** (server sập): key của nó chuyển sang server kế tiếp theo chiều kim đồng hồ (bật vnode thì được chia cho nhiều server).`);
       }
       if (a === "vn") change(() => (vn = vn > 1 ? 1 : 12), vn > 1 ? "Tắt virtual nodes: mỗi server chỉ 1 điểm → khoảng trên vòng lệch, tải không đều." : "Bật **12 virtual node** mỗi server: điểm rải đều hơn → tải cân bằng hơn. Thử xoá server để thấy tải của nó chia cho nhiều server.", false);
       if (a === "reset") reset();
@@ -367,8 +371,8 @@
       <div class="sim-title">${esc(sim.title)}</div>
       <div class="sim-scn">${inline(sim.scenario)}</div>
       <div class="sim-stage"></div>
-      <div class="sim-note"></div>
-      <div class="sim-ctrl">${ACTIONS.map(([a, l]) => `<button class="btn" data-a="${a}">${l}</button>`).join("")}<button class="btn" data-a="reset">⟲</button></div>
+      <div class="sim-note" aria-live="polite"></div>
+      <div class="sim-ctrl">${ACTIONS.map(([a, l]) => `<button class="btn" data-a="${a}">${l}</button>`).join("")}<button class="btn" data-a="reset" title="Về đầu" aria-label="Về đầu">⟲</button></div>
       <ol class="sim-log"></ol>`;
     const stage = root.querySelector(".sim-stage"), note = root.querySelector(".sim-note"), logEl = root.querySelector(".sim-log");
     function reset() { cur = sim.initial; stock = sim.stock; log = []; fired = null; flash = null; render(); }
@@ -426,7 +430,7 @@
       <div class="sim-scn">${inline(sim.scenario)}</div>
       <div class="bs-target"></div>
       <div class="bs-arr"></div>
-      <div class="sim-note"></div>
+      <div class="sim-note" aria-live="polite"></div>
       <div class="sim-ctrl"><button class="btn primary" data-a="step">Bước tiếp</button><button class="btn" data-a="all">Chạy hết</button><button class="btn" data-a="new">Target mới</button></div>
       <ol class="sim-log"></ol>`;
     function fresh() {
@@ -478,8 +482,8 @@
       <div class="sim-title">${esc(sim.title)}</div>
       <div class="sim-scn">${inline(sim.scenario)}</div>
       <div class="tb-wrap"><div class="tb-bucket"></div><div class="tb-stats"></div></div>
-      <div class="sim-note"></div>
-      <div class="sim-ctrl"><button class="btn primary" data-a="one">Gửi 1 request</button><button class="btn" data-a="burst">Burst 8 request</button><button class="btn" data-a="reset">⟲</button></div>
+      <div class="sim-note" aria-live="polite"></div>
+      <div class="sim-ctrl"><button class="btn primary" data-a="one">Gửi 1 request</button><button class="btn" data-a="burst">Burst 8 request</button><button class="btn" data-a="reset" title="Về đầu" aria-label="Về đầu">⟲</button></div>
       <ol class="sim-log"></ol>`;
     function reset() { tokens = CAP; ok = 0; denied = 0; log = []; render("Bucket đầy 10 token, nạp lại **2 token/giây**. Mỗi request lấy 1 token; hết token → 429."); }
     function send(n) {
@@ -510,7 +514,7 @@
   /* ───────────── Custom: Kafka consumer group ───────────── */
   function mountKafkaGroup(root, sim) {
     const P = 4, KEYS = ["user-1", "user-2", "user-3", "user-4", "user-5", "user-6"];
-    const KC = ["#3b7ff5", "#14a37f", "#e08a00", "#d64545", "#8b5cf6", "#0ea5b7"];
+    const KC = ["#2563eb", "#0f7a60", "#b45f00", "#c53030", "#7c3aed", "#0e7490"]; // chữ trắng trên ô ≥4.5:1
     const part = (k) => hash(k) % P;
     let logs, committed, consumers, next, auto, timer, msg, rr;
     root.classList.add("sim");
@@ -518,13 +522,13 @@
       <div class="sim-title">${esc(sim.title)}</div>
       <div class="sim-scn">${inline(sim.scenario)}</div>
       <div class="kg-topic"></div>
-      <div class="sim-note"></div>
+      <div class="sim-note" aria-live="polite"></div>
       <div class="sim-ctrl">
         <button class="btn primary" data-a="auto"></button>
         <button class="btn" data-a="send">Gửi 1 message</button>
         <button class="btn" data-a="add">+ Consumer</button>
         <button class="btn" data-a="del">− Consumer (crash)</button>
-        <button class="btn" data-a="reset">⟲</button>
+        <button class="btn" data-a="reset" title="Về đầu" aria-label="Về đầu">⟲</button>
       </div>`;
     const assign = () => Object.fromEntries(Array.from({ length: P }, (_, p) => [p, consumers.length ? consumers[p % consumers.length] : null]));
     function reset() {
@@ -585,12 +589,12 @@
       if (act === "add") {
         consumers.push(`C${next++}`);
         msg = consumers.length > P
-          ? `**Rebalance** xong: ${consumers.length} consumer nhưng chỉ có ${P} partition → consumer dư **ngồi rảnh**. Muốn song song hơn phải tăng partition.`
+          ? `**Rebalance** xong: ${consumers.length} consumer nhưng chỉ có ${P} partition → consumer dư **ngồi rảnh** (consumer group cổ điển). Muốn song song hơn phải tăng partition.`
           : `**Rebalance**: chia lại ${P} partition cho ${consumers.length} consumer → mỗi consumer gánh ít hơn, lag giảm dần.`;
       }
       if (act === "del" && consumers.length > 1) {
         const dead = consumers.splice(Math.floor(Math.random() * consumers.length), 1)[0];
-        msg = `**${dead} crash** → mất heartbeat → rebalance: partition của nó chuyển cho consumer còn lại và đọc tiếp từ **offset đã commit**, không mất message.`;
+        msg = `**${dead} crash** → mất heartbeat, sau \`session.timeout.ms\` mới bị coi là chết → rebalance: partition của nó chuyển cho consumer còn lại và đọc tiếp từ **offset đã commit** — không mất message, nhưng phần đã xử lý mà chưa commit sẽ bị xử lý lại.`;
       }
       if (act === "reset") { auto = false; clearInterval(timer); return reset(); }
       render();
@@ -608,7 +612,7 @@
       <div class="sim-scn">${inline(sim.scenario)}</div>
       <div class="sim-variants">${TABS.map(([k, l]) => `<button class="chip" data-t="${k}">${l}</button>`).join("")}</div>
       <div class="rp-wrap"><div class="rp-state"></div><pre class="rp-console"></pre></div>
-      <div class="sim-note"></div>
+      <div class="sim-note" aria-live="polite"></div>
       <div class="sim-ctrl rp-btns"></div>`;
     const now = () => Date.now();
     function reset() {
@@ -635,7 +639,7 @@
       lock: [["A lấy lock", () => { sweep(); if (st.lock) run('SET lock:order7 "A-uuid" NX PX 6000', "(nil)"); else { st.lock = { owner: "A", exp: now() + 6000 }; run('SET lock:order7 "A-uuid" NX PX 6000', "OK"); } }],
         ["B lấy lock", () => { sweep(); if (st.lock) run('SET lock:order7 "B-uuid" NX PX 6000', "(nil)"); else { st.lock = { owner: "B", exp: now() + 6000 }; run('SET lock:order7 "B-uuid" NX PX 6000', "OK"); } }],
         ["B nhả bằng DEL (sai)", () => { sweep(); const had = st.lock; st.lock = null; run("DEL lock:order7", had ? `(integer) 1   ← xoá cả lock của ${had.owner}!` : "(integer) 0"); }],
-        ["B nhả bằng Lua (đúng)", () => { sweep(); const ok = st.lock && st.lock.owner === "B"; if (ok) st.lock = null; run('EVAL "if get==ARGV[1] then del" lock:order7 B-uuid', ok ? "(integer) 1" : "(integer) 0   ← không phải lock của B, giữ nguyên"); }]],
+        ["B nhả bằng Lua (đúng)", () => { sweep(); const ok = st.lock && st.lock.owner === "B"; if (ok) st.lock = null; run('EVAL "if get==ARGV[1] then del" 1 lock:order7 B-uuid', ok ? "(integer) 1" : "(integer) 0   ← không phải lock của B, giữ nguyên"); }]],
     };
     const NOTE = {
       zset: "Sorted set giữ phần tử **sắp xếp theo score**: cập nhật O(log N), lấy top K hoặc hạng của một người ngay lập tức — đúng thứ leaderboard cần.",
@@ -644,7 +648,7 @@
     };
     function render() {
       sweep();
-      root.querySelectorAll("[data-t]").forEach((c) => c.classList.toggle("on", c.dataset.t === tab));
+      root.querySelectorAll("[data-t]").forEach((c) => setOn(c, c.dataset.t === tab));
       let html = "";
       if (tab === "zset") {
         const rows = Object.entries(st.board).sort((a, b) => b[1] - a[1]);
@@ -661,7 +665,7 @@
       root.querySelector(".rp-state").innerHTML = html;
       root.querySelector(".rp-console").textContent = out.length ? out.join("\n") : "# bấm một lệnh bên dưới";
       root.querySelector(".sim-note").innerHTML = inline(NOTE[tab]);
-      root.querySelector(".rp-btns").innerHTML = BTN[tab].map(([l], i) => `<button class="btn" data-b="${i}">${esc(l)}</button>`).join("") + `<button class="btn" data-b="reset">⟲</button>`;
+      root.querySelector(".rp-btns").innerHTML = BTN[tab].map(([l], i) => `<button class="btn" data-b="${i}">${esc(l)}</button>`).join("") + `<button class="btn" data-b="reset" title="Về đầu" aria-label="Về đầu">⟲</button>`;
     }
     root.addEventListener("click", (e) => {
       const t = e.target.closest("[data-t]");
@@ -689,7 +693,7 @@
       <div class="table-wrap st-matrix"></div>`;
     function render() {
       const o = OPTS.find((x) => x.id === cur);
-      root.querySelectorAll("[data-o]").forEach((c) => c.classList.toggle("on", c.dataset.o === cur));
+      root.querySelectorAll("[data-o]").forEach((c) => setOn(c, c.dataset.o === cur));
       root.querySelector(".st-stack").innerHTML = LAYERS.map(([name, m]) => `<div class="st-layer st-${m[cur]}"><span>${esc(name)}</span><b>${NAME[m[cur]]}</b></div>`).join("");
       const mine = LAYERS.filter(([, m]) => m[cur] === "y").length, shared = LAYERS.filter(([, m]) => m[cur] === "s").length;
       root.querySelector(".st-side").innerHTML = `
@@ -723,7 +727,7 @@
       yes.forEach((x) => { eks += x.eks || 0; ecs += x.ecs || 0; });
       const answered = Object.keys(ans).length;
       const pick = eks > ecs ? "EKS" : "ECS";
-      const compute = yes.some((x) => x.ec2) ? "node EC2 (managed node group + Karpenter)" : pick === "EKS" ? "Auto Mode hoặc Fargate nếu không cần tuỳ biến node" : "Fargate";
+      const compute = yes.some((x) => x.ec2) ? "máy EC2 (EKS: managed node group + Karpenter; ECS: capacity provider EC2 hoặc Managed Instances)" : pick === "EKS" ? "Auto Mode hoặc Fargate nếu không cần tuỳ biến node" : "Fargate";
       const lambda = yes.some((x) => x.lambda);
       root.querySelector(".dc-out").innerHTML = !answered
         ? `<div class="muted">Trả lời các câu bên trái để xem gợi ý.</div>`
@@ -788,8 +792,8 @@
     function render() {
       const o = sim.options[oi], s = sim.scenarios[si], res = s ? s.res[o.id] : null;
       const touched = new Set(res ? res.touch : []);
-      root.querySelectorAll("[data-o]").forEach((c) => c.classList.toggle("on", +c.dataset.o === oi));
-      root.querySelectorAll("[data-s]").forEach((c) => c.classList.toggle("on", +c.dataset.s === si));
+      root.querySelectorAll("[data-o]").forEach((c) => setOn(c, +c.dataset.o === oi));
+      root.querySelectorAll("[data-s]").forEach((c) => setOn(c, +c.dataset.s === si));
       stage.innerHTML = "";
       const svg = el("svg", { viewBox: `0 0 800 ${o.h || sim.h || 330}`, class: "sim-svg" }, stage);
       const uid = defs(svg);
@@ -831,7 +835,7 @@
       <div class="cw-track"></div>
       <div class="cw-files"></div>
       <pre class="cw-run"></pre>
-      <div class="sim-note"></div>
+      <div class="sim-note" aria-live="polite"></div>
       <div class="sim-ctrl"><button class="btn" data-a="prev">◀ Bước trước</button><span class="sim-step"></span><button class="btn primary" data-a="next">Bước sau ▶</button></div>`;
     // File ở bước trước (cùng tên) để tô dòng mới thêm
     const prevFile = (name) => {
@@ -840,7 +844,7 @@
     };
     function render() {
       const steps = sim.variants[vi].steps, st = steps[i];
-      root.querySelectorAll("[data-v]").forEach((c) => c.classList.toggle("on", +c.dataset.v === vi));
+      root.querySelectorAll("[data-v]").forEach((c) => setOn(c, +c.dataset.v === vi));
       root.querySelector(".cw-track").innerHTML = steps.map((x, k) => `<span class="cw-dot cw-${x.phase} ${k === i ? "on" : ""} ${k < i ? "past" : ""}" data-i="${k}" title="${esc(x.title)}">${k + 1}</span>`).join("");
       root.querySelector(".cw-files").innerHTML = st.files.map((f) => {
         const old = prevFile(f.name), oldLines = new Set(old ? old.code.split("\n") : []);

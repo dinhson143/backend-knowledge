@@ -58,8 +58,8 @@ BK.topic({
       why: "Sau khi chia, mỗi shard là một DB độc lập: tải không còn tự cân bằng, JOIN hay transaction qua hai shard cần phối hợp qua mạng (scatter-gather, 2PC), và không còn transaction ACID cục bộ nào bao trùm toàn bộ dữ liệu để giữ ràng buộc.",
     },
     {
-      t: "**Giải hot spot** — tách shard động (dynamic splitting), compound shard key, cô lập hot key sang shard riêng.",
-      why: "Hot spot sinh ra khi một khoảng key hoặc một key nhận tải quá lớn: dynamic splitting chia khoảng nóng thành hai shard; compound key (ví dụ `user_id + bucket`) trải dữ liệu của một key nóng ra nhiều shard; cô lập hot key thì cho nó một máy riêng để không kéo chậm các key khác.",
+      t: "**Giải hot spot** — tách shard động (dynamic splitting), key salting, cô lập hot key sang shard riêng.",
+      why: "Hot spot sinh ra khi một khoảng key hoặc một key nhận tải quá lớn: dynamic splitting chia khoảng nóng thành hai shard; key salting (shard key thêm hậu tố, ví dụ `user_id#0..N`) trải dữ liệu của một key nóng ra nhiều shard; cô lập hot key thì cho nó một máy riêng để không kéo chậm các key khác.",
     },
     {
       t: "! Hash function **không ngẫu nhiên** — cùng input luôn ra cùng output; chỉ là phân bố trông như đều.",
@@ -70,6 +70,13 @@ BK.topic({
       why: "Query thiếu shard key phải gửi tới mọi shard rồi gộp kết quả → latency bằng shard chậm nhất, tải nhân N lần; transaction qua nhiều shard cần 2PC với nhiều round-trip và lock. App mà phần lớn query là 「dữ liệu của user X」 thì chọn `user_id` làm shard key → gần như query nào cũng chỉ chạm 1 shard.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/sharding-range-vs-hash.svg",
+      caption: "Range-based giữ key gần nhau trên cùng shard nên query theo khoảng chỉ chạm một shard, nhưng key tăng dần dồn mọi ghi mới vào shard cuối; hash-based rải đều ghi nhưng query theo khoảng phải hỏi mọi shard.",
+      source: "https://www.mongodb.com/docs/manual/sharding/#sharding-strategy",
+    },
+  ],
   cards: [
     ["Horizontal vs vertical partitioning?", "Horizontal: chia dòng, giữ cột. Vertical: chia cột, giữ dòng."],
     [
@@ -78,7 +85,7 @@ BK.topic({
     ],
     [
       "Cách xử lý hot spot khi sharding?",
-      "Dynamic shard splitting, compound shard key, isolate hot key sang shard riêng, key salting.",
+      "Dynamic shard splitting, key salting (`key#0..N`), isolate hot key sang shard riêng.",
     ],
   ],
 });

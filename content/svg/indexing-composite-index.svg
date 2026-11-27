@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Composite index (Ho, Ten) sắp theo Ho rồi mới tới Ten: ba query và phần index mỗi query chạm tới</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <style>
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .k { fill: #ffffff; stroke: #cbd5e1; }
+      .hit { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.4; }
+      .bad { fill: #fde8e1; stroke: #e0562b; stroke-width: 1.4; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .v { font-size: 12px; font-weight: 600; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="378" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Query 1 -->
+  <rect class="grp" x="20" y="16" width="232" height="302" rx="12"/>
+  <text class="code" x="32" y="40">WHERE Ho = 'Nguyễn'</text>
+  <text class="s" x="42" y="84">Ho</text><text class="s" x="152" y="84">Ten</text>
+  <rect class="k" x="32" y="92" width="208" height="24" rx="4"/><text class="t" x="42" y="109">Lê</text><text class="t" x="152" y="109">An</text>
+  <rect class="k" x="32" y="118" width="208" height="24" rx="4"/><text class="t" x="42" y="135">Lê</text><text class="t" x="152" y="135">Bình</text>
+  <rect class="hit" x="32" y="144" width="208" height="24" rx="4"/><text class="t" x="42" y="161">Nguyễn</text><text class="t" x="152" y="161">An</text>
+  <rect class="hit" x="32" y="170" width="208" height="24" rx="4"/><text class="t" x="42" y="187">Nguyễn</text><text class="t" x="152" y="187">Hà</text>
+  <rect class="hit" x="32" y="196" width="208" height="24" rx="4"/><text class="t" x="42" y="213">Nguyễn</text><text class="t" x="152" y="213">Minh</text>
+  <rect class="k" x="32" y="222" width="208" height="24" rx="4"/><text class="t" x="42" y="239">Trần</text><text class="t" x="152" y="239">An</text>
+  <rect class="k" x="32" y="248" width="208" height="24" rx="4"/><text class="t" x="42" y="265">Trần</text><text class="t" x="152" y="265">Bảo</text>
+  <text class="v" x="32" y="292" fill="#0f7a5f">✓ một khối liền nhau: tìm entry</text>
+  <text class="v" x="32" y="308" fill="#0f7a5f">đầu tiên rồi quét tới hết khối</text>
+
+  <!-- Query 2 -->
+  <rect class="grp" x="264" y="16" width="232" height="302" rx="12"/>
+  <text class="code" x="276" y="40">WHERE Ho = 'Nguyễn'</text>
+  <text class="code" x="291" y="58">AND Ten = 'Hà'</text>
+  <text class="s" x="286" y="84">Ho</text><text class="s" x="396" y="84">Ten</text>
+  <rect class="k" x="276" y="92" width="208" height="24" rx="4"/><text class="t" x="286" y="109">Lê</text><text class="t" x="396" y="109">An</text>
+  <rect class="k" x="276" y="118" width="208" height="24" rx="4"/><text class="t" x="286" y="135">Lê</text><text class="t" x="396" y="135">Bình</text>
+  <rect class="k" x="276" y="144" width="208" height="24" rx="4"/><text class="t" x="286" y="161">Nguyễn</text><text class="t" x="396" y="161">An</text>
+  <rect class="hit" x="276" y="170" width="208" height="24" rx="4"/><text class="t" x="286" y="187">Nguyễn</text><text class="t" x="396" y="187">Hà</text>
+  <rect class="k" x="276" y="196" width="208" height="24" rx="4"/><text class="t" x="286" y="213">Nguyễn</text><text class="t" x="396" y="213">Minh</text>
+  <rect class="k" x="276" y="222" width="208" height="24" rx="4"/><text class="t" x="286" y="239">Trần</text><text class="t" x="396" y="239">An</text>
+  <rect class="k" x="276" y="248" width="208" height="24" rx="4"/><text class="t" x="286" y="265">Trần</text><text class="t" x="396" y="265">Bảo</text>
+  <text class="v" x="276" y="292" fill="#0f7a5f">✓ đi thẳng tới đúng một entry</text>
+
+  <!-- Query 3 -->
+  <rect class="grp" x="508" y="16" width="232" height="302" rx="12"/>
+  <text class="code" x="520" y="40">WHERE Ten = 'An'</text>
+  <text class="s" x="530" y="84">Ho</text><text class="s" x="640" y="84">Ten</text>
+  <rect class="bad" x="520" y="92" width="208" height="24" rx="4"/><text class="t" x="530" y="109">Lê</text><text class="t" x="640" y="109">An</text>
+  <rect class="k" x="520" y="118" width="208" height="24" rx="4"/><text class="t" x="530" y="135">Lê</text><text class="t" x="640" y="135">Bình</text>
+  <rect class="bad" x="520" y="144" width="208" height="24" rx="4"/><text class="t" x="530" y="161">Nguyễn</text><text class="t" x="640" y="161">An</text>
+  <rect class="k" x="520" y="170" width="208" height="24" rx="4"/><text class="t" x="530" y="187">Nguyễn</text><text class="t" x="640" y="187">Hà</text>
+  <rect class="k" x="520" y="196" width="208" height="24" rx="4"/><text class="t" x="530" y="213">Nguyễn</text><text class="t" x="640" y="213">Minh</text>
+  <rect class="bad" x="520" y="222" width="208" height="24" rx="4"/><text class="t" x="530" y="239">Trần</text><text class="t" x="640" y="239">An</text>
+  <rect class="k" x="520" y="248" width="208" height="24" rx="4"/><text class="t" x="530" y="265">Trần</text><text class="t" x="640" y="265">Bảo</text>
+  <text class="v" x="520" y="292" fill="#c2410c">✗ rải khắp index, không có điểm</text>
+  <text class="v" x="520" y="308" fill="#c2410c">bắt đầu → phải quét toàn bộ</text>
+
+  <text class="t" x="20" y="344">Index (Ho, Ten) sắp theo Ho trước, cùng Ho mới sắp theo Ten — như danh bạ xếp theo họ.</text>
+  <text class="s" x="20" y="366">Dùng được cho Ho, hoặc Ho + Ten (leftmost prefix). Chỉ có Ten thì cần index riêng, trừ engine có skip scan.</text>
+</svg>

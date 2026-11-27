@@ -96,7 +96,7 @@ BK.problem({
             note: "Ops log chỉ append → doc lâu năm có hàng triệu op. Định kỳ nén thành **snapshot**.",
             msgs: [["ds", "snap", "snapshot @v10000", "ok"]],
             set: { snap: "doc42 @v10000" },
-            detail: "Document Service định kỳ (ví dụ mỗi vài nghìn op) ghi trạng thái đầy đủ của doc thành **snapshot @v10000**. Ops log chỉ append, nên doc dùng lâu năm có hàng triệu op; replay từ đầu để dựng lại doc sẽ rất chậm. Ops log vẫn giữ nguyên để xem lịch sử và khôi phục phiên bản cũ; snapshot chỉ là điểm bắt đầu nhanh.",
+            detail: "Document Service định kỳ (ví dụ mỗi vài nghìn op) ghi trạng thái đầy đủ của doc thành **snapshot @v10000**. Ops log chỉ append, nên doc dùng lâu năm có hàng triệu op; replay từ đầu để dựng lại doc sẽ rất chậm. Ops log được giữ N ngày (ví dụ 30) để xem lịch sử chi tiết; phiên bản cũ hơn khôi phục từ snapshot theo version, nên snapshot vừa là điểm bắt đầu nhanh vừa là mốc lịch sử.",
           },
           {
             note: "Người mới mở doc: tải snapshot gần nhất + các op sau đó.",
@@ -162,7 +162,7 @@ BK.problem({
       why: {
         bad: "Ghi đè cả doc cho mỗi phím gõ là hàng MB I/O mỗi giây mỗi người (doc có thể vài MB), và mất lịch sử sửa.",
         good: "Append op chỉ ghi vài byte mỗi thay đổi và giữ được lịch sử. Nhưng mở doc phải replay toàn bộ op từ đầu — doc sửa nhiều năm có hàng triệu op nên load rất chậm.",
-        great: "Mở doc chỉ cần load snapshot rồi replay số ít op sau nó, vì snapshot định kỳ lưu trạng thái đầy đủ tại một version. Compaction xoá op cũ đã nằm trong snapshot để log không phình vô hạn; Cassandra partition theo `docId` cho ghi append nhanh và đọc tuần tự.",
+        great: "Mở doc chỉ cần load snapshot rồi replay số ít op sau nó, vì snapshot định kỳ lưu trạng thái đầy đủ tại một version. Compaction chỉ xoá op đã nằm trong snapshot **và** cũ hơn N ngày, để log không phình vô hạn mà vẫn xem được lịch sử gần đây; mốc lịch sử xa hơn lấy từ snapshot theo version; Cassandra partition theo `docId` cho ghi append nhanh và đọc tuần tự.",
       },
     },
   ],

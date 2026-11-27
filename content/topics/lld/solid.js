@@ -38,7 +38,7 @@ BK.topic({
       {
         cells: [
           "ISP · Interface Segregation",
-          "Nhiều interface nhỏ tốt hơn một interface lớn",
+          "Client không bị buộc phụ thuộc vào method nó không dùng → tách interface theo nhu cầu của client",
           "Class implement method rỗng chỉ vì bắt buộc",
         ],
         why: "Interface `Worker` có cả `work()` và `eat()` → `RobotWorker` buộc phải viết `eat()` rỗng hoặc throw. Tách `Workable` và `Eatable` thì mỗi class chỉ implement thứ nó thật sự làm, và đổi `eat()` không bắt Robot compile lại.",

@@ -226,9 +226,9 @@ BK.sim({
           text: "Đổi driver DB (Frameworks) và gateway implementation (Interface Adapters). Use Cases và Entities giữ nguyên.",
         },
         vslice: {
-          touch: ["s1", "s2", "s3"],
+          touch: ["s1", "s2", "s3", "shared"],
           score: "mid",
-          text: "Mỗi slice tự truy vấn DB nên phải sửa trong **từng slice** dùng bảng đó. Sửa thẳng, ít abstraction, nhưng nhiều chỗ.",
+          text: "Mỗi slice tự truy vấn DB nên phải sửa trong **từng slice** dùng bảng đó, cộng khối Shared giữ kết nối DB. Sửa thẳng, ít abstraction, nhưng nhiều chỗ.",
         },
       },
     },

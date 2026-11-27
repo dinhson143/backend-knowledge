@@ -14,8 +14,8 @@ BK.topic({
   },
   points: [
     {
-      t: "**Dedicated LB · NLB (L4)** — chỉ đọc IP/port, tốc độ gần phần cứng, triệu kết nối/giây, latency cực thấp.",
-      why: "L4 LB đạt hàng triệu request/giây với latency micro-giây, vì chỉ nhìn header TCP/UDP (IP, port) và chuyển tiếp gói, không cần kết thúc TLS hay parse HTTP → mỗi kết nối tốn rất ít CPU. Đổi lại không định tuyến theo URL được.",
+      t: "**Dedicated LB · NLB (L4)** — chỉ đọc IP/port, tốc độ gần phần cứng, hàng triệu request/giây, latency cực thấp.",
+      why: "L4 LB đạt hàng triệu request/giây (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html) với latency micro-giây, vì chỉ nhìn header TCP/UDP (IP, port) và chuyển tiếp gói, không phải parse HTTP (kết thúc TLS ở L4 là tuỳ chọn, ví dụ NLB có TLS listener) → mỗi kết nối tốn rất ít CPU. Đổi lại không định tuyến theo URL được.",
     },
     {
       t: "**Dedicated LB · ALB (L7)** — đọc HTTP (URL, cookie, header) để định tuyến thông minh.",
@@ -36,6 +36,13 @@ BK.topic({
     {
       t: "+ **CDN** — cache ảnh, video, JS/CSS ở edge; giảm latency và tải origin. Ví dụ: CloudFront, Cloudflare.",
       why: "Edge ở Singapore chỉ vài chục ms, trong khi request Việt Nam → Mỹ tốn ~150–250ms RTT, vì ánh sáng trong cáp quang đi ~200km/ms. Nội dung tĩnh ít đổi nên cache lâu ở edge được → phần lớn request không tới origin, giảm tải và băng thông origin.",
+    },
+  ],
+  diagrams: [
+    {
+      src: "content/svg/lb-gateway-cdn-request-path.svg",
+      caption: "DNS đưa user tới CDN edge gần nhất: nội dung tĩnh hit thì trả ngay, miss mới về origin. Request API đi qua API Gateway (auth, rate limit, routing) rồi Load Balancer chia tải giữa các instance của service.",
+      source: "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html",
     },
   ],
   cards: [

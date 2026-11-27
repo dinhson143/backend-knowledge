@@ -148,6 +148,13 @@ BK.problem({
       },
     ],
   },
+  diagrams: [
+    {
+      src: "content/svg/bigdata-ds-bloom-filter.svg",
+      caption: "Bảng “URL đã thấy” dùng Bloom filter: một bit bằng 0 là URL chắc chắn mới nên đưa vào frontier; báo “có thể đã thấy” thì đôi khi nhầm (false positive) và bỏ sót một ít URL — chấp nhận được với crawler.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/",
+    },
+  ],
   deep: [
     {
       q: "Không mất tiến độ khi worker chết?",

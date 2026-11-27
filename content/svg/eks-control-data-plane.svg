@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 410" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">EKS: control plane do AWS chạy riêng cho mỗi cluster trên 3 AZ; data plane là node trong VPC của bạn</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .cp { fill: #fff7eb; stroke: #e08a00; stroke-width: 1.4; }
+      .dp { fill: #eef6ff; stroke: #3b7ff5; stroke-width: 1.4; }
+      .az { fill: #ffffff; stroke: #e0b26b; stroke-dasharray: 5 3; }
+      .box { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.2; }
+      .api { fill: #ffffff; stroke: #e08a00; stroke-width: 1.2; }
+      .etcd { fill: #ffffff; stroke: #b45309; stroke-width: 1.2; }
+      .pod { fill: #e4f5ef; stroke: #14a37f; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .az-l { font-size: 11.5px; fill: #b45309; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="408" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Control plane -->
+  <rect class="cp" x="20" y="16" width="560" height="160" rx="12"/>
+  <text class="h" x="36" y="40">Control plane · AWS chạy, riêng cho từng cluster</text>
+  <rect class="az" x="36" y="52" width="170" height="92" rx="8"/><text class="az-l" x="46" y="68">AZ 1</text>
+  <rect class="api" x="52" y="74" width="138" height="26" rx="6"/><text class="c" x="121" y="92">kube-apiserver</text>
+  <rect class="etcd" x="52" y="108" width="138" height="26" rx="6"/><text class="c" x="121" y="126">etcd</text>
+  <rect class="az" x="215" y="52" width="170" height="92" rx="8"/><text class="az-l" x="225" y="68">AZ 2</text>
+  <rect class="api" x="231" y="74" width="138" height="26" rx="6"/><text class="c" x="300" y="92">kube-apiserver</text>
+  <rect class="etcd" x="231" y="108" width="138" height="26" rx="6"/><text class="c" x="300" y="126">etcd</text>
+  <rect class="az" x="394" y="52" width="170" height="92" rx="8"/><text class="az-l" x="404" y="68">AZ 3</text>
+  <rect class="etcd" x="410" y="108" width="138" height="26" rx="6"/><text class="c" x="479" y="126">etcd</text>
+  <text class="s" x="36" y="166">≥ 2 API server và 3 etcd trên 3 AZ; control plane còn có scheduler, controller-manager.</text>
+
+  <!-- Client -->
+  <rect class="box" x="600" y="60" width="140" height="56" rx="10"/>
+  <text class="c" x="670" y="83">kubectl / CI / Argo CD</text>
+  <text class="sc" x="670" y="102">gọi Kubernetes API</text>
+  <path d="M600,88 L570,88" stroke="#64748b" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <!-- API ↔ node -->
+  <g stroke="#64748b" stroke-width="1.4" fill="none" marker-start="url(#a)" marker-end="url(#a)">
+    <path d="M160,178 L160,214"/><path d="M420,178 L420,214"/>
+  </g>
+  <text class="s" x="170" y="200">kubelet đăng ký node, nhận pod cần chạy</text>
+
+  <!-- Data plane -->
+  <rect class="dp" x="20" y="216" width="720" height="128" rx="12"/>
+  <text class="h" x="36" y="240">Data plane · node trong VPC của bạn</text>
+  <rect class="box" x="36" y="252" width="220" height="80" rx="8"/>
+  <text class="c" x="146" y="270">Node EC2 (managed node group)</text>
+  <text class="sc" x="146" y="287">kubelet · kube-proxy · runtime</text>
+  <rect class="pod" x="48" y="298" width="60" height="24" rx="5"/><text class="sc" x="78" y="315">pod</text>
+  <rect class="pod" x="116" y="298" width="60" height="24" rx="5"/><text class="sc" x="146" y="315">pod</text>
+  <rect class="pod" x="184" y="298" width="60" height="24" rx="5"/><text class="sc" x="214" y="315">pod</text>
+  <rect class="box" x="268" y="252" width="220" height="80" rx="8"/>
+  <text class="c" x="378" y="270">Node EC2 (Karpenter / Auto Mode)</text>
+  <text class="sc" x="378" y="287">kubelet · kube-proxy · runtime</text>
+  <rect class="pod" x="280" y="298" width="60" height="24" rx="5"/><text class="sc" x="310" y="315">pod</text>
+  <rect class="pod" x="348" y="298" width="60" height="24" rx="5"/><text class="sc" x="378" y="315">pod</text>
+  <rect class="box" x="500" y="252" width="228" height="80" rx="8"/>
+  <text class="c" x="614" y="270">Fargate</text>
+  <text class="sc" x="614" y="287">mỗi pod một môi trường riêng,</text>
+  <text class="sc" x="614" y="303">không có node để quản lý</text>
+  <rect class="pod" x="584" y="310" width="60" height="18" rx="5"/><text class="sc" x="614" y="323">pod</text>
+
+  <text class="t" x="20" y="370">AWS lo control plane (HA, vá, thay instance hỏng); bạn lo workload và — tuỳ loại node — cả node.</text>
+  <text class="s" x="20" y="392">Auto Mode mở rộng phần AWS quản lý sang cả node; self-managed node thì bạn tự lo hết phần data plane.</text>
+</svg>

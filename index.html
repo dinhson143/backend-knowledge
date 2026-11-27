@@ -8,16 +8,16 @@
 </head>
 <body>
 <header class="topbar">
-  <button class="icon-btn menu-btn" id="menuBtn" aria-label="Mở mục lục">☰</button>
+  <button class="icon-btn menu-btn" id="menuBtn" aria-label="Mở mục lục" aria-expanded="false" aria-controls="sidebar">☰</button>
   <a class="brand" href="#/">Backend Knowledge <span>· System Design · Cloud · Kiến trúc</span></a>
-  <nav class="modes" role="tablist">
+  <nav class="modes" aria-label="Chế độ học">
     <a href="#/" data-mode="home">Lộ trình</a>
     <a href="#/learn" data-mode="learn">Kiến thức</a>
     <a href="#/problems" data-mode="problems">Luyện bài</a>
     <a href="#/sims" data-mode="sims">Mô phỏng</a>
     <a href="#/glossary" data-mode="glossary">Thuật ngữ</a>
   </nav>
-  <input id="search" type="search" placeholder="Tìm: kafka, redis, saga…" autocomplete="off">
+  <input id="search" type="search" aria-label="Tìm trong chủ đề và bài luyện" placeholder="Tìm: kafka, redis, saga…" autocomplete="off">
   <button class="icon-btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐</button>
 </header>
 

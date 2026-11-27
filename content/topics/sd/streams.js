@@ -26,8 +26,15 @@ BK.topic({
       why: "Chỉ lưu event bất biến, nên trạng thái số dư = fold `Deposited(+100)`, `Withdrawn(-30)` → 70: luôn biết vì sao số dư là 70 (audit) và dựng lại được nếu bảng trạng thái hỏng. Nhưng tài khoản có 1 triệu event thì fold mỗi lần đọc quá chậm → lưu snapshot định kỳ, chỉ fold phần event sau snapshot.",
     },
     {
-      t: "+ Stream processing: Flink, Kafka Streams, Spark Streaming (windowing, aggregation).",
+      t: "+ Stream processing: Flink, Kafka Streams, Spark Structured Streaming (windowing, aggregation).",
       why: "Trả lời 'bao nhiêu click trong 5 phút qua' cần gom event theo cửa sổ thời gian và giữ state giữa các event — đọc từng event thì chưa đủ. Các engine này quản lý window, state và checkpoint thay ta, nên aggregation trên luồng vô hạn vẫn chịu lỗi được.",
+    },
+  ],
+  diagrams: [
+    {
+      src: "content/svg/streams-event-sourcing.svg",
+      caption: "Event sourcing: command handler dựng trạng thái từ snapshot và các event sau nó, kiểm tra rồi append event mới vào stream append-only; projection đọc event để cập nhật read model cho query.",
+      source: "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing",
     },
   ],
   cards: [

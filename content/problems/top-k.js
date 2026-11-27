@@ -115,17 +115,24 @@ BK.problem({
             note: "Cache giữ sẵn kết quả đã **precompute**.",
             msgs: [
               ["client", "api", "GET /views/top?window=1h"],
-              ["api", "cache", "ZREVRANGE top:1h 0 99"],
+              ["api", "cache", "ZRANGE top:1h 0 99 REV"],
               ["cache", "api", "100 video", "ok"],
               ["api", "client", "200 · 5ms", "ok"],
             ],
             lesson: "Luôn < 100ms vì chỉ đọc kết quả tính sẵn, không tính lúc query.",
-            detail: "Query API trả top 100 video trong khoảng **5ms**: client gọi `GET /views/top?window=1h`, Query API chạy `ZREVRANGE top:1h 0 99` trên Redis, lấy 100 video theo score giảm dần. Lúc query không tính toán gì — worker và Merger đã tính trước. Đổi lại kết quả cũ vài giây (độ trễ một vòng gộp), hoàn toàn chấp nhận được với bảng xếp hạng.",
+            detail: "Query API trả top 100 video trong khoảng **5ms**: client gọi `GET /views/top?window=1h`, Query API chạy `ZRANGE top:1h 0 99 REV` trên Redis, lấy 100 video theo score giảm dần. Lúc query không tính toán gì — worker và Merger đã tính trước. Đổi lại kết quả cũ vài giây (độ trễ một vòng gộp), hoàn toàn chấp nhận được với bảng xếp hạng.",
           },
         ],
       },
     ],
   },
+  diagrams: [
+    {
+      src: "content/svg/bigdata-ds-count-min-sketch.svg",
+      caption: "Khi chấp nhận sai số, Count-Min Sketch thay bảng đếm từng video bằng d × w bộ đếm cố định: lấy min của các hàng nên chỉ đếm dư, không đếm thiếu — hợp để tìm video lượt xem cao rồi đưa vào heap K.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/count-min-sketch/",
+    },
+  ],
   deep: [
     {
       q: "Đếm ~800k view/giây?",

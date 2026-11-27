@@ -37,7 +37,7 @@ BK.topic({
           {
             cells: [
               "Sorted Set",
-              "`ZADD` `ZINCRBY` `ZREVRANGE` `ZRANGEBYSCORE`",
+              "`ZADD` `ZINCRBY` `ZRANGE … REV` `ZRANGE … BYSCORE`",
               "Leaderboard, top K, sliding-window rate limit, waiting queue, lịch hẹn theo thời gian",
             ],
             why: "Cập nhật score là O(log N), lấy top K hay khoảng score là O(log N + K), vì sorted set kết hợp skiplist (sắp theo score) và hash table (tra member). Score là timestamp thì cùng cấu trúc đó thành sliding window hay hàng đợi theo thời gian.",
@@ -126,7 +126,7 @@ BK.topic({
           {
             cells: [
               "Leaderboard",
-              "`ZINCRBY board 10 user`; `ZREVRANGE board 0 9 WITHSCORES`",
+              "`ZINCRBY board 10 user`; `ZRANGE board 0 9 REV WITHSCORES`",
               "O(log N) mỗi lần cập nhật",
             ],
             why: "`ZINCRBY` chỉ chèn lại một node O(log N) và top 10 là đọc 10 node đầu, vì sorted set giữ member sắp theo score bằng skiplist. So với `ORDER BY score LIMIT 10` trên DB cập nhật liên tục, Redis không phải sort lại mỗi lần đọc.",
@@ -249,8 +249,8 @@ BK.topic({
       title: "Câu hỏi hay bị hỏi sâu",
       points: [
         {
-          t: "**Hot key** — một key nhận quá nhiều traffic làm một shard quá tải → nhân bản key (`key#1..N`), local cache ở app.",
-          why: "Thêm node không giúp gì cho hot key, vì một key chỉ nằm trên một slot, một node. Nhân thành `key#1..N` rải đọc ra N slot, còn local cache ở app (vài giây) chặn phần lớn request trước khi tới Redis.",
+          t: "**Hot key** — một key nhận quá nhiều traffic làm một shard quá tải → nhân bản key bằng key salting (`key#0..N`), local cache ở app.",
+          why: "Thêm node không giúp gì cho hot key, vì một key chỉ nằm trên một slot, một node. Nhân thành `key#0..N` rải đọc ra N+1 slot, còn local cache ở app (vài giây) chặn phần lớn request trước khi tới Redis.",
         },
         {
           t: "**Big key** — hash/list hàng triệu phần tử làm lệnh chậm và migrate khó → chia nhỏ theo bucket.",
@@ -268,6 +268,12 @@ BK.topic({
     },
     {
       title: "Redis hay lựa chọn khác?",
+      points: [
+        {
+          t: "+ **License & Valkey** — Redis ≤ 7.2 là BSD; 7.4 chuyển sang RSALv2/SSPLv1; từ 8.0 có thêm lựa chọn AGPLv3. **Valkey** là bản tách từ mã BSD của Redis, do Linux Foundation bảo trợ, giữ license BSD.",
+          why: "Chọn Redis hay Valkey là câu hỏi license, không phải câu hỏi thiết kế, vì Valkey mang mã Redis BSD nên dùng cùng mô hình dữ liệu và các lệnh cơ bản; trong phỏng vấn nói 'Redis (hoặc Valkey)' là đủ. Nguồn: https://redis.io/legal/licenses/ · https://valkey.io/",
+        },
+      ],
       table: {
         head: ["", "Redis", "Memcached", "Kafka"],
         rows: [
@@ -329,7 +335,7 @@ BK.topic({
     ],
     [
       "Leaderboard top 10 bằng Redis?",
-      "Sorted set: ZINCRBY board điểm user để cập nhật, ZREVRANGE board 0 9 WITHSCORES để lấy top 10; O(log N).",
+      "Sorted set: ZINCRBY board điểm user để cập nhật, ZRANGE board 0 9 REV WITHSCORES để lấy top 10 (`ZREVRANGE` đã deprecated từ Redis 6.2 — https://redis.io/docs/latest/commands/zrevrange/); O(log N).",
     ],
     [
       "Redis Cluster định tuyến key thế nào?",

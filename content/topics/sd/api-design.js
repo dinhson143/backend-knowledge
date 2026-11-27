@@ -52,7 +52,7 @@ BK.topic({
     },
     {
       t: "**REST bước 4 · Returning Data** — status code + response body.",
-      why: "Status code cho client và hạ tầng biết kết quả mà không cần parse body: 5xx thì retry được, 4xx thì không vì gửi lại vẫn sai. Trả `200` kèm `{\"error\": ...}` làm hỏng retry logic, monitoring và cache.",
+      why: "Status code cho client và hạ tầng biết kết quả mà không cần parse body: 5xx (nhất là 503) là lỗi tạm thời nên retry được, nhưng với POST chỉ an toàn khi có idempotency key; 4xx phần lớn không retry vì gửi lại vẫn sai, trừ 408 và 429 (429 và 503 thường kèm `Retry-After` cho biết chờ bao lâu) — RFC 9110 §15: https://www.rfc-editor.org/rfc/rfc9110#section-15, RFC 6585 §4. Trả `200` kèm `{\"error\": ...}` làm hỏng retry logic, monitoring và cache.",
     },
     {
       t: "**GraphQL · N+1 problem** — GraphQL không biết trước client chọn field nào nên không JOIN sẵn được như REST. Giải pháp: **DataLoader** gom các `venue_id` trong vài ms thành một query `WHERE id IN (...)`.",
@@ -67,7 +67,7 @@ BK.topic({
       why: "Offset càng về sau càng chậm, vì `OFFSET 10000` buộc DB đọc rồi bỏ 10000 dòng trước khi trả 10 dòng; có item mới chèn vào đầu thì mọi item bị đẩy xuống một vị trí và trang sau lặp lại item cũ. Cursor dùng `WHERE id < :cursor LIMIT 10` nên đi thẳng vào index, và vị trí neo theo item chứ không theo số thứ tự → dữ liệu mới không làm lệch.",
     },
     {
-      t: "**Versioning** — URL versioning `/v1/events` (phổ biến, dễ thấy) hoặc Header `Accept-Version: v2`.",
+      t: "**Versioning** — URL versioning `/v1/events` (phổ biến, dễ thấy) hoặc header tự đặt (ví dụ `X-API-Version: 2`) hay media type (`Accept: application/vnd.example.v2+json`) — không có header chuẩn riêng cho version.",
       why: "Thay đổi phá vỡ phải ra version mới để hai bản chạy song song, vì client cũ (app mobile chưa update) vẫn gọi API cũ. Version trên URL hiện rõ trong log và dễ route ở gateway; version trong header giữ URL sạch nhưng khó thấy, khó test bằng trình duyệt.",
     },
     {

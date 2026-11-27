@@ -73,12 +73,19 @@ BK.topic({
       why: "Truy cập phần tử thứ k là O(n), vì node nằm rải rác trong RAM nên phải đi theo `next` k lần. Bù lại, chèn/xoá không cần bộ nhớ liền kề và không phải dịch phần tử.",
     },
     {
-      t: "+ `heapq` là min-heap; muốn max-heap thì đẩy `-x`.",
-      why: "`heapq` chỉ cài min-heap → đổi dấu để biến phần tử lớn nhất thành nhỏ nhất: `-x` nhỏ nhất tương ứng `x` lớn nhất. Khi lấy ra nhớ đổi dấu lại.",
+      t: "+ `heapq` mặc định là min-heap; trước Python 3.14 muốn max-heap thì đẩy `-x`, từ 3.14 có sẵn `heappush_max`/`heappop_max`.",
+      why: "Trước Python 3.14, `heapq` chỉ cài min-heap → đổi dấu để biến phần tử lớn nhất thành nhỏ nhất: `-x` nhỏ nhất tương ứng `x` lớn nhất. Khi lấy ra nhớ đổi dấu lại.",
     },
     {
       t: "+ Không dùng `list.pop(0)` làm queue — O(n); dùng `deque.popleft()`.",
       why: "List là mảng liền kề → `pop(0)` phải dịch n−1 phần tử còn lại sang trái, O(n), và BFS gọi nó n lần thành O(n²). `deque.popleft()` chỉ dịch con trỏ đầu nên O(1).",
+    },
+  ],
+  diagrams: [
+    {
+      src: "content/svg/ds-heap-array.svg",
+      caption: "Min-heap là cây nhị phân hoàn chỉnh lưu trong mảng: con của ô i nằm ở 2i+1 và 2i+2, nên không cần con trỏ, min luôn ở heap[0], và push/pop chỉ đi một đường cao log n.",
+      source: "https://docs.python.org/3/library/heapq.html",
     },
   ],
   cards: [
@@ -88,7 +95,7 @@ BK.topic({
     ],
     [
       "Làm max-heap với heapq?",
-      "heapq chỉ có min-heap: push `-x` và đổi dấu khi pop (hoặc tuple `(-priority, item)`).",
+      "Python ≤ 3.13: heapq chỉ có min-heap, push `-x` và đổi dấu khi pop (hoặc tuple `(-priority, item)`). Từ 3.14: `heapify_max`, `heappush_max`, `heappop_max` (https://docs.python.org/3/library/heapq.html).",
     ],
     [
       "Vì sao dùng deque cho BFS thay vì list?",

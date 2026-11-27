@@ -122,7 +122,7 @@ BK.problem({
           {
             note: "Publish không tới ai — **không sao**, tin vẫn nằm trong inbox.",
             msgs: [["cs1", "pubsub", "PUBLISH user:bob", "warn"]],
-            detail: "Server 1 vẫn `PUBLISH user:bob`, nhưng không có subscriber nên Redis trả số người nhận = 0 và tin không đi đâu cả. Điều này **không sao** vì bản bền của tin đã nằm trong inbox. Server dùng kết quả 0 để gửi **push notification** (APNs/FCM) đánh thức app của Bob — animation không vẽ bước này nhưng app chat thật luôn có.",
+            detail: "Server 1 vẫn `PUBLISH user:bob`, nhưng không có subscriber nên Redis trả số người nhận = 0 và tin không đi đâu cả. Điều này **không sao** vì bản bền của tin đã nằm trong inbox. Server quyết định gửi **push notification** (APNs/FCM) đánh thức app của Bob dựa vào **presence** (Bob offline) hoặc **ack timeout** (tin chưa được xác nhận sau vài giây), không dựa vào kết quả 0 của `PUBLISH`: trong Redis Cluster, `PUBLISH` chỉ đếm subscriber trên node nhận lệnh, và socket chết dở vẫn được tính là đang subscribe (https://redis.io/docs/latest/commands/publish/). Animation không vẽ bước này nhưng app chat thật luôn có.",
           },
           {
             note: "Bob online lại: subscribe và **kéo inbox** về.",
@@ -169,11 +169,11 @@ BK.problem({
       q: "Lưu hàng tỷ tin nhắn?",
       bad: "Một bảng Postgres.",
       good: "Shard theo chatId.",
-      great: "Cassandra/DynamoDB: partition key chatId, sort key timestamp → đọc lịch sử theo thứ tự cực nhanh; TTL 30 ngày.",
+      great: "Cassandra/DynamoDB: partition key `(chatId, tháng)`, sort key là sequence do server cấp → đọc lịch sử theo thứ tự cực nhanh, partition không phình vô hạn; TTL 30 ngày.",
       why: {
         bad: "Một bảng Postgres phình tới hàng chục TB với hàng tỷ tin mỗi ngày: index không còn vừa RAM, write throughput của một primary không đủ.",
         good: "Shard theo `chatId` chia tải ghi và giữ tin cùng chat chung shard. Nhưng tự shard Postgres thì phải tự lo routing, resharding và failover.",
-        great: "Đọc lịch sử chat là một lần quét tuần tự đã có thứ tự, vì Cassandra/DynamoDB phân tán sẵn theo partition key `chatId` và sắp theo sort key timestamp trong partition. Ghi dạng append (LSM-tree) nên throughput ghi rất cao; TTL tự dọn tin cũ, không cần job xoá.",
+        great: "Đọc lịch sử chat là một lần quét tuần tự đã có thứ tự, vì Cassandra/DynamoDB phân tán sẵn theo partition key `(chatId, tháng)` và sắp theo sort key trong partition. Thêm tháng vào partition key để group chat lớn không thành một partition phình mãi và nóng; sort key là sequence do server cấp thay vì giờ máy client, vì đồng hồ các máy lệch nhau. Ghi dạng append (LSM-tree) nên throughput ghi rất cao; TTL tự dọn tin cũ, không cần job xoá.",
       },
     },
   ],

@@ -22,9 +22,9 @@ BK.topic({
             cells: [
               "Control plane",
               "AWS — API server, etcd, scheduler, controller, chạy đa AZ",
-              "Phí ~$0.10/giờ/cluster; extended support đắt hơn nhiều",
+              "Tính phí theo giờ mỗi cluster; extended support đắt hơn nhiều",
             ],
-            why: "AWS chạy nhiều bản etcd trên ít nhất 3 AZ để mất một AZ vẫn hoạt động, vì etcd cần quorum (đa số node sống) mới ghi được. Hết standard support mà chưa nâng version thì AWS tự chuyển sang extended support giá ~$0.60/giờ, gấp 6 lần.",
+            why: "AWS chạy nhiều bản etcd trên ít nhất 3 AZ để mất một AZ vẫn hoạt động, vì etcd cần quorum (đa số node sống) mới ghi được. Hết standard support mà chưa nâng version thì AWS tự chuyển sang extended support, phí control plane theo giờ cao hơn nhiều lần standard support. Nguồn: https://aws.amazon.com/eks/pricing/",
           },
           {
             cells: [
@@ -39,8 +39,8 @@ BK.topic({
             why: "Bạn tự viết launch template và bootstrap → dùng được AMI tuỳ chỉnh, kernel đặc biệt. Đổi lại, drain, nâng cấp, vá lỗi đều tự làm.",
           },
           {
-            cells: ["Fargate", "AWS — mỗi pod một micro-VM", "Không DaemonSet, không GPU, không privileged pod"],
-            why: "Mỗi pod chạy trong micro-VM riêng, không có node dùng chung → DaemonSet (một pod mỗi node) vô nghĩa, và pod privileged không được phép vì có thể chạm host. Fargate cũng không cấp GPU.",
+            cells: ["Fargate", "AWS — mỗi pod một micro-VM", "Không DaemonSet, GPU, privileged pod, EBS, Spot hay Arm; dùng IRSA thay Pod Identity"],
+            why: "Mỗi pod chạy trong micro-VM riêng, không có node dùng chung → DaemonSet (một pod mỗi node) vô nghĩa, và pod privileged không được phép vì có thể chạm host. Fargate cũng không cấp GPU, không gắn được EBS (chỉ EFS), không có Spot và Arm trên EKS. Pod Fargate không có IMDS và không chạy được Pod Identity Agent (một DaemonSet), nên cấp quyền AWS bằng IRSA. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/fargate.html",
           },
           {
             cells: [
@@ -87,11 +87,11 @@ BK.topic({
           },
           {
             cells: ["ConfigMap / Secret", "Cấu hình và bí mật gắn vào pod"],
-            why: "Tách cấu hình khỏi image → cùng image chạy được ở dev và prod. Secret mặc định chỉ base64 trong etcd, nên cần bật KMS envelope encryption hoặc dùng Secrets Manager qua CSI driver.",
+            why: "Tách cấu hình khỏi image → cùng image chạy được ở dev và prod. Kubernetes gốc chỉ lưu Secret dạng base64 trong etcd; EKS từ Kubernetes 1.28 mặc định envelope-encrypt mọi dữ liệu API bằng KMS (có thể dùng key của mình). Secrets Manager qua CSI driver vẫn hữu ích khi cần xoay vòng và quản lý secret tập trung. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/envelope-encryption.html",
           },
           {
             cells: ["HPA", "Tự tăng giảm số pod theo CPU hoặc metric tuỳ chỉnh (KEDA theo độ dài queue)"],
-            why: "Tải tăng là số pod tăng tỉ lệ, vì HPA định kỳ (mặc định 15 giây) lấy metric rồi tính `desired = current × metric / target`. HPA thường không scale về 0, nên KEDA lo trường hợp theo queue và scale-to-zero.",
+            why: "Tải tăng là số pod tăng tỉ lệ, vì HPA định kỳ (mặc định 15 giây) lấy metric rồi tính `desired = ceil(current × metric / target)` (https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/). HPA thường không scale về 0, nên KEDA lo trường hợp theo queue và scale-to-zero.",
           },
           {
             cells: ["Namespace + RBAC", "Chia cluster cho nhiều team, phân quyền trong cluster"],
@@ -129,7 +129,7 @@ BK.topic({
         },
         {
           t: "**Pod gọi AWS** — gắn IAM role cho ServiceAccount qua **EKS Pod Identity** (mới, đơn giản) hoặc **IRSA** (OIDC). Không đặt access key trong pod.",
-          why: "Gắn IAM role cho ServiceAccount để pod nhận credential tạm thời, vì access key tĩnh trong pod có thể lộ qua image hay log và không tự xoay. Pod Identity dùng agent trên node nên không cần cấu hình OIDC provider và trust policy cho từng cluster như IRSA.",
+          why: "Gắn IAM role cho ServiceAccount để pod nhận credential tạm thời, vì access key tĩnh trong pod có thể lộ qua image hay log và không tự xoay. Pod Identity dùng agent trên node nên không cần cấu hình OIDC provider và trust policy cho từng cluster như IRSA; nhưng agent là DaemonSet nên pod chạy trên Fargate phải dùng IRSA (https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html).",
         },
         {
           t: "**NetworkPolicy** — giới hạn pod nào được gọi pod nào (cần bật trong VPC CNI hoặc dùng Calico/Cilium).",
@@ -167,7 +167,7 @@ BK.topic({
         },
         {
           t: "**Chi phí** — phí control plane mỗi cluster + node; bin packing tốt và Spot qua Karpenter có thể rẻ hơn ECS ở quy mô lớn.",
-          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 70–90% so với on-demand. Ở quy mô hàng trăm node, khoản tiết kiệm này vượt phí control plane ~$73/tháng.",
+          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 90% so với on-demand (https://aws.amazon.com/ec2/spot/). Ở quy mô hàng trăm node, khoản tiết kiệm này vượt xa phí control plane của cluster.",
         },
       ],
     },
@@ -205,6 +205,13 @@ BK.topic({
     {
       t: "Đừng chọn EKS chỉ vì “chuẩn ngành”: phải nêu được thứ chỉ Kubernetes cho bạn.",
       why: "Cần lý do cụ thể mà chỉ Kubernetes có — operator, Helm, chạy đa cloud, hay platform cho nhiều team — vì EKS tốn phí và công vận hành hơn ECS. Không nêu được thì ECS là lựa chọn rẻ hơn.",
+    },
+  ],
+  diagrams: [
+    {
+      src: "content/svg/eks-control-data-plane.svg",
+      caption: "Control plane (kube-apiserver, etcd, scheduler, controller-manager) do AWS chạy riêng cho mỗi cluster trên 3 AZ; data plane là node EC2 hoặc Fargate trong VPC của bạn, nơi kubelet nhận pod từ API server.",
+      source: "https://docs.aws.amazon.com/eks/latest/userguide/eks-architecture.html",
     },
   ],
   cards: [

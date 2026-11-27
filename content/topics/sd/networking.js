@@ -39,8 +39,8 @@ BK.topic({
       why: "Cần DNS dịch tên sang IP, vì con người nhớ tên còn mạng chỉ route theo IP. DNS server biết resolver hỏi từ vùng nào → trả IP của datacenter gần nhất, giảm latency mà client không phải đổi gì.",
     },
     {
-      t: "**Ports** — 22 SSH, 80 HTTP, 443 HTTPS (đều TCP).",
-      why: "Port chuẩn hoá để client không cần hỏi trước dịch vụ chạy ở đâu: trình duyệt gõ `https://` là tự nối 443. Cả ba dùng TCP vì SSH và web đều cần dữ liệu đủ, đúng thứ tự — mất một byte là hỏng lệnh hoặc hỏng trang.",
+      t: "! **Ports** — 22 SSH, 80 HTTP, 443 HTTPS (TCP); HTTP/3 chạy QUIC trên UDP (thường cổng 443).",
+      why: "Port chuẩn hoá để client không cần hỏi trước dịch vụ chạy ở đâu: trình duyệt gõ `https://` là tự nối 443. Cả ba dùng TCP vì SSH và web đều cần dữ liệu đủ, đúng thứ tự — mất một byte là hỏng lệnh hoặc hỏng trang. HTTP/3 là ngoại lệ: nó chạy trên QUIC (UDP), QUIC tự đảm bảo đủ và đúng thứ tự cho từng stream, nên một gói mất chỉ chặn stream của nó chứ không chặn cả kết nối như TCP (RFC 9114: https://www.rfc-editor.org/rfc/rfc9114).",
     },
     {
       t: "**TCP** — bắt tay 3 bước, đánh số thứ tự, ACK, mất gói thì gửi lại → tin cậy, có thứ tự.",
@@ -77,6 +77,13 @@ BK.topic({
       why: "REST/JSON an toàn cho client bên ngoài, vì mọi trình duyệt, CDN, cache và công cụ debug đều hiểu. Giữa các service nội bộ bạn kiểm soát cả hai đầu → dùng được gRPC để lấy tốc độ và type safety; kết nối realtime tốn tài nguyên giữ state nên chỉ dùng khi yêu cầu thực cần push.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/networking-layers-tcp.svg",
+      caption: "Mỗi tầng bọc thêm một header: router chỉ đọc IP, L4 load balancer đọc tới port, L7 load balancer đọc cả request nên route theo path được. TCP bắt tay 3 bước (SYN, SYN-ACK, ACK) tốn 1 RTT trước khi gửi dữ liệu.",
+      source: "https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5",
+    },
+  ],
   cards: [
     [
       "TCP khác UDP thế nào? Khi nào chọn UDP?",
@@ -84,7 +91,7 @@ BK.topic({
     ],
     [
       "L4 Load Balancer (NLB) khác L7 (ALB) ra sao?",
-      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu kết nối. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
+      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu request/giây. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
     ],
     [
       "DNS dùng gì trong system design ngoài phân giải tên?",
