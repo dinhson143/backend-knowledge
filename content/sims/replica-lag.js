@@ -47,7 +47,7 @@ BK.sim({
       ],
     },
     {
-      name: "Read-your-own-writes",
+      name: "Read-your-writes",
       steps: [
         {
           note: "User đổi tên thành **Son**. App ghi vào primary.",

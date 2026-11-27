@@ -2,7 +2,7 @@ BK.topic({
   id: "resilience",
   track: "sd",
   section: "sd-core",
-  title: "Timeout, retry & circuit breaker",
+  title: "Timeout, Retry & Circuit Breaker",
   goal: "Đặt timeout, retry có jitter, circuit breaker để lỗi không lan dây chuyền",
   needs: ["api-design", "queue"],
   tldr: {

@@ -2,8 +2,8 @@ BK.topic({
   id: "os-context-switch",
   track: "cs",
   section: "cs-os",
-  title: "Context switch",
-  goal: "Ước lượng chi phí chuyển ngữ cảnh giữa process, thread, coroutine",
+  title: "Context Switch",
+  goal: "Ước lượng chi phí context switch giữa process, thread, coroutine",
   needs: ["thr-thread-vs-process"],
   tldr: {
     t: "Context switch là lúc kernel dừng task đang chạy trên một CPU, **lưu** thanh ghi, PC, con trỏ stack của nó, rồi **nạp** của task khác. Xảy ra khi task tự nhường (chờ I/O, lock, `sleep`: voluntary) hoặc bị giành CPU (hết time slice, task ưu tiên cao hơn sẵn sàng: involuntary). Chi phí trực tiếp chỉ cỡ dưới micro giây, nhưng chi phí gián tiếp lớn hơn: cache và TLB \"lạnh\" khiến task mới chạy chậm một lúc. Chuyển giữa process đắt hơn giữa thread vì phải đổi bảng trang; chuyển giữa coroutine rẻ nhất vì không vào kernel.",

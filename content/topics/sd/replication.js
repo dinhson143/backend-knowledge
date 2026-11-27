@@ -2,7 +2,7 @@ BK.topic({
   id: "replication",
   track: "sd",
   section: "sd-core",
-  title: "Replication & failover",
+  title: "Replication & Failover",
   goal: "Chọn leader–follower, multi-leader hay quorum và xử lý replica lag",
   needs: ["core-db", "cap"],
   tldr: {

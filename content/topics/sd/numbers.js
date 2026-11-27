@@ -2,7 +2,7 @@ BK.topic({
   id: "numbers",
   track: "sd",
   section: "sd-core",
-  title: "Con số cần nhớ",
+  title: "Numbers to Know",
   goal: "Ước lượng tải để biết khi nào cần cache, shard hay thêm máy",
   needs: ["delivery"],
   tldr: {

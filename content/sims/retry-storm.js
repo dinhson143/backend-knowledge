@@ -1,6 +1,6 @@
 BK.sim({
   id: "retry-storm",
-  title: "Retry nhân tải và circuit breaker",
+  title: "Retry storm và circuit breaker",
   topics: ["resilience"],
   scenario: "Payment service bắt đầu lỗi. Client, Gateway và Order service cùng gọi xuống theo chuỗi. Ai retry, retry bao nhiêu lần quyết định Payment nhận bao nhiêu tải.",
   context: "Chuỗi gọi: **Client → Gateway → Order service → Payment**. Payment đang quá tải và trả lỗi. Mỗi tầng tự quyết có retry hay không, và **không biết** tầng trên cũng retry. Theo dõi con số dưới Payment: số lời gọi nó phải nhận cho **một** thao tác của user. Variant 2 thêm circuit breaker ở Order service.",

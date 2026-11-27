@@ -2,7 +2,7 @@ BK.topic({
   id: "bigdata-ds",
   track: "sd",
   section: "sd-deep",
-  title: "Cấu trúc dữ liệu xác suất",
+  title: "Probabilistic Data Structures",
   goal: "Đếm, lọc trùng ở quy mô lớn với bộ nhớ nhỏ, chấp nhận sai số",
   needs: ["numbers"],
   tldr: {

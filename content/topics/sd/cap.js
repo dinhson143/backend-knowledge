@@ -2,8 +2,8 @@ BK.topic({
   id: "cap",
   track: "sd",
   section: "sd-core",
-  title: "CAP & mô hình nhất quán",
-  goal: "Chọn nhất quán hay sẵn sàng cho từng phần dữ liệu khi mạng chia cắt",
+  title: "CAP & Consistency Models",
+  goal: "Chọn consistency hay availability cho từng phần dữ liệu khi có network partition",
   needs: ["sharding"],
   tldr: {
     t: "Khi có network partition (luôn phải chấp nhận P), chọn Consistency hoặc Availability. Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",

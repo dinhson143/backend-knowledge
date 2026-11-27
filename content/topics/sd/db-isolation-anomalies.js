@@ -2,7 +2,7 @@ BK.topic({
   id: "db-isolation-anomalies",
   track: "sd",
   section: "sd-core",
-  title: "Transaction & isolation level",
+  title: "Transaction & Isolation Level",
   goal: "Nhận ra lost update, write skew và chọn isolation level chặn được nó",
   needs: ["core-db"],
   tldr: {

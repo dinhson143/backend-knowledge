@@ -2,7 +2,7 @@ BK.topic({
   id: "thr-thread-vs-process",
   track: "cs",
   section: "cs-os",
-  title: "Thread hay process?",
+  title: "Thread hay Process?",
   goal: "Chọn thread hay process theo chi phí, bộ nhớ chung và cô lập lỗi",
   needs: ["os-process-lifecycle"],
   tldr: {
