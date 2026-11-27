@@ -51,6 +51,13 @@ BK.topic({
       why: "Kể cả khi mạng bình thường vẫn có đánh đổi: muốn đọc luôn thấy bản mới thì mỗi lần ghi phải chờ replica xác nhận, tức thêm round-trip mạng. CAP chỉ nói lúc có sự cố; PACELC chỉ ra rằng 99% thời gian còn lại bạn vẫn đang đổi latency lấy consistency.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/cap-pacelc.svg",
+      caption: "PACELC mở rộng CAP: khi có partition (P) chọn Availability hay Consistency; còn lại (Else) — tức gần như mọi lúc — vẫn phải chọn giữa Latency và Consistency.",
+      source: "https://www.cs.umd.edu/~abadi/papers/abadi-pacelc.pdf",
+    },
+  ],
   cards: [
     [
       "Vì sao nói thực tế chỉ chọn giữa C và A?",

@@ -70,6 +70,13 @@ BK.topic({
       why: "Query thiếu shard key phải gửi tới mọi shard rồi gộp kết quả → latency bằng shard chậm nhất, tải nhân N lần; transaction qua nhiều shard cần 2PC với nhiều round-trip và lock. App mà phần lớn query là 「dữ liệu của user X」 thì chọn `user_id` làm shard key → gần như query nào cũng chỉ chạm 1 shard.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/sharding-range-vs-hash.svg",
+      caption: "Range-based giữ key gần nhau trên cùng shard nên query theo khoảng chỉ chạm một shard, nhưng key tăng dần dồn mọi ghi mới vào shard cuối; hash-based rải đều ghi nhưng query theo khoảng phải hỏi mọi shard.",
+      source: "https://www.mongodb.com/docs/manual/sharding/#sharding-strategy",
+    },
+  ],
   cards: [
     ["Horizontal vs vertical partitioning?", "Horizontal: chia dòng, giữ cột. Vertical: chia cột, giữ dòng."],
     [

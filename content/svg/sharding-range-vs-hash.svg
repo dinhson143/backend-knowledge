@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Range-based và hash-based sharding: query theo khoảng, hot spot khi key tăng dần, scatter-gather</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e0562b"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .q { fill: #e8f0fe; stroke: #3b7ff5; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .c { font-size: 13px; fill: #1f2937; text-anchor: middle; }
+      .w { font-size: 12px; fill: #ffffff; font-weight: 600; text-anchor: middle; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; }
+      .ok { font-size: 12.5px; fill: #0f7a5f; }
+      .no { font-size: 12.5px; fill: #c2410c; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="398" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Range-based -->
+  <rect class="grp" x="20" y="16" width="352" height="330" rx="12"/>
+  <text class="h" x="36" y="40">Range-based · chia theo khoảng key</text>
+  <rect x="36" y="54" width="104" height="26" fill="#3b7ff5"/>
+  <rect x="140" y="54" width="104" height="26" fill="#14a37f"/>
+  <rect x="244" y="54" width="112" height="26" fill="#e08a00"/>
+  <text class="w" x="88" y="72">id 1 – 1M</text>
+  <text class="w" x="192" y="72">1M – 2M</text>
+  <text class="w" x="300" y="72">2M – …</text>
+  <g stroke="#64748b" stroke-width="1.3" marker-end="url(#a)">
+    <path d="M88,80 L88,106"/><path d="M192,80 L192,106"/><path d="M300,80 L300,106"/>
+  </g>
+  <rect class="box" x="40" y="108" width="96" height="40" rx="8"/><text class="c" x="88" y="133">Shard A</text>
+  <rect class="box" x="144" y="108" width="96" height="40" rx="8"/><text class="c" x="192" y="133">Shard B</text>
+  <rect class="box" x="252" y="108" width="96" height="40" rx="8" stroke="#e0562b" stroke-width="2.2"/><text class="c" x="300" y="133">Shard C</text>
+  <!-- query khoảng -->
+  <rect class="q" x="36" y="196" width="168" height="28" rx="6"/>
+  <text class="code" x="46" y="214">id 1200 → 1300</text>
+  <path d="M88,196 L88,152" stroke="#3b7ff5" stroke-width="1.6" fill="none" marker-end="url(#b)"/>
+  <!-- ghi mới -->
+  <rect x="228" y="196" width="128" height="28" rx="6" fill="#fde8e1" stroke="#e0562b"/>
+  <text class="code" x="238" y="214">INSERT id mới</text>
+  <g stroke="#e0562b" stroke-width="1.4" fill="none" marker-end="url(#r)">
+    <path d="M280,196 L292,152"/><path d="M300,196 L300,152"/><path d="M320,196 L308,152"/>
+  </g>
+  <text class="ok" x="36" y="262">✓ query theo khoảng chỉ chạm 1 shard</text>
+  <text class="no" x="36" y="284">✗ id tăng dần → mọi bản ghi mới dồn</text>
+  <text class="no" x="52" y="302">vào shard cuối (hot spot)</text>
+  <text class="no" x="36" y="324">✗ chọn mốc chia kém → shard lệch tải</text>
+
+  <!-- Hash-based -->
+  <rect class="grp" x="388" y="16" width="352" height="330" rx="12"/>
+  <text class="h" x="404" y="40">Hash-based · chia theo hash(key)</text>
+  <rect class="box" x="404" y="54" width="64" height="26" rx="6"/><text class="c" x="436" y="72">1001</text>
+  <rect class="box" x="476" y="54" width="64" height="26" rx="6"/><text class="c" x="508" y="72">1002</text>
+  <rect class="box" x="548" y="54" width="64" height="26" rx="6"/><text class="c" x="580" y="72">1003</text>
+  <rect class="box" x="620" y="54" width="64" height="26" rx="6"/><text class="c" x="652" y="72">1004</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M436,80 L560,106"/>
+    <path d="M508,80 L452,106"/>
+    <path d="M580,80 L676,106"/>
+    <path d="M652,80 L462,106"/>
+  </g>
+  <rect class="box" x="404" y="108" width="88" height="40" rx="8"/><text class="c" x="448" y="133">Shard A</text>
+  <rect class="box" x="520" y="108" width="88" height="40" rx="8"/><text class="c" x="564" y="133">Shard B</text>
+  <rect class="box" x="636" y="108" width="88" height="40" rx="8"/><text class="c" x="680" y="133">Shard C</text>
+  <text class="s" x="404" y="242">hash(key) mod 3 · ánh xạ trên chỉ là ví dụ</text>
+  <!-- scatter-gather -->
+  <rect class="q" x="480" y="196" width="168" height="28" rx="6"/>
+  <text class="code" x="490" y="214">id 1001 → 1004</text>
+  <g stroke="#3b7ff5" stroke-width="1.4" fill="none" marker-end="url(#b)">
+    <path d="M520,196 L456,152"/><path d="M564,196 L564,152"/><path d="M608,196 L672,152"/>
+  </g>
+  <text class="ok" x="404" y="262">✓ id liên tiếp rải đều → ghi đều các shard</text>
+  <text class="no" x="404" y="284">✗ query khoảng phải hỏi mọi shard</text>
+  <text class="no" x="420" y="302">rồi gộp kết quả (scatter-gather)</text>
+  <text class="s" x="404" y="324">Thêm shard: consistent hashing để ít key phải dời</text>
+
+  <text class="t" x="20" y="374">Chọn shard key theo query phổ biến nhất: query đó nên chỉ chạm đúng một shard.</text>
+</svg>

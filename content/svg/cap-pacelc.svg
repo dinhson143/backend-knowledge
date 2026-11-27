@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">PACELC: có partition thì chọn Availability hoặc Consistency, không có partition thì chọn Latency hoặc Consistency</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .c { font-size: 13px; fill: #1f2937; text-anchor: middle; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .lab { font-size: 12.5px; font-weight: 600; fill: #334155; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="388" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <rect x="260" y="18" width="240" height="40" rx="20" fill="#eef2f7" stroke="#64748b" stroke-width="1.3"/>
+  <text class="hc" x="380" y="43">Đang có network partition?</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M300,58 L200,96"/><path d="M460,58 L560,96"/>
+  </g>
+  <text class="lab" x="140" y="76">Có → P</text>
+  <text class="lab" x="562" y="76">Không → E (Else)</text>
+
+  <rect class="grp" x="40" y="98" width="320" height="44" rx="10"/>
+  <text class="c" x="200" y="125">chọn Availability hay Consistency</text>
+  <rect class="grp" x="400" y="98" width="320" height="44" rx="10"/>
+  <text class="c" x="560" y="125">chọn Latency hay Consistency</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M140,142 L120,164"/><path d="M260,142 L280,164"/>
+    <path d="M500,142 L480,164"/><path d="M620,142 L640,164"/>
+  </g>
+
+  <rect class="box" x="40" y="166" width="154" height="68" rx="10" stroke="#e08a00" stroke-width="1.8"/>
+  <text class="hc" x="117" y="188">PA</text>
+  <text class="sc" x="117" y="206">vẫn trả lời,</text>
+  <text class="sc" x="117" y="222">có thể là dữ liệu cũ</text>
+  <rect class="box" x="206" y="166" width="154" height="68" rx="10" stroke="#3b7ff5" stroke-width="1.8"/>
+  <text class="hc" x="283" y="188">PC</text>
+  <text class="sc" x="283" y="206">từ chối hoặc chờ,</text>
+  <text class="sc" x="283" y="222">không trả sai</text>
+  <rect class="box" x="400" y="166" width="154" height="68" rx="10" stroke="#e08a00" stroke-width="1.8"/>
+  <text class="hc" x="477" y="188">EL</text>
+  <text class="sc" x="477" y="206">đọc replica gần, trả</text>
+  <text class="sc" x="477" y="222">nhanh, có thể hơi cũ</text>
+  <rect class="box" x="566" y="166" width="154" height="68" rx="10" stroke="#3b7ff5" stroke-width="1.8"/>
+  <text class="hc" x="643" y="188">EC</text>
+  <text class="sc" x="643" y="206">chờ replica đồng bộ,</text>
+  <text class="sc" x="643" y="222">luôn mới, chậm hơn</text>
+
+  <rect class="grp" x="20" y="256" width="720" height="86" rx="12"/>
+  <text class="h" x="36" y="278">Ví dụ trong bài báo PACELC (cấu hình mặc định)</text>
+  <text class="t" x="36" y="302"><tspan font-weight="650">PA/EL</tspan> — Dynamo, Cassandra, Riak: bỏ consistency cả khi partition lẫn lúc chạy bình thường.</text>
+  <text class="t" x="36" y="324"><tspan font-weight="650">PC/EC</tspan> — VoltDB/H-Store, Megastore, BigTable/HBase: luôn giữ consistency, trả giá bằng A và L.</text>
+
+  <text class="t" x="20" y="364">CAP chỉ nói về lúc có partition (hiếm); đánh đổi Latency ↔ Consistency thì request nào cũng gặp.</text>
+  <text class="s" x="20" y="382">Nhiều hệ cho chỉnh mức consistency theo từng request (ví dụ quorum đọc/ghi), nên nhãn chỉ là mặc định.</text>
+</svg>
