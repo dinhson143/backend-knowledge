@@ -197,7 +197,7 @@
     ${h.list.map((p) => `<div class="pb-item"><a href="#/p/${p.id}">${esc(p.title)}</a> ${levelBadge(p.level)}${h.showMissing ? `<div class="muted small">Còn thiếu: ${missing(p).map((id) => esc(byId[id].title)).join(", ")}</div>` : ""}</div>`).join("")}</div>`; };
   // Tiến độ giai đoạn: topic + bài (giai đoạn có `problems`) — B0, Q7
   const stageKeys = (s) => (s.problems ? [...s.topics, ...PROBLEMS.map((p) => `p:${p.id}`)] : s.topics);
-  const deepTag = (p) => (p && p.optional && p.title !== "Đào sâu" ? `<span class="tag deep">Đào sâu</span>` : ""); // chặng tên "Đào sâu" thì không lặp nhãn
+  const deepTag = (p) => (p && p.optional && !/^Đào sâu/.test(p.title || "") ? `<span class="tag deep">Đào sâu</span>` : ""); // chặng có tên bắt đầu bằng "Đào sâu" thì không lặp nhãn
   // Vị trí topic: "Giai đoạn N · tên" (+ " › chặng") — dùng cho crumb, thẻ Tiếp tục, tìm kiếm
   const stageText = (s) => `${s.parallel ? "Song song" : `Giai đoạn ${stageNum(s)}`} · ${s.title}`;
   const placeText = (t) => stageText(t.stage) + (t.part ? ` › ${t.part.title}` : "");
