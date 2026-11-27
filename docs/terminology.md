@@ -130,12 +130,16 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Race Condition / Data Race | race condition, data race; check-then-act, read-modify-write, TOCTOU (glossary) | kết quả phụ thuộc thứ tự chạy / hai truy cập cùng ô nhớ không đồng bộ, ít nhất một ghi | "Điều kiện tranh chấp", "Tranh chấp dữ liệu" | `conc-race-condition` |
 | Livelock / Starvation | livelock, starvation, fairness, priority inversion | vẫn chạy mà không tiến / chờ mãi không tới lượt | "Khoá sống", "Chết đói", "Đảo ngược ưu tiên" | `conc-livelock-starvation` |
 | Atomic / CAS | atomic, compare-and-swap, CAS (glossary), lock-free; ABA | thao tác không bị chen ngang; chỉ ghi khi giá trị còn như lúc đọc | "So sánh và hoán đổi", "Không khoá" | `conc-atomic-cas` |
+| Memory Model / Happens-before | memory model, happens-before, visibility, reordering, `volatile`, DRF-SC; release/acquire | luật ngôn ngữ nói một lần đọc được thấy lần ghi nào; quan hệ "chắc chắn thấy" giữa hai hành động | "Mô hình bộ nhớ", "Xảy ra trước" | `conc-memory-model` |
 | **LLD & kiến trúc** | | | | |
 | Design Principles | SOLID, KISS, DRY, YAGNI, SoC, LoD | nguyên tắc giữ code dễ đổi | "Nguyên tắc thiết kế", "Giữ thiết kế đơn giản" | `solid`, `principles-other` |
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
 | Event-driven Architecture | event-driven | service giao tiếp bằng event | "Kiến trúc hướng sự kiện" | `system-architecture` |
 | Clean Code | clean code | code dễ đọc, dễ đổi | "Code sạch" | (chặng sắp có) |
 | Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` |
+| Machine Coding | machine coding round | vòng phỏng vấn viết code LLD chạy được trong thời gian giới hạn | "Lập trình máy" | `mc-machine-coding-round` |
+| **DSA** | | | | |
+| Dynamic Programming | dynamic programming, DP (glossary); memoization, tabulation, state, transition | chia bài thành subproblem chồng nhau, lưu kết quả để không tính lại | "Quy hoạch động" | `dsa-dp` |
 | **Python** | | | | |
 | Mutability | mutable, immutable; identity, aliasing | object sửa được tại chỗ hay không; nhiều tên cùng trỏ một object | "Tính khả biến", "Tính bất biến" | `py-object-model` |
 | Data Model / Dunder Method | data model, special method, dunder method (`__eq__`, `__hash__`…) | method hai gạch dưới mà interpreter gọi ngầm cho `len()`, `==`, `for`… | "Phương thức đặc biệt", "Phương thức ma thuật" | `py-data-model` |

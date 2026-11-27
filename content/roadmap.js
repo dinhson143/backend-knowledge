@@ -54,7 +54,7 @@ window.ROADMAP = [
       { id: "cs.process", title: "Process, Thread & Memory", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
       { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound", "thr-thread-pool", "thr-green-threads"] },
       { id: "cs.io", title: "I/O & hệ điều hành", topics: ["io-blocking-models", "os-signals-shutdown"] },
-      { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas"] },
+      { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas", "conc-memory-model", "conc-classic-problems"] },
       { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },
@@ -92,7 +92,7 @@ window.ROADMAP = [
       { id: "lld.oop", title: "Khung trả lời & OOP", topics: ["lld-delivery", "oop-pillars"] },
       { id: "lld.principles", title: "Design Principles", topics: ["solid", "principles-other"] },
       { id: "lld.patterns", title: "Design Patterns", topics: ["patterns-gof"] },
-      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list"] },
+      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list", "mc-machine-coding-round"] },
     ] },
   { id: "arch", title: "Kiến trúc & phương pháp", goal: "Học xong bạn giải thích được code phụ thuộc theo hướng nào, khi nào tách service và cách TDD/DDD khớp với nhau.", parallel: true,
     parts: [
@@ -103,8 +103,8 @@ window.ROADMAP = [
   { id: "dsa", title: "Coding · DSA", goal: "Học xong bạn nhận dạng pattern thuật toán từ ràng buộc đề bài.", parallel: true,
     parts: [
       { id: "dsa.complexity", title: "Độ phức tạp", topics: ["bigo"] },
-      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees"] },
-      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs"] },
+      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees", "dsa-design-ds"] },
+      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs", "dsa-dp"] },
     ] },
 ];
 
