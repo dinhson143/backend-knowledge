@@ -37,6 +37,7 @@ BK.track({ id: "cs", title: "Nền tảng CS", subtitle: "Process · Thread · M
 BK.section({ id: "cs-os", track: "cs", title: "Hệ điều hành" });
 BK.section({ id: "cs-async", track: "cs", title: "Async Programming" });
 BK.section({ id: "cs-net", track: "cs", title: "Mạng máy tính" });
+BK.section({ id: "cs-arch", track: "cs", title: "Kiến trúc máy tính" });
 
 BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding · Code sạch · Kiểm thử" });
 BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });

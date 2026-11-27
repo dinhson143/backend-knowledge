@@ -207,6 +207,7 @@ window.GLOSSARY = [
     ["PID", "Process ID", "Số định danh của một process; `getpid()` trả về nó. Thread trong cùng process có chung PID. Trong container, app thường là PID 1 và phải tự xử lý tín hiệu dừng."],
     ["TID", "Thread ID", "Số định danh của một thread; trên Linux mỗi thread là một task có TID riêng nhưng chung PID với process."],
     ["GIL", "Global Interpreter Lock", "Khoá của CPython chỉ cho một thread chạy bytecode Python tại một thời điểm."],
+    ["IEEE", "Institute of Electrical and Electronics Engineers", "Tổ chức ra chuẩn kỹ thuật; IEEE 754 là chuẩn số float nhị phân mà gần như mọi nền tảng dùng."],
     ["IPC", "Inter-Process Communication", "Cách hai process trao đổi dữ liệu: pipe, socket, shared memory, message queue."],
     ["MMU", "Memory Management Unit", "Phần cứng trong CPU dịch địa chỉ ảo sang địa chỉ vật lý và chặn truy cập sai quyền."],
     ["TLB", "Translation Lookaside Buffer", "Cache nhỏ trong CPU giữ các bản dịch địa chỉ ảo → vật lý vừa dùng, để khỏi đọc page table mỗi lần truy cập bộ nhớ."],

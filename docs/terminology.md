@@ -20,7 +20,7 @@ Giữ tiếng Việt khi nhãn **không phải tên một khái niệm kỹ thu�
 
 1. **Hoạt động, điều hướng, giao diện**: Lộ trình, Luyện bài, Mô phỏng, Khung trả lời, Luyện đề LLD, Vòng coding, Câu chuyện của bạn, Chọn công nghệ, Trên AWS, Kể sâu về dự án, Đào sâu.
 2. **Câu hỏi hoặc so sánh để chọn**: "SQL hay NoSQL?", "ECS hay EKS?", "Thread hay Process?", "Container là gì?", "Gõ URL thì chuyện gì xảy ra".
-3. **Tên môn học CS chuẩn tiếng Việt**: Cấu trúc dữ liệu, Thuật toán, Độ phức tạp, Hệ điều hành, Mạng máy tính, Đệ quy, Kiểm thử. Thêm vào danh sách này phải ghi một dòng D.
+3. **Tên môn học CS chuẩn tiếng Việt**: Cấu trúc dữ liệu, Thuật toán, Độ phức tạp, Hệ điều hành, Mạng máy tính, Kiến trúc máy tính, Bảo mật, Mật mã, Đệ quy, Kiểm thử. Thêm vào danh sách này phải ghi một dòng D (Kiến trúc máy tính, Bảo mật, Mật mã: D180).
 4. **Từ thường ngày ghép với key term**: căn bản, chuyên sâu, kinh điển, hay gặp, trong thực tế, ở mức code.
 5. **Nhãn mô tả không dịch từ một thuật ngữ nào**: Nền móng, Scale dữ liệu, Lưu trữ chuyên dụng, Kỹ năng viết code, Vận hành production.
 
@@ -133,6 +133,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Flow Control / Congestion Control | flow control, congestion control; receive window, congestion window (cwnd), slow start; TIME_WAIT (gạch dưới, như trong `ss`/`netstat`) | bên nhận báo còn chứa được bao nhiêu / bên gửi tự giới hạn để không làm tắc mạng | "Điều khiển luồng", "Kiểm soát luồng", "Kiểm soát tắc nghẽn", "Điều khiển tắc nghẽn" | `net-tcp-deep` |
 | Multiplexing / Head-of-line Blocking | multiplexing, stream; head-of-line blocking (HOL); HTTP/2, HTTP/3, QUIC | nhiều request dùng chung một kết nối / việc đứng đầu hàng chặn mọi việc phía sau | "Ghép kênh", "Đa hợp", "Chặn đầu hàng", "Nghẽn đầu hàng" | `net-http-versions` |
 | TLS / mTLS | TLS, mTLS (glossary); handshake, certificate chain, CA, trust store | mã hoá và xác thực kết nối; mTLS: hai bên cùng đưa chứng chỉ | "Xác thực hai chiều", "Xác thực lẫn nhau", "Bảo mật tầng giao vận" | `net-tls` |
+| Integer Overflow / Floating Point | integer overflow, two's complement; floating point, IEEE 754, float, double; Decimal | số nguyên tràn khi vượt số bit / số thực nhị phân gần đúng / số thập phân chính xác | "Tràn số nguyên", "Bù hai", "Dấu phẩy động", "Số thực dấu phẩy động", "Số chấm động" | `hw-numbers-float` |
 | **LLD & kiến trúc** | | | | |
 | Design Principles | SOLID, KISS, DRY, YAGNI, SoC, LoD | nguyên tắc giữ code dễ đổi | "Nguyên tắc thiết kế", "Giữ thiết kế đơn giản" | `solid`, `principles-other` |
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
