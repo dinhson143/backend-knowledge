@@ -51,7 +51,7 @@ window.ROADMAP = [
   { id: "cs", title: "Nền tảng CS", goal: "Học xong bạn giải thích được process, thread, I/O và viết code chạy đồng thời không race, không deadlock.", parallel: true,
     parts: [
       { id: "cs.process", title: "Process, Thread & Memory", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
-      { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound"] },
+      { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound", "thr-thread-pool"] },
       { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },

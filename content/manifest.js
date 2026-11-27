@@ -76,6 +76,7 @@
     "content/topics/cs/os-memory-layout.js",
     "content/topics/cs/os-virtual-memory.js",
     "content/topics/cs/thr-io-vs-cpu-bound.js",
+    "content/topics/cs/thr-thread-pool.js",
     "content/topics/code/code-interview-communication.js",
     "content/topics/code/code-language-choice.js",
     "content/problems/bitly.js",
