@@ -17,7 +17,9 @@ Phần A là kết quả review 39 topic và 13 problem: những gì đã sửa 
 | `326571b` | Đính chính các thông tin đã lỗi thời, xem 6 mục bên dưới. | |
 | `c6140d1` | Sửa lỗi lập luận, xem 5 mục bên dưới. | |
 | `76fa535` | Đổi tên dòng "State Machine" trong `patterns-gof` thành "State (state machine)" để cùng thuật ngữ với `lld-delivery` và `lld-problems-list`. | Tên pattern theo GoF |
-| `45719f5` | Sửa câu cùng loại với `search` trong `yelp`. Câu cũ "không index nào dùng được" cho `LIKE '%phở%'` mâu thuẫn với đính chính `pg_trgm`. | https://www.postgresql.org/docs/current/pgtrgm.html |
+| `45719f5` | Sửa câu cùng loại với `search` trong `yelp`. Câu cũ "không index nào dùng được" cho `LIKE '%phở%'` mâu thuẫn với đính chính `pg_trgm`. Cùng commit: HTTP/3 "thường dùng UDP 443", vì RFC cho phép chạy trên bất kỳ cổng UDP nào. | https://www.postgresql.org/docs/current/pgtrgm.html · RFC 9114 |
+| (commit sau proposal) | `api-design`: `Retry-After` đi kèm 429 và 503, không đi kèm 408. Câu trước đó gán nó cho cả 408. | RFC 9110 §15.5.9, §15.6.4 · RFC 6585 §4 |
+| `docs/decisions.md` | Ghi D30: luật `PRICE` trong `check.mjs`. `check.mjs` là file dùng chung, nên các nhánh khác sẽ merge với luật này. | |
 
 Sáu thông tin lỗi thời đã đính chính trong `326571b`:
 
@@ -117,7 +119,47 @@ Trong bảng trên, "rate limiting phân tán" được ghép vào problem `rate
 ### A3. Phạm vi chưa review
 
 - 48 sim: chỉ 10 sim được đọc kỹ (Kafka, Redis, container, ECS/EKS, saga). Khoảng 38 sim còn lại chỉ được xem qua grep giá tiền.
-- Bốn reviewer phụ đọc toàn bộ topic và problem. Những mục tôi chưa tự mở nguồn đều ghi "chưa kiểm chứng" ở trên. Mọi mục ở A1 đã được kiểm chứng bằng tài liệu gốc trong phiên này.
+- Bốn reviewer phụ đọc toàn bộ topic và problem.
+- **Mức kiểm chứng của A1.** Các sự thật sau đã được đối chiếu bằng trang tài liệu gốc mở trong phiên này:
+  - heapq 3.14
+  - Lambda execution environment
+  - các lớp Glacier
+  - `pg_trgm`
+  - RFC 9114 (QUIC/UDP, HOL blocking)
+  - RFC 9110 (408, 503) và RFC 6585 (429)
+  - EKS envelope encryption
+  - Flink sink guarantees
+  - Các mục không tra nguồn:
+    - Ba trang giá AWS chỉ được dùng làm link trỏ tới, không mở và không trích số.
+    - Sửa `uber`, `ticketmaster`, `concurrency` và `patterns-gof` là sửa mâu thuẫn nội bộ hoặc định nghĩa, không cần tra nguồn.
+- **Mức kiểm chứng của A2.** Phần lớn các dòng là nhận định của reviewer dựa trên hiểu biết sẵn có. Hai trong bốn reviewer cho biết không mở URL nào. Các dòng A2 coi như **chưa kiểm chứng**, trừ khi đã ghi nguồn đã mở.
+
+### A4. Lỗi nhỏ chưa sửa (nit)
+
+| Chỗ | Vấn đề |
+|---|---|
+| `bigo` và `ds` | `bigo` ghi hash map O(1), `ds` ghi "O(1) trung bình". Nên thêm "trung bình" vào `bigo`. |
+| `bigo` | "Timsort": từ Python 3.11, CPython dùng merge policy Powersort, vẫn thuộc họ Timsort. |
+| `algo` | Quy tắc "gặp lại đỉnh đang trên stack đệ quy là có cycle" chỉ đúng với đồ thị có hướng. Đồ thị vô hướng phải dùng "đã thăm và không phải cha". |
+| `concurrency` | Cột Python ghi `put()`/`take()` theo tên Java. `queue.Queue` của Python dùng `put()`/`get()`. |
+| `dev-methods` | Aggregate là cụm entity **và value object**. |
+| `principles-other` | Câu "khoảng một nửa số đó không bao giờ được dùng" là số liệu không có nguồn. |
+| `yelp` (deep dive) | "Planner chỉ dùng tốt được một index" sai: PostgreSQL gộp được nhiều index bằng BitmapAnd/Or. |
+| `payment` | Đánh dấu FAILED ngay khi network trả "không tìm thấy". Request tới muộn vẫn có thể thành công, nên chỉ đánh dấu FAILED sau cửa sổ idempotency hoặc sau khi void. |
+| `ticketmaster` | "Stripe retry tới khi nhận được": thực tế Stripe chỉ retry trong tối đa vài ngày (**chưa kiểm chứng**). |
+| `lld-problems-list` | "Logger là Singleton" thiếu lưu ý: có thể inject một instance dùng chung qua DI. |
+
+**Ý còn thiếu ở problem và LLD**, có thể đưa vào mục bổ sung ở A2:
+
+| Chỗ | Ý còn thiếu |
+|---|---|
+| `whatsapp` | Inbox theo từng thiết bị, presence, mã hoá đầu cuối |
+| `uber` | Shard theo ô H3/geohash, thành phố nóng |
+| `news-feed` | Bỏ fan-out cho user không hoạt động; backfill feed khi follow mới |
+| `google-docs` | Fencing token hoặc lease theo doc khi đổi chủ server; client gửi lại op chưa ack, dedupe theo `(clientId, seq)` |
+| `ticketmaster` | Kiểm lock còn giữ trước khi tạo PaymentIntent |
+| `solid` | SRP theo cách nói sau này của Martin: "một actor" |
+| `patterns-gof` | Thiếu Adapter, Composite và Chain of Responsibility, dù `lld-problems-list` có dùng |
 
 ---
 
@@ -612,7 +654,9 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
   - Vì sao xoá nhiều trong Cassandra làm đọc chậm?
   - Bloom filter giúp đọc LSM như thế nào?
 - **Sơ đồ / mô phỏng**: sim ghi vào LSM → flush → compaction.
-- **Nguồn**: tài liệu WAL của PostgreSQL (https://www.postgresql.org/docs/current/wal-intro.html) và RocksDB wiki (https://github.com/facebook/rocksdb/wiki), cả hai chưa mở trong phiên này.
+- **Nguồn**
+  - https://www.postgresql.org/docs/current/wal-intro.html (đã mở)
+  - RocksDB wiki: https://github.com/facebook/rocksdb/wiki (chưa mở trong phiên này)
 
 ### 14. `stream-processing` · Stream processing: window, watermark, state · **P2**
 
@@ -661,7 +705,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Câu hỏi tự kiểm tra**
   - Vì sao hai tin nhắn trong group chat không nên sắp theo timestamp của client?
 - **Sơ đồ / mô phỏng**: SVG ba process trao đổi message, có Lamport timestamp.
-- **Nguồn**: Lamport 1978, "Time, Clocks, and the Ordering of Events" (https://lamport.azurewebsites.net/pubs/time-clocks.pdf, chưa mở trong phiên này).
+- **Nguồn**: Lamport 1978, "Time, Clocks, and the Ordering of Events" (https://lamport.azurewebsites.net/pubs/time-clocks.pdf). Link tải được nhưng là bản scan nên không trích được nội dung.
 
 ---
 
@@ -689,6 +733,12 @@ Các viết tắt dưới đây đã được đối chiếu với `glossary.js`
 | USE | Utilization, Saturation, Errors |
 | EOS | Exactly-Once Semantics (Kafka) |
 | MREC / MRSC | Multi-Region Eventual / Strong Consistency (DynamoDB). Chỉ thêm nếu mục 9 dùng. |
+| QUIC | Giao thức transport của HTTP/3. Đã xuất hiện trong `networking` sau đính chính. |
+| RFC | Request for Comments. Đã xuất hiện trong nội dung. |
+| DR | Disaster Recovery |
+| LSN | Log Sequence Number (PostgreSQL) |
+| NTP | Network Time Protocol |
+| BM25 | Hàm xếp hạng độ liên quan, mặc định của Elasticsearch |
 
 ## Còn chưa chắc
 
