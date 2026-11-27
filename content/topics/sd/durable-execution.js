@@ -45,7 +45,7 @@ BK.topic({
       why: "Worker gọi PSP thành công rồi chết trước khi kết quả được ghi vào history: với engine, activity chưa xong, nên nó chạy lại. Engine chỉ đảm bảo kết quả được **ghi nhận** một lần; còn việc PSP không trừ tiền hai lần là nhờ idempotency key mà PSP kiểm tra. \"Exactly-once\" chỉ đúng bên trong engine, ở biên vẫn là at-least-once (xem Idempotency).",
     },
     {
-      t: "**Timer bền và chờ tín hiệu**: \"chờ 7 ngày\" hay \"chờ người duyệt\" là một bước của workflow, không giữ thread. Lambda durable functions: lệnh wait tạm dừng function mà không tính phí compute trong lúc chờ (https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html). Workflow đang chạy nhận signal (sự kiện từ ngoài) và trả lời query (đọc trạng thái).",
+      t: "**Timer bền và chờ tín hiệu**: \"chờ 7 ngày\" hay \"chờ người duyệt\" là một bước của workflow, không giữ thread. Lambda durable functions: lệnh wait tạm dừng function mà không tính phí compute trong lúc chờ (https://docs.aws.amazon.com/lambda/latest/dg/durable-functions.html). Temporal: timer được lưu bền, worker không tốn thêm tài nguyên khi chờ, và timer vẫn kích hoạt dù worker hay chính Temporal Service tạm sập (https://docs.temporal.io/workflow-execution/timers-delays). Workflow đang chạy nhận **signal** (gửi bất đồng bộ, không chờ kết quả), trả lời **query** (đọc trạng thái đồng bộ) và **update** (ghi đồng bộ, theo dõi được) (https://docs.temporal.io/sending-messages).",
       why: "Timer được lưu trong engine như một event, nên worker có thể chết, deploy, scale về 0 trong lúc chờ; tới giờ engine đánh thức workflow trên worker bất kỳ. Tự làm thì cần cron quét bảng \"đơn quá hạn\" và xử lý trường hợp cron chạy trùng.",
     },
     {
