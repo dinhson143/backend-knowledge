@@ -31,3 +31,6 @@ BK.section({ id: "dsa-algo", track: "dsa", title: "Algorithms" });
 
 BK.track({ id: "cs", title: "Nền tảng CS", subtitle: "Process · Thread · Bộ nhớ · I/O · Concurrency" });
 BK.section({ id: "cs-os", track: "cs", title: "Hệ điều hành" });
+
+BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding · Code sạch · Kiểm thử" });
+BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });

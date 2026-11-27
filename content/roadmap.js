@@ -51,6 +51,10 @@ window.ROADMAP = [
       { id: "cs.process", title: "Process, thread & bộ nhớ", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
       { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
     ] },
+  { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
+    parts: [
+      { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication"] },
+    ] },
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn chọn được nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
