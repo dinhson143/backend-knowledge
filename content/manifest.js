@@ -15,7 +15,10 @@
   BK.sim = reg(BK.sims, "sim");
 
   const FILES = [
-    // engine + app luôn nạp cuối
+    "content/tracks.js",
+    "content/topics/dsa/bigo.js",
+    "content/topics/dsa/ds.js",
+    "content/topics/dsa/algo.js",
     "app.js",
   ];
   // async = false giữ đúng thứ tự thực thi với script chèn động
