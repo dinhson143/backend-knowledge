@@ -77,7 +77,7 @@ BK.topic({
       title: "Ảnh hưởng tới thiết kế backend",
       points: [
         {
-          t: "**Load balancer L4 với HTTP/2/gRPC chia không đều.** gRPC chạy trên framing HTTP/2 (https://grpc.github.io/grpc/core/md_doc__p_r_o_t_o_c_o_l-_h_t_t_p2.html); client giữ một kết nối lâu dài và đẩy mọi RPC qua đó. LB L4 chỉ chọn backend lúc mở kết nối, nên một backend có thể nhận gần hết tải.",
+          t: "**Load balancer L4 với HTTP/2/gRPC chia không đều.** gRPC chạy trên framing HTTP/2 (https://grpc.github.io/grpc/core/md_doc__p_r_o_t_o_c_o_l-_h_t_t_p2.html); HTTP/2 cho nhiều RPC dùng chung một kết nối, và client thường giữ kết nối đó lâu dài. LB L4 chỉ chọn backend lúc mở kết nối, nên tải theo RPC có thể dồn lệch về vài backend.",
           why: "Tài liệu gRPC: với HTTP/2, LB tầng ứng dụng \"có thể chia các stream của một client cho nhiều backend\", và khi tải RPC giữa các kết nối chênh nhau nhiều thì nên dùng LB tầng ứng dụng (https://grpc.io/blog/grpc-load-balancing/). Lựa chọn khác: client-side load balancing.",
         },
         {
@@ -107,7 +107,7 @@ BK.topic({
     ["Vì sao HTTP/3 không dùng HPACK?", "HPACK cần header block tới đúng thứ tự; QUIC không đảm bảo thứ tự giữa stream. QPACK cập nhật bảng qua stream riêng."],
     ["Client đổi từ Wi-Fi sang 4G. HTTP/2 và HTTP/3 khác nhau thế nào?", "HTTP/2 trên TCP: IP đổi → kết nối chết, mở lại (handshake, slow start). HTTP/3: QUIC nhận diện kết nối bằng connection ID nên di chuyển được."],
     ["Client biết server có HTTP/3 bằng cách nào?", "Qua header `Alt-Svc: h3=...` trong response HTTP/1.1 hoặc HTTP/2; trong handshake dùng ALPN token `h3` trong handshake."],
-    ["Vì sao gRPC sau L4 load balancer hay bị lệch tải?", "Mỗi client giữ một kết nối HTTP/2 lâu dài, mọi RPC đi qua đó; L4 LB chỉ chọn backend khi mở kết nối. Dùng L7 LB chia theo stream hoặc client-side LB."],
+    ["Vì sao gRPC sau L4 load balancer hay bị lệch tải?", "Nhiều RPC đi chung một kết nối HTTP/2 giữ lâu; L4 LB chỉ chọn backend khi mở kết nối. Dùng L7 LB chia theo stream hoặc client-side LB."],
   ],
   related: ["lb"],
 });

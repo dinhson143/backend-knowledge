@@ -45,8 +45,8 @@ BK.topic({
       why: "4-tuple (IP nguồn, port nguồn, IP đích, port đích) xác định kết nối. Khi IP và port đích cố định, chỉ còn port nguồn thay đổi được, nên số kết nối mới mỗi giây bị giới hạn bởi số ephemeral port chia cho thời gian TIME_WAIT. Cách sửa gốc là **tái dùng kết nối** (HTTP keep-alive, connection pool cho DB/Redis), không phải chỉnh kernel.",
     },
     {
-      t: "**`tcp_fin_timeout` không phải thời gian TIME_WAIT.** tcp(7) mô tả nó là số giây chờ FIN cuối cùng trước khi đóng cưỡng bức socket (tức trạng thái FIN-WAIT-2), mặc định 60 (https://man7.org/linux/man-pages/man7/tcp.7.html). `tcp_tw_reuse` cho tái dùng socket TIME_WAIT cho kết nối mới \"khi an toàn về mặt giao thức\", mặc định tắt, và man page dặn không đổi nếu không có chuyên gia khuyên.",
-      why: "Bài blog hay khuyên hạ `tcp_fin_timeout` để \"giảm TIME_WAIT\" — sai trạng thái. RFC 9293 cho phép rút ngắn TIME_WAIT khi dùng TCP Timestamps (SHLD-4), và đó là cơ chế `tcp_tw_reuse` dựa vào; còn bỏ TIME_WAIT bằng tay là mở cửa cho gói cũ lọt vào kết nối mới.",
+      t: "**`tcp_fin_timeout` không phải thời gian TIME_WAIT.** Tài liệu kernel: đó là thời gian một kết nối mồ côi (không còn app nào giữ) được ở trạng thái **FIN_WAIT_2** trước khi bị huỷ, mặc định 60 giây (https://docs.kernel.org/networking/ip-sysctl.html). `tcp_tw_reuse` cho tái dùng socket TIME_WAIT cho kết nối mới \"khi an toàn về mặt giao thức\"; tài liệu kernel hiện tại ghi mặc định `2` (chỉ cho traffic loopback), man page tcp(7) bản cũ ghi mặc định tắt, và cả hai dặn không đổi nếu không có chuyên gia khuyên (https://man7.org/linux/man-pages/man7/tcp.7.html).",
+      why: "Lời khuyên hạ `tcp_fin_timeout` để \"giảm TIME_WAIT\" nhắm sai trạng thái. RFC 9293 cho phép rút ngắn TIME_WAIT khi có TCP Timestamps (SHLD-4); tài liệu kernel về `tcp_tw_reuse_delay` cũng nói việc tái dùng dựa trên giả định về đồng hồ timestamp của bên kia để PAWS hoạt động đúng. Bỏ TIME_WAIT bằng tay là mở cửa cho gói cũ lọt vào kết nối mới.",
     },
     {
       t: "**CLOSE_WAIT tăng mãi là bug của app**, không phải của mạng: phía bên kia đã gửi FIN, kernel đang chờ **app của bạn** gọi `close()`.",
@@ -66,11 +66,11 @@ BK.topic({
     },
     {
       t: "**Nghỉ lâu cũng mất cwnd.** Linux mặc định `tcp_slow_start_after_idle = 1`: kết nối im lặng quá một retransmission timeout thì congestion window bị reset, request kế tiếp lại slow start (tcp(7)).",
-      why: "Giải thích vì sao p99 nhảy sau mỗi lúc im lặng dù kết nối vẫn mở. Với kết nối dài giữa các service trong cùng datacenter, một số đội tắt tham số này; đánh đổi là bơm cửa sổ cũ vào mạng có thể đã đổi trạng thái.",
+      why: "Giải thích vì sao p99 nhảy sau mỗi lúc im lặng dù kết nối vẫn mở. Tham số đặt được về 0 để giữ cwnd qua lúc nghỉ; đánh đổi là gửi ngay cả cửa sổ cũ vào một mạng có thể đã đổi trạng thái.",
     },
     {
       t: "**Nagle và `TCP_NODELAY`.** Nagle giữ lại các mẩu dữ liệu nhỏ khi còn dữ liệu chưa được ACK, gom thành segment đầy rồi mới gửi; RFC 9293 yêu cầu phải có cách tắt cho từng kết nối (https://www.rfc-editor.org/rfc/rfc9293#section-3.7.4). Trên Linux đó là `TCP_NODELAY`.",
-      why: "Protocol request/response nhỏ (Redis, RPC, game) mà để Nagle bật có thể chờ ACK của gói trước mới gửi gói sau; kết hợp với delayed ACK ở bên kia thì latency tăng thấy rõ. RFC 9293 nhắc chính tương tác Nagle × delayed ACK này. Nhiều client library tự bật `TCP_NODELAY`.",
+      why: "Protocol request/response nhỏ (Redis, RPC, game) mà để Nagle bật có thể chờ ACK của gói trước mới gửi gói sau; kết hợp với delayed ACK ở bên kia thì latency tăng thấy rõ. RFC 9293 nhắc chính tương tác Nagle × delayed ACK này. Kiểm xem client library bạn dùng có bật `TCP_NODELAY` sẵn không.",
     },
     {
       t: "**Keep-alive của TCP mặc định rất thưa.** RFC 9293 yêu cầu keep-alive mặc định **tắt** và khoảng nghỉ mặc định **không dưới 2 giờ** (§3.8.4); Linux `tcp_keepalive_time` = 7200 giây, sau đó 9 lần thăm dò cách 75 giây (tcp(7)).",

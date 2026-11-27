@@ -6,7 +6,7 @@ BK.topic({
   goal: "Giải thích TLS handshake, chuỗi chứng chỉ và khi nào cần mTLS",
   needs: ["net-tcp-deep"],
   tldr: {
-    t: "TLS cho kết nối ba thứ: **bí mật** (người giữa không đọc được), **toàn vẹn** (không sửa được mà không bị phát hiện), **xác thực** server (và client nếu cần). TLS 1.3 làm việc đó trong **1 RTT**: hai bên trao đổi khoá Diffie-Hellman tạm thời (`key_share`) để ra khoá phiên; server gửi **chứng chỉ** và ký lên toàn bộ handshake (`CertificateVerify`) để chứng minh đang giữ private key; client kiểm **chuỗi chứng chỉ** tới một CA gốc nó tin và kiểm tên miền. **mTLS** = server cũng đòi chứng chỉ của client (`CertificateRequest`), nên hai bên cùng xác thực nhau.",
+    t: "TLS cho kết nối ba thứ: **bí mật** (người giữa không đọc được), **toàn vẹn** (không sửa được mà không bị phát hiện), **xác thực** server (và client nếu cần). TLS 1.3 làm việc đó trong **1 RTT**: hai bên trao đổi khoá Diffie-Hellman tạm thời (`key_share`) để ra khoá phiên; server gửi **chứng chỉ** và ký lên toàn bộ handshake (`CertificateVerify`) để chứng minh đang giữ private key; client kiểm **chuỗi chứng chỉ** tới một certificate authority (CA) gốc nó tin và kiểm tên miền. **mTLS** = server cũng đòi chứng chỉ của client (`CertificateRequest`), nên hai bên cùng xác thực nhau.",
     why: "Khoá phiên sinh từ Diffie-Hellman tạm thời nên lộ private key của chứng chỉ sau này không giải mã được phiên cũ (forward secrecy — TLS 1.3 đã bỏ RSA key exchange tĩnh, https://www.rfc-editor.org/rfc/rfc8446#section-1.2). Nhưng Diffie-Hellman một mình không biết đang nói chuyện với ai; chứng chỉ + chữ ký trên handshake mới chặn được kẻ đứng giữa giả làm server.",
   },
   story: {
@@ -75,7 +75,7 @@ BK.topic({
           "",
           "def client_ctx(ca_file=None):",
           ["    ctx = ssl.create_default_context(cafile=ca_file)", "Mặc định `CERT_REQUIRED` + `check_hostname=True`; không có `cafile` thì dùng trust store của hệ thống."],
-          ["    ctx.minimum_version = ssl.TLSVersion.TLSv1_3", "Chặn hạ cấp nếu cả hai bên đều hỗ trợ 1.3."],
+          ["    ctx.minimum_version = ssl.TLSVersion.TLSv1_3", "Chỉ chấp nhận TLS 1.3: server chỉ hỗ trợ 1.2 thì handshake thất bại. Bỏ dòng này nếu còn phải nói chuyện với server cũ (mặc định tối thiểu là 1.2)."],
           "    return ctx",
           "",
           "def mtls_server_ctx(cert, key, client_ca):",

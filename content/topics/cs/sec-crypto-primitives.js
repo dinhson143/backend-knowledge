@@ -5,7 +5,7 @@ BK.topic({
   title: "Hash, MAC, Encryption & Signature",
   goal: "Chọn đúng hash, HMAC, mã hoá hay chữ ký số cho từng việc",
   tldr: {
-    t: "Bốn khối cơ bản, phân biệt bằng **ai giữ khoá** và **bảo đảm điều gì**. **Hash** (SHA-256): không khoá, ai cũng tính được — dấu vân tay để phát hiện thay đổi, không chứng minh ai gửi. **MAC/HMAC**: một khoá bí mật chung — chứng minh message đến từ người có khoá và không bị sửa. **Encryption**: giấu nội dung — đối xứng (AES-GCM, một khoá chung) hoặc bất đối xứng (public key mã hoá, private key giải). **Digital signature**: private key ký, ai có public key cũng kiểm được — chứng minh ai ký và không chối được. Thêm hai thứ đi kèm: **hash mật khẩu** phải dùng hàm cố ý chậm (Argon2id, scrypt, bcrypt, PBKDF2), và mọi khoá/token phải sinh bằng bộ sinh số ngẫu nhiên mật mã (`secrets`).",
+    t: "Bốn khối cơ bản, phân biệt bằng **ai giữ khoá** và **bảo đảm điều gì**. **Hash** (SHA-256): không khoá, ai cũng tính được — dấu vân tay để phát hiện thay đổi, không chứng minh ai gửi. **MAC/HMAC**: một khoá bí mật chung — chứng minh message đến từ người có khoá và không bị sửa. **Encryption**: giấu nội dung — đối xứng (AES ở chế độ GCM, một khoá chung) hoặc bất đối xứng (public key mã hoá, private key giải). **Digital signature**: private key ký, ai có public key cũng kiểm được — chứng minh ai ký và không chối được. Thêm hai thứ đi kèm: **hash mật khẩu** phải dùng hàm cố ý chậm (Argon2id, scrypt, bcrypt, PBKDF2), và mọi khoá/token phải sinh bằng bộ sinh số ngẫu nhiên mật mã (`secrets`).",
     why: "Dùng nhầm khối là lỗ hổng: hash không khoá thì kẻ sửa message tính lại hash được ngay; MAC dùng khoá chung nên bên kiểm cũng ký được, không dùng làm bằng chứng với bên thứ ba; mã hoá không xác thực thì kẻ ở giữa sửa ciphertext mà không bị phát hiện. FIPS 180-4 nói hash dùng \"để phát hiện message có bị đổi từ lúc tạo digest\" (https://csrc.nist.gov/pubs/fips/180-4/upd1/final); FIPS 186-5 nói chữ ký phát hiện sửa đổi **và** xác thực danh tính người ký (https://csrc.nist.gov/pubs/fips/186-5/final).",
   },
   story: {
@@ -18,7 +18,7 @@ BK.topic({
     rows: [
       {
         cells: ["Hash (SHA-256, SHA-3)", "Không", "Phát hiện thay đổi so với digest đã biết", "Ai tạo ra; bí mật nội dung", "Checksum file, content-addressing, dedup, cache key"],
-        why: "Không có khoá nên kẻ sửa dữ liệu cũng tính lại được hash; hash chỉ có ích khi digest được lấy từ một kênh tin cậy khác. MD5 và SHA-1 có điểm yếu va chạm (https://docs.python.org/3/library/hashlib.html); NIST yêu cầu bỏ SHA-1 trước 31/12/2030 và chuyển sang SHA-2 hoặc SHA-3 (https://www.nist.gov/news-events/news/2022/12/nist-retires-sha-1-cryptographic-algorithm).",
+        why: "Không có khoá nên kẻ sửa dữ liệu cũng tính lại được hash; hash chỉ có ích khi digest được lấy từ một kênh tin cậy khác. MD5 và SHA-1 có điểm yếu va chạm (https://docs.python.org/3/library/hashlib.html); NIST công bố SHA-1 nên được loại bỏ dần trước 31/12/2030 và khuyên ai đang dựa vào nó chuyển sang SHA-2 hoặc SHA-3 (https://www.nist.gov/news-events/news/2022/12/nist-retires-sha-1-cryptographic-algorithm).",
       },
       {
         cells: ["MAC (HMAC-SHA256)", "Một khoá bí mật chung", "Message không bị sửa và đến từ bên có khoá", "Ai trong hai bên đã gửi (cả hai cùng ký được); bí mật nội dung", "Ký webhook, cookie/session có chữ ký, JWT HS256, API request signing"],
@@ -26,7 +26,7 @@ BK.topic({
       },
       {
         cells: ["Mã hoá đối xứng (AES-GCM, ChaCha20-Poly1305)", "Một khoá bí mật chung", "Bí mật + toàn vẹn (với chế độ AEAD)", "Chống replay; quản lý khoá", "Mã hoá dữ liệu lưu trữ, trường nhạy cảm trong DB, dữ liệu trong TLS"],
-        why: "AES mã hoá khối 128 bit với khoá 128, 192 hoặc 256 bit (FIPS 197 — https://csrc.nist.gov/pubs/fips/197/final). OWASP: AES khoá ít nhất 128 bit (lý tưởng 256), luôn dùng chế độ có xác thực như GCM/CCM khi có, không dùng ECB. GCM là \"authenticated encryption with associated data\" (SP 800-38D — https://csrc.nist.gov/pubs/sp/800/38/d/final).",
+        why: "AES mã hoá khối 128 bit với khoá 128, 192 hoặc 256 bit (FIPS 197 — https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197-upd1.pdf). OWASP: AES khoá ít nhất 128 bit (lý tưởng 256), luôn dùng chế độ có xác thực như GCM/CCM khi có, không dùng ECB. GCM là \"authenticated encryption with associated data\" (SP 800-38D — https://csrc.nist.gov/pubs/sp/800/38/d/final).",
       },
       {
         cells: ["Mã hoá bất đối xứng (RSA-OAEP, HPKE)", "Public key mã hoá, private key giải", "Chỉ người giữ private key đọc được", "Ai gửi (ai cũng có public key)", "Trao khoá, mã hoá gửi cho một bên không chung bí mật trước"],
@@ -34,7 +34,7 @@ BK.topic({
       },
       {
         cells: ["Digital signature (Ed25519, ECDSA, RSA-PSS)", "Private key ký, public key kiểm", "Không bị sửa + đúng người giữ private key ký + không chối được", "Bí mật nội dung", "JWT RS256/ES256, ký bản phát hành, ký chứng chỉ, giao dịch cần bằng chứng"],
-        why: "Bên kiểm chỉ có public key nên không thể giả chữ ký; đó là khác biệt cốt lõi với MAC. FIPS 186-5 chuẩn hoá RSA, ECDSA và EdDSA; DSA không còn được phép dùng để **tạo** chữ ký mới, chỉ còn để kiểm chữ ký cũ (https://csrc.nist.gov/pubs/fips/186-5/final).",
+        why: "Bên kiểm chỉ có public key nên không thể giả chữ ký; đó là khác biệt cốt lõi với MAC. FIPS 186-5 chuẩn hoá RSA, ECDSA và EdDSA; thuật toán `DSA` cũ không còn được phép dùng để **tạo** chữ ký mới, chỉ còn để kiểm chữ ký cũ (https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf).",
       },
     ],
   },
@@ -49,7 +49,7 @@ BK.topic({
     },
     {
       t: "**MAC không chống replay.** Một webhook hợp lệ bị chép lại và gửi lần nữa vẫn có tag đúng. Ký kèm timestamp (và id sự kiện) trong phần được MAC, từ chối request quá cũ, và xử lý idempotent theo id.",
-      why: "MAC chỉ chứng minh \"nội dung này do người có khoá tạo\", không chứng minh \"tạo vừa xong\". Đưa timestamp vào dữ liệu được ký thì kẻ tấn công không sửa được timestamp mà không làm hỏng tag. Xem topic Idempotency cho phần xử lý trùng.",
+      why: "MAC chỉ chứng minh \"nội dung này do người có khoá tạo\", không chứng minh \"tạo vừa xong\". RFC 9421 (HTTP Message Signatures, §7.2.2) nêu đúng các biện pháp này: ký đủ phần của message để phân biệt message, dùng nonce riêng cho mỗi message để phát hiện bị gửi lại, và ký thời điểm tạo/hết hạn để giới hạn giá trị của một chữ ký bị chép (https://www.rfc-editor.org/rfc/rfc9421#section-7.2.2). Timestamp nằm trong dữ liệu được ký nên kẻ tấn công không sửa được nó mà không làm hỏng tag. Xem topic Idempotency cho phần xử lý trùng.",
     },
     {
       t: "**HS256 hay RS256 cho JWT?** HS256 = HMAC: mọi service kiểm token đều giữ khoá, nên mọi service đều **ký** được token. RS256/ES256 = chữ ký: chỉ auth server giữ private key, các service khác chỉ cần public key (RFC 7518 §3.1 — https://www.rfc-editor.org/rfc/rfc7518#section-3.1).",
@@ -57,7 +57,7 @@ BK.topic({
     },
     {
       t: "**Nonce của AES-GCM không bao giờ được lặp với cùng khoá.** SP 800-38D: xác suất dùng lại cùng IV và cùng khoá cho hai dữ liệu khác nhau không được vượt 2⁻³²; lặp **một lần** là có thể bị giả mạo, \"gần quan trọng ngang việc giữ bí mật khoá\". NIST khuyên IV 96 bit; nếu sinh IV ngẫu nhiên thì một khoá dùng tối đa 2³² lần mã hoá (§8.3 — https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf).",
-      why: "Đây là lý do không tự ghép AES-GCM với bộ đếm nonce tự chế chạy trên nhiều instance: hai instance cùng khoá có thể sinh trùng nonce. Dùng API mức cao của thư viện đã được kiểm, xoay vòng khoá trước khi tới giới hạn, hoặc dùng envelope encryption (mỗi bản ghi một khoá dữ liệu).",
+      why: "Đây là lý do không tự ghép AES-GCM với bộ đếm nonce tự chế chạy trên nhiều instance: hai instance cùng khoá có thể sinh trùng nonce. Dùng API mức cao của thư viện đã được kiểm. OWASP liệt kê \"trước khi chạm giới hạn sử dụng của chế độ mã hoá\" là một trong các lúc phải đổi khoá, cùng với hết cryptoperiod và nghi lộ khoá; và mô tả envelope encryption: khoá dữ liệu (DEK) mã hoá dữ liệu, khoá bọc (KEK) mã hoá DEK và phải lưu tách khỏi DEK (https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html).",
     },
     {
       t: "**Ngẫu nhiên cho bảo mật = `secrets`, không phải `random`.** Module `random` \"được thiết kế cho mô hình hoá và mô phỏng, không phải bảo mật hay mật mã\"; tài liệu `secrets` coi 32 byte (256 bit) là đủ cho trường hợp thông thường (https://docs.python.org/3/library/secrets.html).",

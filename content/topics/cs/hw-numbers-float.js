@@ -26,7 +26,7 @@ BK.topic({
       },
       {
         cells: ["Float (`double`, IEEE 754 binary64)", "Dấu + số mũ + 53 bit significand, cơ số 2", "Không biểu diễn đúng 0.1; số nguyên lớn hơn 2⁵³ mất chính xác; có `inf`, `nan`, `-0.0`", "Đo lường, khoa học, ML, thống kê"],
-        why: "Gần như mọi nền tảng map float của Python vào IEEE 754 binary64 (tutorial floatingpoint); Java `double` cũng là binary64 (JLS §4.2.3). JavaScript chỉ có kiểu số này, nên `Number.MAX_SAFE_INTEGER` = 2⁵³ − 1 = 9007199254740991 và `MAX_SAFE_INTEGER + 1 === MAX_SAFE_INTEGER + 2` là `true` (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER).",
+        why: "Gần như mọi nền tảng map float của Python vào IEEE 754 binary64 (tutorial floatingpoint); Java `double` cũng là binary64 (JLS §4.2.3). Kiểu `Number` của JavaScript là binary64 và `JSON.parse` đọc mọi số JSON thành `Number` (BigInt là kiểu riêng, không tự sinh ra từ JSON), nên `Number.MAX_SAFE_INTEGER` = 2⁵³ − 1 = 9007199254740991 và `MAX_SAFE_INTEGER + 1 === MAX_SAFE_INTEGER + 2` là `true` (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER).",
       },
       {
         cells: ["Decimal (Python `decimal`, SQL `NUMERIC`, Java `BigDecimal`)", "Chữ số cơ số 10 + số mũ, độ chính xác chọn được", "Chậm hơn float; vẫn làm tròn khi chia (1/3); trộn với float là mang lỗi float vào", "Tiền, thuế, tỉ giá, mọi số có bất biến kế toán"],
@@ -37,7 +37,7 @@ BK.topic({
   points: [
     {
       t: "**Two's complement** trong một câu: số âm `-x` được lưu bằng `~x + 1` (đảo bit rồi cộng 1), nên phép cộng dùng chung một mạch cho số dương và âm, và bit cao nhất là bit dấu. Hệ quả: `int32` có một số âm nhiều hơn số dương (−2³¹ … 2³¹−1).",
-      why: "Vì thế `abs(Integer.MIN_VALUE)` trong Java vẫn là số âm: 2³¹ không biểu diễn được trong `int32`, phép đổi dấu tràn và quay về chính nó. Java gọi `int`, `long` là \"signed two's-complement integers\" (JLS §4.2).",
+      why: "Vì thế `Math.abs(Integer.MIN_VALUE)` trong Java trả về chính giá trị âm đó (2³¹ không biểu diễn được trong `int32`); muốn bị báo lỗi thì dùng `Math.absExact` (https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html). Java gọi `int`, `long` là \"signed two's-complement integers\" (JLS §4.2).",
     },
     {
       t: "**Bắt tràn thay vì quay vòng.** Java: `Math.addExact`, `multiplyExact` ném `ArithmeticException` khi tràn `int`/`long` (https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html). C/C++: dùng kiểu rộng hơn hoặc kiểm tra trước phép tính; sau khi tràn mới kiểm là đã muộn vì đó là undefined behavior.",
@@ -53,7 +53,7 @@ BK.topic({
     },
     {
       t: "**Làm tròn có chủ đích.** `round()` của Python làm tròn **half to even** (`round(2.5)` = 2), và `round(2.675, 2)` cho `2.67` vì 2.675 thực ra được lưu hơi nhỏ hơn 2.675. Decimal mặc định cũng là `ROUND_HALF_EVEN`, độ chính xác 28 chữ số; với tiền dùng `quantize(Decimal(\"0.01\"), rounding=...)` và chọn rounding theo quy định nghiệp vụ.",
-      why: "Half-to-even (banker's rounding) không lệch về một phía khi làm tròn rất nhiều số, nên là mặc định trong `round()` (https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex) và trong `decimal`. Nhưng hoá đơn, thuế thường quy định half-up; đó là quyết định nghiệp vụ, phải ghi rõ trong code.",
+      why: "Half-to-even (banker's rounding) là mặc định của `round()` (https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex) và của context mặc định trong `decimal`. Quy tắc làm tròn của hoá đơn, thuế, phí do nghiệp vụ hoặc quy định quyết định và có thể khác (ví dụ half-up); chọn `rounding` tường minh trong code thay vì dựa vào mặc định.",
     },
     {
       t: "**Đơn vị nhỏ nhất khác nhau theo đồng tiền.** ISO 4217 ghi số chữ số lẻ (minor unit) cho từng mã: USD 2, JPY 0, VND 0, BHD 3 (danh sách của cơ quan duy trì ISO 4217 — https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml).",
