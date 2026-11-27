@@ -34,10 +34,10 @@ BK.topic({
       {
         cells: [
           "Compute",
-          "Fargate, EC2, ECS Anywhere",
+          "Fargate, EC2, ECS Managed Instances, ECS Anywhere",
           "Managed/self-managed node, Fargate, Auto Mode, hybrid nodes",
         ],
-        why: "EKS có nhiều cách cung cấp node hơn, kể cả hybrid nodes cho máy on-prem gia nhập cluster, vì nó kế thừa mô hình node của Kubernetes. ECS Anywhere cũng chạy được task trên máy ngoài AWS, nhưng control plane vẫn ở AWS.",
+        why: "EKS có nhiều cách cung cấp node hơn, kể cả hybrid nodes cho máy on-prem gia nhập cluster, vì nó kế thừa mô hình node của Kubernetes. ECS Anywhere cũng chạy được task trên máy ngoài AWS, nhưng control plane vẫn ở AWS. ECS Managed Instances là bản tương ứng của EKS Auto Mode: dùng được mọi loại EC2 (GPU, Arm) mà AWS lo cấp máy và vá OS (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ManagedInstances.html).",
       },
       {
         cells: ["Tính di động", "Gắn với AWS", "Manifest chạy được trên GKE, AKS, on-prem"],

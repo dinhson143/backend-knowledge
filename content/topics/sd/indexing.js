@@ -78,7 +78,7 @@ BK.topic({
     ],
     [
       "Index (Ho, Ten) có giúp query `WHERE Ten = 'An'` không?",
-      "Không — vi phạm leftmost prefix. Cần index riêng trên Ten hoặc đổi thứ tự cột.",
+      "Thường là không — vi phạm leftmost prefix. Cần index riêng trên Ten hoặc đổi thứ tự cột. Ngoại lệ: engine có skip scan (MySQL từ 8.0.13, PostgreSQL từ 18) vẫn dùng được index khi cột đầu có ít giá trị khác nhau.",
     ],
     [
       "B-Tree vs Hash index?",

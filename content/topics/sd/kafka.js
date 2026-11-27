@@ -36,7 +36,7 @@ BK.topic({
               "Log append-only có thứ tự — đơn vị song song",
               "Số partition = số consumer tối đa xử lý song song trong một group",
             ],
-            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận.",
+            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận. Đây là consumer group cổ điển; share group (“Kafka Queues”, KIP-932, sẵn sàng production từ Kafka 4.2) cho nhiều consumer cùng đọc một partition và ack từng record, đổi lại mất thứ tự trong partition (https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/).",
           },
           {
             cells: ["Offset", "Vị trí message trong partition (0, 1, 2…)", "Consumer tự giữ offset → đọc lại được"],
@@ -223,7 +223,7 @@ BK.topic({
         },
         {
           t: "**Poison message** — consumer Kafka không có DLQ sẵn như SQS (Kafka Connect thì có): tự làm retry topic + DLQ topic.",
-          why: "Một message lỗi mãi mà cứ retry tại chỗ sẽ chặn cả partition phía sau, vì consumer xử lý tuần tự theo offset. Kafka không có ack/nack từng message như SQS → phải tự đẩy message lỗi sang retry topic (có delay) rồi DLQ topic, và commit offset để đi tiếp.",
+          why: "Một message lỗi mãi mà cứ retry tại chỗ sẽ chặn cả partition phía sau, vì consumer xử lý tuần tự theo offset. Consumer group cổ điển không có ack/nack từng message như SQS (share group từ Kafka 4.2 thì có, nhưng bỏ thứ tự theo partition) → phải tự đẩy message lỗi sang retry topic (có delay) rồi DLQ topic, và commit offset để đi tiếp.",
         },
         {
           t: "**Consumer chậm** — thêm partition + consumer, hoặc tách việc nặng sang worker pool.",
@@ -297,7 +297,7 @@ BK.topic({
     ],
     [
       "Có 4 partition và 6 consumer trong cùng group thì sao?",
-      "Chỉ 4 consumer nhận partition, 2 consumer rảnh. Số partition là giới hạn song song của một group.",
+      "Chỉ 4 consumer nhận partition, 2 consumer rảnh. Số partition là giới hạn song song của một consumer group cổ điển (share group từ Kafka 4.2 không bị giới hạn này nhưng không giữ thứ tự).",
     ],
     [
       "acks=1 có thể mất dữ liệu khi nào?",

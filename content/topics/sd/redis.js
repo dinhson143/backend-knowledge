@@ -268,6 +268,12 @@ BK.topic({
     },
     {
       title: "Redis hay lựa chọn khác?",
+      points: [
+        {
+          t: "+ **License & Valkey** — Redis ≤ 7.2 là BSD; 7.4 chuyển sang RSALv2/SSPLv1; từ 8.0 có thêm lựa chọn AGPLv3. **Valkey** là bản tách từ mã BSD của Redis, do Linux Foundation bảo trợ, giữ license BSD.",
+          why: "Chọn Redis hay Valkey là câu hỏi license, không phải câu hỏi thiết kế, vì Valkey mang mã Redis BSD nên dùng cùng mô hình dữ liệu và các lệnh cơ bản; trong phỏng vấn nói 'Redis (hoặc Valkey)' là đủ. Nguồn: https://redis.io/legal/licenses/ · https://valkey.io/",
+        },
+      ],
       table: {
         head: ["", "Redis", "Memcached", "Kafka"],
         rows: [

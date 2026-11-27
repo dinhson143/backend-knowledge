@@ -39,8 +39,8 @@ BK.topic({
             why: "Bạn tự viết launch template và bootstrap → dùng được AMI tuỳ chỉnh, kernel đặc biệt. Đổi lại, drain, nâng cấp, vá lỗi đều tự làm.",
           },
           {
-            cells: ["Fargate", "AWS — mỗi pod một micro-VM", "Không DaemonSet, không GPU, không privileged pod"],
-            why: "Mỗi pod chạy trong micro-VM riêng, không có node dùng chung → DaemonSet (một pod mỗi node) vô nghĩa, và pod privileged không được phép vì có thể chạm host. Fargate cũng không cấp GPU.",
+            cells: ["Fargate", "AWS — mỗi pod một micro-VM", "Không DaemonSet, GPU, privileged pod, EBS, Spot hay Arm; dùng IRSA thay Pod Identity"],
+            why: "Mỗi pod chạy trong micro-VM riêng, không có node dùng chung → DaemonSet (một pod mỗi node) vô nghĩa, và pod privileged không được phép vì có thể chạm host. Fargate cũng không cấp GPU, không gắn được EBS (chỉ EFS), không có Spot và Arm trên EKS. Pod Fargate không có IMDS và không chạy được Pod Identity Agent (một DaemonSet), nên cấp quyền AWS bằng IRSA. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/fargate.html",
           },
           {
             cells: [
@@ -129,7 +129,7 @@ BK.topic({
         },
         {
           t: "**Pod gọi AWS** — gắn IAM role cho ServiceAccount qua **EKS Pod Identity** (mới, đơn giản) hoặc **IRSA** (OIDC). Không đặt access key trong pod.",
-          why: "Gắn IAM role cho ServiceAccount để pod nhận credential tạm thời, vì access key tĩnh trong pod có thể lộ qua image hay log và không tự xoay. Pod Identity dùng agent trên node nên không cần cấu hình OIDC provider và trust policy cho từng cluster như IRSA.",
+          why: "Gắn IAM role cho ServiceAccount để pod nhận credential tạm thời, vì access key tĩnh trong pod có thể lộ qua image hay log và không tự xoay. Pod Identity dùng agent trên node nên không cần cấu hình OIDC provider và trust policy cho từng cluster như IRSA; nhưng agent là DaemonSet nên pod chạy trên Fargate phải dùng IRSA (https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html).",
         },
         {
           t: "**NetworkPolicy** — giới hạn pod nào được gọi pod nào (cần bật trong VPC CNI hoặc dùng Calico/Cilium).",

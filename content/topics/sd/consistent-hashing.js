@@ -18,7 +18,7 @@ BK.topic({
       why: "Số key phải đổi chỗ khi scale chính là chi phí mỗi lần thêm/bớt máy, vì di chuyển dữ liệu tốn băng thông, còn với cache thì key chuyển chỗ = cache miss. Consistent hashing đưa chi phí đó từ gần 100% xuống ~1/N.",
     },
     {
-      t: "**Data imbalance → Virtual nodes** — mỗi server map thành hàng trăm virtual node; càng nhiều vnode càng đều. Lý do: băm trực tiếp server vật lý làm các khoảng trên ring không đều.",
+      t: "**Data imbalance → Virtual nodes** — mỗi server map thành nhiều virtual node; càng nhiều vnode càng đều (Cassandra hiện mặc định `num_tokens: 16` kèm thuật toán cấp token cân bằng thay vì hàng trăm token ngẫu nhiên — https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html). Lý do: băm trực tiếp server vật lý làm các khoảng trên ring không đều.",
       why: "Vị trí mỗi server trên ring là ngẫu nhiên, nên với 3 server các khoảng có thể chênh nhau vài lần (một server ôm 50% ring). Băm mỗi server thành vài trăm điểm → mỗi server sở hữu nhiều đoạn nhỏ rải khắp ring, theo luật số lớn tổng các đoạn tiến về 1/N. Thêm nữa, khi một server chết, tải của nó rải ra nhiều server thay vì dồn hết vào một láng giềng.",
     },
     {
