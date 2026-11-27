@@ -249,8 +249,8 @@ BK.topic({
       title: "Câu hỏi hay bị hỏi sâu",
       points: [
         {
-          t: "**Hot key** — một key nhận quá nhiều traffic làm một shard quá tải → nhân bản key (`key#1..N`), local cache ở app.",
-          why: "Thêm node không giúp gì cho hot key, vì một key chỉ nằm trên một slot, một node. Nhân thành `key#1..N` rải đọc ra N slot, còn local cache ở app (vài giây) chặn phần lớn request trước khi tới Redis.",
+          t: "**Hot key** — một key nhận quá nhiều traffic làm một shard quá tải → nhân bản key bằng key salting (`key#0..N`), local cache ở app.",
+          why: "Thêm node không giúp gì cho hot key, vì một key chỉ nằm trên một slot, một node. Nhân thành `key#0..N` rải đọc ra N+1 slot, còn local cache ở app (vài giây) chặn phần lớn request trước khi tới Redis.",
         },
         {
           t: "**Big key** — hash/list hàng triệu phần tử làm lệnh chậm và migrate khó → chia nhỏ theo bucket.",

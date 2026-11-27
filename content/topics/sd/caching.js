@@ -59,7 +59,7 @@ BK.topic({
     },
     {
       t: "**Hot keys** — replicate key nóng lên nhiều node rồi load balance đọc; rate limit traffic bất thường.",
-      why: "Thêm node không giúp gì cho hot key: một key chỉ nằm trên một node, nên mọi request cho key đó dồn vào node ấy dù cluster còn rảnh. Nhân bản key ra nhiều node (hoặc thêm hậu tố như `key#1..#k`) chia lượt đọc ra k node, mỗi node chỉ gánh 1/k tải.",
+      why: "Thêm node không giúp gì cho hot key: một key chỉ nằm trên một node, nên mọi request cho key đó dồn vào node ấy dù cluster còn rảnh. Nhân bản key ra nhiều node (key salting: thêm hậu tố `key#0..N`) chia lượt đọc ra N+1 node, mỗi node chỉ gánh một phần tải.",
     },
     {
       t: "**Cache consistency** — xoá cache sau khi update DB; TTL ngắn nếu chấp nhận stale; chấp nhận eventual consistency cho feed, metrics.",

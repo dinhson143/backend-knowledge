@@ -30,8 +30,8 @@ BK.topic({
       why: "Consistent hashing chỉ trả lời 「key giờ thuộc ai」, dữ liệu vẫn phải chép qua mạng. Với cache, mất bản sao chỉ là miss → server mới cứ rỗng rồi đầy dần từ DB; với DB, dữ liệu là bản gốc → phải stream sang server mới trong nền, trong lúc đó server cũ vẫn phục vụ để không gián đoạn.",
     },
     {
-      t: "**Hot key** — consistent hashing chia đều **số key** chứ không chia đều **tần suất truy cập**. Key viral (người nổi tiếng) vẫn làm quá tải 1 server → dùng key salting (`hotkey_1`, `hotkey_2`) hoặc local caching.",
-      why: "Một key dù nhận 1M request/s vẫn chỉ có một chủ → server đó quá tải trong khi các server khác rảnh, vì ring chỉ quyết định key nằm ở đâu. Key salting biến một key thành k key (`hotkey_1..k`) ở k vị trí khác nhau trên ring, chia tải ra k server; local cache trong app thì chặn hẳn request trước khi tới server.",
+      t: "**Hot key** — consistent hashing chia đều **số key** chứ không chia đều **tần suất truy cập**. Key viral (người nổi tiếng) vẫn làm quá tải 1 server → dùng key salting (`hotkey#0..N`) hoặc local caching.",
+      why: "Một key dù nhận 1M request/s vẫn chỉ có một chủ → server đó quá tải trong khi các server khác rảnh, vì ring chỉ quyết định key nằm ở đâu. Key salting biến một key thành N+1 key (`hotkey#0..N`) ở N+1 vị trí khác nhau trên ring, chia tải ra nhiều server; local cache trong app thì chặn hẳn request trước khi tới server.",
     },
   ],
   cards: [

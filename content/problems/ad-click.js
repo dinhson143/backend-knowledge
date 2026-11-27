@@ -130,11 +130,11 @@ BK.problem({
       q: "Scale 10k+ click/s, có ad cực hot?",
       bad: "Ghi thẳng mỗi click vào DB.",
       good: "Kafka partition theo adId.",
-      great: "Partition theo adId + salt (adId:0..N) cho ad hot để chia tải nhiều partition, Flink gộp lại.",
+      great: "Partition theo adId + key salting (`adId#0..N`) cho ad hot để chia tải nhiều partition, Flink gộp lại.",
       why: {
         bad: "DB nghẽn vì mỗi click là một transaction: 10k write/s trung bình, peak cao hơn nhiều. DB chậm thì redirect của user cũng chậm theo.",
         good: "Kafka hấp thụ write với throughput rất cao; partition theo `adId` cho Flink đếm mỗi ad tại một chỗ. Nhưng một ad cực hot dồn toàn bộ click vào một partition — consumer của partition đó thành bottleneck.",
-        great: "Tải chia cho N consumer, vì salt (`adId:0..N`) rải click của ad hot ra N partition. Flink cộng N count con ở bước sau; kết quả vẫn đúng vì phép đếm có tính cộng.",
+        great: "Tải chia cho N consumer, vì key salting (`adId#0..N`) rải click của ad hot ra N partition. Flink cộng N count con ở bước sau; kết quả vẫn đúng vì phép đếm có tính cộng.",
       },
     },
     {
