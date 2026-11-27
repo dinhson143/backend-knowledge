@@ -1,6 +1,8 @@
 # Đề xuất: kiến trúc thông tin và luồng học tịnh tiến
 
-> Trạng thái: **đề xuất, chưa triển khai** (2026-11-27). Tài liệu này không sửa `content/roadmap.js`, `content/tracks.js`, tiêu đề topic hay code. Phần UI sẽ do agent UI/UX review và triển khai.
+> Trạng thái (2026-11-27): **đã triển khai cho 39 topic hiện có.** §5 bước 1–2, 4, 7 (nhóm A, B0–B5) do agent UI/UX làm (D40–D44). Bước 3, 5, 6 xong: `roadmap.js` theo cây §7.2 (chỉ chặng có topic), tiêu đề + `goal` + `needs` cho 39 topic, bỏ số thứ tự section, luật mới trong `check.mjs` (§3.5). Hai câu UI còn mở đã chốt: topbar mobile (D28), vị trí "Hết giai đoạn" khi có Đào sâu (D29). Còn lại: bước 8 (viết topic mới theo §7–8, mỗi chặng/nhánh mới thêm cùng topic đầu tiên), bước 9 (tách `patterns`), bước 10 phần README/`content-system.md` §6.
+>
+> Lệch so với bảng: `needs` của `patterns` rút còn 3 (bỏ `blob`) theo luật ≤ 3, không giữ ngoại lệ; `concurrency` giữ `needs: ["oop-pillars"]` (xuyên nhánh) cho tới khi có `conc-race-condition`; nhánh `cloud` tên "Container & Kubernetes" (Q11 thay §3.3), chặng duy nhất "Trên AWS".
 >
 > Dải số quyết định dành cho đề xuất này: **D20–D29** (ghi vào `docs/decisions.md` khi chốt).
 
@@ -625,7 +627,7 @@ Bước 1 không đụng file nội dung dùng chung nên có thể làm ngay, s
 
 ## 6. Câu hỏi cần người dùng quyết
 
-> **Q1–Q7 đã duyệt theo mặc định** (ghi thành D20–D26, §8.4). **Q13 đã giải quyết:** SA chốt 5 id Container/Kubernetes (§7.1). Còn chờ: Q8–Q12, Q14.
+> **Q1–Q7 đã duyệt theo mặc định** (ghi thành D20–D26, §8.4). **Q13 đã giải quyết:** SA chốt 5 id Container/Kubernetes (§7.1). **Q8–Q12, Q14 đã duyệt theo mặc định** (D27).
 
 | # | Câu hỏi | Đề xuất mặc định |
 |---|---|---|
@@ -1090,7 +1092,7 @@ Thứ tự triển khai giữ nguyên §5: B0 và B1 (đọc `parts`) phải xon
 
 ### 8.4 Quyết định (dải D20–D29)
 
-D20–D26 là các câu Q1–Q7 người dùng đã duyệt theo mặc định, đã ghi vào `docs/decisions.md`. D27–D29 để dành cho Q8–Q14 và cây §7.2 khi được chốt.
+D20–D26 là các câu Q1–Q7 người dùng đã duyệt theo mặc định, đã ghi vào `docs/decisions.md`. D27 gộp Q8–Q14 và cây §7.2; D28, D29 là hai câu UI còn mở trong `ux-review.md`.
 
 | # | Quyết định | Câu hỏi |
 |---|---|---|
@@ -1101,4 +1103,6 @@ D20–D26 là các câu Q1–Q7 người dùng đã duyệt theo mặc định, 
 | D24 | Bộ lọc trang Luyện bài không đưa vào URL. | Q5 |
 | D25 | Thuật ngữ ngành trong tiêu đề giữ tiếng Anh; giải nghĩa và `goal` viết tiếng Việt. | Q6 |
 | D26 | Tiến độ GĐ5 tính cả topic lẫn 13 bài luyện. | Q7 |
-| D27–D29 | Để dành | Q8–Q14 |
+| D27 | Duyệt Q8–Q14 theo mặc định; áp dụng cây §7.2 cho 39 topic hiện có. | Q8–Q14 |
+| D28 | Topbar ≤860px một hàng dính; 5 tab vào drawer ☰, ô tìm ở lại topbar. | ux-review: topbar 375px |
+| D29 | "Hết giai đoạn" ở topic bắt buộc cuối; Đào sâu là link phụ. | ux-review: Đào sâu cuối giai đoạn |
