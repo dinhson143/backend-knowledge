@@ -22,26 +22,27 @@ window.ROADMAP = [
   { id: "s1", title: "Nền móng", goal: "Học xong bạn trình bày được một bài theo khung 6 bước và chọn giao thức, API, database cho bài đơn giản.",
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
-      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn"] },
+      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth"] },
       { id: "s1.data", title: "Database", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
+      { id: "s1.db-deep", title: "Đào sâu: Database Internals", optional: true, topics: ["db-query-tuning"] },
     ] },
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ consistency model.",
     parts: [
       { id: "s2.cache", title: "Caching", topics: ["caching", "dist-cache"] },
-      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing"] },
-      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication"] },
+      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing", "id-generation"] },
+      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication", "multi-region"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
   { id: "s3", title: "Async & Coordination", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và xử lý contention giữa nhiều máy.",
     parts: [
       { id: "s3.async", title: "Message Queue & Streaming", topics: ["queue", "streams", "kafka"] },
       { id: "s3.resilience", title: "Resilience & Idempotency", topics: ["resilience", "idempotency"] },
-      { id: "s3.contention", title: "Contention & Locking", topics: ["dist-lock"] },
+      { id: "s3.contention", title: "Contention & Locking", topics: ["db-locking", "dist-lock", "consensus"] },
       { id: "s3.workflow", title: "Multi-step Processes", topics: ["outbox-cdc", "durable-execution"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
-      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "bigdata-ds"] },
+      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "vector-search", "bigdata-ds"] },
       { id: "s4.choose", title: "Chọn công nghệ", topics: ["tech-cheatsheet"] },
     ] },
   { id: "s5", title: "Ghép pattern & luyện đề", goal: "Học xong bạn nhận ra dạng bài, gọi đúng pattern, tự giải từ Khởi động tới Nâng cao.", problems: true,
@@ -71,6 +72,7 @@ window.ROADMAP = [
   { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa.", parallel: true,
     parts: [
       { id: "ops.observe", title: "Observability", topics: ["observability"] },
+      { id: "ops.deploy", title: "Deployment", topics: ["deployment-safety"] },
     ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
     parts: [
