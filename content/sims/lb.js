@@ -48,14 +48,14 @@ BK.sim({
         {
           note: "NLB chỉ thấy **IP + port**, payload vẫn mã hoá → không biết path.",
           set: { lb: "NLB · chỉ thấy IP:443" },
-          detail: "NLB **không thể biết** request muốn gì, vì path `/images/cat.png` nằm trong payload đã mã hoá. NLB làm việc ở tầng transport: chỉ đọc header IP/TCP (source IP, dest IP, port) và chuyển tiếp luồng byte nguyên vẹn, không giải mã. Đổi lại, NLB cực nhanh, xử lý hàng triệu request/giây, latency rất thấp, có IP tĩnh và giữ nguyên IP client.",
+          detail: "NLB **không thể biết** request muốn gì, vì path `/images/cat.png` nằm trong payload đã mã hoá. NLB làm việc ở tầng transport: chỉ đọc header IP/TCP (source IP, dest IP, port) và chuyển tiếp luồng byte nguyên vẹn, không giải mã (với TCP listener; NLB cũng có TLS listener để kết thúc TLS). Đổi lại, NLB cực nhanh, xử lý hàng triệu request/giây, latency rất thấp, có IP tĩnh và giữ nguyên IP client.",
         },
         {
           note: "Chọn backend theo hash/round-robin → có thể rơi vào service không phục vụ path này.",
           msgs: [["lb", "api", "TCP stream", "warn"], ["api", "lb", "404", "err"]],
           bad: ["api"],
           lesson: "L4 cực nhanh, hợp TCP/UDP thô hoặc đứng trước L7; không route theo nội dung.",
-          detail: "Kết nối rơi vào API service và nhận **404**: NLB chọn backend bằng flow hash (hash 5-tuple IP/port/protocol) — dựa trên kết nối, không dựa trên nội dung. API giải mã, đọc path `/images/cat.png`, không route nào khớp nên trả 404. Thực tế không ai đặt hai service khác nhau chung một target group sau NLB: cấu hình đúng là mỗi service một NLB/port riêng, hoặc NLB đứng trước một tầng L7 (Nginx, Envoy, ALB) để tầng đó route theo path. Bài học: L4 không route theo nội dung, nên chọn nó cho TCP/UDP thô, gRPC/game/IoT cần throughput cao, hoặc làm lớp ngoài cùng.",
+          detail: "Kết nối rơi vào API service và nhận **404**: NLB chọn backend bằng flow hash (hash 5-tuple IP/port/protocol) — dựa trên kết nối, không dựa trên nội dung. API giải mã, đọc path `/images/cat.png`, không route nào khớp nên trả 404. Thực tế không ai đặt hai service khác nhau chung một target group sau NLB: cấu hình đúng là mỗi service một NLB/port riêng, hoặc NLB đứng trước một tầng L7 (Nginx, Envoy, ALB) để tầng đó route theo path. Bài học: L4 không route theo nội dung, nên chọn nó cho TCP/UDP thô, game/IoT cần throughput cao, hoặc làm lớp ngoài cùng.",
         },
       ],
     },

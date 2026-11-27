@@ -15,7 +15,7 @@ BK.topic({
   points: [
     {
       t: "**Dedicated LB · NLB (L4)** — chỉ đọc IP/port, tốc độ gần phần cứng, hàng triệu request/giây, latency cực thấp.",
-      why: "L4 LB đạt hàng triệu request/giây (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html) với latency micro-giây, vì chỉ nhìn header TCP/UDP (IP, port) và chuyển tiếp gói, không cần kết thúc TLS hay parse HTTP → mỗi kết nối tốn rất ít CPU. Đổi lại không định tuyến theo URL được.",
+      why: "L4 LB đạt hàng triệu request/giây (https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html) với latency micro-giây, vì chỉ nhìn header TCP/UDP (IP, port) và chuyển tiếp gói, không phải parse HTTP (kết thúc TLS ở L4 là tuỳ chọn, ví dụ NLB có TLS listener) → mỗi kết nối tốn rất ít CPU. Đổi lại không định tuyến theo URL được.",
     },
     {
       t: "**Dedicated LB · ALB (L7)** — đọc HTTP (URL, cookie, header) để định tuyến thông minh.",
