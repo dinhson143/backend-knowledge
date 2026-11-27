@@ -8,6 +8,41 @@ Phần A là kết quả review 39 topic và 13 problem: những gì đã sửa 
 
 ## Phần A · Kết quả review
 
+### A0. Bảng quyết định gộp (để hỏi người dùng một lần)
+
+Mỗi dòng gồm vấn đề và **đề xuất mặc định**: nếu người dùng không phản đối thì làm theo đề xuất. Chi tiết và nguồn nằm ở A1, A2, A4 và mục sim ở A3.
+
+| # | Chỗ | Vấn đề | Đề xuất mặc định |
+|---|---|---|---|
+| Q1 | `content-system.md` §6 | Quy định nói URL nguồn nằm trong trường `src`, nhưng app không render trường đó; hiện URL viết ngay trong câu. | Giữ URL trong câu, sửa §6 theo thực tế. |
+| Q2 | Luật giá | "Rẻ hơn tới 70%" (Fargate Spot) và "70–90%" (Spot) có tính là giá không? | Không tính là giá. Giữ "tới 90%" kèm link, bỏ cận 70 vì không có nguồn. |
+| Q3 | `core-db` | Câu "NoSQL không có transaction" đã lỗi thời. | Viết: có transaction, nhưng giới hạn phạm vi, số item và độ trễ. |
+| Q4 | `core-db` | Bảng isolation chỉ mô tả theo chuẩn SQL/InnoDB. | Thêm một dòng: Repeatable Read của PostgreSQL là snapshot, không có phantom nhưng có write skew. |
+| Q5 | `caching` / `dist-cache` | Write-through được định nghĩa hai kiểu. | Dùng "ghi DB thành công rồi cập nhật cache, sau đó mới trả lời"; `dist-cache` link sang `caching`. |
+| Q6 | Nhiều file | Hot key có bốn tên gọi. | Thống nhất "key salting", ví dụ `key#0..N`. |
+| Q7 | `networking` / `lb-gateway-cdn` | Throughput L4 nêu bằng ba đơn vị khác nhau. | Dùng "hàng triệu request/giây". |
+| Q8 | `consistent-hashing` | Ghi "DynamoDB" (ring đến từ paper Dynamo); công thức K/N. | Đổi thành "Dynamo/Cassandra"; thêm một server thì khoảng K/(N+1) key đổi chỗ. |
+| Q9 | `lb-gateway-cdn`, sim `lb` | "L4 không giải mã TLS"; liệt kê gRPC là việc hợp với L4. | "Kết thúc TLS ở L4 là tuỳ chọn"; bỏ gRPC (kết nối HTTP/2 sống lâu, L4 chỉ chia tải theo kết nối nên lệch). |
+| Q10 | `streams`, `api-design`, `redis`, `eks` | Tên cũ: Spark Streaming, `Accept-Version`, `ZREVRANGE`; công thức HPA thiếu `ceil`. | Sửa theo tên hiện hành; thêm `ceil`. |
+| Q11 | `ecs` / sim `ecs-flow` | Task thiếu chỗ gọi là `PROVISIONING` ở chỗ này, `PENDING` ở chỗ kia. | Thống nhất `PROVISIONING` (khi có capacity provider). |
+| Q12 | `payment` | Node "Card Network" nhận idempotency key; "PCI DSS buộc tokenize"; đánh dấu FAILED ngay khi nhận "không tìm thấy". | Đổi nhãn thành "PSP / Acquirer"; viết "tokenize để thu hẹp phạm vi PCI"; chỉ đánh dấu FAILED sau cửa sổ idempotency hoặc sau khi void. |
+| Q13 | `whatsapp` | Dựa vào `PUBLISH` trả 0 để quyết định gửi push; partition theo `chatId` không giới hạn. | Quyết push theo presence hoặc ack timeout; partition theo `(chatId, tháng)`. |
+| Q14 | `news-feed` | Cursor theo id/timestamp trên Redis LIST. | Dùng ZSET với score = timestamp. |
+| Q15 | `google-docs` | Snapshot nói giữ ops log, compaction lại nói xoá op. | Giữ op N ngày cộng snapshot theo version. |
+| Q16 | `ad-click` | Dedupe ở hai nơi (Click Processor và Flink). | Dedupe ở Click Processor; Flink chỉ đếm. |
+| Q17 | `patterns-gof` | `VehicleFactory.create(type)` là Simple Factory; Builder là biến thể Bloch; thiếu Adapter, Composite, Chain of Responsibility. | Đổi nhãn thành "Simple Factory"; ghi rõ "Builder (biến thể Bloch)"; thêm ba pattern còn thiếu. |
+| Q18 | `solid`, glossary | Câu ISP thiếu góc nhìn client; "gRPC = Google RPC"; định nghĩa vCPU. | Sửa theo định nghĩa gốc ở A2. |
+| Q19 | Sim `container-decide`, `container-stack` | GPU được cộng điểm cho EKS (mâu thuẫn với tip); chưa có ECS Managed Instances. | Tách câu hỏi GPU khỏi DaemonSet, GPU chỉ bật EC2; thêm Managed Instances vào sim. |
+| Q20 | Sim `queue` | Hàng đợi tự giao lại theo exponential backoff (SQS không làm vậy); nhãn `maxReceiveCount=3` nhưng vẽ 4 lần nhận; mũi tên 429 vẽ từ queue. | Consumer tự kéo dài visibility timeout theo backoff; đổi thành `maxReceiveCount=4`; nhãn "429 (gateway)". |
+| Q21 | Sim `stampede` | "Chỉ 1 query" trong khi single flight chạy theo từng process. | Viết "1 query mỗi app server (hoặc đúng 1 nếu dùng lock phân tán)". |
+| Q22 | Sim `sys-arch-impact` | Scale checkout mà không scale Inventory, dù đặt hàng phải trừ kho. | Thêm Inventory và DB của nó vào phạm vi scale. |
+| Q23 | Sim `realtime` | WebSocket "cần sticky"; nhãn SSE ghi `event:`; "HTTP/2 hết giới hạn kết nối". | Bỏ "sticky" (chỉ cần LB hỗ trợ Upgrade + pub/sub); nhãn `data:`; viết "nới rộng nhiều (số stream đồng thời do hai bên thoả thuận)". |
+| Q24 | Sim `tdd-codewalk` | Giải thích Hypothesis tìm ra 500000 bằng "shrink". Với bug này 500000 là input hỏng duy nhất; reviewer cho rằng Hypothesis tìm ra nhờ thu hằng số từ source (từ bản 6.131), **chưa kiểm chứng**. | Viết trung tính: "Hypothesis thử cả giá trị biên và hằng số trong code, nên trúng 500000"; kiểm changelog trước khi ghi số phiên bản. |
+| Q25 | Engine (`kgroup`, `rplay`, `binary`, `ring`) | Bốn chỗ: crash chưa nhắc `session.timeout.ms` và xử lý lại phần chưa commit; `EVAL` thiếu `numkeys`; điểm bằng nhau xếp khác Redis; cận `⌈log₂n⌉+1`; ring nói key chuyển sang một server dù đang bật vnode. | Sửa chữ trong engine trong một commit riêng (đây là sửa engine, không phải nội dung). |
+| Q26 | Sim nit: `cache-write`, `isolation`, `inverted-index`, `seat` | Write-around thiếu mũi tên `200`; DAX ghi DB trước rồi mới cập nhật cache; undo log chỉ có ở InnoDB; "hash map" nên là "term dictionary"; ghi rõ mức isolation khi Bob nhận "0 row". | Sửa gộp trong một commit. |
+| Q27 | A4 (nit LLD/DSA) | Tám nit nhỏ: O(1) trung bình, Powersort, cycle trong đồ thị vô hướng, `put/get`, Aggregate, YAGNI, nhiều index, Singleton/DI. | Sửa gộp trong một commit. |
+| Q28 | `eks` và chủ đề mới `k8s-core` | Bảng "Object Kubernetes hay dùng" trong `eks` sẽ trùng với `k8s-core` (Phần B, mục 16–20). | Khi có `k8s-core`, `eks` chỉ giữ phần riêng của AWS và link sang `k8s-core`. |
+
 ### A1. Đã sửa (mỗi loại một commit)
 
 | Commit | Thay đổi | Nguồn |
@@ -54,11 +89,10 @@ Các mục dưới đây là lựa chọn thiết kế, cách diễn đạt, ho�
 |---|---|---|
 | `core-db` (NoSQL "phải tự xử lý ghi dở dang", "Transaction: thường eventual") | MongoDB có transaction nhiều document từ 4.0; DynamoDB có `TransactWriteItems`. Câu cũ cũng trộn transaction với consistency. | Viết: "nhiều NoSQL đã có transaction nhưng giới hạn phạm vi, số item, độ trễ". |
 | `core-db` (bảng isolation, Repeatable Read cho phép phantom) | Câu này chỉ đúng với chuẩn SQL và InnoDB. Repeatable Read của PostgreSQL là snapshot isolation: không có phantom nhưng có write skew. Site lấy PostgreSQL làm DB mặc định. | Thêm một dòng về PostgreSQL. |
-| `indexing` (card "Không — vi phạm leftmost prefix") | Mâu thuẫn với point cùng file nói "trừ engine có skip scan". | Thêm cùng ngoại lệ vào card. Phiên bản hỗ trợ skip scan (PostgreSQL 18, MySQL 8.0.13+) **chưa kiểm chứng**. |
 | `caching` và `dist-cache` | Write-through được định nghĩa hai kiểu: "cache ghi DB rồi trả lời" và "ghi cache và DB cùng lúc". | Chọn một định nghĩa, file còn lại link sang. |
 | Hot key | Có bốn cách gọi: `key#1..#k`, key salting, compound shard key, `hotkey_1`. | Dùng một thuật ngữ "key salting" và một ví dụ. |
 | L4 throughput | Ba cách nói: "triệu kết nối", "triệu kết nối/giây", "triệu request/giây". | Chọn một đơn vị. |
-| `consistent-hashing` | Ghi "hàng trăm virtual node", nhưng Cassandra 4.0 hạ `num_tokens` mặc định xuống 16 (**chưa kiểm chứng**). Ghi "DynamoDB", trong khi ring đến từ paper Dynamo, không phải dịch vụ DynamoDB. Thêm một server vào N server thì khoảng K/(N+1) key đổi chỗ, không phải K/N. | Sửa con số và tên. |
+| `consistent-hashing` | (`num_tokens` đã sửa ở `9774513`.) Ghi "DynamoDB", trong khi ring đến từ paper Dynamo, không phải dịch vụ DynamoDB. Thêm một server vào N server thì khoảng K/(N+1) key đổi chỗ, không phải K/N. | Sửa tên và công thức. |
 | `lb-gateway-cdn` | "L4 không cần kết thúc TLS". NLB có TLS listener. | Viết "kết thúc TLS ở L4 là tuỳ chọn". |
 | `streams` | Tên "Spark Streaming" là DStreams cũ. | Đổi thành "Spark Structured Streaming". |
 | `api-design` | Header `Accept-Version` không phải chuẩn. | Viết "header tự đặt" hoặc media-type versioning. |
@@ -83,14 +117,18 @@ Các mục dưới đây là lựa chọn thiết kế, cách diễn đạt, ho�
 
 Đây là mức giảm tương đối, không phải giá. Luật hiện tại không cấm. Đề xuất giữ "tới 90%" kèm link, bỏ cận 70.
 
-**Thông tin mới do reviewer đưa ra, tôi chưa mở nguồn**
+**Thông tin mới do reviewer đưa ra, đã xác minh ở giai đoạn 1.5 (commit `9774513`)**
 
-| Thông tin | Chỗ bị ảnh hưởng |
-|---|---|
-| Kafka 4.2: share groups (KIP-932, "Queues for Kafka") sẵn sàng production. Cho phép nhiều consumer hơn số partition, ack từng record. | `kafka` (các câu "số partition = số consumer tối đa", "không có ack từng message"). Nếu đúng thì giới hạn phạm vi các câu này về consumer group cổ điển. |
-| ECS Managed Instances: lựa chọn compute thứ ba của ECS. | `ecs`, `ecs-vs-eks`, sim `container-stack` |
-| EKS trên Fargate: không có EBS, không có Spot, không có Arm; không có IMDS nên dùng IRSA thay Pod Identity. | `eks`, `eks-flow` |
-| Redis đổi license (7.4: RSALv2/SSPL; 8: thêm AGPLv3) và bản fork Valkey. | `redis` |
+Cả sáu khẳng định đều đúng; không cái nào bị bác bỏ. Hai cái chỉ đúng một phần nên câu sửa được điều chỉnh theo trang gốc.
+
+| Khẳng định | Kết quả | Đã sửa | Nguồn đã mở |
+|---|---|---|---|
+| Kafka share groups (KIP-932) | **Đúng.** Trang phát hành 4.2.0 ghi "Kafka Queues (Share Groups) is now production-ready". | `kafka`: giới hạn các câu "số partition = số consumer tối đa" và "không có ack từng message" về consumer group cổ điển; nêu share group và cái giá là mất thứ tự trong partition. | https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/ |
+| ECS Managed Instances | **Đúng.** AWS lo cấp máy, vá OS và scale; dùng được mọi loại EC2 (GPU, Arm); mỗi instance sống tối đa 14 ngày. | `ecs` (tldr), `ecs-vs-eks` (dòng Compute). Sim `container-stack` chưa thêm lựa chọn thứ sáu: muốn thêm phải sửa dữ liệu sim, **cần quyết**. | https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ManagedInstances.html |
+| Skip scan | **Đúng.** MySQL có từ 8.0.13; PostgreSQL có từ 18. | `indexing`: card có cùng ngoại lệ với point. | https://dev.mysql.com/doc/refman/8.0/en/range-optimization.html · https://www.postgresql.org/docs/18/release-18.html |
+| Cassandra `num_tokens` mặc định 16 | **Đúng một phần.** `cassandra.yaml` mặc định 16. Câu "4.0 hạ từ 256" chưa thấy trên trang nên không ghi. | `consistent-hashing`: bỏ "hàng trăm virtual node". | https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html |
+| Giới hạn EKS trên Fargate | **Đúng.** Không DaemonSet, GPU, privileged, EBS, Spot, Arm; không có IMDS, nên dùng IRSA. Trang Pod Identity ghi rõ không hỗ trợ pod trên Fargate. | `eks`: dòng Fargate, và why của Pod Identity. Sim `eks-flow` chạy trên node EC2 nên vẫn đúng. | https://docs.aws.amazon.com/eks/latest/userguide/fargate.html · https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html |
+| License Redis / Valkey | **Đúng.** ≤ 7.2: BSD-3. 7.4–7.8: RSALv2/SSPLv1. ≥ 8.0: thêm AGPLv3. Valkey: BSD, Linux Foundation. Câu "ElastiCache dùng Valkey" chưa kiểm nên không ghi. | `redis`: thêm point "+ License & Valkey". | https://redis.io/legal/licenses/ · https://valkey.io/ |
 
 **Ý còn thiếu, nên bổ sung vào chủ đề có sẵn (không đáng tách chủ đề mới)**
 
@@ -118,7 +156,14 @@ Trong bảng trên, "rate limiting phân tán" được ghép vào problem `rate
 
 ### A3. Phạm vi chưa review
 
-- 48 sim: chỉ 10 sim được đọc kỹ (Kafka, Redis, container, ECS/EKS, saga). Khoảng 38 sim còn lại chỉ được xem qua grep giá tiền.
+- **Sim** (giai đoạn 1.5): 48 sim đã được review hết. 13 HLD sim nằm trong problem; 10 sim đọc ở giai đoạn 1; 25 file sim còn lại cùng phần chữ trong engine (`ring`, `kgroup`, `rplay`, `binary`, `bucket`, `vending`) được hai reviewer đọc ở giai đoạn 1.5.
+  - Không có giá tiền.
+  - Commit `fad486a` sửa các lỗi rõ ràng:
+    - `seat`: timeout của row lock là `innodb_lock_wait_timeout`, mặc định 50s (đã mở manual MySQL). `lock_wait_timeout` là timeout của metadata lock. PostgreSQL mặc định `lock_timeout = 0`.
+    - `seat`: lock của UPDATE giữ tới khi transaction kết thúc, không phải "trong chốc lát".
+    - `tdd-codewalk`: import lỗi là collection error của pytest ("1 error"). Bước BDD phải ra `ModuleNotFoundError` vì `shop.py` chỉ có từ bước sau.
+    - `arch-dependency`: phương án vertical slice đổi DB cũng chạm khối Shared, nơi giữ kết nối DB.
+  - Các nhận xét còn lại về sim nằm trong bảng quyết định gộp (A0).
 - Bốn reviewer phụ đọc toàn bộ topic và problem.
 - **Mức kiểm chứng của A1.** Các sự thật sau đã được đối chiếu bằng trang tài liệu gốc mở trong phiên này:
   - heapq 3.14
@@ -192,6 +237,20 @@ Bảng tóm tắt:
 | 13 | `storage-engines` | Storage engine: B-Tree, LSM, WAL | P2 | `indexing`, `core-db` |
 | 14 | `stream-processing` | Stream processing: window, watermark, state | P2 | `streams`, `kafka` |
 | 15 | `time-ordering` | Đồng hồ & thứ tự sự kiện | P2 | `replication`* |
+| 16 | `container-basics` | Container là gì: namespace, cgroup, image, so với VM | P0 | `networking` |
+| 17 | `k8s-core` | Kubernetes cốt lõi: kiến trúc và các object | P0 | `container-basics`* |
+| 18 | `dockerfile` | Viết Dockerfile chuẩn và build cache | P1 | `container-basics`* |
+| 19 | `k8s-operations` | Chạy ổn định trên Kubernetes: probe, resource, rollout, stateful | P1 | `k8s-core`* |
+| 20 | `image-delivery` | Build → tag → push → deploy: registry, digest, scan, SBOM | P1 | `dockerfile`*, `system-architecture` |
+
+**Mảng container (mục 16–20) và các topic có sẵn.** `ecs`, `eks`, `ecs-vs-eks` đều mặc định người học đã biết container và Kubernetes. `eks` hiện có một bảng "Object Kubernetes hay dùng" (Pod, Deployment, Ingress, ConfigMap/Secret, HPA, Namespace/RBAC, DaemonSet, StatefulSet, Job), mỗi object một dòng.
+
+Đề xuất chia vai như sau:
+
+- `container-basics` và `k8s-core` là **nền tảng chung**.
+- `k8s-operations` là nền tảng để vận hành.
+- `ecs`, `eks` và `ecs-vs-eks` chỉ giữ phần riêng của AWS: Fargate, IAM/Pod Identity, VPC CNI, Karpenter, phí control plane. Bảng object trong `eks` rút lại thành link sang `k8s-core` (Q28).
+- Thứ tự học gợi ý: `container-basics` → `dockerfile` → `k8s-core` → `k8s-operations` → `image-delivery` → `ecs` / `eks`.
 
 \* là id mới trong đề xuất này. Mục 7, 9 và 15 phụ thuộc mục 4.
 
@@ -295,7 +354,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Nguồn**
   - https://docs.stripe.com/api/idempotent_requests
   - https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/ (Internet-Draft -09, chưa là RFC)
-  - Kafka delivery semantics: https://kafka.apache.org/documentation/#semantics (trang trả về redirect, chưa đọc được nội dung; cần mở lại khi viết)
+  - Kafka delivery semantics (docs 4.4 hiện hành, đã mở): https://kafka.apache.org/44/design/design/#message-delivery-semantics. Trang này nói idempotent producer, transaction nhiều partition, và với hệ thống ngoài thì lưu offset cùng chỗ với output.
 
 ### 3. `outbox-cdc` · Dual write, Transactional Outbox & CDC · **P0**
 
@@ -370,7 +429,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
   - Thêm sim failover có split brain, hai variant: không fencing và có fencing.
 - **Nguồn**
   - https://www.postgresql.org/docs/current/warm-standby.html
-  - Dynamo paper: https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf (chưa mở trong phiên này)
+  - Dynamo paper, SOSP 2007, DOI https://dx.doi.org/10.1145/1294261.1294281. Bản PDF trên allthingsdistributed.com tải được nhưng không trích được chữ; bài giới thiệu chính thức: https://www.allthingsdistributed.com/2007/10/amazons_dynamo.html. Khi viết cần đọc bản PDF bằng công cụ khác.
 
 ### 5. `resilience` · Timeout, retry, circuit breaker, load shedding · **P0**
 
@@ -406,7 +465,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Sơ đồ / mô phỏng**: sim ba tầng retry nhân tải (đếm request tới DB), và sim circuit breaker chuyển trạng thái.
 - **Nguồn**
   - https://builder.aws.com/content/3EumjoZascWd1oZiEgL8ORlv3qE/timeouts-retries-and-backoff-with-jitter (Amazon Builders' Library)
-  - Load shedding (Builders' Library): https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/ (chưa mở trong phiên này; URL cũ có thể redirect như bài trên)
+  - Load shedding (Builders' Library, đã mở): https://builder.aws.com/content/3Eun1EEyX6p2e3VYNyRLSJzLuMV/using-load-shedding-to-avoid-overload. Ý chính: từ chối phần việc vượt sức sớm để các request đã nhận vẫn xong kịp trước khi client bỏ cuộc.
 
 ### 6. `observability` · Observability: logs, metrics, traces, SLO · **P0**
 
@@ -442,7 +501,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Nguồn**
   - https://sre.google/sre-book/service-level-objectives/
   - https://opentelemetry.io/docs/concepts/signals/
-  - W3C Trace Context: https://www.w3.org/TR/trace-context/ (chưa mở trong phiên này)
+  - W3C Trace Context: https://www.w3.org/TR/trace-context/ trả 403 khi fetch tự động. Đã đối chiếu bản spec trên repo chính thức của W3C (header `traceparent`, `tracestate`): https://github.com/w3c/trace-context/blob/main/spec/20-http_request_header_format.md
 
 ### 7. `consensus` · Consensus & leader election (Raft, lease, fencing) · **P1**
 
@@ -507,7 +566,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Nguồn**
   - https://www.rfc-editor.org/rfc/rfc9700 (OAuth 2.0 Security BCP, 01/2025)
   - https://openid.net/specs/openid-connect-core-1_0.html
-  - RFC 6749, 7519, 7636 (chưa mở trong phiên này)
+  - Đã mở: RFC 6749 (OAuth 2.0, bốn loại grant) https://www.rfc-editor.org/rfc/rfc6749 · RFC 7519 (JWT) https://www.rfc-editor.org/rfc/rfc7519 · RFC 7636 (PKCE chống chặn authorization code) https://www.rfc-editor.org/rfc/rfc7636
 
 ### 9. `multi-region` · Multi-region & Disaster Recovery · **P1**
 
@@ -603,7 +662,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Sơ đồ / mô phỏng**: sim expand/contract qua 5 bước với hai phiên bản app chạy song song.
 - **Nguồn**
   - https://martinfowler.com/bliki/ParallelChange.html
-  - OpenFeature spec: https://openfeature.dev/specification/ (chưa mở trong phiên này)
+  - OpenFeature spec (đã mở; dự án CNCF incubating): https://openfeature.dev/specification/
 
 ### 12. `vector-search` · Vector search & ANN · **P1**
 
@@ -656,7 +715,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Sơ đồ / mô phỏng**: sim ghi vào LSM → flush → compaction.
 - **Nguồn**
   - https://www.postgresql.org/docs/current/wal-intro.html (đã mở)
-  - RocksDB wiki: https://github.com/facebook/rocksdb/wiki (chưa mở trong phiên này)
+  - RocksDB Overview (đã mở; memtable, SST, compaction leveled/universal, write/space amplification): https://github.com/facebook/rocksdb/wiki/RocksDB-Overview
 
 ### 14. `stream-processing` · Stream processing: window, watermark, state · **P2**
 
@@ -682,7 +741,7 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Sơ đồ / mô phỏng**: sim window + watermark với một event đến muộn.
 - **Nguồn**
   - https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/datastream/overview/ (fault tolerance guarantees)
-  - Khi viết nên mở thêm trang concepts/time của Flink.
+  - Flink concepts/time (đã mở; event time, processing time, watermark): https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/
 
 ### 15. `time-ordering` · Đồng hồ & thứ tự sự kiện · **P2**
 
@@ -705,7 +764,209 @@ Các ý đã cân nhắc nhưng không tách thành chủ đề:
 - **Câu hỏi tự kiểm tra**
   - Vì sao hai tin nhắn trong group chat không nên sắp theo timestamp của client?
 - **Sơ đồ / mô phỏng**: SVG ba process trao đổi message, có Lamport timestamp.
-- **Nguồn**: Lamport 1978, "Time, Clocks, and the Ordering of Events" (https://lamport.azurewebsites.net/pubs/time-clocks.pdf). Link tải được nhưng là bản scan nên không trích được nội dung.
+- **Nguồn**: Lamport 1978, "Time, Clocks, and the Ordering of Events" (https://lamport.azurewebsites.net/pubs/time-clocks.pdf). Bản PDF là scan, không trích được chữ. Đối chiếu bằng trang chính thức của Microsoft Research (tiêu đề, tác giả, CACM 21(7), 1978, tóm tắt): https://www.microsoft.com/en-us/research/publication/time-clocks-ordering-events-distributed-system/
+
+### 16. `container-basics` · Container là gì: namespace, cgroup, image, so với VM · **P0**
+
+- **Vì sao cần**
+  - Mọi câu trả lời về deploy (ECS, EKS, "đóng gói service") đều dựa trên container, nhưng site chưa giải thích container là gì.
+  - Nếu không hiểu container chỉ là một process được cách ly, người học sẽ nhầm nó với VM. Từ đó dễ sai khi nói về bảo mật (dùng chung kernel), về giới hạn tài nguyên (OOM kill), và về chuyện "vì sao Fargate cho mỗi pod một VM".
+- **Tiên quyết**: `networking`.
+- **Liên quan**: `ecs`, `eks`, `ecs-vs-eks`, `system-architecture`; sim `container-stack`.
+- **tldr**: Container là một process Linux bình thường, được đóng khung bằng hai cơ chế của kernel.
+  - **Namespace** cho process thấy một thế giới riêng: PID, mạng, mount, hostname, user.
+  - **Cgroup** giới hạn CPU, RAM, IO, số process mà nó được dùng.
+  - Container khởi động trong khoảng một giây vì không phải boot hệ điều hành; đổi lại, mọi container trên một máy **dùng chung kernel**, nên cách ly yếu hơn VM.
+- **Ý chính**
+  1. **VM và container**: hypervisor giả lập cả máy, mỗi VM có kernel riêng; container chỉ là process trên kernel của host.
+  2. **Namespace**: các loại pid, net, mnt, uts, ipc, user, cgroup, time. Mỗi loại cách ly một thứ gì, và vì sao `localhost` trong container không phải `localhost` của host.
+  3. **Cgroup v2**: các controller cpu, memory, io, pids. Vượt giới hạn memory thì kernel OOM-kill process; vượt giới hạn CPU thì bị throttle, không bị kill.
+  4. **Image**:
+     - Gồm nhiều layer filesystem chồng lên nhau, cộng với config (lệnh chạy, env).
+     - Mỗi phần được định danh bằng digest (hash nội dung), nên hai image dùng chung layer thì chỉ tải và lưu một lần.
+  5. **Container layer ghi được và tạm thời**: dữ liệu ghi vào container mất khi container bị xoá. Dữ liệu cần giữ phải đặt ở volume hoặc dịch vụ ngoài. Đây là lý do service phải stateless.
+  6. **Chuẩn OCI**: image spec, runtime spec, distribution spec. Docker, containerd, Podman và Kubernetes (qua CRI) cùng chạy được một image.
+  7. **Docker gồm những gì**: CLI, daemon, containerd, runc; `docker run` thực chất làm gì.
+  8. **Mạng và volume** ở mức cần cho SD: port mapping, bridge network, bind mount và volume.
+  9. **Bảo mật**: chạy với root trong container vẫn nguy hiểm vì dùng chung kernel; dùng user namespace, capability, seccomp. Khi cần cách ly mạnh thì dùng micro-VM (Fargate, Firecracker).
+- **Câu hỏi tự kiểm tra**
+  - Vì sao container khởi động nhanh hơn VM?
+  - Container vượt memory limit thì chuyện gì xảy ra? Vượt CPU limit thì sao?
+  - Hai image cùng base thì registry và máy chạy lưu bao nhiêu bản của base?
+  - Vì sao không nên lưu file upload trong filesystem của container?
+- **Sơ đồ / mô phỏng**
+  - SVG so sánh VM (hypervisor + nhiều kernel) và container (một kernel, nhiều namespace).
+  - SVG các layer của image và layer ghi được của container.
+- **Nguồn (đã mở)**
+  - https://man7.org/linux/man-pages/man7/namespaces.7.html
+  - https://docs.kernel.org/admin-guide/cgroup-v2.html
+  - https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/
+  - https://github.com/opencontainers/image-spec/blob/main/spec.md (trang chủ dự án: https://opencontainers.org/)
+
+### 17. `k8s-core` · Kubernetes cốt lõi: kiến trúc và các object · **P0**
+
+- **Vì sao cần**
+  - Kubernetes là nền chung của EKS, GKE, AKS và các cluster tự dựng.
+  - `eks` hiện vừa phải dạy Kubernetes vừa phải dạy phần AWS, nên mỗi object chỉ được một dòng.
+  - Không nắm vòng reconcile (desired state → controller kéo actual state về) thì không giải thích được vì sao pod chết lại tự sống, vì sao phải dùng label/selector, hay vì sao Service tìm được pod.
+- **Tiên quyết**: `container-basics`.
+- **Liên quan**:
+  - Topic: `eks`, `ecs-vs-eks`, `lb-gateway-cdn`, `cap` (etcd cần quorum)
+  - Sim: `eks-flow`
+- **tldr**:
+  - Bạn khai báo **trạng thái mong muốn** (YAML) cho API server; etcd lưu nó.
+  - Các controller liên tục so trạng thái thật với trạng thái mong muốn rồi sửa lệch; scheduler chọn node cho pod; kubelet trên mỗi node chạy container.
+  - Mọi object nối với nhau bằng **label/selector**, không bằng tên cứng.
+- **Ý chính**
+  1. **Control plane** gồm kube-apiserver, etcd, kube-scheduler, kube-controller-manager, cloud-controller-manager. **Node** gồm kubelet, kube-proxy, container runtime (CRI).
+  2. **Reconcile loop**: khai báo thay vì ra lệnh. Đây là lý do Kubernetes tự chữa lành.
+  3. **Pod**: đơn vị nhỏ nhất; các container trong pod dùng chung network namespace; sidecar; pod là thứ dùng một lần, chết thì thay bằng pod mới, không sửa pod cũ.
+  4. **Deployment → ReplicaSet → Pod**: Deployment quản lý ReplicaSet; không sửa trực tiếp ReplicaSet do Deployment sở hữu.
+  5. **Service**:
+     - Các kiểu ClusterIP, NodePort, LoadBalancer, headless.
+     - EndpointSlice chọn pod theo selector.
+     - DNS nội bộ.
+  6. **Ingress và Gateway API**:
+     - Ingress đã bị **đóng băng**: vẫn GA, không bị gỡ, nhưng không phát triển thêm.
+     - Kubernetes khuyến nghị Gateway API (GatewayClass, Gateway, HTTPRoute) cho việc mới.
+  7. **ConfigMap và Secret**:
+     - Secret mặc định **không mã hoá** trong etcd; ai tạo được pod trong namespace thì đọc được Secret của namespace đó.
+     - Cần bật mã hoá at rest, RBAC tối thiểu, hoặc dùng secret store bên ngoài.
+     - EKS ≥ 1.28 đã mã hoá sẵn (link `eks`).
+  8. **Namespace và RBAC**: Role/ClusterRole, RoleBinding, ServiceAccount; namespace là ranh giới mềm.
+  9. **Các workload khác**: DaemonSet, Job/CronJob, StatefulSet (giới thiệu, chi tiết ở mục 19).
+- **Câu hỏi tự kiểm tra**
+  - Xoá một pod của Deployment thì chuyện gì xảy ra, và thành phần nào làm việc đó?
+  - Service tìm pod bằng cách nào? Đổi label của pod thì sao?
+  - Vì sao dự án mới nên chọn Gateway API thay vì Ingress?
+  - Ai tạo được Deployment trong namespace thì có đọc được Secret không?
+- **Sơ đồ / mô phỏng**
+  - SVG kiến trúc control plane / node.
+  - Sim "xoá một pod": controller thấy 2/3 replica → tạo pod mới → scheduler gán node → kubelet chạy pod → EndpointSlice cập nhật.
+- **Nguồn (đã mở)**
+  - https://kubernetes.io/docs/concepts/overview/components/
+  - https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+  - https://kubernetes.io/docs/concepts/services-networking/gateway/
+  - https://kubernetes.io/docs/concepts/services-networking/ingress/
+  - https://kubernetes.io/docs/concepts/configuration/secret/
+
+### 18. `dockerfile` · Viết Dockerfile chuẩn và build cache · **P1**
+
+- **Vì sao cần**
+  - Image to, build chậm, lộ secret trong layer, chạy bằng root: đây là lỗi thực tế hay gặp nhất khi đóng gói service.
+  - Câu hỏi "tối ưu Dockerfile thế nào" phổ biến trong phỏng vấn backend và DevOps.
+- **Tiên quyết**: `container-basics`.
+- **Liên quan**: `ecs`, `eks`, `dev-methods` (CI).
+- **tldr**: Mỗi lệnh `RUN`/`COPY` tạo một layer và được cache theo thứ tự; một lệnh đổi thì mọi lệnh sau nó build lại. Vì vậy:
+  - Đặt bước ít đổi lên trước: cài dependency trước, copy code sau.
+  - Dùng multi-stage build để image cuối chỉ chứa thứ cần để chạy.
+  - Chạy bằng user không phải root.
+  - Không đưa secret qua `ARG`/`ENV`.
+- **Ý chính**
+  1. **Base image**: nguồn tin cậy, nhỏ (slim, distroless); **pin theo digest** để tag bị ghi đè vẫn build ra cùng kết quả.
+  2. **Multi-stage build**: stage build có compiler và dev dependency; stage cuối chỉ copy artifact sang.
+  3. **Thứ tự layer**: copy file lock rồi cài dependency, xong mới `COPY . .`. Gộp `apt-get update && apt-get install` trong cùng một `RUN`, nếu tách ra thì cache giữ danh sách gói cũ.
+  4. **`.dockerignore`**: build context nhỏ thì build nhanh và không lọt `.git` hay `.env` vào image.
+  5. **`USER` không phải root**; mỗi container một trách nhiệm; container dùng một lần rồi bỏ.
+  6. **Secret lúc build**: dùng `RUN --mount=type=secret`. `ARG`/`ENV` nằm lại trong image, ai có image cũng đọc được.
+  7. **BuildKit cache**:
+     - Cache mount (`RUN --mount=type=cache,target=/root/.npm`) giữ cache của package manager qua các lần build.
+     - Bind mount cho source không lưu vào layer.
+     - Cache dùng chung qua registry (`--cache-to` / `--cache-from type=registry`) cho các runner CI.
+  8. **Build lại định kỳ** với `--pull` (lấy base mới có bản vá) và `--no-cache` khi cần build sạch hoàn toàn.
+  9. **`HEALTHCHECK`, `ENTRYPOINT` và `CMD`, tín hiệu dừng**: process PID 1 phải xử lý SIGTERM để shutdown êm. Trên Kubernetes, probe thay cho `HEALTHCHECK` (link mục 19).
+- **Câu hỏi tự kiểm tra**
+  - Đổi một dòng code mà `npm install` chạy lại. Vì sao, sửa thế nào?
+  - Vì sao `ENV API_KEY=…` lúc build là lộ secret?
+  - Multi-stage giảm kích thước image bằng cách nào?
+  - Pin `node:22` khác pin `node@sha256:…` ở đâu?
+- **Sơ đồ / mô phỏng**: codewalk (cùng kiểu `tdd-codewalk`) gồm Dockerfile xấu → sắp lại layer → multi-stage → non-root → secret mount. Mỗi bước hiện kích thước image và số layer phải build lại khi đổi một file code.
+- **Nguồn (đã mở)**
+  - https://docs.docker.com/build/building/best-practices/
+  - https://docs.docker.com/build/cache/optimize/
+  - https://docs.docker.com/build/building/secrets/
+
+### 19. `k8s-operations` · Chạy ổn định trên Kubernetes: probe, resource, rollout, stateful · **P1**
+
+- **Vì sao cần**
+  - Phần lớn sự cố khi chạy trên Kubernetes đến từ cấu hình sai, không phải từ code:
+    - không có readiness probe nên traffic vào pod chưa sẵn sàng
+    - liveness probe quá gắt nên pod restart liên tục
+    - không đặt requests nên bị xếp chồng
+    - memory limit thấp nên OOMKilled
+  - `eks` có nhắc HPA và `requests`/`limits`, nhưng chưa có chỗ giải thích cơ chế.
+- **Tiên quyết**: `k8s-core`.
+- **Liên quan**:
+  - Topic: `eks`, `ecs` (rolling deploy), `observability` (mục 6), `deployment-safety` (mục 11), `resilience` (mục 5)
+  - Sim: `eks-flow`, `ecs-flow`
+- **tldr**:
+  - Probe: **readiness** quyết định pod có nhận traffic không; **liveness** quyết định có restart không; **startup** che hai probe kia khi app khởi động chậm.
+  - Resource: **requests** dùng để xếp lịch; **limits** thì CPU bị throttle, RAM bị OOM-kill.
+  - Rollout: Deployment rolling update mặc định `maxSurge` và `maxUnavailable` 25%, rollback bằng `kubectl rollout undo`.
+  - Workload có trạng thái dùng StatefulSet kèm PVC.
+- **Ý chính**
+  1. **Ba loại probe** và hậu quả khi fail:
+     - readiness: pod bị gỡ khỏi EndpointSlice, không restart
+     - liveness: kubelet restart container
+     - startup: chặn liveness/readiness tới khi pass
+  2. **Bẫy probe**: liveness kiểm cả DB. DB chậm thì mọi pod cùng restart, sự cố lan rộng hơn.
+  3. **Requests và limits**:
+     - Scheduler dùng requests để chọn node.
+     - CPU vượt limit thì bị throttle; RAM vượt limit thì bị OOM-kill.
+     - Chỉ đặt limit mà không đặt request thì request lấy bằng limit.
+     - Các lớp QoS.
+  4. **HPA**: `desired = ceil(current × metric / target)`; CPU tính theo % của requests, nên không đặt requests thì HPA không hoạt động. Link `eks`.
+  5. **Rolling update**:
+     - `maxSurge` / `maxUnavailable` mặc định 25%.
+     - `revisionHistoryLimit` mặc định 10.
+     - `progressDeadlineSeconds` mặc định 600; quá hạn thì chỉ báo lỗi, **không tự rollback**.
+  6. **Shutdown êm**: SIGTERM, `terminationGracePeriodSeconds`, preStop. Readiness phải tắt trước khi process thoát.
+  7. **StatefulSet**:
+     - Tên pod ổn định (`web-0`) nhờ headless Service.
+     - Mỗi pod một PVC từ `volumeClaimTemplates`.
+     - Thứ tự khởi tạo và cập nhật.
+     - Xoá hoặc scale down **không xoá PVC**.
+  8. **PV, PVC, StorageClass**: dynamic provisioning; access mode; volume gắn theo AZ (link `eks` stateful).
+  9. **PodDisruptionBudget** khi drain node; ResourceQuota/LimitRange cho mỗi namespace.
+- **Câu hỏi tự kiểm tra**
+  - Pod đang chạy bị gỡ khỏi Service nhưng không restart. Probe nào đang fail?
+  - Vì sao liveness probe không nên gọi DB?
+  - Container dùng 120% CPU limit thì bị gì? 120% memory limit thì sao?
+  - Scale StatefulSet từ 3 xuống 2 thì PVC `data-web-2` ra sao?
+- **Sơ đồ / mô phỏng**: sim rolling update 4 replica với `maxSurge=1`, `maxUnavailable=0`, có variant readiness fail ở bản mới (rollout dừng, bản cũ vẫn phục vụ) và variant không có readiness probe (traffic vào pod chưa sẵn sàng).
+- **Nguồn (đã mở)**
+  - https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/
+  - https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  - https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+  - https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+
+### 20. `image-delivery` · Build → tag → push → deploy: registry, digest, scan, SBOM · **P1**
+
+- **Vì sao cần**
+  - "Code từ commit tới production đi đường nào" là câu hỏi phổ biến.
+  - Lỗi hay gặp: deploy theo tag `latest` hay tag bị ghi đè, nên không biết production chạy bản nào và rollback không chắc chắn.
+  - Image chứa CVE mà không ai biết.
+  - Mục này nối `dockerfile` với `deployment-safety` (mục 11).
+- **Tiên quyết**: `dockerfile`, `system-architecture`.
+- **Liên quan**: `ecs` (`ecs-flow`: ECS kéo image từ ECR), `eks`, `dev-methods`, `deployment-safety`.
+- **tldr**: CI build image một lần, gắn tag theo commit, push lên registry; deploy theo **digest** (bất biến). Cùng một image đi qua dev → staging → prod, không build lại. Image được scan lỗ hổng và kèm SBOM để biết bên trong có gì.
+- **Ý chính**
+  1. **Tag khác digest**: tag là con trỏ có thể bị dời đi; digest là hash nội dung. Bật tag immutable ở registry.
+  2. **Chiến lược tag**: git SHA, semver; tránh `latest` trong production.
+  3. **Build once, promote many**: đổi cấu hình theo môi trường bằng env/ConfigMap, không build lại image.
+  4. **Registry**: quyền push/pull; image đa kiến trúc (image index, amd64 và arm64).
+  5. **Scan lỗ hổng** trong CI và trên registry; chặn deploy theo mức độ nghiêm trọng.
+  6. **SBOM** (BuildKit sinh SPDX bằng `--sbom=true`) và provenance; ký image (đề cập, không đi sâu).
+  7. **Deploy**: cập nhật digest trong task definition / manifest; GitOps (repo là nguồn trạng thái mong muốn); rollback = trỏ lại digest cũ.
+- **Câu hỏi tự kiểm tra**
+  - Vì sao deploy theo digest thay vì theo tag?
+  - "Build lại cho prod" sai ở chỗ nào?
+  - SBOM giúp gì khi một CVE mới được công bố?
+- **Sơ đồ / mô phỏng**: SVG pipeline commit → CI build → scan + SBOM → push (tag + digest) → deploy dev → promote staging → prod.
+- **Nguồn (đã mở)**
+  - https://docs.docker.com/build/metadata/attestations/sbom/
+  - https://github.com/opencontainers/image-spec/blob/main/spec.md (manifest, image index, digest)
+  - https://docs.docker.com/build/building/best-practices/ (pin digest, build lại định kỳ)
 
 ---
 
@@ -739,10 +1000,15 @@ Các viết tắt dưới đây đã được đối chiếu với `glossary.js`
 | LSN | Log Sequence Number (PostgreSQL) |
 | NTP | Network Time Protocol |
 | BM25 | Hàm xếp hạng độ liên quan, mặc định của Elasticsearch |
+| SBOM | Software Bill of Materials (mục 20) |
+| SPDX | Định dạng SBOM mà BuildKit sinh ra (mục 20) |
+| CVE | Common Vulnerabilities and Exposures (mục 20) |
+| CRI | Container Runtime Interface (mục 16, 17) |
+| PV | PersistentVolume (glossary đã có PVC; mục 19) |
+| QoS | Quality of Service class của pod (mục 19) |
 
 ## Còn chưa chắc
 
-- Thông tin trong bảng "chưa kiểm chứng" ở A2: Kafka share groups 4.2, ECS Managed Instances, skip scan, `num_tokens` của Cassandra, giới hạn của EKS Fargate.
-- Một số nguồn trong Phần B ghi "chưa mở trong phiên này". Phải mở và đối chiếu trước khi viết topic ở giai đoạn 2.
-- Trang Kafka delivery semantics trả về redirect; chưa đọc được nội dung để trích.
+- Sáu khẳng định của reviewer ở A2 đã xác minh xong (giai đoạn 1.5). Các dòng khác của A2 vẫn là nhận định của reviewer.
+- Nguồn Part B đã mở hết, trừ hai bản PDF không trích được chữ (Dynamo, Lamport). Lamport đã đối chiếu qua trang Microsoft Research; Dynamo cần đọc bằng công cụ khác khi viết `replication`.
 - Cách ghi nguồn: hiện là URL trong câu; quy định §6 nói trường `src`, nhưng app chưa render trường đó (xem cuối A1).
