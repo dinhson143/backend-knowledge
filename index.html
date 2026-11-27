@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend Knowledge</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <button class="icon-btn menu-btn" id="menuBtn" aria-label="Mở mục lục">☰</button>
+  <a class="brand" href="#/">Backend Knowledge <span>· System Design · Cloud · Kiến trúc</span></a>
+  <nav class="modes" role="tablist">
+    <a href="#/" data-mode="home">Lộ trình</a>
+    <a href="#/learn" data-mode="learn">Kiến thức</a>
+    <a href="#/problems" data-mode="problems">Luyện bài</a>
+    <a href="#/sims" data-mode="sims">Mô phỏng</a>
+    <a href="#/glossary" data-mode="glossary">Thuật ngữ</a>
+  </nav>
+  <input id="search" type="search" placeholder="Tìm: kafka, redis, saga…" autocomplete="off">
+  <button class="icon-btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main id="main"></main>
+</div>
+
+<script src="glossary.js"></script>
+<script src="data.js"></script>
+<script src="diagrams.js"></script>
+<script src="problems.js"></script>
+<script src="why.js"></script>
+<script src="sim-detail.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
