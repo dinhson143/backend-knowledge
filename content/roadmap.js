@@ -57,6 +57,7 @@ window.ROADMAP = [
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [
       { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication", "code-language-choice"] },
+      { id: "code.clean", title: "Clean Code", topics: ["code-clean-naming"] },
     ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [
