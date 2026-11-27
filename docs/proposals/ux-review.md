@@ -23,12 +23,12 @@ Mức độ: **cao** = chặn việc dùng hoặc trượt WCAG AA ở thành ph
 | 13 | Tìm kiếm | vừa | Không thấy kết quả chỉ hiện "Không tìm thấy." — không gợi ý làm gì tiếp. Mở thẳng `#/search/x` thì ô tìm trống. | Thêm dòng gợi ý (từ khoá khác, link Thuật ngữ); điền lại ô tìm từ URL. | đã sửa (view) |
 | 14 | Mô phỏng, Luyện bài (thẻ) | vừa | Thẻ `<a class="sim-card">` chứa `<abbr tabindex="0">`: phần tử tương tác lồng trong link, Tab dừng bên trong thẻ. | Bỏ tooltip trong tóm tắt của thẻ (giống cách trang tìm kiếm làm). | đã sửa (view) |
 | 15 | Mọi trang (tối) | vừa | Tooltip thuật ngữ `#111318` trên nền trang `#141414`: không có viền, gần như hoà vào nền. Không đóng được bằng Esc (WCAG 1.4.13). | Thêm viền; Esc ẩn tooltip. | đã sửa (focus, sidebar, tooltip) |
-| 16 | Topic (desktop) | thấp | Dòng chữ trong panel dài ~115 ký tự ở 1490px (khuyến nghị 60–90). Chữ thân 15px, "Vì sao" 13.5px, tóm tắt thẻ 13px — hơi nhỏ cho chữ Việt nhiều dấu. | Đề xuất: thân 16px, giới hạn `main` ~920px. Chưa làm vì đổi nhịp toàn site; nên quyết cùng đặc tả luồng mới. | chưa |
+| 16 | Topic (desktop) | thấp | Dòng chữ trong panel dài ~115 ký tự ở 1490px (khuyến nghị 60–90). Chữ thân 15px, "Vì sao" 13.5px, tóm tắt thẻ 13px — hơi nhỏ cho chữ Việt nhiều dấu. | Đề xuất: thân 16px, giới hạn `main` ~920px. Chưa làm vì đổi nhịp toàn site; nên quyết cùng đặc tả luồng mới. | đã sửa (giai đoạn 2, D41) |
 | 17 | Sim, sơ đồ SVG (375px) | thấp | Khung sim/sơ đồ rộng tối thiểu 560px rồi cuộn ngang; chữ nhãn SVG còn ~8–9px. | Có chủ ý (D11). Ghi nhận, không đổi. | không sửa |
 | 18 | Bài luyện | thấp | Nhãn mức ("Khởi động") lệch dọc so với các chip bên cạnh trong `.prob-meta`. | `vertical-align` / `align-items: center`. | đã sửa (view) |
-| 19 | Mọi trang | thấp | Không tôn trọng `prefers-reduced-motion` (transition sidebar, sim chạy animation bằng JS). | CSS tắt transition; animation sim cần sửa engine — để sau. | chưa |
+| 19 | Mọi trang | thấp | Không tôn trọng `prefers-reduced-motion` (transition sidebar, sim chạy animation bằng JS). | CSS tắt transition; animation sim cần sửa engine — để sau. | đã sửa (giai đoạn 2: CSS + engine bỏ gói tin bay) |
 | 21 | Kafka consumer group (sim) | vừa | Ô message `.kg-m` chữ trắng 12px trên bảng màu `KC` trong engine: 2.69–4.38:1. | Làm đậm 6 màu `KC` cùng sắc độ (≥4.59:1). | đã sửa (tương phản) |
-| 20 | Bảng | thấp | Bảng cuộn ngang (`.table-wrap`) không có dấu hiệu còn cột bên phải. | Đổ bóng mép phải bằng `background-attachment: local` — để sau. | chưa |
+| 20 | Bảng | thấp | Bảng cuộn ngang (`.table-wrap`) không có dấu hiệu còn cột bên phải. | Đổ bóng mép phải bằng `background-attachment: local` — để sau. | đã sửa (giai đoạn 2) |
 
 ## Gửi Product
 
@@ -84,9 +84,20 @@ Các ý về luồng/điều hướng, không tự sửa:
 | Trang chủ mobile | A6 | Đã giải quyết. |
 | Mỗi từ viết tắt là một điểm dừng Tab | Không nhắc | Vẫn mở. |
 
+## Giai đoạn 2 — đã triển khai
+
+Nhóm A (A1–A9) và các mục 16, 19, 20, cùng Back khi tìm kiếm. Quyết định: D41–D43. Mỗi cụm một commit, có số A trong tiêu đề commit. Đã kiểm tra:
+- **Tương tác** (Back khi gõ tìm kiếm, `#/learn` không kẹt Back, ô lọc Thuật ngữ điền sẵn từ kết quả tìm kiếm, nút "Đã nắm, sang bài tiếp" không đảo trạng thái, nhóm sim, "Dùng trong bài"): bằng script trong iframe cùng origin, chạy Chrome headless.
+- **Giao diện**: chụp Chrome headless ở 1440px và khung iframe 375px, sáng và tối, với 4 trạng thái `ip.done`: rỗng, xong GĐ1–2, xong lộ trình chính, xong hết.
+- **Mở qua `file://`**: trang topic render đủ (H1, khối Tiếp theo, sim, `document.title`).
+
+Còn lại:
+- Trang chủ hiện 9 bài trùng giữa "Kiểm tra chặng" của GĐ4 cũ và GĐ5 (xem A5). Tự hết sau bước 3.
+- Các mục B chờ `roadmap.js` mới.
+
 ## Chưa kiểm tra được
 
-- Mở bằng `file://` (extension trình duyệt không mở được file://).
+- Tương tác qua `file://` (iframe file:// khác origin nên script kiểm tra không chạy được; chỉ kiểm tra render).
 - Thiết bị cảm ứng thật (tooltip khi chạm, cuộn ngang bảng/sim).
 - Đầu ra trình đọc màn hình thật (NVDA/VoiceOver); chỉ kiểm tra thuộc tính ARIA trong DOM.
 - Bảng rộng ở 375px (chỉ thấy bảng Thuật ngữ; bảng nhiều cột trong topic chưa mở ở 375px).
