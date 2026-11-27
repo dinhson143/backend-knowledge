@@ -2,7 +2,7 @@ BK.topic({
   id: "dist-cache",
   track: "sd",
   section: "sd-tech",
-  title: "Distributed Cache (Redis)",
+  title: "Distributed Cache",
   tldr: {
     t: "Redis/Memcached làm lớp cache dùng chung giữa các instance. Nhắc lại: write strategy, invalidation, eviction — chi tiết ở Core Concepts › Caching.",
     why: "Ghi/xoá ở một nơi là mọi instance đều thấy, hết lệch giữa các bản local — vì mọi instance chia sẻ cùng một cache. Nhưng cache vẫn là bản sao của DB, nên luôn phải trả lời ba câu: ghi thế nào, khi nào xoá bản cũ, đầy RAM thì bỏ gì.",

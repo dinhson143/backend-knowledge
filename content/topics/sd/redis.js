@@ -2,7 +2,7 @@ BK.topic({
   id: "redis",
   track: "sd",
   section: "sd-deep",
-  title: "Redis chi tiết",
+  title: "Redis chuyên sâu",
   tldr: {
     t: "Redis là **in-memory data structure server**: lệnh chạy tuần tự trên một thread nên mỗi lệnh là atomic, latency < 1ms, ~100k+ ops/s mỗi node. Dùng làm cache, counter, lock, rate limiter, leaderboard, geo, pub/sub — nhưng dữ liệu nằm trong RAM và replication **bất đồng bộ**.",
     why: "Mỗi lệnh tự nhiên là atomic, vì chỉ một thread thực thi lệnh → hai lệnh không bao giờ xen nhau, `INCR` không thể bị race giữa đọc và ghi. Mỗi lệnh chỉ tốn micro giây, latency chủ yếu là round-trip mạng, vì dữ liệu nằm trong RAM và không có lock. Failover có thể làm mất write vừa ack, vì primary ack client ngay rồi mới gửi lệnh sang replica (replication bất đồng bộ).",

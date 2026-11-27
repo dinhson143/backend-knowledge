@@ -2,7 +2,7 @@ BK.topic({
   id: "principles-other",
   track: "lld",
   section: "lld-principles",
-  title: "KISS · DRY · YAGNI · SoC · LoD",
+  title: "Giữ thiết kế đơn giản",
   tldr: {
     t: "Coding mindset (KISS, DRY, YAGNI) chống over-engineering. Architecture & coupling (SoC, LoD) giảm phụ thuộc chéo.",
     why: "KISS, DRY, YAGNI chống viết thừa và lặp → giảm lượng code phải bảo trì. SoC và LoD giới hạn mỗi phần biết bao nhiêu về phần khác → thay đổi nội bộ một module không lan sang module khác.",

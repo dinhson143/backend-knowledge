@@ -2,7 +2,7 @@ BK.topic({
   id: "numbers",
   track: "sd",
   section: "sd-core",
-  title: "Numbers to Know",
+  title: "Con số cần nhớ",
   tldr: {
     t: "+ Dùng để ước lượng nhanh có cần shard/cache hay không. Nhánh này không có trên Miro — bổ sung vì Hello Interview coi là core concept.",
     why: "Thuộc năng lực một node thì một phép chia là ra câu trả lời, vì quyết định shard hay cache chỉ là so sánh tải ước lượng với năng lực đó. Ví dụ 100M request/ngày ≈ 1.2k req/s, nằm gọn trong sức một Postgres.",

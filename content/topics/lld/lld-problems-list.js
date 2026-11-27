@@ -2,7 +2,7 @@ BK.topic({
   id: "lld-problems-list",
   track: "lld",
   section: "lld-problems",
-  title: "9 bài LLD kinh điển",
+  title: "Bài LLD kinh điển",
   tldr: {
     t: "+ Mỗi bài chuẩn bị sẵn: entity chính, pattern then chốt, câu hỏi mở rộng hay gặp. Danh sách lấy từ Hello Interview LLD.",
     why: "Chuẩn bị sẵn entity, pattern và câu mở rộng cho mỗi bài giúp trả lời có cấu trúc, vì interviewer chấm chủ yếu ở cách mô hình hoá entity và khả năng mở rộng. Câu mở rộng hay gặp chính là nơi pattern được kiểm chứng.",

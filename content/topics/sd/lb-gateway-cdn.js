@@ -2,7 +2,7 @@ BK.topic({
   id: "lb-gateway-cdn",
   track: "sd",
   section: "sd-tech",
-  title: "Load Balancer · API Gateway · CDN",
+  title: "Load Balancer, API Gateway, CDN",
   tldr: {
     t: "LB chia tải giữa các instance. API Gateway là cửa vào duy nhất (auth, rate limit, routing). CDN cache nội dung tĩnh ở edge gần user.",
     why: "LB cho phép scale ngang vì client chỉ thấy một địa chỉ, phía sau thêm bớt instance tuỳ ý. Mọi request đều đi qua Gateway nên đặt auth/rate limit ở đó là đủ cho mọi service; CDN giảm latency vì rút ngắn khoảng cách mạng và chặn request trước khi tới origin.",

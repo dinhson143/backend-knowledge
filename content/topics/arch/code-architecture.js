@@ -2,7 +2,7 @@ BK.topic({
   id: "code-architecture",
   track: "arch",
   section: "arch-main",
-  title: "Kiến trúc code: Layered, Hexagonal, Onion, Clean, Vertical Slice",
+  title: "Kiến trúc code: Layered → Clean",
   tldr: {
     t: "Các kiểu này đều trả lời một câu hỏi: **code nào được phép phụ thuộc vào code nào**. Layered cho phụ thuộc đi từ trên xuống nên business dính vào data access. Hexagonal, Onion, Clean **đảo ngược** để mọi phụ thuộc hướng vào domain — DB, web, framework chỉ là chi tiết cắm ở ngoài. Vertical Slice cắt theo **tính năng** thay vì theo tầng.",
     why: "Mọi kiến trúc code thực chất là luật về `import`: ai được biết ai. Layered cho business biết data access, vì đó là cách tự nhiên nhất khi gọi từ trên xuống. Hexagonal/Onion/Clean dùng Dependency Inversion — core định nghĩa interface, hạ tầng cài đặt — nên mũi tên phụ thuộc đảo chiều vào trong.",

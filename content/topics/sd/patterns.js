@@ -2,7 +2,7 @@ BK.topic({
   id: "patterns",
   track: "sd",
   section: "sd-patterns",
-  title: "8 pattern hay gặp",
+  title: "Common Patterns",
   tldr: {
     t: "Mỗi bài system design thường là tổ hợp vài pattern. Nhận ra bài toán → gọi đúng pattern → nói trade-off.",
     why: "Vấn đề lặp lại thì lời giải cũng lặp lại, vì các ràng buộc vật lý (mạng, disk, lock, timeout HTTP) giống nhau ở mọi hệ thống. Nhận đúng vấn đề giúp bạn đi thẳng vào phần khó và dành thời gian nói trade-off — phần interviewer thực sự chấm.",

@@ -2,7 +2,7 @@ BK.topic({
   id: "networking",
   track: "sd",
   section: "sd-core",
-  title: "Networking Essentials",
+  title: "Networking căn bản",
   tldr: {
     t: "Nắm 3 tầng quan trọng (L3 IP, L4 TCP/UDP, L7 HTTP/WebSocket/gRPC), DNS, và khác biệt L4 vs L7 load balancing.",
     why: "L3, L4, L7 là chỗ các quyết định thiết kế thực tế xảy ra (routing, độ tin cậy, ngữ nghĩa request); DNS là bước đầu tiên của mọi request. L4 LB nhanh nhưng không route theo URL được, vì chỉ thấy IP:port; L7 LB route theo path/header được vì đọc được HTTP, nhưng tốn CPU hơn.",

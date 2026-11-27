@@ -2,7 +2,7 @@ BK.topic({
   id: "delivery",
   track: "sd",
   section: "sd-framework",
-  title: "Khung trả lời 6 bước",
+  title: "Khung trả lời System Design",
   tldr: {
     t: "Đi theo thứ tự cố định để không lạc đề: Requirements → Core Entities → API → (Data Flow) → High-Level Design → Deep Dives. HLD giải quyết functional, Deep Dives giải quyết non-functional.",
     why: "Đi sai thứ tự sẽ phải quay lại sửa, vì mỗi bước phụ thuộc output bước trước. HLD chỉ cần chứng minh hệ thống **làm được** các FR; NFR (latency, scale, consistency) là bài toán tối ưu trên một design đã chạy đúng, nên để dành cho deep dive.",

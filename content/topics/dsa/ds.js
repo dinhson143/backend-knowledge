@@ -2,7 +2,7 @@ BK.topic({
   id: "ds",
   track: "dsa",
   section: "dsa-ds",
-  title: "Cấu trúc dữ liệu cốt lõi",
+  title: "Cấu trúc dữ liệu",
   tldr: {
     t: "Hash table cho tra cứu O(1), heap cho top-K, deque cho queue/stack/sliding window, graph/tree cho quan hệ.",
     why: "Hash table đổi bộ nhớ lấy tra cứu bằng cách nhảy thẳng tới bucket; heap chỉ giữ thứ tự từng phần nên chèn rẻ hơn sắp xếp toàn bộ; deque cho thao tác O(1) ở cả hai đầu; graph/tree mô tả trực tiếp quan hệ cha–con hay kết nối.",

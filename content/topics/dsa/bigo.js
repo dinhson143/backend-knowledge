@@ -2,7 +2,7 @@ BK.topic({
   id: "bigo",
   track: "dsa",
   section: "dsa-complexity",
-  title: "Big-O cần thuộc",
+  title: "Big-O",
   tldr: {
     t: "Đọc constraint để đoán độ phức tạp cần đạt: n ≤ 10⁵ → cần O(n log n) hoặc tốt hơn.",
     why: "Đề cho n ≤ 10⁵ là ngầm bảo cần **O(n log n)** hoặc tốt hơn. Máy chạy khoảng 10⁸ phép tính đơn giản mỗi giây: n log n ≈ 1,7×10⁶ thì vừa vặn, còn n² = 10¹⁰ thì vượt khoảng 100 lần.",
