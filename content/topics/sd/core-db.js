@@ -8,7 +8,7 @@ BK.topic({
     why: "SQL mạnh khi quan hệ phức tạp nhưng khó chia ra nhiều máy, vì transaction ACID và JOIN cần mọi dữ liệu liên quan nằm chung chỗ để khoá và kiểm tra cùng lúc. NoSQL scale ngang tự nhiên cho dữ liệu lớn và tải ghi cao, vì mỗi item tự đủ và phân tán theo key.",
   },
   story: {
-    problem: "Chọn sai nơi lưu dữ liệu thì trả giá lâu dài: dùng NoSQL cho đơn hàng cần transaction thì phải tự xử lý ghi dở dang; dùng một Postgres cho 1 triệu write/s thì không máy nào chịu nổi.",
+    problem: "Chọn sai nơi lưu dữ liệu thì trả giá lâu dài: dùng NoSQL cho đơn hàng cần transaction nhiều bản ghi thì phải chịu giới hạn của transaction NoSQL (số item, phạm vi, độ trễ) hoặc tự xử lý ghi dở dang; dùng một Postgres cho 1 triệu write/s thì không máy nào chịu nổi.",
     idea: "SQL đặt tính đúng lên trước: schema, FK và ACID để nhiều bảng luôn nhất quán. NoSQL nới các đảm bảo đó (ít JOIN, transaction hạn chế, thường eventual) để dữ liệu chia ra nhiều máy dễ dàng, đổi lấy scale ngang và write throughput.",
     tradeoff: "SQL scale ngang khó, vì JOIN và transaction trải qua nhiều máy rất đắt. NoSQL scale dễ nhưng đẩy phần đảm bảo nhất quán và JOIN lên code ứng dụng, và buộc thiết kế schema theo query từ đầu.",
   },
@@ -20,8 +20,8 @@ BK.topic({
         why: "SQL chuẩn hoá dữ liệu thành nhiều bảng nối bằng FK để mỗi thông tin chỉ lưu một chỗ — sửa một nơi là đúng mọi nơi. NoSQL lưu theo hình dạng query cần (cả object trong một document, hoặc một key) → đọc một lần là đủ nhưng dữ liệu có thể bị lặp.",
       },
       {
-        cells: ["Transaction", "ACID", "Thường eventual, một số hỗ trợ strong"],
-        why: "ACID trên một node dễ vì chỉ có một bộ quản lý lock và log. Với NoSQL, dữ liệu nằm trên nhiều replica/node, strong consistency phải chờ đồng thuận giữa các node nên tăng latency → nhiều hệ chọn eventual mặc định và cho bật strong khi cần (DynamoDB strongly consistent read).",
+        cells: ["Transaction", "ACID, nhiều bảng tuỳ ý", "Có nhưng giới hạn (số item, phạm vi, độ trễ); đọc thường eventual"],
+        why: "ACID trên một node dễ vì chỉ có một bộ quản lý lock và log. Với NoSQL, dữ liệu nằm trên nhiều replica/node, strong consistency phải chờ đồng thuận giữa các node nên tăng latency → nhiều hệ chọn eventual mặc định và cho bật strong khi cần (DynamoDB strongly consistent read). Transaction thì đã có nhưng bị giới hạn: DynamoDB `TransactWriteItems` tối đa 100 item, 4 MB, trong một account và một region (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html); MongoDB có transaction nhiều document nhưng tốn hơn ghi một document và không thay được thiết kế schema tốt (https://www.mongodb.com/docs/manual/core/transactions/).",
       },
       {
         cells: [
@@ -85,7 +85,7 @@ BK.topic({
       },
       {
         cells: ["Repeatable Read", "Phantom (theo chuẩn SQL)", "Dirty + non-repeatable read", "MySQL InnoDB"],
-        why: "Đọc lại một dòng luôn ra cùng giá trị, vì cả **transaction** đọc cùng một snapshot từ lúc bắt đầu. Theo chuẩn SQL, mức này chỉ khoá các dòng đã đọc nên dòng mới chèn khớp điều kiện vẫn có thể xuất hiện (phantom); InnoDB dùng MVCC snapshot và next-key lock nên thực tế chặn được phần lớn phantom.",
+        why: "Đọc lại một dòng luôn ra cùng giá trị, vì cả **transaction** đọc cùng một snapshot từ lúc bắt đầu. Theo chuẩn SQL, mức này chỉ khoá các dòng đã đọc nên dòng mới chèn khớp điều kiện vẫn có thể xuất hiện (phantom); InnoDB dùng MVCC snapshot và next-key lock nên thực tế chặn được phần lớn phantom. Repeatable Read của PostgreSQL là snapshot isolation: không có phantom, nhưng vẫn có serialization anomaly như write skew — hai transaction cùng đọc rồi ghi hai dòng khác nhau, mỗi bên hợp lệ nhưng gộp lại vi phạm ràng buộc (https://www.postgresql.org/docs/current/transaction-iso.html).",
       },
       {
         cells: ["Serializable", "—", "Mọi anomaly, chạy như tuần tự", "Hiếm khi mặc định (chậm nhất)"],
