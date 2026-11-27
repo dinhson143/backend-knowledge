@@ -33,6 +33,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; } /* để thuộc tính hidden thắng display của class */
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--text);
@@ -334,6 +335,21 @@ details.dd .dd-grid { padding: 0 16px 16px; }
 .lvl-1 { background: var(--added-soft); color: var(--added); }
 .lvl-2 { background: var(--fix-soft); color: var(--fix); }
 .lvl-3 { background: var(--err-soft); color: var(--err); }
+/* Đủ nền, chặng kiểm tra, bộ lọc (A3, A5) */
+.need-chip { color: var(--text); border-style: dashed; border-color: var(--border-strong); }
+.need-chip.ok { border-style: solid; border-color: var(--added); background: var(--added-soft); color: var(--added); }
+a.need-chip:hover { border-color: var(--accent); }
+.needs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; margin: 8px 0 0; }
+.needs-hint { margin: 6px 0 0; }
+.ready { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 1px 8px; border-radius: 10px; vertical-align: 1px; white-space: nowrap; }
+.ready.ok { background: var(--added-soft); color: var(--added); }
+.ready.miss { background: var(--surface-2); color: var(--muted); }
+.filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 4px; }
+.rm-check { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 13px; }
+.practice-box { margin-bottom: 24px; font-size: 14px; }
+.practice-box .l { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+.pb-item { padding: 4px 0; }
+.pb-item > a { font-weight: 600; }
 .practice-hint { margin: 10px 0 0; font-size: 14px; border-left: 3px solid var(--fix); }
 
 /* Kafka consumer group */
