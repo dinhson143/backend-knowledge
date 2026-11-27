@@ -36,7 +36,7 @@ BK.topic({
               "Log append-only có thứ tự — đơn vị song song",
               "Số partition = số consumer tối đa xử lý song song trong một group",
             ],
-            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận. Đây là consumer group cổ điển; share group (“Kafka Queues”, KIP-932, sẵn sàng production từ Kafka 4.2) cho nhiều consumer cùng đọc một partition và ack từng record, đổi lại mất thứ tự trong partition (https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/).",
+            why: "Topic có 12 partition thì tối đa 12 consumer cùng làm việc, vì mỗi partition chỉ giao cho đúng một consumer trong group (để giữ thứ tự). Consumer thứ 13 không có partition nào để nhận. Đây là consumer group cổ điển; share group (“Kafka Queues”, KIP-932, sẵn sàng production từ Kafka 4.2) cho nhiều consumer cùng đọc một partition và ack từng record, đổi lại record trong partition có thể được giao không theo thứ tự, nhất là khi giao lại (https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/ · KIP-932: https://cwiki.apache.org/confluence/display/KAFKA/KIP-932%3A+Queues+for+Kafka).",
           },
           {
             cells: ["Offset", "Vị trí message trong partition (0, 1, 2…)", "Consumer tự giữ offset → đọc lại được"],

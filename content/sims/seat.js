@@ -65,7 +65,7 @@ BK.sim({
           note: "Bob cũng `FOR UPDATE` → bị **block**, phải chờ.",
           msgs: [["api", "db", "FOR UPDATE (Bob)", "warn"]],
           set: { bob: "⏳ chờ lock" },
-          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `innodb_lock_wait_timeout` (MySQL, mặc định 50s — https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html); PostgreSQL mặc định `lock_timeout = 0` nên chờ không giới hạn.",
+          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `innodb_lock_wait_timeout` (MySQL, mặc định 50s — https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html); PostgreSQL mặc định `lock_timeout = 0` nên chờ không giới hạn (https://www.postgresql.org/docs/current/runtime-config-client.html).",
         },
         {
           note: "Alice UPDATE và COMMIT → nhả lock.",
