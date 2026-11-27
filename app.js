@@ -132,7 +132,7 @@
   }
   function setNav(mode, side) {
     glSeen = mode === "glossary" ? null : new Set();
-    document.querySelectorAll(".modes a").forEach((a) => a.classList.toggle("active", a.dataset.mode === mode));
+    document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
     sidebar.innerHTML = side;
     sidebar.classList.remove("open");
     window.scrollTo(0, 0);
@@ -341,7 +341,7 @@
     main.innerHTML = `
       <h1>Thuật ngữ viết tắt</h1>
       <p class="lead">${total} từ viết tắt. Ở mọi trang, rê chuột hoặc chạm vào từ gạch chấm để xem nghĩa.</p>
-      <input id="glFilter" class="gl-filter" type="search" placeholder="Lọc: LRU, TTL, Kafka…" autocomplete="off">
+      <input id="glFilter" class="gl-filter" type="search" aria-label="Lọc thuật ngữ" placeholder="Lọc: LRU, TTL, Kafka…" autocomplete="off">
       <div id="glList"></div>`;
     const render = (q) => {
       const n = q.trim().toLowerCase();

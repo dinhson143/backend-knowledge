@@ -53,11 +53,13 @@ code { font-family: var(--mono); font-size: .86em; background: var(--surface-2);
 .modes a { padding: 4px 12px; border-radius: 6px; color: var(--muted); font-size: 14px; }
 .modes a.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 #search {
-  margin-left: auto; width: 240px; padding: 7px 12px; border-radius: 8px;
+  margin-left: auto; flex: 0 1 240px; min-width: 120px; padding: 7px 12px; border-radius: 8px;
   border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); font: inherit; font-size: 14px;
 }
 .icon-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; }
 .menu-btn { display: none; }
+/* 861–1200px: brand + 5 tab + ô tìm không vừa một hàng nếu giữ phụ đề */
+@media (max-width: 1200px) { .brand span { display: none; } }
 
 /* ── Layout ── */
 .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: calc(100vh - 55px); }
@@ -143,7 +145,8 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   main { padding: 20px 16px 60px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .topbar { gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
-  #search { order: 5; width: 100%; margin-left: 0; }
+  .topbar { position: static; } /* ba hàng dính trên cùng chiếm ~1/4 màn hình khi đọc */
+  #search { order: 5; flex: 1 1 100%; margin-left: 0; }
   .face { padding: 28px 20px; }
   .face .q { font-size: 18px; }
 }
@@ -275,7 +278,8 @@ pre.api { margin: 0; padding: 14px 16px; background: var(--surface); border: 1px
 
 .modes a { white-space: nowrap; }
 @media (max-width: 860px) {
-  .modes { order: 4; width: 100%; overflow-x: auto; }
+  .modes { order: 4; width: 100%; flex-wrap: wrap; }
+  .modes a { flex: 1 1 auto; text-align: center; padding: 4px 8px; }
 }
 
 /* ── Roadmap & learning structure ── */
