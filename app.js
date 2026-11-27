@@ -168,7 +168,7 @@
   // Sidebar (A7): mỗi giai đoạn là <details>, chỉ mở giai đoạn chứa topic đang xem (không có thì giai đoạn đang học).
   // Lọc theo "có topic" chứ không theo `problems`, để giai đoạn vừa có topic vừa có bài vẫn hiện (B0)
   function sideKnowledge(active) {
-    const open = active ? byId[active].stage : currentStage();
+    const open = active && byId[active] ? byId[active].stage : currentStage();
     const block = (s) => `
       <details class="sb-track" ${s === open ? "open" : ""}>
         <summary class="sb-track-title"><span>${stageNum(s)} · ${esc(s.title)}</span><span class="sb-count">${s.topics.filter((id) => done.has(id)).length}/${s.topics.length}</span></summary>
@@ -332,7 +332,7 @@
       </div>
       ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}</div>` : ""}
       ${soon.length ? `<div class="small"><span class="muted">Sắp mở:</span> ${soon.map((p) => { const rest = missing(p).filter((x) => x !== id);
-        return `<a href="#/p/${p.id}">${esc(p.title)}</a> · ${LEVELS[p.level]} ${rest.length ? `(còn ${esc(byId[rest[0]].title)})` : "(đủ nền sau bài này)"}`; }).join("; ")}</div>` : ""}
+        return `<a href="#/p/${p.id}">${esc(p.title)}</a> · ${LEVELS[p.level]} ${rest.length ? `(còn ${esc(byId[rest[0]].title)})` : isDone ? "(đã đủ nền)" : "(đủ nền sau bài này)"}`; }).join("; ")}</div>` : ""}
     </section>`;
   }
 
