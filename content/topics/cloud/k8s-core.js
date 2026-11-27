@@ -219,6 +219,18 @@ BK.topic({
       why: "Ba ý này phân biệt người đã vận hành Kubernetes với người chỉ đọc giới thiệu, và dẫn tự nhiên sang RBAC tối thiểu, NetworkPolicy, secret store.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/k8s-core-components.svg",
+      caption: "Control plane và node. Đường xanh: mọi thay đổi trạng thái đi qua kube-apiserver, chỉ apiserver đọc ghi etcd; kubelet gọi container runtime qua CRI. Đường cam: traffic giữa các pod đi theo luật mạng do kube-proxy cài trên node, không qua control plane.",
+      source: "https://kubernetes.io/docs/concepts/overview/components/",
+    },
+    {
+      src: "content/svg/k8s-core-deployment-service-gateway.svg",
+      caption: "Giữa rolling update: Deployment có hai ReplicaSet; Service chọn pod theo `app=web` nên gồm cả v1 lẫn v2, EndpointSlice chỉ giữ pod Ready. HTTPRoute gắn vào Gateway bằng `parentRefs` và trỏ tới Service bằng `backendRefs`.",
+      source: "https://kubernetes.io/docs/concepts/services-networking/gateway/",
+    },
+  ],
   cards: [
     [
       "Xoá một pod của Deployment thì chuyện gì xảy ra, thành phần nào làm?",

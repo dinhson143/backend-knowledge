@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Thành phần Kubernetes: mọi thay đổi trạng thái đi qua kube-apiserver (chỉ nó đọc ghi etcd); traffic của app đi theo luật mạng trên node, không qua control plane</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .cp { fill: #fff7eb; stroke: #e08a00; stroke-width: 1.4; }
+      .nd { fill: #eef6ff; stroke: #3b7ff5; stroke-width: 1.4; }
+      .box { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.2; }
+      .api { fill: #ffffff; stroke: #e08a00; stroke-width: 1.8; }
+      .etcd { fill: #ffffff; stroke: #b45309; stroke-width: 1.2; }
+      .pod { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.2; }
+      .net { fill: #fff3db; stroke: #e08a00; stroke-width: 1.2; }
+      .st { stroke: #3b7ff5; stroke-width: 1.4; fill: none; }
+      .tr { stroke: #e08a00; stroke-width: 2; fill: none; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .bl { font-size: 11.5px; fill: #1d4ed8; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="448" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Control plane -->
+  <rect class="cp" x="20" y="16" width="580" height="158" rx="12"/>
+  <text class="h" x="36" y="40">Control plane</text>
+  <rect class="box" x="36" y="52" width="150" height="40" rx="7"/>
+  <text class="c" x="111" y="68">kube-scheduler</text><text class="sc" x="111" y="85">gán node cho pod</text>
+  <rect class="box" x="198" y="52" width="188" height="40" rx="7"/>
+  <text class="c" x="292" y="68">kube-controller-manager</text><text class="sc" x="292" y="85">các controller (Deployment…)</text>
+  <rect class="box" x="398" y="52" width="186" height="40" rx="7"/>
+  <text class="c" x="491" y="68">cloud-controller-manager</text><text class="sc" x="491" y="85">tuỳ chọn · nói với cloud</text>
+  <rect class="etcd" x="36" y="120" width="150" height="40" rx="7"/>
+  <text class="c" x="111" y="136">etcd</text><text class="sc" x="111" y="153">lưu trạng thái cluster</text>
+  <rect class="api" x="230" y="120" width="200" height="40" rx="7"/>
+  <text class="c" x="330" y="136">kube-apiserver</text><text class="sc" x="330" y="153">cửa vào duy nhất</text>
+  <g class="st" marker-end="url(#b)">
+    <path d="M111,92 L250,118"/><path d="M292,92 L300,118"/><path d="M491,92 L410,118"/>
+  </g>
+  <path class="st" d="M188,140 L228,140" marker-start="url(#b)" marker-end="url(#b)"/>
+
+  <rect class="box" x="620" y="120" width="120" height="40" rx="7"/>
+  <text class="c" x="680" y="136">kubectl / CI</text><text class="sc" x="680" y="153">gửi YAML</text>
+  <path class="st" d="M620,140 L432,140" marker-end="url(#b)"/>
+
+  <!-- API ↔ node -->
+  <g class="st" marker-end="url(#b)" marker-start="url(#b)">
+    <path d="M250,162 L170,252"/><path d="M398,162 L480,252"/>
+  </g>
+  <text class="bl" x="228" y="204">nhận pod được gán, báo status</text>
+  <text class="bl" x="450" y="204">watch Service, EndpointSlice</text>
+
+  <!-- Node -->
+  <rect class="nd" x="20" y="226" width="720" height="162" rx="12"/>
+  <text class="h" x="724" y="246" text-anchor="end">Node (mỗi node đều có)</text>
+  <rect class="box" x="36" y="254" width="160" height="40" rx="7"/>
+  <text class="c" x="116" y="270">kubelet</text><text class="sc" x="116" y="287">chạy pod, chạy probe</text>
+  <rect class="box" x="36" y="330" width="160" height="40" rx="7"/>
+  <text class="c" x="116" y="346">container runtime</text><text class="sc" x="116" y="363">containerd, CRI-O…</text>
+  <path class="st" d="M116,296 L116,328" marker-end="url(#b)"/>
+  <text class="bl" x="124" y="316">CRI (gRPC)</text>
+  <g stroke="#64748b" stroke-width="1.2" fill="none" marker-end="url(#a)">
+    <path d="M196,342 L238,286"/><path d="M196,354 L238,354"/>
+  </g>
+  <rect class="pod" x="240" y="254" width="130" height="40" rx="7"/>
+  <text class="c" x="305" y="270">Pod A</text><text class="sc" x="305" y="287">gọi Service web:80</text>
+  <rect class="pod" x="240" y="334" width="130" height="40" rx="7"/>
+  <text class="c" x="305" y="350">Pod B</text><text class="sc" x="305" y="367">label app=web</text>
+  <rect class="box" x="420" y="254" width="160" height="40" rx="7"/>
+  <text class="c" x="500" y="270">kube-proxy</text><text class="sc" x="500" y="287">tuỳ chọn · cài luật</text>
+  <path class="st" d="M500,296 L500,328" marker-end="url(#b)" style="stroke-dasharray: 4 3"/>
+  <rect class="net" x="420" y="330" width="300" height="44" rx="7"/>
+  <text class="c" x="570" y="348">luật mạng trong kernel (vd. iptables)</text>
+  <text class="sc" x="570" y="365">IP của Service → IP của một pod</text>
+  <path class="tr" d="M370,264 L398,264 L398,340 L418,340" marker-end="url(#o)"/>
+  <path class="tr" d="M420,362 L372,362" marker-end="url(#o)"/>
+
+  <!-- Legend -->
+  <path class="st" d="M20,412 L52,412" marker-end="url(#b)"/>
+  <text class="t" x="60" y="416">Thay đổi trạng thái: mọi thành phần watch và ghi qua kube-apiserver; chỉ apiserver chạm etcd.</text>
+  <path class="tr" d="M20,434 L52,434" marker-end="url(#o)"/>
+  <text class="t" x="60" y="438">Traffic của app: đi theo luật mạng trên node, không qua apiserver hay process kube-proxy.</text>
+</svg>
