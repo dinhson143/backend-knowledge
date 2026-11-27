@@ -14,7 +14,8 @@
   3. Hai trường topic mới, đều tuỳ chọn: `goal` (học xong làm được gì) và `needs` (tiên quyết, chỉ gợi ý, không khoá).
   4. Quy ước tiêu đề nhất quán, kèm bảng tiêu đề mới cho cả 39 topic.
   5. Có quy tắc xếp chỗ cho chủ đề mới (Durable Execution, outbox/CDC, consensus, observability, auth…), không cần sửa code.
-  6. UI flow chia hai nhóm: **nhóm A chạy được với dữ liệu hiện có** (agent UI làm ngay, không đụng file nội dung dùng chung), **nhóm B cần trường mới**.
+  6. **Giai đoạn 2 (§7–8):** đã phân loại 15 chủ đề của SA, 134 đề mục của Research và chỗ cho mảng Container: 136 topic mới, 22 đề mục gộp, 3 nhánh mới. Viết theo 4 đợt; đợt 1 gồm 21 topic.
+  7. UI flow chia hai nhóm: **nhóm A chạy được với dữ liệu hiện có** (agent UI làm ngay, không đụng file nội dung dùng chung), **nhóm B cần trường mới**.
 
 ## 1. Hiện trạng
 
@@ -87,6 +88,8 @@ Số liệu lấy từ `node scripts/check.mjs` và registry `BK` ngày 2026-11-
 6. **Thêm chủ đề không sửa code** (nguyên tắc 5 của `content-system.md`): chủ đề mới = file + dòng manifest + id trong một chặng của `roadmap.js`.
 
 ### 3.1 (a) Cây danh mục mới
+
+> **Cập nhật:** đã có danh sách chủ đề thật; cây đầy đủ và các điểm thay đổi so với cây dưới đây ở **§7.2** (§7 ghi đè §3.1).
 
 Ký hiệu: `[+ chỗ chứa]` là chỗ dành cho chủ đề sắp có; **chỉ ghi trong tài liệu này, không tạo chặng rỗng trong dữ liệu** (chặng rỗng sẽ bị `check.mjs` báo lỗi, xem §3.5). Chặng `Đào sâu` là `optional: true`.
 
@@ -234,7 +237,7 @@ Nhánh song song giữ thứ tự hiện tại.
 | solid | oop-pillars |
 | principles-other | solid |
 | patterns-gof | solid |
-| concurrency | oop-pillars |
+| concurrency | oop-pillars *(§7: đổi thành `conc-race-condition` khi dời sang Nền tảng CS)* |
 | lld-problems-list | patterns-gof, concurrency |
 | code-architecture | solid *(xuyên nhánh)* |
 | system-architecture | code-architecture, queue *(queue xuyên nhánh)* |
@@ -631,3 +634,450 @@ Bước 1 không đụng file nội dung dùng chung nên có thể làm ngay, s
 | Q5 | Bộ lọc trang Luyện bài có cần nằm trong URL (`#/problems/ready`) để chia sẻ/bookmark không? | **Không**; trạng thái lọc chỉ trong trang. |
 | Q6 | Tiêu đề thuật ngữ ngành: giữ tiếng Anh (Caching, Sharding) hay Việt hoá? | **Giữ tiếng Anh** cho thuật ngữ phỏng vấn dùng nguyên văn; phần giải nghĩa và `goal` bằng tiếng Việt. |
 | Q7 | GĐ5 có nên tính 13 bài vào tiến độ giai đoạn (hiện "0/14" = 1 topic + 13 bài) không? | **Có**, như cách GĐ5 cũ đang đếm. |
+| Q8 | Dời `concurrency` (thư mục `lld`) từ nhánh LLD sang Nền tảng CS › Concurrency? Id không đổi, chỉ đổi chỗ trong `roadmap.js`. | **Có**: 10 topic concurrency mới xây quanh nó; LLD còn tham chiếu qua `needs` của `lld-problems-list`. |
+| Q9 | Lời giải chi tiết 9 bài LLD: mở rộng `lld-problems-list` hay thành trang riêng như bài System Design (loại nội dung mới, phải sửa `app.js`)? | **Mở rộng `lld-problems-list`** trước; tách trang riêng khi có ≥ 3 bài viết đủ sâu. |
+| Q10 | Kỹ năng viết code và Behavioral có thuộc phạm vi site "Backend Knowledge" không? | **Có**, là hai nhánh song song, không chen vào lộ trình chính. |
+| Q11 | Tách "Container & Kubernetes" (id giai đoạn `cloud`) và "Vận hành production" (id mới `ops`) thành hai nhánh, hay giữ một nhánh? | **Hai nhánh**: mảng container có 12 topic, observability/deploy là câu hỏi khác. |
+| Q12 | Giữ tiền tố id của Research (`os-`, `thr-`, `io-`, `conc-`, `async-`, `net-`, `db-`, `code-`, `dsa-`, `beh-`, `ood-`, `mc-`)? Topic hiện có không dùng tiền tố. Id sẽ thành hợp đồng ngay khi phát hành, nên chỉ đổi được bây giờ. | **Giữ**: tiền tố giúp nhận ra nhánh trong URL, và các id đã được hai tài liệu tham chiếu chéo. |
+| Q13 | 9 id Container/Kubernetes là id tạm (SA chưa commit danh sách). Ai chốt? | **SA chốt** trước khi viết đợt 1; đổi id lúc này còn miễn phí. |
+| Q14 | Nền tảng CS có 60 topic: giữ một nhánh 6 chặng hay tách hai nhánh ("Hệ điều hành & I/O", "Concurrency & Async")? | **Một nhánh**: sidebar gập theo chặng (A7, B1) là đủ; tách khi chặng nào vượt ~15 topic. |
+
+## 7. Phân loại chủ đề mới (giai đoạn 2)
+
+Nguồn:
+
+- Solution Architect: `docs/proposals/content-gaps.md` trên nhánh `sa/content-gaps` (đỉnh `fad486a`), Phần B, 15 chủ đề.
+- Research: `docs/proposals/interview-topic-catalog.md` trên nhánh `research/interview-catalog` (đỉnh `a2d8885`), 134 đề mục mới.
+- Mảng Container/Docker/Kubernetes mà Solution Architect đang nghiên cứu: nhánh `sa/content-gaps` **chưa có** commit nào về mảng này. Tôi dành sẵn chỗ và đặt **id tạm** (9 id). Solution Architect chốt id trước khi viết (Q13).
+
+Mọi số liệu dưới đây sinh bằng một script đọc thẳng hai file nguồn và registry `BK`. Script kiểm:
+
+- Mọi id Research đều được xử lý, hoặc đặt vào cây hoặc gộp: 112 đặt + 22 gộp = 134.
+- Đủ 15 id SA.
+- Id mới không trùng id topic, problem, sim, track, section đang có.
+- Mọi topic có sẵn vẫn nằm trong cây.
+- Tiêu đề ≤ 40 ký tự, `goal` ≤ 90 ký tự, `needs` ≤ 3 mục và trỏ tới id có thật.
+- Trong cùng lộ trình chính hoặc cùng một nhánh, tiên quyết đứng trước.
+
+Kết quả: **136 topic mới** (15 SA, 9 Container, 112 Research) và **22 đề mục gộp**. Cây có tổng cộng 175 topic.
+
+### 7.1 Gộp trùng
+
+Luật áp dụng:
+
+- Trùng giữa hai danh sách thì giữ id của SA.
+- Trùng với topic có sẵn thì ghi "mở rộng topic X", không tạo id mới.
+- Trùng ở mức nhỏ (một mục trong bài khác) thì gộp vào bài lớn hơn.
+
+| Id Research | Gộp vào | Lý do |
+|---|---|---|
+| `sd-observability` | `observability` | trùng SA |
+| `sd-resilience` | `resilience` | trùng SA |
+| `sd-outbox-cdc` | `outbox-cdc` | trùng SA |
+| `sd-durable-execution` | `durable-execution` | trùng SA |
+| `sd-consensus` | `consensus` | trùng SA |
+| `sd-authn-authz` | `auth` | trùng SA |
+| `sd-distributed-time` | `time-ordering` | trùng SA |
+| `sd-replication` | `replication` | trùng SA |
+| `sd-tech-deep-dives` | — | không phải một topic: mỗi công nghệ là một topic riêng trong chặng **Đào sâu** của giai đoạn tương ứng (§3.1), viết khi có nhu cầu |
+| `sd-more-problems` | — | là bài luyện (`BK.problem`), không phải topic: vào GĐ5 › Luyện đề theo mức |
+| `db-storage-engines` | `storage-engines` | trùng SA |
+| `db-wal-recovery` | `storage-engines` | SA đã gồm WAL và crash recovery |
+| `os-containers-primitives` | `container-basics` | namespaces/cgroups là phần mở đầu của "container cơ bản" |
+| `conc-optimistic-pessimistic` | `db-locking` | mở rộng: optimistic (version/CAS) vs pessimistic (`FOR UPDATE`) là một mục của `db-locking` |
+| `db-schema-migration` | `deployment-safety` | mở rộng: expand/contract là trọng tâm của `deployment-safety` |
+| `code-logging` | `observability` | mở rộng: thêm mục "log ở mức code" vào `observability` |
+| `db-normalization` | `data-modeling` | mở rộng topic có sẵn `data-modeling` |
+| `net-proxy-nat` | `lb-gateway-cdn` | mở rộng topic có sẵn `lb-gateway-cdn` |
+| `net-serialization` | `api-design` | mở rộng topic có sẵn `api-design` (JSON vs Protobuf); phần schema evolution nằm ở `deployment-safety` |
+| `ood-problem-walkthroughs` | `lld-problems-list` | mở rộng topic có sẵn `lld-problems-list` (xem Q9 về trang lời giải riêng) |
+| `ood-concurrent-lld` | `conc-classic-problems` | mở rộng: bài LLD thread-safe là một nhóm trong `conc-classic-problems` |
+| `thr-virtual-threads-java` | `thr-green-threads` | mở rộng: pinning và giới hạn của virtual thread là một mục của `thr-green-threads` |
+
+Những chỗ **không** gộp dù gần nhau, vì khác tầng:
+
+| Cặp | Vì sao để riêng |
+|---|---|
+| `async-backpressure` ↔ `resilience` | Một bên là giới hạn concurrency trong code, một bên là load shedding ở mức hệ thống. Hai bài link chéo nhau. |
+| `async-cancellation-timeout` ↔ `resilience` | Huỷ task và truyền deadline trong code, so với chọn timeout giữa các service |
+| `conc-atomic-cas` ↔ `redis-atomic`, `dist-lock` | Atomic trong một process, so với atomic giữa nhiều máy |
+| `conc-classic-problems` ↔ `rate-limiter` (problem) | Bài coding chạy trong một process, so với bài System Design |
+| `db-isolation-anomalies` ↔ `core-db`, sim `isolation` | `core-db` chỉ chọn SQL hay NoSQL. Isolation cần một bài riêng, dùng lại sim `isolation`. |
+
+### 7.2 Cây danh mục sau khi gộp
+
+`+` = topic mới; không có dấu = topic có sẵn (id giữ nguyên). Chặng có "(Đào sâu)" là `optional: true`.
+
+```text
+GĐ1 · Nền móng
+  Khung trả lời: delivery, numbers
+  Giao tiếp & cửa vào: networking, api-design, lb-gateway-cdn, +auth
+  Lưu & truy vấn dữ liệu: data-modeling, core-db, indexing, +db-isolation-anomalies
+  Đào sâu: bên trong database (Đào sâu): +db-query-tuning, +db-sql-handwriting, +storage-engines, +db-mvcc
+GĐ2 · Scale dữ liệu
+  Đọc nhanh hơn với cache: caching, dist-cache
+  Chia dữ liệu ra nhiều máy: sharding, consistent-hashing, +id-generation
+  Nhất quán & sao chép: cap, +replication, +multi-region
+  Công nghệ trọng tâm: redis
+  Đào sâu: phân tán (Đào sâu): +time-ordering
+GĐ3 · Bất đồng bộ & phối hợp
+  Hàng đợi & luồng sự kiện: queue, streams, kafka
+  Gọi nhau an toàn khi có lỗi: +resilience, +idempotency
+  Tranh chấp tài nguyên: +db-locking, dist-lock, +consensus
+  Quy trình nhiều bước đáng tin: +outbox-cdc, +durable-execution
+  Đào sâu: xử lý luồng (Đào sâu): +stream-processing
+GĐ4 · Lưu trữ chuyên dụng
+  Kho chuyên dụng: blob, search, +vector-search, bigdata-ds
+  Chọn công nghệ: tech-cheatsheet
+GĐ5 · Ghép pattern & luyện đề
+  Common patterns: patterns
+∥ Nền tảng CS
+  Process, thread & bộ nhớ: +os-process-lifecycle, +thr-thread-vs-process, +os-context-switch, +os-memory-layout, +os-virtual-memory, +os-syscall-kernel-mode, +os-scheduling, +code-memory-gc, +os-cpu-cache-locality
+  Thread trong thực tế: +thr-io-vs-cpu-bound, +thr-thread-pool, +io-connection-pool, +thr-gil, +thr-green-threads, +thr-goroutine-channel, +thr-thread-local-context
+  I/O & hệ điều hành: +os-file-descriptors, +io-blocking-models, +io-epoll-kqueue, +io-reactor-proactor, +io-uring, +io-buffering-fsync, +os-filesystem, +io-zero-copy, +os-ipc, +os-signals-shutdown, +os-linux-diagnostics
+  Concurrency: +conc-race-condition, concurrency, +conc-monitor-rwlock, +conc-livelock-starvation, +conc-atomic-cas, +conc-memory-model, +conc-thread-safe-collections, +conc-producer-consumer, +conc-parallelism-amdahl, +conc-classic-problems, +conc-testing-debugging
+  Async: +async-concurrency-models, +async-event-loop, +async-callback-promise-await, +async-microtask-queue, +async-coroutine, +async-future-combinators, +async-error-handling, +async-blocking-in-loop, +async-backpressure, +async-cancellation-timeout, +async-structured-concurrency, +async-sync-primitives, +conc-actor-model, +async-reactive-streams
+  Mạng máy tính: +net-url-to-page, +net-dns-deep, +net-tcp-deep, +net-sockets, +net-http-semantics, +net-http-versions, +net-tls, +net-cors-cookies
+∥ Kỹ năng viết code
+  Vòng coding: +code-interview-communication, +code-language-choice
+  Code sạch: +code-clean-naming, +code-error-handling, +code-defensive-validation, +code-immutability, +code-fp-vs-oop, +code-api-design-code, +code-generics-types
+  Kiểm thử & debug: +code-testing-fundamentals, +code-testable-design, +code-debugging, +code-refactoring, +code-review
+  Hiệu năng & an toàn: +code-complexity-perf, +code-secure-coding, +code-git-workflow
+∥ Behavioral
+  Câu chuyện của bạn: +beh-star-stories, +beh-common-questions, +beh-project-deep-dive
+  Quy trình & cấp độ: +beh-interview-process, +beh-self-intro, +beh-senior-signals
+∥ Container & Kubernetes
+  Container cơ bản: +container-basics, +container-image, +dockerfile, +container-build
+  Từ build tới deploy: +container-pipeline
+  Kubernetes: +k8s-workloads, +k8s-networking, +k8s-health-scaling, +k8s-rbac
+  Trên AWS: ecs, eks, ecs-vs-eks
+∥ Vận hành production
+  Quan sát hệ thống: +observability
+  Triển khai an toàn: +deployment-safety
+∥ Low-Level Design
+  Khung & OOP: lld-delivery, oop-pillars, +ood-uml-diagrams
+  Nguyên tắc thiết kế: solid, principles-other
+  Design pattern: patterns-gof, +ood-state-machine
+  Luyện đề LLD: lld-problems-list, +mc-machine-coding-round
+∥ Kiến trúc & phương pháp
+  Tổ chức code: code-architecture
+  Tổ chức hệ thống: system-architecture
+  Cách làm việc: dev-methods
+∥ Coding · DSA
+  Độ phức tạp: bigo, +dsa-recursion
+  Cấu trúc dữ liệu: ds, +dsa-arrays-hashing, +dsa-linked-list, +dsa-stack-monotonic, +dsa-heap-topk, +dsa-trees, +dsa-trie, +dsa-design-ds, +dsa-range-trees
+  Thuật toán: algo, +dsa-two-pointers, +dsa-sliding-window, +dsa-prefix-sum, +dsa-sorting, +dsa-binary-search-answer, +dsa-intervals, +dsa-greedy, +dsa-backtracking, +dsa-graphs, +dsa-matrix, +dsa-dp, +dsa-strings, +dsa-bit-manipulation
+```
+
+Thay đổi so với cây ở §3.1 (§7 ghi đè §3.1 ở các điểm này):
+
+| Điểm | §3.1 | Sau khi có danh sách thật | Lý do |
+|---|---|---|---|
+| Transaction & isolation | chỗ chứa ở GĐ2 › Nhất quán & sao chép | GĐ1 › Lưu & truy vấn dữ liệu (`db-isolation-anomalies`) | Theo quy tắc xếp chỗ: chuyện của một database, không phải của nhiều máy (câu 4) |
+| Consensus | GĐ2 › Nhất quán & sao chép | GĐ3 › Tranh chấp tài nguyên, sau `dist-lock` | SA đặt `dist-lock` làm tiên quyết (lease, fencing); để ở GĐ2 thì tiên quyết đứng sau |
+| Chặng mới GĐ3 | — | "Gọi nhau an toàn khi có lỗi" (`resilience`, `idempotency`) | Hai bài P0, là nền cho outbox và durable execution |
+| `db-locking` | — | GĐ3 › Tranh chấp tài nguyên, trước `dist-lock` | Học lock một database trước lock nhiều máy |
+| Nhánh "Container trên AWS" / "Vận hành production" | một nhánh `cloud` | tách hai: **Container & Kubernetes** (id giai đoạn `cloud`, chứa `ecs`, `eks`, `ecs-vs-eks`) và **Vận hành production** (id giai đoạn mới `ops`) | Mảng container có 9 + 3 topic, đủ thành một nhánh riêng |
+| Nhánh mới | — | **Nền tảng CS** (6 chặng theo gợi ý của Research: Process → Thread → I/O → Concurrency → Async → Mạng), **Kỹ năng viết code**, **Behavioral** | Đều là vòng phỏng vấn riêng, không phải phần của bài System Design (quy tắc câu 2 và 9) |
+| `concurrency` (thư mục `lld`) | LLD › Concurrency | Nền tảng CS › Concurrency (**id giữ nguyên**, chỉ dời chỗ trong `roadmap.js`; file có thể ở nguyên `content/topics/lld/`) | 10 topic concurrency mới xây quanh nó. LLD vẫn tham chiếu chéo qua `needs` (Q8). |
+| `durable-execution` · `needs` | SA ghi `queue`, `patterns` | `queue`, `idempotency` | `patterns` ở GĐ5, đứng sau. Saga giải thích ngay trong bài và link sim `saga`. Khi tách `pattern-multi-step` (§3.2), durable execution là phần chính của pattern đó. |
+
+Thư mục cho file mới (track = thư mục, không phải điều hướng):
+
+| Thư mục | Topic |
+|---|---|
+| `content/topics/sd/` | 15 topic của SA, `db-*` |
+| `content/topics/cs/` (track mới) | `os-*`, `thr-*`, `io-*`, `conc-*`, `async-*`, `net-*`, `code-memory-gc` |
+| `content/topics/code/` (track mới) | `code-*` còn lại |
+| `content/topics/beh/` (track mới) | `beh-*` |
+| `content/topics/cloud/` | Container, Kubernetes |
+| `content/topics/lld/` | `ood-*`, `mc-*` |
+| `content/topics/dsa/` | `dsa-*` |
+
+### 7.3 Tiêu đề, goal, needs từng topic mới
+
+Tiêu đề theo quy ước §3.3. Tiêu đề tạm của nguồn chỉ là gợi ý; khi viết dùng cột này. `needs` có tiên quyết **xuyên nhánh** (ví dụ `container-basics` cần `os-process-lifecycle`, `code-fp-vs-oop` cần `oop-pillars`) chỉ để hiển thị, không ràng buộc thứ tự. Cột "Đợt" xem §8.
+
+#### GĐ1 · Nền móng
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Giao tiếp & cửa vào | `auth` | Xác thực & phân quyền | Chọn session hay token, đi đúng luồng OAuth 2.0/OIDC và thu hồi quyền | `api-design`, `networking` | SA · P1 | 2 |
+| Lưu & truy vấn dữ liệu | `db-isolation-anomalies` | Transaction & isolation level | Nhận ra lost update, write skew và chọn isolation level chặn được nó | `core-db` | Research · P0 | 1 |
+| Đào sâu: bên trong database *(Đào sâu)* | `db-query-tuning` | Đọc EXPLAIN & tối ưu truy vấn | Đọc query plan và sửa truy vấn không dùng được index | `indexing` | Research · P0 | 2 |
+| Đào sâu: bên trong database *(Đào sâu)* | `db-sql-handwriting` | Viết SQL tay | Viết join, group by, window function cho câu hỏi phỏng vấn | `core-db` | Research · P1 | 3 |
+| Đào sâu: bên trong database *(Đào sâu)* | `storage-engines` | Storage engine: B-Tree, LSM, WAL | Giải thích vì sao DB này ghi nhanh, DB kia đọc nhanh và commit bền nhờ WAL | `indexing`, `core-db` | SA · P2 | 4 |
+| Đào sâu: bên trong database *(Đào sâu)* | `db-mvcc` | MVCC & snapshot | Giải thích đọc không chặn ghi và vì sao transaction dài làm phình bảng | `db-isolation-anomalies`, `storage-engines` | Research · P1 | 3 |
+
+#### GĐ2 · Scale dữ liệu
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Chia dữ liệu ra nhiều máy | `id-generation` | Sinh ID phân tán | Chọn UUIDv7, Snowflake hay dải ID theo yêu cầu sắp xếp và shard | `sharding`, `indexing` | SA · P1 | 2 |
+| Nhất quán & sao chép | `replication` | Replication & failover | Chọn leader–follower, multi-leader hay quorum và xử lý replica lag | `core-db`, `cap` | SA · P0 | 1 |
+| Nhất quán & sao chép | `multi-region` | Multi-region & DR | Chọn chiến lược DR theo RPO/RTO và chạy hệ thống trên nhiều region | `replication`, `lb-gateway-cdn` | SA · P1 | 2 |
+| Đào sâu: phân tán *(Đào sâu)* | `time-ordering` | Đồng hồ & thứ tự sự kiện | Sắp thứ tự sự kiện khi đồng hồ lệch bằng Lamport/vector clock | `replication` | SA · P2 | 4 |
+
+#### GĐ3 · Bất đồng bộ & phối hợp
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Gọi nhau an toàn khi có lỗi | `resilience` | Timeout, retry & circuit breaker | Đặt timeout, retry có jitter, circuit breaker để lỗi không lan dây chuyền | `api-design`, `queue` | SA · P0 | 1 |
+| Gọi nhau an toàn khi có lỗi | `idempotency` | Idempotency | Cho phép gửi lại request/message mà không xử lý hai lần | `api-design`, `queue` | SA · P0 | 1 |
+| Tranh chấp tài nguyên | `db-locking` | Lock trong database | Chọn optimistic hay pessimistic lock và tránh deadlock trong DB | `db-isolation-anomalies` | Research · P0 | 2 |
+| Tranh chấp tài nguyên | `consensus` | Consensus & leader election | Giải thích Raft, lease, fencing và vì sao cluster cần đa số | `replication`, `dist-lock` | SA · P1 | 2 |
+| Quy trình nhiều bước đáng tin | `outbox-cdc` | Outbox & CDC | Ghi DB và phát event mà không mất hay lệch nhau | `core-db`, `kafka` | SA · P0 | 1 |
+| Quy trình nhiều bước đáng tin | `durable-execution` | Durable Execution | Chạy quy trình nhiều bước sống qua crash, deploy và chờ nhiều ngày | `queue`, `idempotency` | SA · P0 | 1 |
+| Đào sâu: xử lý luồng *(Đào sâu)* | `stream-processing` | Stream processing | Tính toán theo window, watermark và giữ state khi xử lý luồng | `streams`, `kafka` | SA · P2 | 4 |
+
+#### GĐ4 · Lưu trữ chuyên dụng
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Kho chuyên dụng | `vector-search` | Vector search & ANN | Tìm theo độ tương đồng bằng embedding và chọn index ANN | `search`, `indexing` | SA · P1 | 2 |
+
+#### ∥ Nền tảng CS
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Process, thread & bộ nhớ | `os-process-lifecycle` | Process: fork, exec, zombie | Kể chuyện gì xảy ra khi chạy một lệnh và dọn zombie process | — | Research · P0 | 1 |
+| Process, thread & bộ nhớ | `thr-thread-vs-process` | Thread hay process? | Chọn thread hay process theo chi phí, bộ nhớ chung và cô lập lỗi | `os-process-lifecycle` | Research · P0 | 1 |
+| Process, thread & bộ nhớ | `os-context-switch` | Context switch | Ước lượng chi phí chuyển ngữ cảnh giữa process, thread, coroutine | `thr-thread-vs-process` | Research · P0 | 1 |
+| Process, thread & bộ nhớ | `os-memory-layout` | Stack & heap | Biết biến nằm ở stack hay heap và vì sao đệ quy sâu tràn stack | — | Research · P0 | 1 |
+| Process, thread & bộ nhớ | `os-virtual-memory` | Virtual memory & paging | Giải thích page fault, TLB, swap và tác động lên latency | `os-memory-layout` | Research · P0 | 1 |
+| Process, thread & bộ nhớ | `os-syscall-kernel-mode` | System call & kernel mode | Giải thích vì sao syscall đắt hơn gọi hàm thường | `os-process-lifecycle` | Research · P1 | 3 |
+| Process, thread & bộ nhớ | `os-scheduling` | CPU scheduling | So sánh preemptive và cooperative, nhận ra job bị đói CPU | `os-context-switch` | Research · P1 | 3 |
+| Process, thread & bộ nhớ | `code-memory-gc` | Bộ nhớ & garbage collection | Tìm memory leak trong ngôn ngữ có GC và hiểu stop-the-world pause | `os-memory-layout` | Research · P1 | 3 |
+| Process, thread & bộ nhớ | `os-cpu-cache-locality` | CPU cache & locality | Viết vòng lặp thân thiện cache và nhận ra false sharing | `os-memory-layout` | Research · P2 | 4 |
+| Thread trong thực tế | `thr-io-vs-cpu-bound` | I/O-bound hay CPU-bound? | Chọn thread, process hay async theo loại tải | `thr-thread-vs-process` | Research · P0 | 2 |
+| Thread trong thực tế | `thr-thread-pool` | Thread pool | Chọn kích thước pool, hàng đợi và cách từ chối khi đầy | `thr-io-vs-cpu-bound` | Research · P0 | 2 |
+| Thread trong thực tế | `io-connection-pool` | Connection pool | Chọn số connection tới DB và nhận ra connection leak | `thr-thread-pool` | Research · P1 | 3 |
+| Thread trong thực tế | `thr-gil` | GIL & free-threading | Biết khi nào multithreading Python có ích và khi nào không | `thr-io-vs-cpu-bound` | Research · P0 | 2 |
+| Thread trong thực tế | `thr-green-threads` | Goroutine & virtual thread | Giải thích M:N scheduling và vì sao goroutine rẻ hơn OS thread | `thr-thread-vs-process`, `os-context-switch` | Research · P0 | 2 |
+| Thread trong thực tế | `thr-goroutine-channel` | Goroutine & channel | Dựng pipeline, fan-out/fan-in bằng channel và tránh goroutine leak | `thr-green-threads` | Research · P1 | 3 |
+| Thread trong thực tế | `thr-thread-local-context` | Thread-local & truyền context | Truyền request id, trace qua thread pool và task an toàn | `thr-thread-pool` | Research · P2 | 4 |
+| I/O & hệ điều hành | `os-file-descriptors` | File descriptor & ulimit | Sửa lỗi "too many open files" và hiểu socket cũng là fd | `os-process-lifecycle` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-blocking-models` | Blocking, non-blocking, async I/O | Phân biệt 4 mô hình I/O và vì sao event loop cần multiplexing | `os-file-descriptors` | Research · P0 | 2 |
+| I/O & hệ điều hành | `io-epoll-kqueue` | epoll & kqueue | Giải thích vì sao epoll scale hơn select, level vs edge triggered | `io-blocking-models` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-reactor-proactor` | Reactor & proactor | Nhận ra mô hình I/O của Nginx, Netty, libuv | `io-epoll-kqueue` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-uring` | io_uring | Giải thích io_uring giảm syscall bằng hàng đợi completion | `io-reactor-proactor` | Research · P2 | 4 |
+| I/O & hệ điều hành | `io-buffering-fsync` | Buffer, flush & fsync | Biết dữ liệu "đã ghi" thật sự nằm ở đâu và fsync tốn gì | `os-file-descriptors` | Research · P1 | 3 |
+| I/O & hệ điều hành | `os-filesystem` | File system & journaling | Giải thích inode, journaling và page cache | `io-buffering-fsync` | Research · P2 | 4 |
+| I/O & hệ điều hành | `io-zero-copy` | Zero-copy & page cache | Giải thích sendfile, mmap và vì sao Kafka đọc đĩa nhanh | `os-virtual-memory`, `io-buffering-fsync` | Research · P2 | 4 |
+| I/O & hệ điều hành | `os-ipc` | Giao tiếp giữa process (IPC) | Chọn pipe, Unix socket hay shared memory cho hai process | `thr-thread-vs-process` | Research · P1 | 3 |
+| I/O & hệ điều hành | `os-signals-shutdown` | Signal & graceful shutdown | Dừng app không rớt request: SIGTERM, drain, PID 1 trong container | `os-process-lifecycle` | Research · P0 | 2 |
+| I/O & hệ điều hành | `os-linux-diagnostics` | Chẩn đoán trên Linux | Dùng top, strace, lsof, /proc để tìm nguyên nhân server chậm | `os-file-descriptors` | Research · P2 | 4 |
+| Concurrency | `conc-race-condition` | Race condition | Nhận ra check-then-act và phân biệt race condition với data race | `thr-thread-vs-process` | Research · P0 | 2 |
+| Concurrency | `conc-monitor-rwlock` | Monitor, RW lock, spinlock | Chọn loại lock và độ mịn lock theo mức tranh chấp | `concurrency` | Research · P1 | 3 |
+| Concurrency | `conc-livelock-starvation` | Livelock, starvation, fairness | Nhận ra livelock, thread bị đói và priority inversion | `concurrency` | Research · P0 | 2 |
+| Concurrency | `conc-atomic-cas` | Atomic, CAS & lock-free | Dùng CAS đúng chỗ và biết bài toán ABA | `conc-race-condition` | Research · P0 | 2 |
+| Concurrency | `conc-memory-model` | Memory model & happens-before | Giải thích visibility, reordering và volatile đảm bảo gì | `conc-atomic-cas` | Research · P0 | 2 |
+| Concurrency | `conc-thread-safe-collections` | Collection thread-safe | Chọn concurrent map, copy-on-write hay dữ liệu immutable | `conc-atomic-cas` | Research · P1 | 3 |
+| Concurrency | `conc-producer-consumer` | Producer–consumer | Cài bounded blocking queue bằng lock và condition variable | `concurrency` | Research · P1 | 3 |
+| Concurrency | `conc-parallelism-amdahl` | Concurrency, parallelism & Amdahl | Ước lượng tăng tốc khi thêm core bằng định luật Amdahl | `thr-io-vs-cpu-bound` | Research · P1 | 3 |
+| Concurrency | `conc-classic-problems` | Bài coding concurrency kinh điển | Giải bài in theo thứ tự, readers–writers, rate limiter thread-safe | `concurrency`, `conc-producer-consumer` | Research · P0 | 2 |
+| Concurrency | `conc-testing-debugging` | Test & debug concurrency | Bắt race bằng race detector, stress test và đọc thread dump | `conc-race-condition` | Research · P1 | 3 |
+| Async | `async-concurrency-models` | Thread, event loop, coroutine, actor | So sánh 4 mô hình concurrency cho server nhiều kết nối | `thr-thread-vs-process`, `io-blocking-models` | Research · P0 | 2 |
+| Async | `async-event-loop` | Event loop | Giải thích một thread phục vụ nhiều request nhờ event loop | `async-concurrency-models` | Research · P0 | 2 |
+| Async | `async-callback-promise-await` | Callback, Promise, async/await | Viết code async không callback hell và chạy song song đúng cách | `async-event-loop` | Research · P0 | 2 |
+| Async | `async-microtask-queue` | Microtask & macrotask | Đoán đúng thứ tự chạy khi trộn Promise và setTimeout | `async-event-loop` | Research · P1 | 3 |
+| Async | `async-coroutine` | Coroutine | Giải thích suspend/resume và coroutine khác thread ở đâu | `async-callback-promise-await` | Research · P0 | 2 |
+| Async | `async-future-combinators` | Kết hợp Future: all, any, race | Gọi nhiều việc song song và xử lý lỗi lan truyền | `async-callback-promise-await` | Research · P1 | 3 |
+| Async | `async-error-handling` | Lỗi trong code async | Không để exception bị nuốt hay unhandled rejection làm chết process | `async-callback-promise-await` | Research · P1 | 3 |
+| Async | `async-blocking-in-loop` | Đừng chặn event loop | Đưa việc CPU-bound và lời gọi blocking ra khỏi event loop | `async-event-loop`, `thr-io-vs-cpu-bound` | Research · P0 | 2 |
+| Async | `async-backpressure` | Backpressure trong code | Giới hạn số việc đồng thời và dùng queue có giới hạn | `async-event-loop` | Research · P0 | 2 |
+| Async | `async-cancellation-timeout` | Huỷ, timeout & deadline | Huỷ việc con khi client bỏ đi và truyền deadline qua các lời gọi | `async-callback-promise-await` | Research · P0 | 2 |
+| Async | `async-structured-concurrency` | Structured concurrency | Dùng TaskGroup để việc con không chạy mồ côi | `async-cancellation-timeout` | Research · P1 | 3 |
+| Async | `async-sync-primitives` | Lock trong code async | Biết code async đơn luồng vẫn có race và khi nào cần asyncio.Lock | `conc-race-condition`, `async-event-loop` | Research · P1 | 3 |
+| Async | `conc-actor-model` | Actor model | Tránh lock bằng message passing và xử lý mailbox đầy | `async-concurrency-models` | Research · P1 | 3 |
+| Async | `async-reactive-streams` | Reactive streams | Nhận ra khi nào reactive đáng dùng hơn async/await | `async-backpressure` | Research · P2 | 4 |
+| Mạng máy tính | `net-url-to-page` | Gõ URL thì chuyện gì xảy ra | Kể đủ các bước từ DNS tới render và bước nào tốn thời gian | `networking` | Research · P0 | 1 |
+| Mạng máy tính | `net-dns-deep` | DNS | Giải thích resolve đệ quy, TTL, loại record và DNS load balancing | `networking` | Research · P1 | 3 |
+| Mạng máy tính | `net-tcp-deep` | TCP chuyên sâu | Giải thích handshake, TIME_WAIT, flow và congestion control | `networking` | Research · P0 | 2 |
+| Mạng máy tính | `net-sockets` | Socket & giới hạn kết nối | Tính số kết nối tối đa và nhận ra hết ephemeral port | `net-tcp-deep`, `os-file-descriptors` | Research · P1 | 3 |
+| Mạng máy tính | `net-http-semantics` | HTTP semantics | Chọn method, status code, header cache đúng nghĩa | `networking` | Research · P1 | 3 |
+| Mạng máy tính | `net-http-versions` | HTTP/1.1, HTTP/2, HTTP/3 | Giải thích multiplexing, head-of-line blocking và vì sao QUIC dùng UDP | `net-tcp-deep` | Research · P0 | 2 |
+| Mạng máy tính | `net-tls` | TLS & mTLS | Giải thích TLS handshake, chuỗi chứng chỉ và khi nào cần mTLS | `net-tcp-deep` | Research · P0 | 2 |
+| Mạng máy tính | `net-cors-cookies` | CORS, cookie & CSRF | Cấu hình CORS, cookie flag và chặn CSRF | `net-http-semantics` | Research · P1 | 3 |
+
+#### ∥ Kỹ năng viết code
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Vòng coding | `code-interview-communication` | Kỹ năng vòng coding | Làm rõ đề, nói to suy nghĩ, đi từ brute force và tự test | — | Research · P0 | 1 |
+| Vòng coding | `code-language-choice` | Chọn ngôn ngữ phỏng vấn | Chọn ngôn ngữ và thuộc thư viện chuẩn cần cho vòng coding | — | Research · P1 | 1 |
+| Code sạch | `code-clean-naming` | Đặt tên & hàm nhỏ | Đặt tên rõ nghĩa và tách hàm theo một mức trừu tượng | — | Research · P0 | 2 |
+| Code sạch | `code-error-handling` | Xử lý lỗi | Chọn exception hay error value, không nuốt lỗi và thêm ngữ cảnh | — | Research · P0 | 2 |
+| Code sạch | `code-defensive-validation` | Validate ở biên & invariant | Validate dữ liệu ở biên và giữ invariant bằng kiểu dữ liệu | `code-error-handling` | Research · P1 | 3 |
+| Code sạch | `code-immutability` | Immutability & value object | Dùng dữ liệu bất biến để giảm lỗi và an toàn khi chạy song song | `code-clean-naming` | Research · P1 | 3 |
+| Code sạch | `code-fp-vs-oop` | Functional hay OOP? | Chọn composition, pure function hay kế thừa cho từng tình huống | `oop-pillars` | Research · P1 | 3 |
+| Code sạch | `code-api-design-code` | Thiết kế API ở mức code | Thiết kế chữ ký hàm, interface nhỏ và giữ tương thích ngược | `code-clean-naming` | Research · P1 | 3 |
+| Code sạch | `code-generics-types` | Generics & hệ thống kiểu | Giải thích variance, type erasure và khi nào cần generic | — | Research · P2 | 4 |
+| Kiểm thử & debug | `code-testing-fundamentals` | Kiểm thử căn bản | Chọn unit, integration, e2e và mock, stub, fake đúng chỗ | — | Research · P0 | 2 |
+| Kiểm thử & debug | `code-testable-design` | Viết code dễ test | Tách phụ thuộc bằng DI và pure function để test được | `code-testing-fundamentals` | Research · P1 | 3 |
+| Kiểm thử & debug | `code-debugging` | Debug có hệ thống | Tái hiện, thu hẹp, chia đôi bằng git bisect để tìm bug | — | Research · P0 | 2 |
+| Kiểm thử & debug | `code-refactoring` | Refactoring & code smell | Refactor từng bước nhỏ an toàn, kể cả code legacy chưa có test | `code-testing-fundamentals` | Research · P1 | 3 |
+| Kiểm thử & debug | `code-review` | Code review | Review đúng trọng tâm và viết, nhận góp ý mang tính xây dựng | `code-clean-naming` | Research · P1 | 3 |
+| Hiệu năng & an toàn | `code-complexity-perf` | Hiệu năng ở mức code | Đo bằng profiler trước rồi mới tối ưu và chọn cấu trúc dữ liệu | `bigo` | Research · P1 | 3 |
+| Hiệu năng & an toàn | `code-secure-coding` | Secure coding căn bản | Chặn injection, lưu mật khẩu đúng cách và giữ secret khỏi code | `code-defensive-validation` | Research · P1 | 3 |
+| Hiệu năng & an toàn | `code-git-workflow` | Git & quy trình | Commit nhỏ, chọn merge hay rebase và đánh version theo semver | — | Research · P2 | 4 |
+
+#### ∥ Behavioral
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Câu chuyện của bạn | `beh-star-stories` | Khung STAR | Kể một câu chuyện theo STAR và có sẵn ngân hàng câu chuyện | — | Research · P0 | 1 |
+| Câu chuyện của bạn | `beh-common-questions` | Câu hỏi behavioral hay gặp | Trả lời nhóm câu hỏi xung đột, thất bại, ownership, mơ hồ | `beh-star-stories` | Research · P0 | 1 |
+| Câu chuyện của bạn | `beh-project-deep-dive` | Kể sâu về dự án | Vẽ lại kiến trúc dự án đã làm, nêu trade-off và số liệu | `beh-star-stories` | Research · P0 | 1 |
+| Quy trình & cấp độ | `beh-interview-process` | Quy trình & rubric phỏng vấn | Biết mỗi vòng chấm tín hiệu gì để chuẩn bị đúng chỗ | — | Research · P1 | 3 |
+| Quy trình & cấp độ | `beh-self-intro` | Tự giới thiệu & hỏi ngược | Giới thiệu bản thân trong 2 phút và chuẩn bị câu hỏi cho interviewer | — | Research · P1 | 3 |
+| Quy trình & cấp độ | `beh-senior-signals` | Tín hiệu senior | Kể được scope, ảnh hưởng, mentoring và quyết định kỹ thuật lớn | `beh-project-deep-dive` | Research · P1 | 3 |
+
+#### ∥ Container & Kubernetes
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Container cơ bản | `container-basics` | Container là gì? | Giải thích container khác VM nhờ namespaces và cgroups | `os-process-lifecycle` | SA (Container, id tạm) · P0 | 1 |
+| Container cơ bản | `container-image` | Image & layer | Giải thích image gồm các layer và registry lưu chúng thế nào | `container-basics` | SA (Container, id tạm) · P0 | 1 |
+| Container cơ bản | `dockerfile` | Dockerfile chuẩn | Viết Dockerfile nhỏ, an toàn, chạy non-root bằng multi-stage build | `container-image` | SA (Container, id tạm) · P0 | 1 |
+| Container cơ bản | `container-build` | Build cache | Sắp lệnh Dockerfile để build lại nhanh nhờ cache layer | `dockerfile` | SA (Container, id tạm) · P0 | 2 |
+| Từ build tới deploy | `container-pipeline` | Build, push, deploy | Dựng luồng build image → push registry → deploy có tag rõ ràng | `container-build` | SA (Container, id tạm) · P0 | 2 |
+| Kubernetes | `k8s-workloads` | Pod, Deployment, StatefulSet | Chọn loại workload và hiểu rolling update hoạt động thế nào | `container-image` | SA (Container, id tạm) · P0 | 2 |
+| Kubernetes | `k8s-networking` | Service & Ingress | Đưa traffic tới Pod bằng Service và Ingress | `k8s-workloads`, `lb-gateway-cdn` | SA (Container, id tạm) · P0 | 2 |
+| Kubernetes | `k8s-health-scaling` | Probe & HPA | Cấu hình probe đúng loại và tự scale bằng HPA | `k8s-workloads` | SA (Container, id tạm) · P0 | 2 |
+| Kubernetes | `k8s-rbac` | RBAC trong Kubernetes | Cấp quyền tối thiểu cho người và service account | `k8s-workloads` | SA (Container, id tạm) · P0 | 2 |
+
+#### ∥ Vận hành production
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Quan sát hệ thống | `observability` | Observability: log, metric, trace | Đặt SLO, đo p99 và lần theo một request qua nhiều service | `numbers`, `system-architecture` | SA · P0 | 1 |
+| Triển khai an toàn | `deployment-safety` | Triển khai an toàn | Deploy không downtime: expand/contract, feature flag, rollback | `system-architecture`, `ecs` | SA · P1 | 2 |
+
+#### ∥ Low-Level Design
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Khung & OOP | `ood-uml-diagrams` | Class & sequence diagram | Vẽ class và sequence diagram tối thiểu đủ cho phỏng vấn | `oop-pillars` | Research · P1 | 3 |
+| Design pattern | `ood-state-machine` | State machine trong LLD | Mô hình hoá trạng thái đơn hàng, thang máy và chặn chuyển sai | `patterns-gof` | Research · P1 | 3 |
+| Luyện đề LLD | `mc-machine-coding-round` | Vòng machine coding | Ra code chạy được trong 90 phút, chia module và mở rộng khi đổi đề | `lld-problems-list`, `code-testing-fundamentals` | Research · P0 | 2 |
+
+#### ∥ Coding · DSA
+
+| Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
+|---|---|---|---|---|---|---|
+| Độ phức tạp | `dsa-recursion` | Đệ quy | Phân tích độ phức tạp đệ quy và đổi đệ quy sang vòng lặp | `bigo` | Research · P2 | 4 |
+| Cấu trúc dữ liệu | `dsa-arrays-hashing` | Array & hashing | Giải bài đếm tần suất, two-sum, nhóm theo key trong O(n) | `bigo` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-linked-list` | Linked list | Đảo, ghép linked list bằng dummy node và con trỏ | `ds` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-stack-monotonic` | Stack & monotonic stack | Giải next greater element và max trong sliding window | `ds` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-heap-topk` | Heap & top-K | Giải top-K, K-way merge và median của luồng số | `ds` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-trees` | Tree & BST | Duyệt cây DFS/BFS, kiểm tra BST và tìm LCA | `dsa-recursion` | Research · P0 | 2 |
+| Cấu trúc dữ liệu | `dsa-trie` | Trie | Cài trie cho tìm theo tiền tố và autocomplete | `dsa-trees` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-design-ds` | Thiết kế cấu trúc dữ liệu | Cài LRU cache O(1), min stack, hit counter | `dsa-linked-list`, `dsa-arrays-hashing` | Research · P0 | 2 |
+| Cấu trúc dữ liệu | `dsa-range-trees` | Segment tree & Fenwick tree | Nhận ra khi nào range query có update cần segment tree | `dsa-trees` | Research · P2 | 4 |
+| Thuật toán | `dsa-two-pointers` | Two pointers | Giải 3-sum, phát hiện chu trình bằng hai con trỏ | `dsa-arrays-hashing` | Research · P0 | 2 |
+| Thuật toán | `dsa-sliding-window` | Sliding window | Giải bài chuỗi con dài nhất bằng cửa sổ co giãn | `dsa-two-pointers` | Research · P0 | 2 |
+| Thuật toán | `dsa-prefix-sum` | Prefix sum | Trả lời range sum và đếm mảng con có tổng k | `dsa-arrays-hashing` | Research · P2 | 4 |
+| Thuật toán | `dsa-sorting` | Sorting | Chọn thuật toán sort và biết sort ổn định nghĩa là gì | `bigo` | Research · P1 | 3 |
+| Thuật toán | `dsa-binary-search-answer` | Binary search trên đáp án | Dùng binary search cả trên không gian đáp án | `dsa-sorting` | Research · P1 | 3 |
+| Thuật toán | `dsa-intervals` | Intervals | Gộp khoảng và tính số phòng họp tối thiểu bằng sweep line | `dsa-sorting` | Research · P1 | 3 |
+| Thuật toán | `dsa-greedy` | Greedy | Giải bài greedy và chứng minh nhanh vì sao đúng | `dsa-sorting` | Research · P2 | 4 |
+| Thuật toán | `dsa-backtracking` | Backtracking | Sinh tập con, hoán vị và cắt nhánh sớm | `dsa-recursion` | Research · P1 | 3 |
+| Thuật toán | `dsa-graphs` | Graph | Giải bài grid, topological sort, union-find, Dijkstra | `dsa-trees` | Research · P0 | 2 |
+| Thuật toán | `dsa-matrix` | Matrix | Duyệt xoắn ốc, xoay ma trận, flood fill | `dsa-graphs` | Research · P2 | 4 |
+| Thuật toán | `dsa-dp` | Dynamic programming | Nhận ra bài DP và dựng bảng 1D/2D | `dsa-recursion` | Research · P0 | 2 |
+| Thuật toán | `dsa-strings` | String | Giải palindrome, anagram và tìm pattern bằng rolling hash | `dsa-sliding-window` | Research · P2 | 4 |
+| Thuật toán | `dsa-bit-manipulation` | Bit manipulation | Dùng XOR, mask để giải bài đếm và tìm phần tử lẻ | `bigo` | Research · P2 | 4 |
+
+## 8. Đợt viết
+
+Quy tắc chia đợt:
+
+- **Đợt 1** (21 topic) gồm:
+  - 6 chủ đề P0 của SA.
+  - Chặng đầu của mỗi nhánh mới, để nhánh nào cũng học được từ ngày đầu:
+    - Nền tảng CS › Process, thread & bộ nhớ: 5 P0.
+    - Kỹ năng viết code › Vòng coding: 2 topic.
+    - Behavioral › Câu chuyện của bạn: 3 P0.
+    - Container cơ bản: 3 topic.
+    - Vận hành production › Quan sát: chính là `observability`.
+  - 2 P0 đứng độc lập và hay bị hỏi: `db-isolation-anomalies`, `net-url-to-page`.
+- **Đợt 2** (46): phần còn lại có P0 của Research, P1 của SA và các topic Container còn lại.
+- **Đợt 3** (50): P1 của Research.
+- **Đợt 4** (19): P2 của cả hai nguồn (3 của SA: `storage-engines`, `stream-processing`, `time-ordering`).
+
+Một chặng chỉ được tạo trong `roadmap.js` cùng commit với topic đầu tiên của nó (§3.5), nên chặng còn thiếu bài vẫn chạy được.
+
+### 8.1 Đợt 1: Solution Architect viết, Diagram vẽ
+
+| # | Id | Tiêu đề | Chỗ | Người viết | Hình cho agent Diagram |
+|---|---|---|---|---|---|
+| 1 | `db-isolation-anomalies` | Transaction & isolation level | GĐ1 · Nền móng › Lưu & truy vấn dữ liệu | Solution Architect (nguồn: Research) | mở rộng sim `isolation` thêm lost update, write skew |
+| 2 | `replication` | Replication & failover | GĐ2 · Scale dữ liệu › Nhất quán & sao chép | Solution Architect | dùng lại sim `replica-lag`; sim failover split brain (SA) |
+| 3 | `resilience` | Timeout, retry & circuit breaker | GĐ3 · Bất đồng bộ & phối hợp › Gọi nhau an toàn khi có lỗi | Solution Architect | sim: retry 3 tầng nhân tải; sim circuit breaker (SA) |
+| 4 | `idempotency` | Idempotency | GĐ3 · Bất đồng bộ & phối hợp › Gọi nhau an toàn khi có lỗi | Solution Architect | sim: client timeout → gửi lại, 3 variant (SA) |
+| 5 | `outbox-cdc` | Outbox & CDC | GĐ3 · Bất đồng bộ & phối hợp › Quy trình nhiều bước đáng tin | Solution Architect | sim: dual write vs outbox; SVG DB → WAL → CDC → Kafka (SA) |
+| 6 | `durable-execution` | Durable Execution | GĐ3 · Bất đồng bộ & phối hợp › Quy trình nhiều bước đáng tin | Solution Architect | sim: worker crash → replay; SVG so sánh 3 cách (SA) |
+| 7 | `os-process-lifecycle` | Process: fork, exec, zombie | ∥ Nền tảng CS › Process, thread & bộ nhớ | Solution Architect (nguồn: Research) | SVG trạng thái process (new → ready → running → zombie) |
+| 8 | `thr-thread-vs-process` | Thread hay process? | ∥ Nền tảng CS › Process, thread & bộ nhớ | Solution Architect (nguồn: Research) | SVG bộ nhớ chung của thread vs bộ nhớ riêng của process |
+| 9 | `os-context-switch` | Context switch | ∥ Nền tảng CS › Process, thread & bộ nhớ | Solution Architect (nguồn: Research) | SVG chi phí: process vs thread vs coroutine |
+| 10 | `os-memory-layout` | Stack & heap | ∥ Nền tảng CS › Process, thread & bộ nhớ | Solution Architect (nguồn: Research) | SVG không gian địa chỉ: stack, heap, code |
+| 11 | `os-virtual-memory` | Virtual memory & paging | ∥ Nền tảng CS › Process, thread & bộ nhớ | Solution Architect (nguồn: Research) | SVG page table + TLB |
+| 12 | `net-url-to-page` | Gõ URL thì chuyện gì xảy ra | ∥ Nền tảng CS › Mạng máy tính | Solution Architect (nguồn: Research) | SVG dòng thời gian DNS → TCP → TLS → HTTP → render |
+| 13 | `code-interview-communication` | Kỹ năng vòng coding | ∥ Kỹ năng viết code › Vòng coding | Solution Architect (nguồn: Research) | — |
+| 14 | `code-language-choice` | Chọn ngôn ngữ phỏng vấn | ∥ Kỹ năng viết code › Vòng coding | Solution Architect (nguồn: Research) | — |
+| 15 | `beh-star-stories` | Khung STAR | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
+| 16 | `beh-common-questions` | Câu hỏi behavioral hay gặp | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
+| 17 | `beh-project-deep-dive` | Kể sâu về dự án | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
+| 18 | `container-basics` | Container là gì? | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | SVG container vs VM |
+| 19 | `container-image` | Image & layer | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | SVG layer chồng nhau + registry |
+| 20 | `dockerfile` | Dockerfile chuẩn | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | code-walk (custom `code` sim) Dockerfile xấu → tốt |
+| 21 | `observability` | Observability: log, metric, trace | ∥ Vận hành production › Quan sát hệ thống | Solution Architect | SVG trace waterfall 4 service (SA) |
+
+Thứ tự viết gợi ý trong đợt 1:
+
+1. `idempotency` và `resilience`: `outbox-cdc`, `durable-execution` đều dựa vào hai bài này.
+2. `replication`.
+3. `outbox-cdc`, `durable-execution`.
+4. `observability`.
+5. Phần còn lại không phụ thuộc nhau nên viết song song được.
+
+Mục "Hình" lấy từ đề xuất của SA khi có ghi "(SA)". Các mục khác là gợi ý của tôi, Diagram chốt.
+
+### 8.2 Đợt 2 (46 topic, theo thứ tự ưu tiên)
+
+1. **System Design** (SA P1 và DB P0 của Research): `auth`, `id-generation`, `multi-region`, `db-locking`, `consensus`, `vector-search`, `deployment-safety`, `db-query-tuning`.
+2. **Container & Kubernetes:** `container-build`, `container-pipeline`, `k8s-workloads`, `k8s-networking`, `k8s-health-scaling`, `k8s-rbac`.
+3. **Nền tảng CS (P0):**
+   - Thread & I/O: `thr-io-vs-cpu-bound`, `thr-thread-pool`, `thr-gil`, `thr-green-threads`, `io-blocking-models`, `os-signals-shutdown`.
+   - Concurrency: `conc-race-condition`, `conc-livelock-starvation`, `conc-atomic-cas`, `conc-memory-model`, `conc-classic-problems`.
+   - Async: `async-concurrency-models`, `async-event-loop`, `async-callback-promise-await`, `async-coroutine`, `async-blocking-in-loop`, `async-backpressure`, `async-cancellation-timeout`.
+   - Mạng: `net-tcp-deep`, `net-http-versions`, `net-tls`.
+4. **Kỹ năng viết code (P0):** `code-clean-naming`, `code-error-handling`, `code-testing-fundamentals`, `code-debugging`.
+5. **LLD:** `mc-machine-coding-round`.
+6. **DSA (P0):** `dsa-two-pointers`, `dsa-sliding-window`, `dsa-trees`, `dsa-graphs`, `dsa-dp`, `dsa-design-ds`.
+
+Đợt 3 và 4: xem cột "Đợt" ở §7.3.
+
+### 8.3 Ảnh hưởng tới UI
+
+Không có màn hình mới. Khối lượng tăng từ 39 lên 175 topic nên hai mục UI ở §3.4 chuyển từ "nên có" thành **bắt buộc trước đợt 2**:
+
+- **A7:** sidebar gập theo giai đoạn/nhánh. Không gập thì sidebar dài 175 dòng.
+- **B1:** hiển thị chặng.
+
+Trang chủ cũng cần gập "Nhánh song song" thành các ô (A6). Đã có trong wireframe; sẽ có 8 nhánh.
+
+### 8.4 Quyết định đề xuất (dải D20–D29)
+
+Chưa ghi vào `docs/decisions.md` (file dùng chung). Người dùng chốt §6 thì chép sang.
+
+| # | Quyết định |
+|---|---|
+| D20 | `ROADMAP` là cây học duy nhất: giai đoạn → chặng (`parts`, id `<giai đoạn>.<tên>`) → topic. Track chỉ là thư mục. |
+| D21 | Topic có thêm `goal` (≤ 90 ký tự, bắt đầu bằng động từ) và `needs` (≤ 3, chỉ gợi ý). Bài luyện "đủ nền" tính từ `problem.topics`. |
+| D22 | Quy ước tiêu đề §3.3. |
+| D23 | Quy tắc xếp chỗ 9 câu hỏi (§3.1) cho chủ đề mới. Chặng tạo cùng commit với topic đầu tiên, không có chặng rỗng. |
+| D24 | Gộp trùng theo §7.1: giữ id SA; trùng topic có sẵn thì mở rộng topic đó. |
+| D25 | Cây §7.2. Có 3 nhánh mới: Nền tảng CS, Kỹ năng viết code, Behavioral. Nhánh `cloud` thành Container & Kubernetes, thêm nhánh `ops`. `concurrency` dời sang Nền tảng CS, id không đổi. |
+| D26 | Chia đợt viết theo §8; đợt 1 gồm 21 topic. |
