@@ -3,7 +3,7 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "API Gateway, BFF & API Composition",
-  goal: "Thiết kế cửa vào cho client: routing, gom lời gọi, BFF riêng và phần việc đẩy lên gateway",
+  goal: "Thiết kế API Gateway: routing, offloading, API composition và BFF cho từng loại client",
   needs: ["lb-gateway-cdn", "auth", "service-discovery"],
   tldr: {
     t: "**API Gateway** là cửa vào duy nhất của client vào hệ nhiều service. Nó làm ba việc: **routing** (đưa request tới đúng service), **offloading** (gánh việc chung: TLS, kiểm token, rate limit, log) và **aggregation / API composition** (gọi nhiều service rồi ghép thành một response). **BFF** (Backend for Frontend) là biến thể: mỗi loại client (web, mobile) có một gateway riêng, do team làm client đó sở hữu. Gateway không chứa business logic.",

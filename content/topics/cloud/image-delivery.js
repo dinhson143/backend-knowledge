@@ -39,7 +39,7 @@ BK.topic({
       },
       {
         cells: ["Ký", "`cosign sign` theo digest; cluster chỉ chạy image có chữ ký hợp lệ", "Chứng minh image do pipeline của bạn tạo, không bị thay trên đường đi"],
-        why: "Cosign hỗ trợ ký keyless bằng khoá tạm cấp qua OIDC, chữ ký lưu cạnh image theo OCI 1.1 referrers (https://docs.sigstore.dev/cosign/signing/signing_with_containers/); khi verify, cosign mặc định kiểm digest trong chữ ký khớp với image (https://docs.sigstore.dev/cosign/verifying/verify/). Ký theo tag thì không chứng minh được gì vì tag có thể đổi.",
+        why: "Cosign hỗ trợ ký keyless bằng key tạm thời cấp qua OIDC, chữ ký lưu cạnh image theo OCI 1.1 referrers (https://docs.sigstore.dev/cosign/signing/signing_with_containers/); khi verify, cosign mặc định kiểm digest trong chữ ký khớp với image (https://docs.sigstore.dev/cosign/verifying/verify/). Vì chữ ký gắn với digest, pipeline ký và verify theo `image@sha256:…`, không theo tag.",
       },
       {
         cells: ["Deploy + promote", "Ghi `image@sha256:…` vào manifest (thường qua Git); đưa cùng digest từ staging lên production", "Môi trường nào cũng chạy đúng bản đã kiểm"],
@@ -85,14 +85,14 @@ BK.topic({
           "docker buildx build \\",
           ["  --platform linux/amd64,linux/arm64 \\", "Một lần build cho hai kiến trúc: kết quả là một image index."],
           ["  --sbom=true --provenance=mode=max \\", "Gắn SBOM và provenance vào image dưới dạng attestation."],
-          ["  --metadata-file meta.json \\", "Buildx ghi digest vào `meta.json` (khoá `containerimage.digest`)."],
+          ["  --metadata-file meta.json \\", "Buildx ghi digest vào `meta.json` (trường `containerimage.digest`)."],
           ["  -t \"$IMAGE:$TAG\" --push .", "`--push` đẩy thẳng lên registry: blob trước, manifest sau."],
           "",
           "DIGEST=$(python3 -c 'import json; print(json.load(open(\"meta.json\"))[\"containerimage.digest\"])')",
           "REF=\"$IMAGE@$DIGEST\"",
           "",
-          ["trivy image --exit-code 1 --severity CRITICAL,HIGH \"$REF\"", "Mặc định Trivy thoát 0 kể cả khi có lỗ hổng; `--exit-code 1` mới làm CI dừng."],
-          ["cosign sign --yes \"$REF\"", "Ký theo digest, không theo tag."],
+          ["trivy image --exit-code 1 --severity CRITICAL \"$REF\"", "Mặc định Trivy thoát 0 kể cả khi có lỗ hổng; `--exit-code 1` mới làm CI dừng."],
+          ["cosign sign \"$REF\"", "Ký theo digest, không theo tag."],
           "",
           ["# Bước deploy: sửa manifest trong Git thành image: $REF", "GitOps: CI chỉ đổi digest trong Git; Argo CD/Flux reconcile cluster theo Git."],
         ],
@@ -103,7 +103,7 @@ BK.topic({
       points: [
         {
           t: "Build lại image cho từng môi trường (`docker build` ở staging, rồi build lần nữa ở production).",
-          why: "Hai lần build có thể khác nhau (base image `:latest` đã đổi, dependency không khoá phiên bản), nên thứ chạy ở production chưa từng được test. Build một lần, promote cùng digest; khác biệt giữa môi trường để ở config (ConfigMap, Secret), không ở image.",
+          why: "Hai lần build có thể khác nhau (base image `:latest` đã đổi, dependency không ghim phiên bản), nên thứ chạy ở production chưa từng được test. Build một lần, promote cùng digest; khác biệt giữa môi trường để ở config (ConfigMap, Secret), không ở image.",
         },
         {
           t: "Đưa secret vào image (`COPY .env`, `ARG TOKEN`) rồi push lên registry.",

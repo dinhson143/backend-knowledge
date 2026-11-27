@@ -3,7 +3,7 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Sync vs Async Communication",
-  goal: "Chọn gọi đồng bộ hay gửi message giữa service theo availability, latency và consistency",
+  goal: "Chọn sync hay async communication giữa service theo availability, latency, consistency",
   needs: ["api-design", "queue", "resilience"],
   tldr: {
     t: "**Sync communication** (giao tiếp đồng bộ): service A gọi B qua REST/gRPC rồi **chờ response**. **Async communication** (giao tiếp bất đồng bộ): A gửi message qua broker rồi đi tiếp, B xử lý khi nó sẵn sàng. Sync đơn giản và trả lời ngay, nhưng A chỉ chạy được khi B **cũng đang sống**, nên availability và latency **nhân dồn** theo chuỗi gọi. Async cắt sự phụ thuộc đó, đổi lại phải chịu eventual consistency, message trùng, và một broker phải luôn sống.",
@@ -119,7 +119,7 @@ BK.topic({
         },
         {
           t: "Mặc định consumer nhận message đúng thứ tự gửi.",
-          why: "Thứ tự chỉ được giữ trong phạm vi broker hứa (một partition Kafka, một FIFO queue) và với một consumer mỗi phạm vi đó; retry và nhiều consumer làm thứ tự đảo. Dữ liệu cần thứ tự thì chọn partition key theo thực thể (`order_id`) hoặc mang version trong message để consumer bỏ bản cũ.",
+          why: "Broker chỉ hứa thứ tự trong một phạm vi hẹp: Kafka chỉ giữ thứ tự **trong một partition** (bài `kafka`). Message ở hai partition khác nhau, hay message được giao lại sau retry, có thể tới consumer theo thứ tự khác lúc gửi. Dữ liệu cần thứ tự thì chọn partition key theo thực thể (`order_id`) hoặc mang version trong message để consumer bỏ bản cũ.",
         },
       ],
     },

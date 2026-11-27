@@ -31,7 +31,7 @@ BK.topic({
       },
       {
         cells: ["Token bucket", "2 số: `tokens`, `last_refill`", "Cho burst tới **dung lượng bucket**, trung bình theo tốc độ nạp", "API muốn chịu burst ngắn (app mở lên gọi dồn) nhưng giữ trung bình"],
-        why: "Token được nạp đều theo thời gian tới tối đa bằng dung lượng; mỗi request lấy một token, hết token thì bị từ chối. Bucket đầy cho phép gửi liền một loạt bằng dung lượng, sau đó tốc độ bị khoá ở mức nạp. Envoy dùng token bucket cho local rate limit (`max_tokens`, `tokens_per_fill`, `fill_interval`) và mặc định trả 429 (https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/local_rate_limit_filter).",
+        why: "Token được nạp đều theo thời gian tới tối đa bằng dung lượng; mỗi request lấy một token, hết token thì bị từ chối. Bucket đầy cho phép gửi liền một loạt bằng dung lượng, sau đó tốc độ bị giữ ở mức nạp. Envoy dùng token bucket cho local rate limit (`max_tokens`, `tokens_per_fill`, `fill_interval`) và mặc định trả 429 (https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/local_rate_limit_filter).",
       },
       {
         cells: ["Leaky bucket", "Mức nước hiện tại, hoặc thời điểm slot trống kế tiếp", "Không burst: ra đều theo tốc độ rò", "Bảo vệ phụ thuộc không chịu được burst; làm mượt tải ra"],

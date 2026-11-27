@@ -61,8 +61,8 @@ BK.topic({
       why: "PDB được tôn trọng khi công cụ gọi Eviction API, như `kubectl drain`; \"deleting deployments or pods bypasses Pod Disruption Budgets\", gián đoạn không chủ động thì không ngăn được nhưng vẫn tính vào budget, và Deployment/StatefulSet \"are not limited by PDBs when doing rolling upgrades\" (https://kubernetes.io/docs/concepts/workloads/pods/disruptions/). Không có PDB, nâng cấp node pool có thể drain cả 3 replica của một service trong vài phút.",
     },
     {
-      t: "**HPA tính số replica bằng `ceil(currentReplicas × currentMetric / desiredMetric)`**, chạy mỗi 15 giây, bỏ qua chênh lệch dưới 10%, và khi giảm thì lấy đề xuất cao nhất trong 300 giây gần nhất. Utilization CPU tính **theo request**: container không có request thì HPA không làm gì với metric đó.",
-      why: "Công thức, chu kỳ 15 giây, tolerance 10% và cửa sổ ổn định 300 giây khi scale down đều ở trang HPA (https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/). Cửa sổ 300 giây chặn việc scale lên xuống liên tục khi tải dao động. Cùng trang khuyên **xoá `spec.replicas`** khỏi manifest Deployment khi dùng HPA, vì mỗi lần `kubectl apply` sẽ kéo số pod về giá trị trong file. Scale node (Karpenter, Cluster Autoscaler) ở bài `eks`.",
+      t: "**HPA tính số replica bằng `ceil(currentReplicas × currentMetric / desiredMetric)`**, chạy mỗi 15 giây, bỏ qua chênh lệch dưới 10%, và khi giảm thì chọn đề xuất cao nhất trong cửa sổ ổn định (mặc định 300 giây). Utilization CPU tính **theo request**: container không có request thì HPA không làm gì với metric đó.",
+      why: "Công thức, chu kỳ 15 giây, tolerance 10% và cửa sổ ổn định 300 giây khi scale down đều ở trang HPA; controller xét mọi đề xuất trong cửa sổ và \"choosing the highest recommendation from within that window\" (https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/). Cửa sổ 300 giây chặn việc scale lên xuống liên tục khi tải dao động. Cùng trang khuyên **xoá `spec.replicas`** khỏi manifest Deployment khi dùng HPA, vì mỗi lần `kubectl apply` sẽ kéo số pod về giá trị trong file. Scale node (Karpenter, Cluster Autoscaler) ở bài `eks`.",
     },
   ],
   sections: [
@@ -224,7 +224,7 @@ BK.topic({
     ],
     [
       "HPA không scale dù CPU cao. Nguyên nhân hay gặp?",
-      "Container không khai CPU request (utilization không tính được), metrics-server không chạy, hoặc đã chạm `maxReplicas`.",
+      "Container không khai CPU request (utilization không tính được), Metrics API chưa có (thường do metrics-server cung cấp), hoặc đã chạm `maxReplicas`.",
     ],
     [
       "PDB có chặn rolling update không?",

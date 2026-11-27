@@ -19,7 +19,7 @@ BK.topic({
     rows: [
       {
         cells: ["Ai tra registry", "Client (thư viện trong app)", "Router / load balancer đứng giữa"],
-        why: "Client-side: client \"queries\" registry rồi tự chọn instance (https://microservices.io/patterns/client-side-discovery.html). Server-side: client gửi request tới router, router tra registry và chuyển tiếp, nên \"the client code is simpler since it does not have to deal with discovery\" (https://microservices.io/patterns/server-side-discovery.html).",
+        why: "Client-side: client tra registry rồi tự chọn instance (https://microservices.io/patterns/client-side-discovery.html). Server-side: client gửi request tới router, router tra registry và chuyển tiếp, nên \"the client code is simpler since it does not have to deal with discovery\" (https://microservices.io/patterns/server-side-discovery.html).",
       },
       {
         cells: ["Số hop mạng", "Một: client → instance", "Hai: client → router → instance"],
@@ -27,7 +27,7 @@ BK.topic({
       },
       {
         cells: ["Thuật toán chia tải", "Client chọn (round robin, least-request, theo latency)", "Router chọn"],
-        why: "Client-side cho phép chọn theo từng request với thông tin client thấy được (latency, số request đang chờ). gRPC gọi kiểu này là client-side load balancing, đổi lại \"the client is complex\" và phải cài cho từng ngôn ngữ (https://grpc.io/blog/grpc-load-balancing/).",
+        why: "Client-side cho phép chọn theo từng request với thông tin client thấy được (latency, số request đang chờ). gRPC gọi kiểu này là client-side load balancing, đổi lại client phức tạp hơn và phải cài cho từng ngôn ngữ (https://grpc.io/blog/grpc-load-balancing/).",
       },
       {
         cells: ["Ràng buộc", "Client gắn với một registry; cần thư viện cho mỗi ngôn ngữ", "Router phải hiểu giao thức (HTTP, gRPC…) và phải scale"],
