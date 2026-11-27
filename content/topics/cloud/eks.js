@@ -167,7 +167,7 @@ BK.topic({
         },
         {
           t: "**Chi phí** — phí control plane mỗi cluster + node; bin packing tốt và Spot qua Karpenter có thể rẻ hơn ECS ở quy mô lớn.",
-          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 70–90% so với on-demand. Ở quy mô hàng trăm node, khoản tiết kiệm này vượt xa phí control plane của cluster.",
+          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 90% so với on-demand (https://aws.amazon.com/ec2/spot/). Ở quy mô hàng trăm node, khoản tiết kiệm này vượt xa phí control plane của cluster.",
         },
       ],
     },

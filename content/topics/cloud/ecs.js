@@ -48,7 +48,7 @@ BK.topic({
               "Task chạy ở đâu: Fargate, Fargate Spot, hoặc EC2 Auto Scaling group",
               "Node group / Karpenter",
             ],
-            why: "Capacity provider tách “chạy ở đâu” khỏi định nghĩa service, vì cùng một service có thể cần chạy trên Fargate, Fargate Spot (rẻ hơn tới ~70% nhưng có thể bị thu hồi) hoặc EC2. Trộn tỉ lệ được bằng base và weight.",
+            why: "Capacity provider tách “chạy ở đâu” khỏi định nghĩa service, vì cùng một service có thể cần chạy trên Fargate, Fargate Spot (rẻ hơn tới 70% nhưng có thể bị thu hồi — https://aws.amazon.com/fargate/pricing/) hoặc EC2. Trộn tỉ lệ được bằng base và weight.",
           },
           {
             cells: [
