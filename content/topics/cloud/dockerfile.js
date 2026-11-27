@@ -53,6 +53,10 @@ BK.topic({
             why: "Distroless chỉ chứa \"only your application and its runtime dependencies\" (https://github.com/GoogleContainerTools/distroless): không có shell hay `apt` cho kẻ tấn công dùng, ít gói nên ít CVE để vá. Stage này bắt đầu từ base mới tinh, nên mọi thứ của stage build không đi theo trừ những gì `COPY --from` chỉ định.",
           },
           {
+            cells: ["`WORKDIR /app`", "Đặt lại thư mục làm việc ở stage chạy"],
+            why: "`WORKDIR` của stage build không đi theo sang stage mới; không đặt lại thì `./node_modules`, `./dist` và đường dẫn tương đối trong `CMD` phụ thuộc thư mục mặc định của base image. Docker khuyên luôn dùng đường dẫn tuyệt đối cho `WORKDIR` (https://docs.docker.com/build/building/best-practices/).",
+          },
+          {
             cells: ["`COPY --from=build /app/node_modules ./node_modules` và `COPY --from=build /app/dist ./dist`", "Chỉ lấy artifact cần để chạy"],
             why: "Multi-stage giảm kích thước image vì image cuối chỉ gồm layer của stage cuối (https://docs.docker.com/build/building/best-practices/). Source TypeScript, cache build, file lock của dev đều ở lại stage build.",
           },
