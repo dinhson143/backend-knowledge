@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Sharding & Partitioning",
+  goal: "Chia dữ liệu ra nhiều máy với shard key khớp access pattern",
+  needs: ["indexing", "numbers"],
   tldr: {
     t: "Partitioning chia dữ liệu trong một máy; sharding chia ra nhiều máy. Hash-based là mặc định. Shard key phải khớp access pattern chính.",
     why: "Chỉ sharding mới phá được giới hạn một máy; partitioning giảm kích thước mỗi bảng/index nhưng vẫn nằm trong giới hạn đó. **Hash** là mặc định vì trải key đều mà không cần hiểu dữ liệu. Shard key phải khớp access pattern: query có shard key trong điều kiện thì đi thẳng tới 1 shard, query thiếu nó phải hỏi tất cả shard.",

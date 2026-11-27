@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Consistent Hashing",
+  goal: "Thêm/bớt node mà chỉ dời khoảng 1/N số key",
+  needs: ["sharding"],
   tldr: {
     t: "Đặt server và key lên một hash ring; key thuộc server đầu tiên theo chiều kim đồng hồ. Thêm/bớt server chỉ di chuyển ~1/N key. Production bắt buộc dùng virtual nodes + replication.",
     why: "Thêm server mới chỉ cướp phần key nằm trong đoạn ngay trước nó — trung bình K/N key, các key khác giữ nguyên chỗ — vì vị trí key trên ring không phụ thuộc số server. Virtual node và replication là bắt buộc: với vài server vật lý các đoạn ring rất lệch nhau, và một server chết thì mất toàn bộ đoạn của nó nếu không có bản sao.",

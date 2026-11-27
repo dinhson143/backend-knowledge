@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-tech",
   title: "SQL hay NoSQL?",
+  goal: "Chọn loại database theo access pattern và nhu cầu transaction",
+  needs: ["data-modeling"],
   tldr: {
     t: "SQL cho quan hệ phức tạp + transaction ACID. NoSQL cho scale ngang, schema linh hoạt, big data / realtime.",
     why: "SQL mạnh khi quan hệ phức tạp nhưng khó chia ra nhiều máy, vì transaction ACID và JOIN cần mọi dữ liệu liên quan nằm chung chỗ để khoá và kiểm tra cùng lúc. NoSQL scale ngang tự nhiên cho dữ liệu lớn và tải ghi cao, vì mỗi item tự đủ và phân tán theo key.",

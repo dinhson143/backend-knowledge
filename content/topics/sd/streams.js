@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-tech",
   title: "Stream & Event Sourcing",
+  goal: "Phân biệt queue với log bền vững và lưu sự kiện thay cho trạng thái",
+  needs: ["queue"],
   tldr: {
     t: "+ Stream (Kafka, Kinesis) là log bền vững, nhiều consumer group đọc lại được; Event Sourcing lưu chuỗi sự kiện thay vì trạng thái hiện tại. Nhánh này trống trên Miro.",
     why: "Nhiều hệ thống đọc cùng event độc lập và đọc lại được từ đầu, vì log không bị xoá khi đọc và offset thuộc về từng consumer group. Event Sourcing tận dụng đúng tính chất đó: lưu đủ event thì trạng thái là hàm của event, lúc nào cũng tính lại được.",

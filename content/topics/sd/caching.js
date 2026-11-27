@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Caching",
+  goal: "Đặt cache đúng chỗ, chọn cách ghi, xử lý hot key và stampede",
+  needs: ["core-db", "numbers"],
   tldr: {
     t: "Cache ở 4 chỗ (client, CDN, in-process, external như Redis). Chọn write strategy, invalidation, eviction. Thuộc lòng 3 sự cố: hot key, consistency, stampede.",
     why: "Phải chọn chỗ đặt cache trước, vì mỗi tầng chặn request ở một khoảng cách khác nhau tới DB — càng gần user càng rẻ nhưng càng khó invalidate. Ba sự cố hot key, consistency, stampede chung một gốc: cache là bản sao có thời hạn của DB, nên khi bản sao lệch, hết hạn hoặc bị dồn tải thì DB phía sau lãnh hậu quả.",

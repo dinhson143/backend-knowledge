@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Data Modeling",
+  goal: "Đi từ requirements tới bảng, khoá chính và shard key",
+  needs: ["delivery", "api-design"],
   tldr: {
     t: "6 bước: chọn loại DB → liệt kê cột theo FR → PK/FK → index theo access pattern → cân nhắc denormalize → cân nhắc sharding và shard key.",
     why: "Đi từ quyết định lớn, khó đổi nhất (loại DB) tới tối ưu cục bộ, vì mỗi bước dựa vào output bước trước: phải biết cột mới chọn được key, biết query mới chọn được index. Denormalize và sharding đứng cuối vì chúng thêm độ phức tạp, chỉ đáng làm khi con số tải đòi hỏi.",

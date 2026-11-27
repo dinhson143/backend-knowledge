@@ -3,6 +3,8 @@ BK.topic({
   track: "arch",
   section: "arch-main",
   title: "Phương pháp phát triển",
+  goal: "Ghép TDD, BDD, DDD vào một quy trình làm việc",
+  needs: ["code-architecture"],
   tldr: {
     t: "TDD là cách **viết code**: test trước, code sau, vòng Red → Green → Refactor. BDD và ATDD đưa ý tưởng đó lên mức **hành vi và tiêu chí nghiệm thu** để dev, QA, PO hiểu chung. DDD là cách **thiết kế mô hình nghiệp vụ**, thường đi cùng Hexagonal/Clean. Contract testing và property-based testing là hai kỹ thuật test bổ sung khi hệ thống lớn dần.",
     why: "TDD, BDD, ATDD và DDD không thay thế nhau mà xếp lớp được. Ba cái đầu khác nhau ở **mức** của thứ được kiểm chứng trước (hàm, hành vi, tiêu chí story); DDD trả lời câu hỏi khác hẳn: mô hình nghiệp vụ trông thế nào.",

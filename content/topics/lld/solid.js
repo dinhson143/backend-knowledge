@@ -3,6 +3,8 @@ BK.topic({
   track: "lld",
   section: "lld-principles",
   title: "SOLID",
+  goal: "Nhận ra class vi phạm SOLID và sửa cho dễ mở rộng",
+  needs: ["oop-pillars"],
   tldr: {
     t: "5 nguyên tắc giúp class dễ đổi, dễ mở rộng. SRP là nền tảng.",
     why: "Các nguyên tắc này đều nhắm vào khoanh vùng thay đổi, vì chi phí lớn nhất của phần mềm là sửa đổi. **SRP** là nền: khi mỗi class chỉ có một lý do để đổi, OCP, ISP, DIP mới có ranh giới rõ để áp dụng.",

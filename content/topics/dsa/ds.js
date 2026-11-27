@@ -3,6 +3,8 @@ BK.topic({
   track: "dsa",
   section: "dsa-ds",
   title: "Cấu trúc dữ liệu",
+  goal: "Chọn cấu trúc dữ liệu theo thao tác cần nhanh",
+  needs: ["bigo"],
   tldr: {
     t: "Hash table cho tra cứu O(1), heap cho top-K, deque cho queue/stack/sliding window, graph/tree cho quan hệ.",
     why: "Hash table đổi bộ nhớ lấy tra cứu bằng cách nhảy thẳng tới bucket; heap chỉ giữ thứ tự từng phần nên chèn rẻ hơn sắp xếp toàn bộ; deque cho thao tác O(1) ở cả hai đầu; graph/tree mô tả trực tiếp quan hệ cha–con hay kết nối.",

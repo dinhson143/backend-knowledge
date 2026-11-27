@@ -3,6 +3,8 @@ BK.topic({
   track: "lld",
   section: "lld-problems",
   title: "Bài LLD kinh điển",
+  goal: "Chuẩn bị sẵn entity và pattern then chốt cho các bài LLD hay gặp",
+  needs: ["patterns-gof", "concurrency"],
   tldr: {
     t: "+ Mỗi bài chuẩn bị sẵn: entity chính, pattern then chốt, câu hỏi mở rộng hay gặp. Danh sách lấy từ Hello Interview LLD.",
     why: "Chuẩn bị sẵn entity, pattern và câu mở rộng cho mỗi bài giúp trả lời có cấu trúc, vì interviewer chấm chủ yếu ở cách mô hình hoá entity và khả năng mở rộng. Câu mở rộng hay gặp chính là nơi pattern được kiểm chứng.",

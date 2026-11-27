@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-deep",
   title: "Bảng chọn công nghệ",
+  goal: "Trả lời “vì sao dùng X mà không dùng Y” cho từng công nghệ phổ biến",
+  needs: ["redis", "kafka", "search"],
   tldr: {
     t: "+ Ở phỏng vấn, mỗi công nghệ chỉ cần trả lời được: dùng nó cho việc gì, vì sao không dùng cái khác, giới hạn của nó ở đâu. Hello Interview có bài riêng cho từng công nghệ.",
     why: "Ba câu hỏi đó buộc ta nói ra cơ chế: dùng cho việc gì = workload nó tối ưu, vì sao không dùng cái khác = cơ chế khác biệt, giới hạn = cái giá của cơ chế đó. Nói được cơ chế cho thấy hiểu bản chất chứ không thuộc tên.",

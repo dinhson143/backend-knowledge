@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "Database Indexing",
+  goal: "Chọn index cho truy vấn và biết nó làm chậm ghi bao nhiêu",
+  needs: ["core-db"],
   tldr: {
     t: "B-Tree là mặc định (range + equality). Hash index chỉ cho equality. Composite index theo quy tắc leftmost prefix. Mỗi bảng chỉ có 1 clustered index.",
     why: "B-Tree là mặc định vì giữ key theo thứ tự → làm được cả `=` lẫn range/sort. Hash chỉ làm được `=`, vì chỉ biết vị trí của từng giá trị riêng lẻ. Composite phải có cột trái nhất, vì sắp theo cột đầu trước; clustered quyết định thứ tự vật lý của dòng nên mỗi bảng chỉ có một.",

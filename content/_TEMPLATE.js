@@ -1,5 +1,5 @@
 // Mẫu một chủ đề. Copy thành content/topics/<track>/<id>.js (tên file = id), thêm một dòng vào
-// FILES trong content/manifest.js, thêm id vào một giai đoạn trong content/roadmap.js, rồi chạy
+// FILES trong content/manifest.js, thêm id vào một chặng (`parts`) trong content/roadmap.js, rồi chạy
 // `node scripts/check.mjs`. File này KHÔNG nằm trong manifest nên không được nạp.
 //
 // Luật chung (check.mjs kiểm tra):
@@ -13,7 +13,9 @@ BK.topic({
   id: "vi-du-chu-de",                 // bắt buộc · chữ thường, gạch ngang
   track: "sd",                        // bắt buộc · id track trong content/tracks.js = tên thư mục
   section: "sd-core",                 // bắt buộc · id section thuộc track đó (content/tracks.js)
-  title: "Tên chủ đề",                // bắt buộc · ngắn, hiện ở sidebar và lộ trình
+  title: "Tên chủ đề",                // bắt buộc · ≤ 40 ký tự, hiện ở sidebar và lộ trình (quy ước: product-learning-flow §3.3)
+  goal: "Động từ + làm được gì",      // tuỳ chọn · ≤ 90 ký tự, khác title; hiện "Làm được: …"
+  needs: ["id-topic-khac"],           // tuỳ chọn · ≤ 3 tiên quyết trực tiếp, không vòng; cùng nhánh thì phải đứng trước
   tldr: {                             // bắt buộc · "Nói trong 30 giây", 1–3 câu
     t: "Tóm tắt điều phải nhớ.",
     why: "Vì sao điều đó đúng (tuỳ chọn).",
