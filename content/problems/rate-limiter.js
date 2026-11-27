@@ -4,7 +4,7 @@ BK.problem({
   title: "Distributed Rate Limiter",
   hi: "distributed-rate-limiter",
   summary: "Giới hạn request cho hàng triệu client qua nhiều gateway, thêm độ trễ < 10ms.",
-  topics: ["redis", "api-design", "dist-cache", "lb-gateway-cdn"],
+  topics: ["redis", "api-design", "dist-cache", "lb-gateway-cdn", "rate-limiting"],
   fr: [
     "Giới hạn theo user / IP / API key với rule cấu hình được",
     "Trả 429 kèm header Retry-After, X-RateLimit-Remaining",

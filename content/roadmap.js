@@ -22,7 +22,7 @@ window.ROADMAP = [
   { id: "s1", title: "Nền móng", goal: "Học xong bạn trình bày được một bài theo khung 6 bước và chọn giao thức, API, database cho bài đơn giản.",
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
-      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth"] },
+      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth", "rate-limiting"] },
       { id: "s1.data", title: "Database", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
       { id: "s1.db-deep", title: "Đào sâu: Database Internals", optional: true, topics: ["db-query-tuning"] },
     ] },
@@ -39,6 +39,10 @@ window.ROADMAP = [
       { id: "s3.resilience", title: "Resilience & Idempotency", topics: ["resilience", "idempotency"] },
       { id: "s3.contention", title: "Contention & Locking", topics: ["db-locking", "dist-lock", "consensus"] },
       { id: "s3.workflow", title: "Multi-step Processes", topics: ["outbox-cdc", "durable-execution"] },
+    ] },
+  { id: "svc", title: "Hệ thống nhiều service", goal: "Học xong bạn tách được service theo nghiệp vụ, cho chúng tìm và gọi nhau an toàn, và giữ dữ liệu nhất quán giữa các service.",
+    parts: [
+      { id: "svc.comm", title: "Giao tiếp giữa service", topics: ["sync-vs-async-comm", "service-discovery", "api-gateway-bff"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
@@ -79,7 +83,8 @@ window.ROADMAP = [
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn giải thích được container, Kubernetes và chọn nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
       { id: "cloud.basics", title: "Container cơ bản", topics: ["container-basics", "dockerfile"] },
-      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core"] },
+      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core", "k8s-operations"] },
+      { id: "cloud.delivery", title: "Từ build tới deploy", topics: ["image-delivery"] },
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
     ] },
   { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa, và deploy bản mới mà không làm gián đoạn người dùng.", parallel: true,

@@ -49,10 +49,13 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | API Design | API Design; REST, GraphQL, gRPC | thiết kế API | — | `api-design` |
 | Pagination | pagination; cursor-based, offset-based | phân trang kết quả API | "Phân trang" | `api-design` |
 | Load Balancer / Load Balancing | load balancer (thiết bị), load balancing (việc); L4, L7 | chia request cho nhiều server | "Cân bằng tải" | `lb-gateway-cdn` |
-| API Gateway | API Gateway | cửa vào duy nhất: auth, rate limit, routing | "Cổng API" | `lb-gateway-cdn` |
+| API Gateway | API Gateway | cửa vào duy nhất: auth, rate limit, routing | "Cổng API" | `lb-gateway-cdn`, `api-gateway-bff` |
 | CDN | CDN (glossary) | mạng máy chủ biên cache nội dung gần user | "Mạng phân phối nội dung" | `lb-gateway-cdn` |
 | Authentication / Authorization | authentication (authn), authorization (authz) | xác thực (là ai) / phân quyền (được làm gì) | "Xác thực & phân quyền" | `auth` |
-| Rate Limiting | rate limiting (việc), rate limiter (thành phần); token bucket, sliding window | giới hạn số request mỗi khoảng thời gian | "Giới hạn tốc độ", "Giới hạn tần suất" | `rate-limiter` (problem) |
+| Rate Limiting | rate limiting (việc), rate limiter (thành phần); token bucket, leaky bucket, fixed window, sliding window | giới hạn số request mỗi khoảng thời gian | "Giới hạn tốc độ", "Giới hạn tần suất" | `rate-limiting`, `rate-limiter` (problem) |
+| Sync / Async Communication | sync (synchronous), async (asynchronous) communication; request/response, messaging, command, event | service gọi nhau rồi chờ response / gửi message qua broker rồi đi tiếp | "Giao tiếp đồng bộ", "Giao tiếp bất đồng bộ" | `sync-vs-async-comm` |
+| Service Discovery | service discovery; service registry, client-side / server-side discovery, self-registration, third-party registration | tìm địa chỉ các instance đang sống của một service | "Khám phá dịch vụ", "Phát hiện dịch vụ" | `service-discovery` |
+| BFF / API Composition | Backend for Frontend (BFF), API composition, gateway aggregation, gateway offloading | backend riêng cho từng loại client; gom kết quả của nhiều service thành một response | "Tổng hợp API", "Hậu phương cho giao diện" | `api-gateway-bff` |
 | **Database** | | | | |
 | Data Modeling | Data Modeling | đi từ requirement tới bảng, khoá, quan hệ | "Mô hình hoá dữ liệu", "Mô hình dữ liệu" | `data-modeling` |
 | Database Indexing | index (số nhiều: indexes); B-Tree, composite index | cấu trúc phụ giúp tìm dòng không phải quét cả bảng | "Chỉ mục", "Lập chỉ mục" | `indexing` |
@@ -105,6 +108,11 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | **Vận hành** | | | | |
 | Observability | observability; log, metric, trace; SLI, SLO, SLA | đo và lần theo hệ thống đang chạy | "Quan sát hệ thống", "Khả năng quan sát", "Giám sát hệ thống" | `observability` |
 | Zero-downtime Deployment | zero-downtime deployment; rolling, blue/green, canary, feature flag | deploy mà không ngừng phục vụ | "Triển khai an toàn", "Triển khai không gián đoạn" | `deployment-safety` |
+| Probe / Health Check | liveness, readiness, startup probe; health check | kubelet hỏi container còn sống không, sẵn sàng nhận traffic chưa | "Kiểm tra sức khoẻ", "Kiểm tra sức khỏe" | `k8s-operations` |
+| Requests / Limits | resource requests, limits; QoS class (Guaranteed, Burstable, BestEffort) | CPU/RAM xin để scheduler xếp pod / trần cứng kernel áp | "Yêu cầu tài nguyên", "Giới hạn tài nguyên" | `k8s-operations` |
+| Autoscaling | autoscaling; HPA, VPA (glossary) | tự thêm bớt pod hay node theo tải | "Tự động co giãn", "Tự động mở rộng" | `k8s-operations` |
+| Image Digest / Tag | digest (`sha256:…`), tag, container registry; image index | định danh image theo nội dung (không đổi) / tên dễ đọc trỏ tới một digest (đổi được) | "Mã băm image", "Kho image" | `image-delivery` |
+| Supply Chain Security | SBOM, provenance, image signing, vulnerability scanning | biết image chứa gì, build từ đâu, ai ký | "Chuỗi cung ứng phần mềm", "Danh mục phần mềm" | `image-delivery` |
 | **Nền tảng CS** | | | | |
 | Process | process; PID, fork, exec | chương trình đang chạy, có không gian địa chỉ riêng | "Tiến trình" | `os-process-lifecycle` |
 | Thread | thread; single-thread, multi-thread | luồng thực thi trong một process, dùng chung bộ nhớ | "Đa luồng", "Đơn luồng", "Luồng thực thi" | `thr-thread-vs-process` |
