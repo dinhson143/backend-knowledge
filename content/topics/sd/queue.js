@@ -12,7 +12,7 @@ BK.topic({
   story: {
     problem: "API gọi đồng bộ thẳng vào service xử lý chậm (gửi email, transcode video) thì một đợt spike 10x làm service đó quá tải, request timeout dây chuyền ngược lên user. Producer và consumer bị buộc phải sống, chết và scale cùng nhau.",
     idea: "Đặt một bộ đệm bền vững ở giữa: producer chỉ cần ghi message vào queue rồi trả lời ngay, consumer kéo việc ra theo tốc độ của chính nó → hai bên tách rời về thời gian, tốc độ và số lượng instance.",
-    tradeoff: "Xử lý thành bất đồng bộ nên user không nhận kết quả ngay, phải có cơ chế poll/notify. Hệ thống phải chịu message trùng (at-least-once), sai thứ tự giữa partition, và thêm một thành phần cần vận hành, giám sát lag.",
+    tradeoff: "Xử lý thành **async** (bất đồng bộ) nên user không nhận kết quả ngay, phải có cơ chế poll/notify. Hệ thống phải chịu message trùng (at-least-once), sai thứ tự giữa partition, và thêm một thành phần cần vận hành, giám sát lag.",
   },
   points: [
     {
