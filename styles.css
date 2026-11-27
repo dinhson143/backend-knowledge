@@ -59,7 +59,7 @@ code { font-family: var(--mono); font-size: .86em; background: var(--surface-2);
   border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); font: inherit; font-size: 14px;
 }
 .icon-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; }
-.menu-btn { display: none; }
+.menu-btn, .sb-modes { display: none; }
 /* 861–1200px: brand + 5 tab + ô tìm không vừa một hàng nếu giữ phụ đề */
 @media (max-width: 1200px) { .brand span { display: none; } }
 
@@ -166,9 +166,16 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   .sidebar.open { transform: none; visibility: visible; box-shadow: 0 0 0 100vmax rgba(0,0,0,.45); }
   .sidebar.open ~ main { pointer-events: none; } /* chạm nền mờ chỉ đóng sidebar, không bấm nhầm link bên dưới */
   main { padding: 20px 16px 60px; }
-  .topbar { gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
-  .topbar { position: static; } /* ba hàng dính trên cùng chiếm ~1/4 màn hình khi đọc */
-  #search { order: 5; flex: 1 1 100%; margin-left: 0; }
+  /* Một hàng dính: ☰ · brand · ô tìm · ◐. 5 tab chuyển vào đầu drawer (.sb-modes) — D28 */
+  .topbar { gap: 8px; padding: 10px 16px; }
+  .topbar .modes { display: none; }
+  #search { flex: 1 1 auto; min-width: 0; }
+  .sb-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .sb-modes a { padding: 8px 10px; border-radius: 6px; background: var(--surface-2); color: var(--text); font-size: 14px; }
+  .sb-modes a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+}
+@media (max-width: 480px) { /* nhường chỗ cho ô tìm; về trang chủ bằng tab "Lộ trình" trong drawer */
+  .brand { display: none; }
   .face { padding: 28px 20px; }
   .nc-btns .btn { flex: 1 1 100%; }
   .pager { flex-direction: column; }
@@ -302,10 +309,6 @@ pre.api { margin: 0; padding: 14px 16px; background: var(--surface); border: 1px
 }
 
 .modes a { white-space: nowrap; }
-@media (max-width: 860px) {
-  .modes { order: 4; width: 100%; flex-wrap: wrap; }
-  .modes a { flex: 1 1 auto; text-align: center; padding: 4px 8px; }
-}
 
 /* ── Roadmap & learning structure ── */
 .method { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; font-size: 14px; }

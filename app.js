@@ -201,7 +201,8 @@
   function setNav(mode, side) {
     glSeen = mode === "glossary" ? null : new Set();
     document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
-    sidebar.innerHTML = side;
+    // Màn hẹp: 5 tab nằm đầu drawer ☰ (bản sao của .modes, CSS chỉ hiện một trong hai) — D28
+    sidebar.innerHTML = `<nav class="sb-modes" aria-label="Chế độ học">${$(".modes").innerHTML}</nav>${side}`;
     setMenu(false);
     window.scrollTo(0, 0);
   }
@@ -335,10 +336,15 @@
   // Khối "Tiếp theo" cuối trang topic (A4); topic cuối giai đoạn thì thành "Hết giai đoạn" kèm chặng kiểm tra (A5)
   function nextCard(t, next, end) {
     const id = t.id, isDone = done.has(id);
-    const lastOfStage = !t.stage.parallel && t.stage.topics[t.stage.topics.length - 1] === id;
+    // "Hết giai đoạn" nằm ở topic bắt buộc cuối; nút chính nhảy qua chặng Đào sâu sang giai đoạn sau,
+    // Đào sâu chỉ là link phụ (pager vẫn đi qua nó) — D29
+    const req = t.stage.topics.filter((x) => !(byId[x].part && byId[x].part.optional));
+    const lastOfStage = !t.stage.parallel && req[req.length - 1] === id;
+    const deep = lastOfStage ? t.stage.topics.filter((x) => !req.includes(x)) : [];
+    if (lastOfStage) next = MAIN.slice(MAIN.indexOf(t) + 1).find((x) => x.stage !== t.stage);
     const ck = lastOfStage ? checkpoint(t.stage) : [];
     const verb = !next ? end.label.replace(" →", "").toLowerCase()
-      : lastOfStage ? `sang Giai đoạn ${stageNum(next.stage)}: ${next.stage.title}` : "sang bài tiếp";
+      : next.stage !== t.stage ? `sang Giai đoạn ${stageNum(next.stage)}: ${next.stage.title}` : "sang bài tiếp";
     const label = (isDone ? verb[0].toUpperCase() + verb.slice(1) : `✓ Đã nắm, ${verb}`) + " →";
     // Bài sắp mở: dùng topic này và chỉ còn thiếu tối đa 1 chủ đề khác
     const soon = problemsFor(id).filter((p) => !done.has(`p:${p.id}`) && missing(p).filter((x) => x !== id).length <= 1).slice(0, 2);
@@ -350,6 +356,7 @@
         <a class="btn primary" id="goNext" href="${next ? `#/t/${next.id}` : end.href}">${esc(label)}</a>
         <button class="btn ${isDone ? "done" : ""}" id="doneBtn" aria-pressed="${isDone}">${isDone ? "✓ Đã nắm" : "Chỉ đánh dấu đã nắm"}</button>
       </div>
+      ${deep.length ? `<div class="small"><span class="muted">Đào sâu (tuỳ chọn):</span> ${deep.map((x) => `<a href="#/t/${x}">${esc(byId[x].title)}</a>`).join(", ")}</div>` : ""}
       ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}${next.goal ? ` — ${inline(next.goal)}` : ""}</div>` : ""}
       ${(() => { const opens = ALL.filter((x) => (x.needs || []).includes(id)); return opens.length ? `<div class="small"><span class="muted">Bài này mở đường cho:</span> ${opens.map((x) => `<a href="#/t/${x.id}">${esc(x.title)}</a>`).join(", ")}</div>` : ""; })()}
       ${soon.length ? `<div class="small"><span class="muted">Sắp mở:</span> ${soon.map((p) => { const rest = missing(p).filter((x) => x !== id);
