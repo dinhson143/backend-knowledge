@@ -142,7 +142,7 @@ window.WHY = {
      },
      {
       "row": 1,
-      "key": "At-least-once (mặc định)",
+      "key": "At-least-once (phổ biến nhất)",
       "why": "Không mất message nhưng có trùng: commit sau khi xử lý xong, nên crash giữa \"xử lý xong\" và \"commit\" làm consumer mới đọc lại từ offset cũ và xử lý lần hai. Vì vậy consumer phải idempotent (upsert, dedupe theo event ID)."
      },
      {
@@ -210,7 +210,7 @@ window.WHY = {
      },
      {
       "i": 1,
-      "key": "**Chọn số partition** — theo throughput ",
+      "key": "**Chọn số partition** — throughput mục t",
       "why": "Cần đủ partition để số consumer × throughput mỗi consumer ≥ mục tiêu (ví dụ 100MB/s ÷ 10MB/s = 10, thường làm tròn lên dư), vì mỗi partition chỉ một consumer trong group đọc. Giảm partition thì phải gộp log và offset — Kafka không hỗ trợ; tăng thì `hash % N` đổi, key cũ đi sang partition mới."
      },
      {
@@ -220,7 +220,7 @@ window.WHY = {
      },
      {
       "i": 3,
-      "key": "**Poison message** — Kafka không có DLQ ",
+      "key": "**Poison message** — consumer Kafka khôn",
       "why": "Một message lỗi mãi mà cứ retry tại chỗ sẽ chặn cả partition phía sau, vì consumer xử lý tuần tự theo offset. Kafka không có ack/nack từng message như SQS → phải tự đẩy message lỗi sang retry topic (có delay) rồi DLQ topic, và commit offset để đi tiếp."
      },
      {
@@ -412,7 +412,7 @@ window.WHY = {
     "points": [
      {
       "i": 0,
-      "key": "**TTL** — `EXPIRE key 60`. Key hết hạn b",
+      "key": "**TTL** — `EXPIRE key 60`. Redis xoá key",
       "why": "Redis xoá key hết hạn khi có ai truy cập (lazy) và định kỳ lấy mẫu ngẫu nhiên một ít key có TTL để xoá (active, ~10 lần/s), vì quét mọi key sẽ chặn thread chính. Key hết hạn mà không ai đụng và không bị lấy mẫu trúng vẫn chiếm RAM một thời gian."
      }
     ],
@@ -486,7 +486,7 @@ window.WHY = {
      },
      {
       "i": 3,
-      "key": "**Hash tag** — lệnh nhiều key chỉ chạy k",
+      "key": "**Hash tag** — trong Cluster, lệnh nhiều",
       "why": "`MGET` hay Lua trên nhiều key không thể atomic trong Cluster, vì các key khác slot có thể nằm trên hai node khác nhau. Hash tag chỉ băm phần trong `{}` → `{user42}:cart` và `{user42}:profile` chắc chắn cùng slot, cùng node."
      },
      {
@@ -607,7 +607,7 @@ window.WHY = {
    },
    {
     "i": 6,
-    "key": "Ở bước API, mỗi FR nên map ra ít nhất mộ",
+    "key": "Bước API: mỗi FR map ra ít nhất một endp",
     "why": "Mỗi FR cần ít nhất một endpoint, nếu không FR đó không có đường vào hệ thống. `userId` phải lấy từ JWT đã được server verify, vì giá trị trong body do client tự điền — attacker đổi thành id người khác là đặt vé/xem dữ liệu của họ."
    },
    {
@@ -619,7 +619,7 @@ window.WHY = {
   "tips": [
    {
     "i": 0,
-    "key": "Đừng nhảy vào vẽ kiến trúc khi chưa chốt",
+    "key": "Chốt FR/NFR trước rồi mới vẽ kiến trúc —",
     "why": "Vẽ kiến trúc khi chưa chốt yêu cầu là đang đoán bài toán: bạn có thể dựng hệ thống realtime phức tạp trong khi đề chỉ cần batch. Interviewer trừ điểm vì đó đúng là hành vi gây lãng phí trong dự án thật."
    },
    {
@@ -672,7 +672,7 @@ window.WHY = {
   "points": [
    {
     "i": 0,
-    "key": "**IP Addressing** — mỗi thiết bị có địa ",
+    "key": "**IP Addressing** — mỗi thiết bị có IP d",
     "why": "IP trùng thì gói không biết đi đâu, vì IP là địa chỉ để router tìm đường. DB và service nội bộ đặt ở private subnet vì không có route từ Internet vào → attacker không kết nối thẳng được dù biết IP, chỉ đi qua LB/gateway ở public subnet."
    },
    {
@@ -777,7 +777,7 @@ window.WHY = {
    },
    {
     "i": 4,
-    "key": "**GraphQL · N+1 problem** — REST giải bằ",
+    "key": "**GraphQL · N+1 problem** — GraphQL khôn",
     "why": "GraphQL dễ sinh 1 + 50 query, vì nó resolve từng field độc lập: lấy 50 event rồi resolver `venue` chạy 50 lần. REST endpoint thì biết trước dữ liệu cần trả nên viết sẵn một câu JOIN. DataLoader hoãn các lần gọi trong cùng một tick, gom 50 `venue_id` thành một `WHERE id IN (...)` → còn 2 query."
    },
    {
@@ -1189,17 +1189,17 @@ window.WHY = {
   "points": [
    {
     "i": 0,
-    "key": "**Mục tiêu** — phân phối dữ liệu qua nhi",
+    "key": "**Mục tiêu** — chia dữ liệu ra nhiều ser",
     "why": "Số key phải đổi chỗ khi scale chính là chi phí mỗi lần thêm/bớt máy, vì di chuyển dữ liệu tốn băng thông, còn với cache thì key chuyển chỗ = cache miss. Consistent hashing đưa chi phí đó từ gần 100% xuống ~1/N."
    },
    {
     "i": 1,
-    "key": "**Data imbalance → Virtual nodes** — băm",
+    "key": "**Data imbalance → Virtual nodes** — mỗi",
     "why": "Vị trí mỗi server trên ring là ngẫu nhiên, nên với 3 server các khoảng có thể chênh nhau vài lần (một server ôm 50% ring). Băm mỗi server thành vài trăm điểm → mỗi server sở hữu nhiều đoạn nhỏ rải khắp ring, theo luật số lớn tổng các đoạn tiến về 1/N. Thêm nữa, khi một server chết, tải của nó rải ra nhiều server thay vì dồn hết vào một láng giềng."
    },
    {
     "i": 2,
-    "key": "**Replication** — key được lưu ở server ",
+    "key": "**Replication** — key nằm ở server đầu t",
     "why": "Mọi node tự tính được bản sao nằm đâu mà không cần bảng tra cứu, vì key đã có server 「chủ」 xác định trên ring và quy tắc chỉ là đi tiếp theo chiều kim đồng hồ. Server chủ chết thì server kế tiếp vốn đã có bản sao, vừa là chủ mới vừa phục vụ được ngay (dùng vnode thì phải bỏ qua các vnode cùng máy vật lý để bản sao nằm trên máy khác)."
    },
    {
@@ -1225,7 +1225,7 @@ window.WHY = {
   "points": [
    {
     "i": 0,
-    "key": "**Partition Tolerance** — trong hệ phân ",
+    "key": "**Partition Tolerance** — hệ phân tán bu",
     "why": "Với hệ phân tán, bỏ P là không có thật — hệ 「CA」 chỉ tồn tại khi chạy trên một máy. Switch hỏng, GC pause dài hay mất kết nối giữa hai DC đều khiến node không liên lạc được nhau, và hệ không thể ngăn chúng xảy ra."
    },
    {
@@ -1273,7 +1273,7 @@ window.WHY = {
   "points": [
    {
     "i": 0,
-    "key": "Phần cứng hiện đại mạnh hơn nhiều so với",
+    "key": "Đừng shard khi 1 Postgres còn chịu được",
     "why": "Phần lớn hệ thống thực tế chưa cần shard: một Postgres với SSD và RAM lớn chịu được hàng chục nghìn TPS và vài TB, mà tải thực tế thường thấp hơn thế nhiều. Shard sớm là trả ngay chi phí cross-shard query, migration và vận hành mà không được gì; dùng read replica và cache trước thường đủ."
    }
   ],
@@ -1331,7 +1331,7 @@ window.WHY = {
    },
    {
     "i": 2,
-    "key": "**Read replicas** — 1 primary chỉ ghi, n",
+    "key": "**Read replicas** — mọi lệnh ghi đi qua",
     "why": "Chỉ một node nhận ghi nên không có xung đột ghi, còn đọc nhân ra nhiều replica. Replica nhận thay đổi bất đồng bộ qua log replication nên luôn trễ vài ms đến vài giây → đọc ngay sau khi ghi có thể thấy dữ liệu cũ."
    },
    {
@@ -1993,7 +1993,7 @@ window.WHY = {
   "points": [
    {
     "i": 0,
-    "key": "Singleton nên cẩn thận: là global state,",
+    "key": "Cẩn thận với Singleton: đó là global sta",
     "why": "Singleton khó test: truy cập qua `getInstance()` tĩnh nên test không inject mock được và state rò rỉ giữa các test case. Trong đa luồng, hai thread cùng thấy `instance == null` sẽ tạo hai instance → cần lock, double-checked locking hoặc khởi tạo sẵn."
    },
    {
@@ -2311,7 +2311,7 @@ window.WHY = {
    },
    {
     "i": 1,
-    "key": "**Quick sort O(n log n)** — chọn pivot, ",
+    "key": "**Quick sort O(n log n) trung bình, O(n²",
     "why": "Pivot tốt chia mảng gần đôi → trung bình log n tầng, mỗi tầng partition O(n). Partition hoán đổi ngay trong mảng nên in-place, nhưng stack đệ quy vẫn tốn O(log n), và pivot tệ đẩy lên O(n²)."
    },
    {
@@ -2819,7 +2819,7 @@ window.WHY = {
      },
      {
       "i": 1,
-      "key": "**Image giống hệt nhau** — cùng một Dock",
+      "key": "**Image giống hệt nhau** — bắt đầu bằng",
       "why": "Không cần chọn EKS “phòng trước”, vì chi phí chuyển thấp: cả ECS và EKS đều chạy OCI image chuẩn nên phần ứng dụng không đổi, chỉ phải viết lại cấu hình triển khai (task definition → manifest)."
      },
      {
@@ -2971,7 +2971,7 @@ window.WHY = {
   "tips": [
    {
     "i": 0,
-    "key": "Khi được hỏi, vẽ mũi tên phụ thuộc",
+    "key": "Khi interviewer hỏi, vẽ mũi tên ph",
     "why": "Interviewer muốn thấy bạn hiểu bản chất (hướng phụ thuộc), không phải thuộc tên các vòng."
    },
    {
