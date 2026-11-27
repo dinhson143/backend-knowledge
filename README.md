@@ -6,17 +6,21 @@ Lộ trình ôn System Design và Backend theo khung Hello Interview: 5 giai đo
 
 ## Chạy local
 
-Mở `index.html` bằng trình duyệt — không cần build hay server.
+Mở `index.html` bằng trình duyệt — không cần build hay server. Kiểm tra nội dung: `node scripts/check.mjs`.
 
 ## Cấu trúc
 
-| File | Nội dung |
+| Đường dẫn | Nội dung |
 |---|---|
 | `index.html`, `styles.css` | Khung trang và giao diện |
 | `app.js` | Điều hướng, render trang chủ đề, bài luyện, thuật ngữ |
-| `data.js` | Nội dung chủ đề + lộ trình (`TRACKS`, `ROADMAP`) |
-| `problems.js` | 13 bài System Design |
-| `diagrams.js` | Engine mô phỏng + kịch bản (`SIMS`) |
-| `why.js` | Giải thích "vì sao" theo index của nội dung |
-| `sim-detail.js` | Giải thích từng bước mô phỏng |
-| `glossary.js` | Bảng thuật ngữ viết tắt |
+| `content/manifest.js` | Danh sách file nạp + registry `BK` |
+| `content/topics/<track>/<id>.js` | Mỗi chủ đề một file (nội dung + "vì sao") |
+| `content/problems/<id>.js` | Mỗi bài System Design một file |
+| `content/sims/<id>.js` | Kịch bản mô phỏng |
+| `content/svg/` | Sơ đồ SVG tĩnh |
+| `content/roadmap.js`, `content/glossary.js`, `content/tracks.js` | Lộ trình, thuật ngữ, track/section |
+| `engine/diagrams.js` | Engine mô phỏng |
+| `scripts/check.mjs` | Kiểm tra toàn bộ nội dung |
+
+Cách thêm nội dung: `docs/content-system.md` và `content/_TEMPLATE.js`.
