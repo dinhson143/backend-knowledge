@@ -26,66 +26,66 @@ BK.topic({
   sections: [
     {
       title: "Template: hai đầu đi vào (tổng hai số trên mảng đã sắp)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def two_sum_sorted(nums, target):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0lo, hi = 0, len(nums) - 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0while lo < hi:`", "`<` chứ không `<=`: một phần tử không ghép với chính nó."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0s = nums[lo] + nums[hi]`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if s == target: return [lo, hi]`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if s < target: lo += 1`", "Tổng nhỏ: tăng phía nhỏ. `nums[lo]` không thể ghép với ai còn lại."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0else: hi -= 1`", "Tổng lớn: giảm phía lớn, cùng lập luận."],
-          ["`\u00a0\u00a0\u00a0\u00a0return []`", ""],
+      code: {
+        lang: "python",
+        lines: [
+          "def two_sum_sorted(nums, target):",
+          "    lo, hi = 0, len(nums) - 1",
+          ["    while lo < hi:", "`<` chứ không `<=`: một phần tử không ghép với chính nó."],
+          "        s = nums[lo] + nums[hi]",
+          "        if s == target: return [lo, hi]",
+          ["        if s < target: lo += 1", "Tổng nhỏ: tăng phía nhỏ. `nums[lo]` không thể ghép với ai còn lại."],
+          ["        else: hi -= 1", "Tổng lớn: giảm phía lớn, cùng lập luận."],
+          "    return []",
         ],
       },
     },
     {
       title: "Template: 3-sum (cố định một số + hai đầu, bỏ trùng)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def three_sum(nums):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0nums.sort(); res = []`", "O(n log n), nhỏ hơn phần O(n²) phía sau."],
-          ["`\u00a0\u00a0\u00a0\u00a0for i in range(len(nums) - 2):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if i > 0 and nums[i] == nums[i - 1]: continue`", "Bỏ trùng ở số thứ nhất: cùng giá trị cho cùng tập lời giải."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0lo, hi = i + 1, len(nums) - 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0while lo < hi:`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0s = nums[i] + nums[lo] + nums[hi]`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if s < 0: lo += 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0elif s > 0: hi -= 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0else:`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0res.append([nums[i], nums[lo], nums[hi]]); lo += 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0while lo < hi and nums[lo] == nums[lo - 1]: lo += 1`", "Bỏ trùng ở số thứ hai; số thứ ba tự khác vì tổng cố định."],
-          ["`\u00a0\u00a0\u00a0\u00a0return res`", ""],
+      code: {
+        lang: "python",
+        lines: [
+          "def three_sum(nums):",
+          ["    nums.sort(); res = []", "O(n log n), nhỏ hơn phần O(n²) phía sau."],
+          "    for i in range(len(nums) - 2):",
+          ["        if i > 0 and nums[i] == nums[i - 1]: continue", "Bỏ trùng ở số thứ nhất: cùng giá trị cho cùng tập lời giải."],
+          "        lo, hi = i + 1, len(nums) - 1",
+          "        while lo < hi:",
+          "            s = nums[i] + nums[lo] + nums[hi]",
+          "            if s < 0: lo += 1",
+          "            elif s > 0: hi -= 1",
+          "            else:",
+          "                res.append([nums[i], nums[lo], nums[hi]]); lo += 1",
+          ["                while lo < hi and nums[lo] == nums[lo - 1]: lo += 1", "Bỏ trùng ở số thứ hai; số thứ ba tự khác vì tổng cố định."],
+          "    return res",
         ],
       },
     },
     {
       title: "Template: nhanh–chậm (phát hiện cycle)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def has_cycle(head):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0slow = fast = head`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0while fast and fast.next:`", "Kiểm cả `fast.next` vì `fast` nhảy hai bước."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0slow, fast = slow.next, fast.next.next`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if slow is fast: return True`", "So bằng `is` (cùng node), không so giá trị: hai node khác nhau có thể cùng giá trị."],
-          ["`\u00a0\u00a0\u00a0\u00a0return False`", "`fast` chạm cuối danh sách: không có cycle."],
+      code: {
+        lang: "python",
+        lines: [
+          "def has_cycle(head):",
+          "    slow = fast = head",
+          ["    while fast and fast.next:", "Kiểm cả `fast.next` vì `fast` nhảy hai bước."],
+          "        slow, fast = slow.next, fast.next.next",
+          ["        if slow is fast: return True", "So bằng `is` (cùng node), không so giá trị: hai node khác nhau có thể cùng giá trị."],
+          ["    return False", "`fast` chạm cuối danh sách: không có cycle."],
         ],
       },
     },
     {
       title: "Template: đọc–ghi tại chỗ (xoá trùng trên mảng đã sắp)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def remove_duplicates(nums):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0write = 0`", "`nums[:write]` luôn là kết quả đã đúng."],
-          ["`\u00a0\u00a0\u00a0\u00a0for read in range(len(nums)):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if write == 0 or nums[read] != nums[write - 1]:`", "Phần tử mới khác phần tử cuối đã giữ thì giữ nó."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0nums[write] = nums[read]; write += 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0return write`", "Độ dài phần đã lọc; phần sau `write` không còn ý nghĩa."],
+      code: {
+        lang: "python",
+        lines: [
+          "def remove_duplicates(nums):",
+          ["    write = 0", "`nums[:write]` luôn là kết quả đã đúng."],
+          "    for read in range(len(nums)):",
+          ["        if write == 0 or nums[read] != nums[write - 1]:", "Phần tử mới khác phần tử cuối đã giữ thì giữ nó."],
+          "            nums[write] = nums[read]; write += 1",
+          ["    return write", "Độ dài phần đã lọc; phần sau `write` không còn ý nghĩa."],
         ],
       },
     },

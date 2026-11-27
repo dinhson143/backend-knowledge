@@ -26,76 +26,76 @@ BK.topic({
   sections: [
     {
       title: "Template: DFS đệ quy (chiều cao)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def max_depth(node):`", "Hàm trả lời câu hỏi cho cây có gốc `node`."],
-          ["`\u00a0\u00a0\u00a0\u00a0if node is None:`", "Base case: cây rỗng. Thiếu dòng này là `AttributeError` ở lá."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0return 0`", "Chiều cao cây rỗng là 0."],
-          ["`\u00a0\u00a0\u00a0\u00a0return 1 + max(max_depth(node.left), max_depth(node.right))`", "Ghép đáp án hai cây con. Đổi phép ghép là ra bài khác: tổng, đếm, cân bằng."],
+      code: {
+        lang: "python",
+        lines: [
+          ["def max_depth(node):", "Hàm trả lời câu hỏi cho cây có gốc `node`."],
+          ["    if node is None:", "Base case: cây rỗng. Thiếu dòng này là `AttributeError` ở lá."],
+          ["        return 0", "Chiều cao cây rỗng là 0."],
+          ["    return 1 + max(max_depth(node.left), max_depth(node.right))", "Ghép đáp án hai cây con. Đổi phép ghép là ra bài khác: tổng, đếm, cân bằng."],
         ],
       },
     },
     {
       title: "Template: BFS theo tầng",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`from collections import deque`", "`deque.popleft()` O(1); `list.pop(0)` là O(n) (https://docs.python.org/3/library/collections.html#collections.deque)."],
-          ["`def level_order(root):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0out, q = [], deque([root]) if root else deque()`", "Cây rỗng thì không có tầng nào."],
-          ["`\u00a0\u00a0\u00a0\u00a0while q:`", "Mỗi vòng `while` xử lý trọn một tầng."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0level = []`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0for _ in range(len(q)):`", "Chụp số node của tầng hiện tại trước khi thêm con vào queue."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0node = q.popleft()`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0level.append(node.val)`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if node.left: q.append(node.left)`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if node.right: q.append(node.right)`", "Con được xếp sau mọi node còn lại của tầng này."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0out.append(level)`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0return out`", ""],
+      code: {
+        lang: "python",
+        lines: [
+          ["from collections import deque", "`deque.popleft()` O(1); `list.pop(0)` là O(n) (https://docs.python.org/3/library/collections.html#collections.deque)."],
+          "def level_order(root):",
+          ["    out, q = [], deque([root]) if root else deque()", "Cây rỗng thì không có tầng nào."],
+          ["    while q:", "Mỗi vòng `while` xử lý trọn một tầng."],
+          "        level = []",
+          ["        for _ in range(len(q)):", "Chụp số node của tầng hiện tại trước khi thêm con vào queue."],
+          "            node = q.popleft()",
+          "            level.append(node.val)",
+          "            if node.left: q.append(node.left)",
+          ["            if node.right: q.append(node.right)", "Con được xếp sau mọi node còn lại của tầng này."],
+          "        out.append(level)",
+          "    return out",
         ],
       },
     },
     {
       title: "Template: kiểm tra BST bằng khoảng (lo, hi)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def is_bst(node, lo=float(\"-inf\"), hi=float(\"inf\")):`", "Truyền xuống khoảng mà mọi key trong cây con này phải nằm trong."],
-          ["`\u00a0\u00a0\u00a0\u00a0if node is None: return True`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0if not (lo < node.val < hi): return False`", "So với cả tổ tiên, không chỉ với cha. Dùng `<` chặt nếu đề cấm key trùng."],
-          ["`\u00a0\u00a0\u00a0\u00a0return is_bst(node.left, lo, node.val) and is_bst(node.right, node.val, hi)`", "Đi trái thì cận trên thành `node.val`; đi phải thì cận dưới thành `node.val`."],
+      code: {
+        lang: "python",
+        lines: [
+          ["def is_bst(node, lo=float(\"-inf\"), hi=float(\"inf\")):", "Truyền xuống khoảng mà mọi key trong cây con này phải nằm trong."],
+          "    if node is None: return True",
+          ["    if not (lo < node.val < hi): return False", "So với cả tổ tiên, không chỉ với cha. Dùng `<` chặt nếu đề cấm key trùng."],
+          ["    return is_bst(node.left, lo, node.val) and is_bst(node.right, node.val, hi)", "Đi trái thì cận trên thành `node.val`; đi phải thì cận dưới thành `node.val`."],
         ],
       },
     },
     {
       title: "Template: LCA của binary tree",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def lca(node, p, q):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0if node is None or node is p or node is q:`", "Gặp một trong hai đích thì trả nó lên; so bằng `is` (cùng node), không bằng giá trị."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0return node`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0left, right = lca(node.left, p, q), lca(node.right, p, q)`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0if left and right: return node`", "p và q nằm ở hai phía: node này là tổ tiên chung thấp nhất."],
-          ["`\u00a0\u00a0\u00a0\u00a0return left or right`", "Cả hai cùng một phía (hoặc chưa thấy): đẩy kết quả của phía đó lên."],
+      code: {
+        lang: "python",
+        lines: [
+          "def lca(node, p, q):",
+          ["    if node is None or node is p or node is q:", "Gặp một trong hai đích thì trả nó lên; so bằng `is` (cùng node), không bằng giá trị."],
+          "        return node",
+          "    left, right = lca(node.left, p, q), lca(node.right, p, q)",
+          ["    if left and right: return node", "p và q nằm ở hai phía: node này là tổ tiên chung thấp nhất."],
+          ["    return left or right", "Cả hai cùng một phía (hoặc chưa thấy): đẩy kết quả của phía đó lên."],
         ],
       },
     },
     {
       title: "Template: inorder lặp (nhỏ thứ k trong BST)",
-      table: {
-        head: ["Code", "Vì sao"],
-        rows: [
-          ["`def kth_smallest(root, k):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0stack, node = [], root`", "Stack tường minh thay đệ quy: không đụng giới hạn đệ quy."],
-          ["`\u00a0\u00a0\u00a0\u00a0while stack or node:`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0while node:`", "Đi hết về bên trái, đẩy từng node lên stack."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0stack.append(node); node = node.left`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0node = stack.pop()`", "Node nhỏ nhất chưa thăm."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0k -= 1`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0if k == 0: return node.val`", "Dừng sớm: O(h + k) thay vì O(n)."],
-          ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0node = node.right`", "Sau node là cây con phải của nó."],
+      code: {
+        lang: "python",
+        lines: [
+          "def kth_smallest(root, k):",
+          ["    stack, node = [], root", "Stack tường minh thay đệ quy: không đụng giới hạn đệ quy."],
+          "    while stack or node:",
+          ["        while node:", "Đi hết về bên trái, đẩy từng node lên stack."],
+          "            stack.append(node); node = node.left",
+          ["        node = stack.pop()", "Node nhỏ nhất chưa thăm."],
+          "        k -= 1",
+          ["        if k == 0: return node.val", "Dừng sớm: O(h + k) thay vì O(n)."],
+          ["        node = node.right", "Sau node là cây con phải của nó."],
         ],
       },
     },
