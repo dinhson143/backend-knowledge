@@ -93,6 +93,13 @@ BK.topic({
       },
     ],
   },
+  diagrams: [
+    {
+      src: "content/svg/core-db-btree-vs-lsm.svg",
+      caption: "B-Tree ghi đè page tại chỗ nên mỗi update là một lần ghi ngẫu nhiên; LSM-Tree gom ghi vào memtable trong RAM, flush tuần tự thành SSTable bất biến và gộp dần bằng compaction ở nền, đổi lại đọc có thể phải xem nhiều file.",
+      source: "https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html",
+    },
+  ],
   cards: [
     [
       "Giải thích ACID trong 4 câu.",
