@@ -15,6 +15,7 @@ BK.section({ id: "lld-concurrency", track: "lld", title: "Concurrency" });
 BK.section({ id: "lld-problems", track: "lld", title: "Problem Breakdowns" });
 
 BK.track({ id: "cloud", title: "Container trên AWS", subtitle: "ECS · EKS · Fargate" });
+BK.section({ id: "cloud-k8s", track: "cloud", title: "Container & Kubernetes" });
 BK.section({ id: "cloud-containers", track: "cloud", title: "ECS & EKS" });
 
 BK.track({
