@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Geohash xen kẽ bit kinh độ và vĩ độ thành mã ô; GEOSEARCH quét ô chứa tâm cùng 8 ô kề rồi lọc theo bán kính</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <style>
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .q00 { fill: #e8f0fe; } .q01 { fill: #e4f5ef; } .q10 { fill: #fff3db; } .q11 { fill: #f3e8ff; }
+      .gl { stroke: #94a3b8; stroke-width: 1; fill: none; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .cd { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; text-anchor: middle; }
+      .lab { font-size: 12px; font-weight: 600; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="398" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Trái: geohash 4 bit -->
+  <rect class="grp" x="20" y="16" width="344" height="320" rx="12"/>
+  <text class="h" x="34" y="38">Geohash: xen kẽ bit kinh độ, vĩ độ</text>
+  <text class="s" x="34" y="56">mã = lon₁ lat₁ lon₀ lat₀ · màu = 2 bit đầu</text>
+  <!-- 4 góc phần tư theo prefix -->
+  <rect class="q01" x="50" y="70" width="100" height="100"/>
+  <rect class="q11" x="150" y="70" width="100" height="100"/>
+  <rect class="q00" x="50" y="170" width="100" height="100"/>
+  <rect class="q10" x="150" y="170" width="100" height="100"/>
+  <g class="gl">
+    <path d="M50,70 L250,70 L250,270 L50,270 Z"/>
+    <path d="M100,70 L100,270 M150,70 L150,270 M200,70 L200,270"/>
+    <path d="M50,120 L250,120 M50,170 L250,170 M50,220 L250,220"/>
+  </g>
+  <path d="M150,70 L150,270 M50,170 L250,170" stroke="#475569" stroke-width="2" fill="none"/>
+  <text class="cd" x="75" y="100">0101</text><text class="cd" x="125" y="100">0111</text><text class="cd" x="175" y="100">1101</text><text class="cd" x="225" y="100">1111</text>
+  <text class="cd" x="75" y="150">0100</text><text class="cd" x="125" y="150">0110</text><text class="cd" x="175" y="150">1100</text><text class="cd" x="225" y="150">1110</text>
+  <text class="cd" x="75" y="200">0001</text><text class="cd" x="125" y="200">0011</text><text class="cd" x="175" y="200">1001</text><text class="cd" x="225" y="200">1011</text>
+  <text class="cd" x="75" y="250">0000</text><text class="cd" x="125" y="250">0010</text><text class="cd" x="175" y="250">1000</text><text class="cd" x="225" y="250">1010</text>
+  <rect x="101" y="121" width="98" height="48" fill="none" stroke="#e0562b" stroke-width="2"/>
+  <text class="s" x="150" y="288" text-anchor="middle">kinh độ →</text>
+  <text class="s" x="258" y="80">↑ vĩ độ</text>
+  <text class="s" x="258" y="140" fill="#c2410c">sát nhau</text>
+  <text class="s" x="258" y="156" fill="#c2410c">nhưng khác</text>
+  <text class="s" x="258" y="172" fill="#c2410c">prefix</text>
+  <text class="s" x="34" y="310">Thêm bit → ô nhỏ đi một nửa. Redis GEO: 52 bit,</text>
+  <text class="s" x="34" y="326">lưu làm score của sorted set.</text>
+
+  <!-- Phải: GEOSEARCH -->
+  <rect class="grp" x="380" y="16" width="360" height="320" rx="12"/>
+  <text class="h" x="394" y="38">GEOSEARCH bán kính 2km</text>
+  <text class="s" x="394" y="56">quét ô chứa tâm + 8 ô kề, rồi lọc theo khoảng cách</text>
+  <rect x="420" y="70" width="210" height="210" fill="#eef2f7"/>
+  <rect x="490" y="140" width="70" height="70" fill="#fff3db"/>
+  <g class="gl">
+    <path d="M420,70 L630,70 L630,280 L420,280 Z"/>
+    <path d="M490,70 L490,280 M560,70 L560,280 M420,140 L630,140 M420,210 L630,210"/>
+  </g>
+  <circle cx="540" cy="156" r="62" fill="#3b7ff5" fill-opacity="0.08" stroke="#3b7ff5" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <!-- Rider -->
+  <circle cx="540" cy="156" r="6" fill="#3b7ff5"/>
+  <text class="lab" x="534" y="134" text-anchor="end" fill="#1d4ed8">điểm đón</text>
+  <!-- Tài xế -->
+  <circle cx="515" cy="183" r="5.5" fill="#14a37f"/><text class="lab" x="524" y="196">d42</text>
+  <circle cx="580" cy="112" r="5.5" fill="#14a37f"/><text class="lab" x="590" y="108">d7</text>
+  <circle cx="452" cy="252" r="5.5" fill="#e0562b"/><text class="lab" x="462" y="256">d13</text>
+  <text class="s" x="642" y="96">ô vàng: ô</text>
+  <text class="s" x="642" y="112">chứa tâm</text>
+  <text class="s" x="642" y="136">ô xám: 8 ô</text>
+  <text class="s" x="642" y="152">kề</text>
+  <text class="s" x="394" y="304"><tspan fill="#0f7a5f">● d42, d7</tspan>: trong bán kính → trả về (d7 ở ô kề)</text>
+  <text class="s" x="394" y="322"><tspan fill="#c2410c">● d13</tspan>: nằm trong ô được quét nhưng ngoài 2km → loại</text>
+
+  <text class="t" x="20" y="362">Chỉ so prefix của ô chứa tâm sẽ bỏ sót d7: hai ô sát nhau có thể khác prefix (ô viền đỏ bên trái).</text>
+  <text class="s" x="20" y="384">Mỗi ô là một dải score liên tục trong sorted set, nên quét 9 ô = 9 lần đọc theo khoảng score.</text>
+</svg>

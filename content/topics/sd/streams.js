@@ -30,6 +30,13 @@ BK.topic({
       why: "Trả lời 'bao nhiêu click trong 5 phút qua' cần gom event theo cửa sổ thời gian và giữ state giữa các event — đọc từng event thì chưa đủ. Các engine này quản lý window, state và checkpoint thay ta, nên aggregation trên luồng vô hạn vẫn chịu lỗi được.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/streams-event-sourcing.svg",
+      caption: "Event sourcing: command handler dựng trạng thái từ snapshot và các event sau nó, kiểm tra rồi append event mới vào stream append-only; projection đọc event để cập nhật read model cho query.",
+      source: "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing",
+    },
+  ],
   cards: [
     [
       "Queue khác Stream (Kafka) chỗ nào?",

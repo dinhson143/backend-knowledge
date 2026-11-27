@@ -164,6 +164,13 @@ BK.problem({
       },
     ],
   },
+  diagrams: [
+    {
+      src: "content/svg/uber-geohash.svg",
+      caption: "Redis GEO lưu toạ độ thành geohash 52 bit làm score của sorted set; GEOSEARCH quét ô chứa tâm cùng 8 ô kề rồi loại tài xế ngoài bán kính, vì hai ô sát nhau có thể khác prefix.",
+      source: "https://redis.io/docs/latest/commands/geoadd/",
+    },
+  ],
   deep: [
     {
       q: "Ghi 400k vị trí/giây?",
