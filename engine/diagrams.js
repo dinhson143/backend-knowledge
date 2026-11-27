@@ -700,7 +700,7 @@
         <div class="st-score"><b>${mine}</b> lớp bạn tự lo · <b>${shared}</b> lớp chia sẻ</div>
         <div class="st-meter">${LAYERS.map(([, m]) => `<i class="st-${m[cur]}"></i>`).join("")}</div>
         <div class="st-h">Hợp khi</div><div>${esc(o.fit)}</div>
-        <div class="st-h">Chi phí</div><div class="muted">${esc(COST[cur])}</div>
+        <div class="st-h">Chi phí</div><div class="muted">${inline(COST[cur])}</div>
         <div class="st-legend"><span class="st-y">Bạn</span><span class="st-s">Chia sẻ</span><span class="st-a">AWS</span></div>`;
       root.querySelector(".st-matrix").innerHTML = `<table><thead><tr><th>Lớp</th>${OPTS.map((x) => `<th class="${x.id === cur ? "st-cur" : ""}" data-o="${x.id}">${x.label}</th>`).join("")}</tr></thead>
         <tbody>${LAYERS.map(([name, m]) => `<tr><td>${esc(name)}</td>${OPTS.map((x) => `<td class="st-cell st-${m[x.id]} ${x.id === cur ? "st-cur" : ""}">${NAME[m[x.id]]}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
@@ -737,7 +737,7 @@
            <div class="st-h">Compute</div><div>${esc(compute)}</div>
            ${lambda ? `<div class="dc-warn">Cân nhắc <b>Lambda</b> trước: tải lẻ tẻ, chạy ngắn thì không cần container thường trực.</div>` : ""}
            <div class="st-h">Vì sao</div>
-           <ul class="tips">${yes.length ? yes.map((x) => `<li>${esc(x.why)}</li>`).join("") : "<li>Không có nhu cầu đặc thù nào của Kubernetes → chọn phương án ít vận hành hơn.</li>"}</ul>`;
+           <ul class="tips">${yes.length ? yes.map((x) => `<li>${inline(x.why)}</li>`).join("") : "<li>Không có nhu cầu đặc thù nào của Kubernetes → chọn phương án ít vận hành hơn.</li>"}</ul>`;
     }
     root.addEventListener("click", (e) => {
       const b = e.target.closest("[data-q]");

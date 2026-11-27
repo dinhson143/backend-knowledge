@@ -94,9 +94,75 @@
     glSeen.add(m);
     return `${tag}<span class="g-full"> (${esc(GL[m].full)})</span>`;
   });
-  const plain = (s) => { const keep = glSeen; glSeen = null; try { return inline(s); } finally { glSeen = keep; } };
-  const inline = (s) => esc(s).split(/(`[^`]+`)/).map((part) => (/^`[^`]+`$/.test(part) ? `<code>${part.slice(1, -1)}</code>` : glossify(part))).join("")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  // ── cite:start — URL viết trong câu → chú thích [n] (D92). check.mjs nạp đúng đoạn này để soát câu sau khi tách ──
+  // Trả về { text, urls }: text thay mỗi URL bằng \u0001k\u0002 (k = chỉ số trong urls) và bỏ phần thừa quanh nó
+  // ("(URL)", "— URL", "Nguồn: URL", dấu phẩy giữa hai URL). Chỉ gọi cho phần ngoài `code`.
+  const CITE_URL = /https?:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?(?:[^\s()<>"'`\u0001\u0002]|\([^\s()]*\))*/gi;
+  function splitCites(s) {
+    const urls = [];
+    let t = s.replace(CITE_URL, (u) => {
+      const tail = u.match(/[.,;:!?…]+$/);
+      if (tail) u = u.slice(0, -tail[0].length);
+      const k = urls.indexOf(u) >= 0 ? urls.indexOf(u) : urls.push(u) - 1;
+      return `\u0001${k}\u0002${tail ? tail[0] : ""}`;
+    });
+    if (!urls.length) return { text: s, urls };
+    const M = "\u0001\\d+\u0002";
+    t = t
+      .replace(new RegExp(`(?:[Nn]guồn|[Ss]ource|[Xx]em)\\s*:\\s*(?=${M})`, "g"), "")          // "Nguồn: URL"
+      .replace(new RegExp(`(${M})\\s*(?:[,;·]|và)\\s*(?=${M})`, "g"), "$1")                         // "URL, URL"
+      .replace(new RegExp(`\\s*(?:[—–:,;]|\\s-)\\s*(?=${M})`, "g"), "")                           // "nhãn — URL"
+      .replace(new RegExp(`\\(\\s*((?:${M})+)\\s*\\)`, "g"), "$1")                                  // "(URL)"
+      .replace(new RegExp(`\\(\\s*((?:${M})+)\\s*[·,;]\\s*`, "g"), "$1 (")                        // "(URL · nhãn)" → "[n] (nhãn)"
+      .replace(new RegExp(`((?:${M})+)\\s*\\)`, "g"), ")$1")                                     // "(nhãn URL)" → "(nhãn)[n]"
+      .replace(new RegExp(`\\s+(?=${M})`, "g"), "")                                               // khoảng trắng trước [n]
+      .replace(new RegExp(`([.!?])((?:${M})+)[.]`, "g"), "$1$2");                                  // ".[n]." → ".[n]"
+    return { text: t, urls };
+  }
+  // ── cite:end ──
+  // Nguồn của trang (topic, problem, sim): Map URL → số [n], đánh theo thứ tự xuất hiện, khử trùng lặp.
+  // null = trang không có mục "Nguồn tham khảo" (tìm kiếm, thẻ, tooltip): chỉ bỏ URL khỏi câu
+  let refs = null, citeLink = true;
+  const shortUrl = (u) => {
+    try {
+      const x = new URL(u);
+      let path = x.pathname + x.search + x.hash;
+      try { path = decodeURI(path); } catch {}
+      if (path === "/") path = "";
+      if (path.length > 44) { const seg = x.pathname.split("/").filter(Boolean); path = `/${seg[0]}/…/${seg.at(-1)}${x.hash}`; }
+      if (path.length > 44) path = `${path.slice(0, 20)}…${path.slice(-20)}`;
+      return { host: x.hostname.replace(/^www\./, ""), path };
+    } catch { return { host: u, path: "" }; }
+  };
+  const refItem = (u, n) => { const { host, path } = shortUrl(u); return `<li id="ref-${n}" value="${n}"><a href="${esc(u)}" target="_blank" rel="noopener"><span class="ref-host">${esc(host)}</span><span class="ref-path">${esc(path)}</span></a></li>`; };
+  const refNo = (u) => {
+    if (!refs.has(u)) {
+      refs.set(u, refs.size + 1);
+      const ol = main.querySelector(".refs ol"); // URL mới xuất hiện sau khi danh sách đã vẽ (văn bản do engine sinh): thêm vào cuối
+      if (ol) ol.insertAdjacentHTML("beforeend", refItem(u, refs.size));
+    }
+    return refs.get(u);
+  };
+  // [n] là link thẳng tới nguồn (không dùng #ref-n vì router đọc mọi thay đổi hash); trong <summary> thì chỉ là số
+  const cite = (u) => { const n = refNo(u), host = shortUrl(u).host;
+    return citeLink ? `<sup class="cite"><a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(host)}" aria-label="Nguồn ${n}: ${esc(host)}">[${n}]</a></sup>` : `<sup class="cite">[${n}]</sup>`; };
+  // Đăng ký trước mọi URL của một sim khi chèn khung sim: bước sim vẽ sau (khi bấm ▶) vẫn giữ đúng số theo thứ tự trang
+  const preCite = (v) => {
+    if (!refs) return;
+    if (typeof v === "string") v.split(/`[^`]+`/).forEach((p) => splitCites(p).urls.forEach(refNo));
+    else if (Array.isArray(v)) v.forEach(preCite);
+    else if (v && typeof v === "object") Object.values(v).forEach(preCite);
+  };
+  const refList = () => !refs || !refs.size ? "" : `<section class="refs" aria-labelledby="refsH">
+    <h2 id="refsH">Nguồn tham khảo</h2><p class="muted small">Tài liệu gốc cho các chú thích [n] trong bài; mở trong tab mới.</p>
+    <ol>${[...refs].map(([u, n]) => refItem(u, n)).join("")}</ol></section>`;
+  const plain = (s) => { const keep = glSeen, keepR = refs; glSeen = null; refs = null; try { return inline(s); } finally { glSeen = keep; refs = keepR; } };
+  const inline = (s) => String(s).split(/(`[^`]+`)/).map((part) => {
+    if (/^`[^`]+`$/.test(part)) return `<code>${esc(part.slice(1, -1))}</code>`;
+    const { text, urls } = splitCites(part);
+    return glossify(esc(text)).replace(/\u0001(\d+)\u0002/g, (_, k) => (refs ? cite(urls[k]) : ""));
+  }).join("").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  const inSummary = (s) => { citeLink = false; try { return inline(s); } finally { citeLink = true; } };
   window.glossInline = inline;
   // Chữ trong thẻ <a> (thẻ sim/bài): không chèn <abbr tabindex> để tránh phần tử tương tác lồng trong link
   const noTip = (s) => plain(s).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1");
@@ -117,9 +183,10 @@
   const points = (ps) => !ps || !ps.length ? "" : `<div class="panel"><ul class="points">${ps.map((p) => `<li>${tagged(txt(p))}${whyLine(p.why)}</li>`).join("")}</ul></div>`;
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
   // Sơ đồ SVG tĩnh (content/svg/): <img> chạy được qua file://, nền sáng nằm sẵn trong file SVG (D11)
-  const figure = (d) => `<figure class="panel diagram"><div class="diagram-img"><img src="${esc(d.src)}" alt="${esc(d.caption.replace(/[*`]/g, ""))}" loading="lazy"></div>
-    <figcaption>${inline(d.caption)}${d.source ? ` <a href="${esc(d.source)}" target="_blank" rel="noopener">Nguồn ↗</a>` : ""}</figcaption></figure>`;
-  const simBox = (sim) => `<div class="panel sim-box" id="sim-${sim.id}"></div>`;
+  // Nguồn của sơ đồ (`source`) vào cùng danh sách "Nguồn tham khảo", hiện thành [n] sau caption (D92)
+  const figure = (d) => `<figure class="panel diagram"><div class="diagram-img"><img src="${esc(d.src)}" alt="${esc(splitCites(d.caption).text.replace(/\u0001\d+\u0002|[*`]/g, ""))}" loading="lazy"></div>
+    <figcaption>${inline(d.caption)}${d.source && refs ? cite(d.source) : ""}</figcaption></figure>`;
+  const simBox = (sim) => { preCite(sim); return `<div class="panel sim-box" id="sim-${sim.id}"></div>`; };
   const mountAll = (sims) => sims.forEach((sim) => window.mountSim(document.getElementById(`sim-${sim.id}`), sim));
   const levelBadge = (l) => `<span class="lvl lvl-${l}">${LEVELS[l]}</span>`;
   // Chip chủ đề có trạng thái: ✓/○ + chữ ẩn cho trình đọc màn hình + viền khác nhau, không chỉ khác màu.
@@ -267,6 +334,7 @@
   sidebar.addEventListener("scroll", () => (sb.scroll = sidebar.scrollTop), { passive: true });
   function setNav(mode, side) {
     glSeen = mode === "glossary" ? null : new Set();
+    refs = null; // trang topic/problem/sim tự bật lại sau setNav
     document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
     // Màn hẹp: 5 tab nằm đầu drawer ☰ (bản sao của .modes, CSS chỉ hiện một trong hai) — D28
     sidebar.innerHTML = `<nav class="sb-modes" aria-label="Chế độ học">${$(".modes").innerHTML}</nav>${side}`;
@@ -354,6 +422,7 @@
     const t = byId[id];
     if (!t) return viewHome();
     setNav("learn", sideKnowledge(id));
+    refs = new Map();
     const group = groupOf(t), i = group.indexOf(t), prev = group[i - 1], next = group[i + 1];
     // Cuối nhóm: lộ trình chính sang luyện đề, nhánh song song về trang chủ (không nhảy sang nhánh khác)
     const end = t.stage.parallel ? { href: "#/", label: "Về lộ trình →" } : { href: "#/problems", label: "Sang luyện đề →" };
@@ -386,7 +455,7 @@
       ${t.tips ? `${h("Mẹo khi phỏng vấn")}<div class="panel"><ul class="tips">${t.tips.map((x) => `<li>${inline(txt(x))}${whyLine(x.why)}</li>`).join("")}</ul></div>` : ""}
 
       ${t.cards && t.cards.length ? `${h("Tự kiểm tra")}<p class="muted small">Trả lời thành tiếng trước, rồi mới mở đáp án.</p>
-        <div class="qa">${t.cards.map(([q, a]) => `<details class="panel"><summary>${inline(q)}</summary><div>${inline(a)}</div></details>`).join("")}</div>` : ""}
+        <div class="qa">${t.cards.map(([q, a]) => `<details class="panel"><summary>${inSummary(q)}</summary><div>${inline(a)}</div></details>`).join("")}</div>` : ""}
 
       ${probs.length || related.length ? `${h("Áp dụng")}
         ${probs.length ? `<div class="apply"><span class="muted">Dùng trong bài:</span> ${probs.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""}
@@ -396,7 +465,8 @@
       <div class="pager">
         ${prev ? `<a href="#/t/${prev.id}">← ${esc(prev.title)}</a>` : "<span></span>"}
         ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="${end.href}" style="text-align:right">${end.label}</a>`}
-      </div>`;
+      </div>
+      ${refList()}`;
     mountAll(sims);
     abbrBox(main.querySelector(".tldr"));
     $("#doneBtn").onclick = () => { toggleDone(id); keepPlace(() => viewTopic(id)); };
@@ -478,6 +548,7 @@
     if (!p) return viewProblems();
     const key = `p:${id}`;
     setNav("problems", sideProblems(id));
+    refs = new Map();
     const i = PROBLEMS.indexOf(p), prev = PROBLEMS[i - 1], next = PROBLEMS[i + 1];
     const sims = (p.sims || []).map((sid) => simById[sid]).filter(Boolean);
     const lvl = (k, text, w) => `<div class="dd-col dd-${k}"><b>${{ bad: "Bad", good: "Good", great: "Great" }[k]}</b>${inline(text)}${w ? `<div class="why"><b>Vì sao</b>${inline(w)}</div>` : ""}</div>`;
@@ -512,7 +583,7 @@
 
       <h2><span class="h-n">5</span>Deep Dives</h2>
       <p class="muted small">Trả lời từng câu trước, rồi mới mở 3 mức đáp án.</p>
-      ${p.deep.map((d, k) => `<details class="panel dd"><summary class="dd-q">${k + 1}. ${inline(d.q)}</summary>
+      ${p.deep.map((d, k) => `<details class="panel dd"><summary class="dd-q">${k + 1}. ${inSummary(d.q)}</summary>
         <div class="dd-grid">${(() => { const w = d.why || {}; return lvl("bad", d.bad, w.bad) + lvl("good", d.good, w.good) + lvl("great", d.great, w.great); })()}</div></details>`).join("")}
 
       ${sims.length ? `<h2><span class="h-n">+</span>Mô phỏng liên quan</h2>${sims.map(simBox).join("")}` : ""}
@@ -521,7 +592,8 @@
       <div class="pager">
         ${prev ? `<a href="#/p/${prev.id}">← ${esc(prev.title)}</a>` : "<span></span>"}
         ${next ? `<a href="#/p/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : "<span></span>"}
-      </div>`;
+      </div>
+      ${refList()}`;
     mountAll([p.hld, ...sims]);
     abbrBox(main.querySelector(".needs-hint") || main.querySelector(".needs"));
     $("#doneBtn").onclick = () => { toggleDone(key); keepPlace(() => viewProblem(id)); };
@@ -555,12 +627,14 @@
     const sim = simById[id];
     if (!sim) return viewSims();
     setNav("sims", sideKnowledge(sim.topics[0]));
+    refs = new Map();
     main.innerHTML = `
       <div class="crumb"><a href="#/sims">Mô phỏng</a> · ${esc(sim.title)}</div>
       <h1 class="sr-only">${esc(sim.title)}</h1>
       ${simBox(sim)}
       <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>
-      ${(() => { const uses = PROBLEMS.filter((p) => (p.sims || []).includes(id)); return uses.length ? `<div class="apply sim-uses"><span class="muted">Dùng trong bài:</span> ${uses.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""; })()}`;
+      ${(() => { const uses = PROBLEMS.filter((p) => (p.sims || []).includes(id)); return uses.length ? `<div class="apply sim-uses"><span class="muted">Dùng trong bài:</span> ${uses.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""; })()}
+      ${refList()}`;
     mountAll([sim]);
   }
 

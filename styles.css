@@ -624,3 +624,18 @@ td.ar-good { color: var(--added); } td.ar-mid { color: var(--fix); } td.ar-bad {
 .sim-n.cw-red { background: var(--err-soft); color: var(--err); } .sim-n.cw-green { background: var(--added-soft); color: var(--added); } .sim-n.cw-spec, .sim-n.cw-run { background: var(--fix-soft); color: var(--fix); }
 
 @media (max-width: 860px) { .ar-sum-grid { grid-template-columns: 1fr; } }
+
+/* ── Chú thích nguồn [n] + "Nguồn tham khảo" cuối trang (D92) ── */
+sup.cite { font-size: .72em; line-height: 0; vertical-align: super; margin-left: 1px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+sup.cite a { padding: 0 1px; border-radius: 3px; }
+sup.cite a:hover { background: var(--accent-soft); text-decoration: underline; }
+summary sup.cite { color: var(--muted); }
+.refs { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); }
+.refs h2 { margin: 0 0 2px; font-size: 17px; }
+.refs p { margin: 0 0 10px; }
+.refs ol { margin: 0; padding-left: 2.6em; font-size: 14px; line-height: 1.5; columns: 2 300px; column-gap: 32px; }
+.refs li { margin: 0 0 6px; break-inside: avoid; color: var(--muted); font-variant-numeric: tabular-nums; }
+.refs li a { display: inline-flex; flex-wrap: wrap; column-gap: 2px; overflow-wrap: anywhere; }
+.refs a:hover .ref-host { text-decoration: underline; }
+.ref-host { font-weight: 600; }
+.ref-path { color: var(--muted); }

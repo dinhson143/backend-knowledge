@@ -157,8 +157,28 @@ const NO_DIACRITICS = /\b(khong|duoc|nguoi|nhieu|truoc|chung ta|tuong|thuc hien|
 const PRICE = /\$\s?\d[\d.,]*\s*(\/|mỗi|per\b)|≈\s*\$\d/i;
 // files/run = code; còn lại là id, toạ độ, đường dẫn
 const CODE_KEYS = new Set(["files", "run", "id", "x", "y", "w", "h", "src"]);
+// URL trong câu: app.js tách thành chú thích [n] (D92). Nạp đúng hàm splitCites của app.js để kiểm tra
+// URL đọc được, là https, và câu còn lại không sót "()" hay dấu câu treo sau khi tách.
+const citeSrc = read("app.js").match(/\/\/ ── cite:start[\s\S]*?\/\/ ── cite:end/);
+const splitCites = citeSrc ? vm.runInNewContext(`${citeSrc[0]}\nsplitCites`) : null;
+if (!splitCites) at("app.js", "", "không tìm thấy đoạn cite:start … cite:end (check.mjs dùng splitCites)");
+function checkCites(file, path, prose) {
+  if (!splitCites) return;
+  const { text, urls } = splitCites(prose);
+  urls.forEach((u) => {
+    let ok = false;
+    try { ok = new URL(u).protocol === "https:"; } catch {}
+    if (!ok) at(file, path, `URL nguồn hỏng hoặc không phải https: "${u}"`);
+  });
+  if (!urls.length) return;
+  const left = text.replace(/\u0001\d+\u0002/g, "[n]");
+  const bad = left.match(/\(\s*\)|\(\s*[,;:·—–]|[,;:—–]\s*\)/);
+  if (bad) at(file, path, `câu sau khi tách URL còn "${bad[0]}" — viết URL trong ngoặc "(https://…)" hoặc sau "—", xem content-system §6`);
+}
 function walk(file, v, path) {
   if (typeof v === "string") {
+    if (path.endsWith(".source") && /^https:\/\/\S+$/.test(v)) return; // source của sơ đồ: kiểm tra ở mục SVG
+    v.split(/`[^`]*`/).forEach((seg) => checkCites(file, path, seg)); // như app.js: tách từng đoạn ngoài `code`
     const ticks = (v.match(/`/g) || []).length;
     if (ticks % 2) return at(file, path, "backtick lẻ");
     const prose = v.replace(/`[^`]*`/g, "");
