@@ -6,7 +6,7 @@ BK.topic({
   goal: "Ra code chạy được trong 90 phút, chia module và mở rộng khi đổi đề",
   needs: ["lld-problems-list", "code-testing-fundamentals"],
   tldr: {
-    t: "**Machine coding round** (vòng viết code LLD chạy được) là biến thể của vòng LLD: cùng đề (Parking Lot, Splitwise, Snake & Ladder…), nhưng kết quả phải **chạy được và demo được** trong một khung giờ cố định, thường dài hơn vòng LLD thường. Bí quyết không phải gõ nhanh mà là **cắt phạm vi sớm**, chia lớp rõ (model, service, strategy, driver), làm **happy path end-to-end trước**, rồi mới thêm edge case, test và phần mở rộng.",
+    t: "**Machine coding round** (vòng viết code LLD chạy được) là biến thể của vòng LLD: cùng đề (Parking Lot, Splitwise, Snake & Ladder…), nhưng kết quả phải **chạy được và demo được** trong một khung giờ cố định. Bí quyết không phải gõ nhanh mà là **cắt phạm vi sớm**, chia lớp rõ (model, service, strategy, driver), làm **happy path end-to-end trước**, rồi mới thêm edge case, test và phần mở rộng.",
     why: "Hello Interview mô tả vòng LLD ở Big Tech Mỹ thường là \"partial code\" trông như Java/Python dù không compile, còn ở Ấn Độ/châu Á gần với pseudocode có cấu trúc, và khuyên hỏi thẳng công ty xem họ kỳ vọng gì (https://www.hellointerview.com/learn/low-level-design/in-a-hurry/introduction). Machine coding thì khác ở chỗ code phải chạy, nên mọi quyết định thiết kế phải trả giá bằng thời gian gõ thật.",
   },
   story: {
@@ -50,7 +50,7 @@ BK.topic({
     },
     {
       t: "**Dùng thư viện chuẩn để bớt gõ** — `@dataclass` sinh `__init__`, `__repr__`, `__eq__`; `frozen=True` cho object bất biến (vé, giao dịch); `field(default_factory=list)` cho field là list; `Enum` cho trạng thái; `abc.ABC` + `@abstractmethod` cho interface.",
-      why: "`dataclass` tự thêm các method trên và ném `FrozenInstanceError` khi gán vào instance `frozen`; default là list/dict trực tiếp thì ném `ValueError`, phải dùng `default_factory` (https://docs.python.org/3/library/dataclasses.html). Class con thiếu method trừu tượng thì không tạo được instance (https://docs.python.org/3/library/abc.html), bắt lỗi quên cài ngay lúc chạy.",
+      why: "`dataclass` tự thêm các method trên và ném `FrozenInstanceError` khi gán vào instance `frozen`; default là list/dict trực tiếp thì ném `ValueError`, phải dùng `default_factory` (https://docs.python.org/3/library/dataclasses.html). Class có metaclass `ABCMeta` không tạo được instance khi chưa override hết method trừu tượng (https://docs.python.org/3/library/abc.html); CPython ném `TypeError` lúc tạo object, nên quên cài là lộ ngay.",
     },
     {
       t: "**Lỗi nghiệp vụ là exception có tên, không phải `print` hay `return None`** — `ParkingError`, `InsufficientBalance`. Driver bắt exception và in thông báo; service không biết gì về in ấn.",
@@ -95,7 +95,7 @@ BK.topic({
           "class Spot:",
           "    id: str",
           "    size: Size",
-          "    vehicle: Vehicle | None = None",
+          ["    vehicle: Vehicle | None = None", "Cú pháp `X | None` cần Python 3.10+; bản cũ hơn dùng `Optional[Vehicle]`."],
           "",
           "@dataclass(frozen=True)",
           "class Ticket:",
@@ -208,7 +208,7 @@ BK.topic({
           "        self.assertEqual(len(set(got)), 50)",
           "",
           "if __name__ == \"__main__\":",
-          ["    unittest.main(argv=[\"mc\"])", "`argv` cố định để không đọc nhầm tham số dòng lệnh; thoát mã khác 0 khi test đỏ."],
+          ["    unittest.main(argv=[\"mc\"])", "`argv` cố định để không đọc nhầm tham số dòng lệnh. Mặc định `main` gọi `sys.exit()` với mã 0 khi xanh, 1 khi đỏ (https://docs.python.org/3/library/unittest.html)."],
         ],
       },
     },

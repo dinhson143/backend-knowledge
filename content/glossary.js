@@ -237,5 +237,7 @@ window.GLOSSARY = [
     ["DFS", "Depth-First Search", "Duyệt đi sâu hết một nhánh rồi quay lui (dùng stack/đệ quy)."],
     ["DP", "Dynamic Programming", "Quy hoạch động: lưu kết quả bài toán con để không tính lại."],
     ["BST", "Binary Search Tree", "Cây nhị phân mà trái < gốc < phải — tìm kiếm O(log n) nếu cân bằng."],
+    ["LIS", "Longest Increasing Subsequence", "Dãy con (không cần liền nhau) tăng dài nhất — bài DP kinh điển, O(n log n) với binary search."],
+    ["LCS", "Longest Common Subsequence", "Dãy con chung dài nhất của hai chuỗi — bài DP 2D kinh điển."],
   ] },
 ];

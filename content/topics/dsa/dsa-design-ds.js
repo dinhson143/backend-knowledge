@@ -38,7 +38,7 @@ BK.topic({
       },
       {
         cells: ["Median của luồng số", "`add`, `median`", "Max-heap nửa dưới + min-heap nửa trên", "Giữ hai heap lệch nhau tối đa 1 phần tử"],
-        why: "`add` O(log n), `median` O(1) vì median nằm ở đỉnh heap. Python chỉ có min-heap (`heapq`), nên nửa dưới lưu số âm.",
+        why: "`add` O(log n), `median` O(1) vì median nằm ở đỉnh heap. `heapq` mặc định là min-heap: trước Python 3.14 nửa dưới lưu số âm; từ 3.14 có `heappush_max`, `heappop_max` (https://docs.python.org/3/library/heapq.html); cách số âm chạy được trên mọi phiên bản.",
       },
     ],
   },
@@ -373,7 +373,7 @@ BK.topic({
     {
       title: "Lỗi hay gặp",
       points: [
-        { t: "**Quên cập nhật thứ tự khi `get`** (LRU) hoặc khi `put` đè key cũ.", why: "Cả hai đều là \"dùng\"; bỏ sót thì phần tử vừa dùng lại bị loại sớm. Bài 146 có ca kiểm đúng chỗ này." },
+        { t: "**Quên cập nhật thứ tự khi `get`** (LRU) hoặc khi `put` đè key cũ.", why: "Cả hai đều là \"dùng\"; bỏ sót thì phần tử vừa dùng lại bị loại sớm. Test đối chiếu ở khối code trên bắt được lỗi này." },
         { t: "**Node không lưu `key`.**", why: "Khi bỏ node đầu danh sách, bạn cần key để xoá khỏi dict; không có thì phải dò dict O(n)." },
         { t: "**LFU: quên reset `min_freq = 1` khi thêm key mới, hoặc tăng `min_freq` khi danh sách chưa rỗng.**", why: "`min_freq` sai thì `popitem` chạy trên danh sách rỗng (`KeyError`) hoặc bỏ nhầm key có freq cao hơn." },
         { t: "**LFU với `capacity = 0`.**", why: "Không có chỗ cho key nào; `put` phải không làm gì. Không xét trước thì code sẽ bỏ một phần tử từ danh sách rỗng." },

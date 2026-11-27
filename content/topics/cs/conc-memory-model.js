@@ -12,13 +12,13 @@ BK.topic({
   story: {
     problem: "Thread A gán `config = load()` rồi đặt cờ `ready = true`. Thread B vòng `while (!ready) {}` rồi đọc `config`. Trên laptop chạy đúng; trên server nhiều core, B thỉnh thoảng đọc `config` còn `null`, hoặc vòng lặp không bao giờ thoát. Không dòng code nào \"sai\" nếu đọc tuần tự.",
     idea: "Đừng lý luận bằng \"lệnh nào chạy trước\". Lý luận bằng cạnh happens-before: ghi `config` đứng trước ghi cờ trong cùng thread (program order), ghi cờ `volatile` happens-before lần đọc cờ thấy nó, nên B thấy `config`. Không có cạnh đó thì không có đảm bảo nào.",
-    tradeoff: "Mỗi cạnh happens-before chặn bớt tối ưu của compiler/CPU (barrier, flush cache line), nên đồng bộ thừa làm chậm. Nhưng tự lý luận ở mức memory model rất dễ sai; tài liệu Go khuyên \"Don't be clever\": dùng lock, channel, atomic có sẵn thay vì đoán.",
+    tradeoff: "Mỗi cạnh happens-before giới hạn việc compiler/CPU được đổi thứ tự hay giữ giá trị trong register, nên đồng bộ thừa có thể làm chậm. Nhưng tự lý luận ở mức memory model rất dễ sai; tài liệu Go khuyên \"Don't be clever\": dùng lock, channel, atomic có sẵn thay vì đoán.",
   },
   table: {
     head: ["Ngôn ngữ", "Cạnh happens-before có sẵn", "Không đồng bộ thì sao"],
     rows: [
       {
-        cells: ["Java (JLS §17.4)", "Unlock monitor → lock sau đó cùng monitor; ghi `volatile` → đọc sau đó; `Thread.start()` → mọi hành động trong thread mới; mọi hành động trong thread → `join()` trả về", "Chương trình có data race: lần đọc có thể thấy giá trị cũ hoặc thứ tự lạ, nhưng vẫn là giá trị đã từng được ghi (không \"từ trên trời rơi xuống\")"],
+        cells: ["Java (JLS §17.4)", "Unlock monitor → lock sau đó cùng monitor; ghi `volatile` → đọc sau đó; `Thread.start()` → mọi hành động trong thread mới; mọi hành động trong thread → `join()` trả về", "Chương trình có data race: lần đọc có thể thấy giá trị cũ hoặc thấy các lần ghi theo thứ tự lạ; `long`/`double` không `volatile` còn có thể bị \"xé\" thành hai nửa của hai lần ghi khác nhau (§17.7)"],
         why: "Danh sách lấy từ §17.4.5. §17.4.3: \"nếu chương trình không có data race thì mọi lần chạy đều trông như sequentially consistent\" (https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html). Đây là đảm bảo DRF-SC: chỉ cần không có data race, bạn được lý luận như thể các thread chạy xen kẽ trên một CPU.",
       },
       {
@@ -78,12 +78,12 @@ BK.topic({
           "import threading",
           "",
           "config = None",
-          ["ready = threading.Event()", "`Event` có lock bên trong; `set()` và `wait()` đồng bộ qua lock đó nên có thứ tự rõ ràng."],
+          ["ready = threading.Event()", "`Event` là primitive đồng bộ của `threading`: một thread `set()`, các thread khác `wait()` tới khi cờ bật (https://docs.python.org/3/library/threading.html)."],
           "",
           "def loader():",
           "    global config",
           ["    config = {\"db\": \"primary\", \"pool\": 10}", "Ghi dữ liệu **trước** khi báo; sau `set()` thì không sửa nữa."],
-          ["    ready.set()", "Thay cho `ready_flag = True` (biến thường không có đảm bảo nào trên bản free-threaded)."],
+          ["    ready.set()", "Thay cho `ready_flag = True`: tài liệu `threading` không hứa gì về visibility của biến thường giữa các thread, nên đừng dùng nó để báo hiệu."],
           "",
           "def reader(out):",
           ["    if not ready.wait(timeout=2):", "Có timeout: loader chết thì reader không treo mãi."],
@@ -115,7 +115,7 @@ BK.topic({
             why: "Cần atomic cho cả chuỗi đọc–cộng–ghi; `volatile` không đủ.",
           },
           {
-            cells: ["Khởi tạo lười một lần (singleton, cache)", "Holder class `static`, hoặc DCL với `volatile`", "`sync.Once`", "`functools.cache` hoặc lock quanh lần khởi tạo"],
+            cells: ["Khởi tạo lười một lần (singleton, cache)", "Holder class `static`, hoặc double-checked locking với `volatile`", "`sync.Once`", "`functools.cache` hoặc lock quanh lần khởi tạo"],
             why: "Đây là chỗ double-checked locking hỏng kinh điển; dùng cấu trúc có sẵn thay vì tự viết.",
           },
           {
@@ -133,7 +133,7 @@ BK.topic({
   tips: [
     {
       t: "Khi được hỏi \"`volatile` làm gì?\", trả lời hai ý: visibility + ordering (happens-before), và **không** atomic cho `count++`. Rồi nêu ví dụ double-checked locking.",
-      why: "Câu hỏi này lọc người học thuộc \"`volatile` là không cache\" với người hiểu happens-before; ví dụ DCL cho thấy bạn biết reordering gây hỏng thật.",
+      why: "Câu hỏi này lọc người học thuộc \"`volatile` là không cache\" với người hiểu happens-before; ví dụ double-checked locking cho thấy bạn biết reordering gây hỏng thật.",
     },
     {
       t: "Nói câu DRF-SC: \"không có data race thì được lý luận như chạy tuần tự\". Mục tiêu khi viết code là **không có data race**, không phải thuộc luật reorder.",

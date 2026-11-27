@@ -41,7 +41,7 @@ BK.topic({
         why: "O(n²) là DP thuần; bản O(n log n) giữ mảng \"đuôi nhỏ nhất của dãy dài k\" và tìm vị trí bằng `bisect`.",
       },
       {
-        cells: ["Khoảng (interval) / bitmask", "`dp[l][r]` / `dp[mask][i]`", "Chia khoảng tại `k` / thêm một phần tử vào tập", "Burst Balloons; TSP nhỏ"],
+        cells: ["Khoảng (interval) / bitmask", "`dp[l][r]` / `dp[mask][i]`", "Chia khoảng tại `k` / thêm một phần tử vào tập", "Burst Balloons; bài người du lịch (traveling salesman) với n nhỏ"],
         why: "Ít gặp hơn ở vòng phỏng vấn thường; nhận ra được dạng là đủ, chi tiết luyện sau các dạng trên.",
       },
     ],
@@ -56,7 +56,7 @@ BK.topic({
       why: "Đệ quy buộc bạn trả lời \"state là gì\" và \"base case là gì\" trước. `functools.cache` (từ 3.9) tương đương `lru_cache(maxsize=None)`, nhỏ và nhanh hơn vì không phải loại phần tử; tham số phải hashable (https://docs.python.org/3/library/functools.html).",
     },
     {
-      t: "**Giới hạn đệ quy của Python** — memoization đệ quy sâu theo `n`; với `n` vài nghìn sẽ gặp `RecursionError`. Trên CPython 3.14, `sys.getrecursionlimit()` trả về 1000 mặc định (đã chạy thử).",
+      t: "**Giới hạn đệ quy của Python** — memoization đệ quy sâu theo `n`; trên CPython 3.14, `sys.getrecursionlimit()` mặc định trả về 1000 và `rob_memo` bên dưới với `n = 5000` ném `RecursionError`, còn `rob_table` chạy bình thường (đã chạy thử).",
       why: "Giới hạn này chặn đệ quy vô hạn làm tràn C stack; tăng bằng `sys.setrecursionlimit` thì có thể crash nếu quá cao so với nền tảng (https://docs.python.org/3/library/sys.html). Bottom-up không có vấn đề này, nên với `n` lớn hãy điền bảng bằng vòng lặp.",
     },
     {

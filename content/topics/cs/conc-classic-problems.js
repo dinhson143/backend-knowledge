@@ -288,7 +288,7 @@ BK.topic({
           "import threading, time",
           "",
           "class TokenBucket:",
-          ["    def __init__(self, rate, capacity, clock=time.monotonic):", "`monotonic` không lùi khi đổi giờ hệ thống; `clock` truyền vào để test không phụ thuộc thời gian thật."],
+          ["    def __init__(self, rate, capacity, clock=time.monotonic):", "`time.monotonic()` là đồng hồ không chạy lùi và không bị ảnh hưởng khi đổi giờ hệ thống (https://docs.python.org/3/library/time.html); `clock` truyền vào để test không phụ thuộc thời gian thật."],
           "        self.rate, self.capacity, self.clock = rate, capacity, clock",
           "        self.tokens = capacity",
           "        self.last = clock()",
