@@ -26,7 +26,7 @@ BK.topic({
         why: "Mỗi region ghi vào leader gần nó rồi đồng bộ chéo bất đồng bộ, nên ghi nhanh và một region đứt vẫn ghi được. Nhưng hai leader có thể nhận hai thay đổi trái nhau cho cùng một dòng trước khi thấy nhau; không có thứ tự chung để biết cái nào \"sau\".",
       },
       {
-        cells: ["Leaderless (kiểu Dynamo)", "Client ghi vào nhiều node cùng lúc", "Cần luôn ghi được, chịu node chết (Cassandra, DynamoDB)", "Đọc phải hỏi nhiều node; xung đột giải bằng version hoặc LWW"],
+        cells: ["Leaderless (kiểu Dynamo)", "Client ghi vào nhiều node cùng lúc", "Cần luôn ghi được, chịu node chết (Dynamo, Cassandra)", "Đọc phải hỏi nhiều node; xung đột giải bằng version hoặc LWW"],
         why: "Không có leader nên không có failover: node chết thì client ghi vào node khác. Bài viết về Dynamo mô tả mục tiêu thiết kế \"always writeable\" và đẩy việc giải xung đột sang lúc đọc (https://www.allthingsdistributed.com/2007/10/amazons_dynamo.html).",
       },
     ],
@@ -86,8 +86,8 @@ BK.topic({
         why: "Tài liệu `WAIT` nói rõ: failover qua Sentinel hay Cluster chỉ cố gắng chọn replica tốt nhất, nên vẫn có thể mất một ghi đã được replicate đồng bộ tới nhiều replica (https://redis.io/docs/latest/commands/wait/).",
       },
       {
-        cells: ["Dynamo / Cassandra", "Leaderless, N bản sao theo consistent hashing", "Chọn R, W cho từng thao tác; sloppy quorum và hinted handoff"],
-        why: "Đặt vị trí bản sao bằng hash ring (xem Consistent Hashing) nên thêm node chỉ dời một phần key. R, W thấp thì nhanh và sẵn sàng hơn nhưng dễ đọc bản cũ.",
+        cells: ["Cassandra (kế thừa Dynamo)", "Mọi replica nhận ghi cho key nó giữ; N bản sao theo consistent hashing", "Chọn consistency level (`ONE`, `QUORUM`, `ALL`) cho từng thao tác; xung đột giải bằng LWW theo timestamp"],
+        why: "Tài liệu Cassandra: ghi luôn được gửi tới **mọi** replica, consistency level chỉ quyết định coordinator chờ bao nhiêu phản hồi; tập đọc và tập ghi giao nhau thì mọi ghi đã xác nhận đều thấy được ở lần đọc sau. Mỗi thay đổi mang timestamp và bản mới nhất thắng, nên đúng đắn phụ thuộc đồng hồ các máy được đồng bộ (https://cassandra.apache.org/doc/latest/cassandra/architecture/dynamo.html). Đặt vị trí bản sao bằng hash ring (xem Consistent Hashing).",
       },
     ],
   },
