@@ -79,9 +79,48 @@ BK.problems.forEach((p) => p.nfr.forEach((x, i) => shapeP(p.id, `nfr[${i}]`, x))
 
 // ── Tham chiếu ──
 const ref = (map, id, owner, path, what) => { if (!map[id]) E(owner, path, `${what} "${id}" không tồn tại`); };
-const inRoadmap = new Set();
-W.ROADMAP.forEach((st) => (st.topics || []).forEach((id) => { inRoadmap.add(id); if (!topics[id]) at(fileOf.ROADMAP, st.id, `topic "${id}" không tồn tại`); }));
+// ROADMAP: giai đoạn có `parts` (chặng, id "<giai đoạn>.<tên>") hoặc `topics`, không cả hai (D20, D44)
+const inRoadmap = new Map(), partIds = new Set(), RM = fileOf.ROADMAP;
+W.ROADMAP.forEach((st) => {
+  if (st.parts && st.topics) at(RM, st.id, "giai đoạn có cả parts lẫn topics");
+  (st.parts || [{ id: st.id, topics: st.topics || [] }]).forEach((p) => {
+    if (st.parts) {
+      if (partIds.has(p.id)) at(RM, p.id, "trùng id chặng");
+      partIds.add(p.id);
+      if (!p.id?.startsWith(`${st.id}.`)) at(RM, p.id, `id chặng phải có dạng "${st.id}.<tên>"`);
+      if (!p.topics?.length) at(RM, p.id, "chặng rỗng — chỉ thêm chặng cùng topic đầu tiên của nó");
+    }
+    (p.topics || []).forEach((id) => {
+      if (inRoadmap.has(id)) at(RM, p.id, `topic "${id}" nằm ở hai chỗ`);
+      inRoadmap.set(id, st);
+      if (!topics[id]) at(RM, p.id, `topic "${id}" không tồn tại`);
+    });
+  });
+});
 Object.keys(topics).filter((id) => !inRoadmap.has(id)).forEach((id) => E(id, id, "topic không có trong ROADMAP (rơi vào \"Khác\")"));
+// title ≤ 40 (sidebar, chip), goal ≤ 90 và khác title; needs ≤ 3, trỏ topic có thật, không vòng,
+// và đứng trước khi cùng lộ trình chính hoặc cùng một nhánh (xuyên nhánh chỉ để hiển thị)
+const rmOrder = [...inRoadmap.keys()];
+const groupKey = (id) => { const st = inRoadmap.get(id); return st && (st.parallel ? st.id : "main"); };
+Object.values(topics).forEach((t) => {
+  if (t.title && t.title.length > 40) E(t.id, `${t.id}.title`, `${t.title.length} ký tự > 40`);
+  if (t.goal != null && (typeof t.goal !== "string" || t.goal.length > 90 || t.goal === t.title)) E(t.id, `${t.id}.goal`, "goal phải là chuỗi ≤ 90 ký tự, khác title");
+  const needs = t.needs || [];
+  if (needs.length > 3) E(t.id, `${t.id}.needs`, "tối đa 3 tiên quyết trực tiếp");
+  needs.forEach((id) => {
+    if (!topics[id]) return E(t.id, `${t.id}.needs`, `topic "${id}" không tồn tại`);
+    if (groupKey(id) === groupKey(t.id) && rmOrder.indexOf(id) > rmOrder.indexOf(t.id)) E(t.id, `${t.id}.needs`, `"${id}" đứng sau "${t.id}" trong ROADMAP`);
+  });
+});
+const needState = {}; // 1 = đang duyệt, 2 = xong
+const visit = (id, path) => {
+  if (needState[id] === 1) return E(id, `${id}.needs`, `vòng tiên quyết: ${[...path, id].join(" → ")}`);
+  if (needState[id] || !topics[id]) return;
+  needState[id] = 1;
+  (topics[id].needs || []).forEach((n) => visit(n, [...path, id]));
+  needState[id] = 2;
+};
+Object.keys(topics).forEach((id) => visit(id, []));
 Object.values(topics).forEach((t) => (t.related || []).forEach((sid) => ref(sims, sid, t.id, `${t.id}.related`, "sim")));
 BK.sims.forEach((s) => s.topics.forEach((id) => ref(topics, id, s.id, `${s.id}.topics`, "topic")));
 Object.values(problems).forEach((p) => {
