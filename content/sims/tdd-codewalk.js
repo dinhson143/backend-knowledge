@@ -230,7 +230,7 @@ BK.sim({
             ok: false,
             out: "Falsifying example: test_fee_rule_holds_for_any_total(total=500000)\nAssertionError\n1 failed, 2 passed",
           },
-          note: "Thay vì chọn ví dụ, khai báo **tính chất đúng với mọi tổng tiền**. Hypothesis sinh hàng trăm giá trị; gặp lỗi thì **thu gọn (shrink)** về ví dụ nhỏ nhất làm hỏng — ở đây chính là 500000, giá trị biên chứa bug.",
+          note: "Thay vì chọn ví dụ, khai báo **tính chất đúng với mọi tổng tiền**. Hypothesis sinh nhiều giá trị, thử cả giá trị biên và hằng số xuất hiện trong code, nên trúng 500000 — với bug này đó là input duy nhất làm hỏng; khi tìm được lỗi, nó còn **thu gọn (shrink)** về ví dụ nhỏ nhất.",
         },
         {
           phase: "green",
