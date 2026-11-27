@@ -76,7 +76,7 @@ BK.topic({
       {
         cells: [
           "Behavioral",
-          "State Machine",
+          "State (state machine)",
           "Quản lý vòng đời nhiều trạng thái, chỉ cho chuyển hợp lệ",
           "Vending machine, Order, Elevator",
         ],
