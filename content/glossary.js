@@ -62,6 +62,7 @@ window.GLOSSARY = [
     ["SQL", "Structured Query Language", "Ngôn ngữ truy vấn DB quan hệ; cũng dùng để chỉ DB quan hệ."],
     ["NoSQL", "Not only SQL", "Nhóm DB không theo mô hình bảng quan hệ: key-value, document, column, graph."],
     ["RDBMS", "Relational Database Management System", "Hệ quản trị DB quan hệ (PostgreSQL, MySQL)."],
+    ["UUID", "Universally Unique Identifier", "ID 128 bit sinh độc lập ở mọi máy mà gần như không trùng; v4 ngẫu nhiên, v7 có thời gian ở đầu nên sắp xếp được."],
     ["ACID", "Atomicity · Consistency · Isolation · Durability", "4 đảm bảo của transaction: tất cả-hoặc-không, đúng ràng buộc, không thấy dữ liệu tạm của nhau, commit rồi thì bền."],
     ["PK", "Primary Key", "Khoá chính — định danh duy nhất mỗi dòng."],
     ["FK", "Foreign Key", "Khoá ngoại — cột trỏ tới khoá chính của bảng khác."],
@@ -115,6 +116,7 @@ window.GLOSSARY = [
     ["ZAB", "ZooKeeper Atomic Broadcast", "Giao thức đồng thuận của ZooKeeper."],
     ["KEDA", "Kubernetes Event-Driven Autoscaling", "Scale pod theo sự kiện (độ dài queue, Kafka lag), kể cả về 0."],
     ["PSP", "Payment Service Provider", "Bên xử lý thanh toán thẻ (Stripe, Adyen…)."],
+    ["EOS", "Exactly-Once Semantics", "Chế độ exactly-once của Kafka: idempotent producer + transaction; chỉ phủ đọc–xử lý–ghi giữa các topic Kafka."],
   ] },
   { group: "AWS & Kubernetes", items: [
     ["AWS", "Amazon Web Services", "Nền tảng cloud của Amazon."],

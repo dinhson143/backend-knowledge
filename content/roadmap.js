@@ -35,6 +35,7 @@ window.ROADMAP = [
   { id: "s3", title: "Bất đồng bộ & phối hợp", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và chống tranh chấp giữa nhiều máy.",
     parts: [
       { id: "s3.async", title: "Hàng đợi & luồng sự kiện", topics: ["queue", "streams", "kafka"] },
+      { id: "s3.resilience", title: "Gọi nhau an toàn khi có lỗi", topics: ["idempotency"] },
       { id: "s3.contention", title: "Tranh chấp tài nguyên", topics: ["dist-lock"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
