@@ -1,6 +1,6 @@
 // Kiểm tra toàn bộ nội dung. Chạy: node scripts/check.mjs  (thoát 1 khi có lỗi)
-// Nạp đúng những gì index.html nạp: các <script> tĩnh rồi các file content/manifest.js chèn động (trừ app.js),
-// trong vm với window = global. Luật lấy từ docs/content-system.md §4. Phát hiện loại lỗi mới → thêm một kiểm tra ở đây.
+// Nạp đúng những gì index.html nạp: content/manifest.js rồi các file nó chèn (trừ app.js), trong vm với window = global.
+// Luật lấy từ docs/content-system.md §4. Phát hiện loại lỗi mới → thêm một kiểm tra ở đây.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import vm from "node:vm";
 
@@ -31,43 +31,29 @@ function load(f) {
 for (const m of read("index.html").matchAll(/<script src="([^"]+)"/g)) load(m[1]);
 while (queue.length) load(queue.shift());
 const W = ctx;
-const BK = W.BK || { tracks: [], sections: [], topics: [], problems: [], sims: [] };
-const err = (global, path, msg) => at(fileOf[global] || global, path, msg);
+if (!W.BK) { console.error("index.html phải nạp content/manifest.js"); process.exit(1); }
+const BK = W.BK;
 const fileIn = (x) => bkFile.get(x) || "?";
 
 // Một ý: chuỗi hoặc { t, why }; dòng bảng: mảng ô hoặc { cells, why }
 const txt = (p) => (typeof p === "string" ? p : p && p.t);
 const cellsOf = (r) => (Array.isArray(r) ? r : r && r.cells);
 
-// ── Index (bố cục cũ + BK) ──
-const topics = {}, sections = {}, tracks = {}, sims = {}, problems = {};
-const whereOf = {}; // id → file, để báo lỗi
-const put = (map, id, where, path, what, v) => {
-  if (map[id]) at(where, path, `trùng ${what} id "${id}"`);
-  map[id] = v;
-};
-(W.TRACKS || []).forEach((tr) => {
-  put(tracks, tr.id, fileOf.TRACKS, tr.id, "track", tr);
-  tr.sections.forEach((sec) => {
-    put(sections, sec.id, fileOf.TRACKS, `${tr.id}.${sec.id}`, "section", { ...sec, track: tr.id });
-    sec.topics.forEach((tp) => { put(topics, tp.id, fileOf.TRACKS, tp.id, "topic", tp); whereOf[tp.id] = fileOf.TRACKS; });
-  });
+// ── Index (registry đã báo trùng id trong cùng loại; ở đây bắt trùng giữa sim và hld) ──
+const index = (list) => Object.fromEntries(list.map((x) => [x.id, x]));
+const tracks = index(BK.tracks), sections = index(BK.sections), topics = index(BK.topics), problems = index(BK.problems);
+const sims = {}, whereOf = {};
+BK.topics.forEach((t) => (whereOf[t.id] = fileIn(t)));
+BK.sims.forEach((s) => { sims[s.id] = s; whereOf[s.id] = fileIn(s); });
+BK.problems.forEach((p) => {
+  whereOf[p.id] = fileIn(p);
+  if (!p.hld) return at(fileIn(p), p.id, "thiếu hld");
+  if (sims[p.hld.id]) at(fileIn(p), `${p.id}.hld`, `trùng sim id "${p.hld.id}"`);
+  sims[p.hld.id] = p.hld; whereOf[p.hld.id] = fileIn(p);
 });
-BK.tracks.forEach((tr) => put(tracks, tr.id, fileIn(tr), tr.id, "track", tr));
-BK.sections.forEach((s) => put(sections, s.id, fileIn(s), s.id, "section", s));
-BK.topics.forEach((tp) => { put(topics, tp.id, fileIn(tp), tp.id, "topic", tp); whereOf[tp.id] = fileIn(tp); });
-const addSim = (s, where, path) => { put(sims, s.id, where, path, "sim", s); whereOf[s.id] = where; };
-(W.SIMS || []).forEach((s) => addSim(s, fileOf.SIMS, s.id));
-BK.sims.forEach((s) => addSim(s, fileIn(s), s.id));
-const addProblem = (p, where) => {
-  put(problems, p.id, where, p.id, "problem", p); whereOf[p.id] = where;
-  if (p.hld) addSim(p.hld, where, `${p.id}.hld`);
-};
-(W.PROBLEMS || []).forEach((p) => addProblem(p, fileOf.PROBLEMS));
-BK.problems.forEach((p) => addProblem(p, fileIn(p)));
 const E = (id, path, msg) => at(whereOf[id] || "?", path, msg);
 
-// ── File BK: đúng chỗ, đủ trường, track/section khớp ──
+// ── File đúng chỗ, đủ trường, track/section khớp ──
 BK.sections.forEach((s) => { if (!tracks[s.track]) at(fileIn(s), s.id, `track "${s.track}" không tồn tại`); });
 BK.topics.forEach((tp) => {
   const f = fileIn(tp), want = `content/topics/${tp.track}/${tp.id}.js`;
@@ -94,57 +80,18 @@ BK.problems.forEach((p) => p.nfr.forEach((x, i) => shapeP(p.id, `nfr[${i}]`, x))
 // ── Tham chiếu ──
 const ref = (map, id, owner, path, what) => { if (!map[id]) E(owner, path, `${what} "${id}" không tồn tại`); };
 const inRoadmap = new Set();
-W.ROADMAP.forEach((st) => (st.topics || []).forEach((id) => { inRoadmap.add(id); if (!topics[id]) err("ROADMAP", st.id, `topic "${id}" không tồn tại`); }));
+W.ROADMAP.forEach((st) => (st.topics || []).forEach((id) => { inRoadmap.add(id); if (!topics[id]) at(fileOf.ROADMAP, st.id, `topic "${id}" không tồn tại`); }));
 Object.keys(topics).filter((id) => !inRoadmap.has(id)).forEach((id) => E(id, id, "topic không có trong ROADMAP (rơi vào \"Khác\")"));
 Object.values(topics).forEach((t) => (t.related || []).forEach((sid) => ref(sims, sid, t.id, `${t.id}.related`, "sim")));
-Object.values(sims).filter((s) => s.topics).forEach((s) => s.topics.forEach((id) => ref(topics, id, s.id, `${s.id}.topics`, "topic")));
+BK.sims.forEach((s) => s.topics.forEach((id) => ref(topics, id, s.id, `${s.id}.topics`, "topic")));
 Object.values(problems).forEach((p) => {
   p.topics.forEach((id) => ref(topics, id, p.id, `${p.id}.topics`, "topic"));
   (p.sims || []).forEach((sid) => ref(sims, sid, p.id, `${p.id}.sims`, "sim"));
 });
 
-// ── (Bố cục cũ) giải thích ghép theo chỉ số: chỉ số trong phạm vi và key là tiền tố của chuỗi gốc ──
-const norm = (s) => String(s).replace(/^[+!] /, "").replace(/\s+/g, " ").trim();
-const aligned = (g, path, src, key) => {
-  if (src == null) return err(g, path, "chỉ số ngoài phạm vi");
-  if (key != null && !norm(src).startsWith(norm(key))) err(g, path, `lệch: key "${norm(key).slice(0, 40)}…" ≠ gốc "${norm(src).slice(0, 40)}…"`);
-};
-const rows = (t) => (t ? t.rows : []);
-for (const [id, w] of Object.entries(W.WHY || {})) {
-  const t = topics[id];
-  if (!t) { err("WHY", id, "topic không tồn tại"); continue; }
-  (w.points || []).forEach((x) => aligned("WHY", `${id}.points[${x.i}]`, t.points?.[x.i], x.key));
-  (w.tips || []).forEach((x) => aligned("WHY", `${id}.tips[${x.i}]`, t.tips?.[x.i], x.key));
-  for (const tb of ["table", "table2"]) (w[tb] || []).forEach((x) => aligned("WHY", `${id}.${tb}[${x.row}]`, rows(t[tb])[x.row]?.[0], x.key));
-  (w.sections || []).forEach((ws) => {
-    const s = t.sections?.[ws.s];
-    if (!s) return err("WHY", `${id}.sections[${ws.s}]`, "chỉ số ngoài phạm vi");
-    if (ws.title != null) aligned("WHY", `${id}.sections[${ws.s}].title`, s.title, ws.title);
-    (ws.points || []).forEach((x) => aligned("WHY", `${id}.sections[${ws.s}].points[${x.i}]`, s.points?.[x.i], x.key));
-    (ws.table || []).forEach((x) => aligned("WHY", `${id}.sections[${ws.s}].table[${x.row}]`, rows(s.table)[x.row]?.[0], x.key));
-  });
-}
-for (const [id, w] of Object.entries(W.PWHY || {})) {
-  const p = problems[id];
-  if (!p) { err("PWHY", id, "problem không tồn tại"); continue; }
-  (w.nfr || []).forEach((x) => aligned("PWHY", `${id}.nfr[${x.i}]`, p.nfr?.[x.i], x.key));
-  (w.deep || []).forEach((x) => aligned("PWHY", `${id}.deep[${x.i}]`, p.deep?.[x.i]?.q, x.key));
-}
-const variantsOf = (s) => s.variants || [{ name: null, steps: s.steps || [] }];
-for (const [id, d] of Object.entries(W.SIM_DETAIL || {})) {
-  const s = sims[id];
-  if (!s) { err("SIM_DETAIL", id, "sim không tồn tại"); continue; }
-  const vs = variantsOf(s);
-  (d.variants || []).forEach((dv) => {
-    const v = vs[dv.v];
-    if (!v) return err("SIM_DETAIL", `${id}.variants[${dv.v}]`, "chỉ số ngoài phạm vi");
-    if (dv.name != null && dv.name !== v.name) err("SIM_DETAIL", `${id}.variants[${dv.v}]`, `lệch tên variant "${dv.name}" ≠ "${v.name}"`);
-    (dv.steps || []).forEach((x) => aligned("SIM_DETAIL", `${id}.v${dv.v}.steps[${x.i}]`, v.steps?.[x.i]?.note, x.key));
-  });
-}
-
 // ── Sim dạng flow: node id có thật, kind hợp lệ ──
 const KINDS = new Set(["req", "ok", "err", "warn"]);
+const variantsOf = (s) => s.variants || [{ name: null, steps: s.steps || [] }];
 for (const s of Object.values(sims)) {
   if (s.custom) continue;
   variantsOf(s).forEach((v, vi) => {
@@ -167,8 +114,8 @@ for (const s of Object.values(sims)) {
 
 // ── Văn bản hiển thị: markup inline, tiền tố points, chữ không dấu ──
 const NO_DIACRITICS = /\b(khong|duoc|nguoi|nhieu|truoc|chung ta|tuong|thuc hien|du lieu|he thong)\b/i;
-// key = tiền tố đối chiếu (bị cắt, không hiển thị); files/run = code
-const CODE_KEYS = new Set(["key", "files", "run", "id", "x", "y", "w", "h"]);
+// files/run = code; còn lại là id, toạ độ, đường dẫn
+const CODE_KEYS = new Set(["files", "run", "id", "x", "y", "w", "h", "src"]);
 function walk(file, v, path) {
   if (typeof v === "string") {
     const ticks = (v.match(/`/g) || []).length;
@@ -193,11 +140,12 @@ Object.values(topics).forEach((t) => pointLists(t).flat().forEach((p) => {
 const MAX = 40 * 1024;
 const NOT_LOADED = new Set(["content/manifest.js", "content/_TEMPLATE.js"]);
 const walkDir = (d) => readdirSync(new URL(d, root), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walkDir(`${d}${e.name}/`) : [`${d}${e.name}`]));
-const onDisk = walkDir("content/").filter((f) => f.endsWith(".js") && !NOT_LOADED.has(f));
+const onDisk = walkDir("content/");
+const jsOnDisk = onDisk.filter((f) => f.endsWith(".js") && !NOT_LOADED.has(f));
 const inManifest = new Set(loaded.filter((f) => f.startsWith("content/") && f !== "content/manifest.js"));
-onDisk.filter((f) => !inManifest.has(f)).forEach((f) => at(f, "", "file không có trong content/manifest.js"));
-onDisk.forEach((f) => { const n = statSync(new URL(f, root)).size; if (n > MAX) at(f, "", `${Math.round(n / 1024)} KB > 40 KB — nên tách`); });
-if (loaded.includes("content/manifest.js") && loaded[loaded.length - 1] !== "app.js") at("content/manifest.js", "FILES", "app.js phải là file nạp cuối cùng");
+jsOnDisk.filter((f) => !inManifest.has(f)).forEach((f) => at(f, "", "file không có trong content/manifest.js"));
+jsOnDisk.forEach((f) => { const n = statSync(new URL(f, root)).size; if (n > MAX) at(f, "", `${Math.round(n / 1024)} KB > 40 KB — nên tách`); });
+if (loaded.at(-1) !== "app.js") at("content/manifest.js", "FILES", "app.js phải là file nạp cuối cùng");
 
 // ── Kết quả ──
 if (errors.length) {

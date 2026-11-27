@@ -3,46 +3,9 @@
   const main = $("#main");
   const sidebar = $("#sidebar");
 
-  // ── Bố cục cũ → dạng mới (TRACKS + WHY, SIMS + SIM_DETAIL, PROBLEMS + PWHY ghép theo chỉ số). Xoá ở bước 5. ──
-  function fromLegacy() {
-    const WHY = window.WHY || {}, PWHY = window.PWHY || {}, SD = window.SIM_DETAIL || {};
-    const find = (arr, k, v) => (arr || []).find((x) => x[k] === v);
-    const wm = (arr, k = "i") => Object.fromEntries((arr || []).map((w) => [w[k], w.why]));
-    const pt = (s, why) => (why == null ? s : { t: s, why });
-    const tb = (t, m) => t && { head: t.head, rows: t.rows.map((r, i) => (m[i] == null ? r : { cells: r, why: m[i] })) };
-    const topics = [];
-    (window.TRACKS || []).forEach((tr) => tr.sections.forEach((sec) => sec.topics.forEach((tp) => {
-      const w = WHY[tp.id] || {};
-      const o = { ...tp, track: tr.id, section: sec.id, tldr: pt(tp.tldr, w.tldr), story: w.story };
-      if (tp.points) { const m = wm(w.points); o.points = tp.points.map((p, i) => pt(p, m[i])); }
-      if (tp.tips) { const m = wm(w.tips); o.tips = tp.tips.map((p, i) => pt(p, m[i])); }
-      o.table = tb(tp.table, wm(w.table, "row"));
-      o.table2 = tb(tp.table2, wm(w.table2, "row"));
-      if (tp.sections) o.sections = tp.sections.map((s, si) => {
-        const ws = find(w.sections, "s", si) || {};
-        const m = wm(ws.points);
-        return { ...s, points: s.points && s.points.map((p, i) => pt(p, m[i])), table: tb(s.table, wm(ws.table, "row")) };
-      });
-      topics.push(o);
-    })));
-    const sim = (s) => {
-      if (s.custom) return s;
-      const d = SD[s.id] || {};
-      const steps = (arr, v) => arr.map((st, k) => { const x = find(find(d.variants, "v", v)?.steps, "i", k); return x ? { ...st, detail: x.detail } : st; });
-      return { ...s, context: d.context, ...(s.variants ? { variants: s.variants.map((v, vi) => ({ ...v, steps: steps(v.steps, vi) })) } : { steps: steps(s.steps, 0) }) };
-    };
-    const problems = (window.PROBLEMS || []).map((p) => {
-      const w = PWHY[p.id] || {}, m = wm(w.nfr);
-      return { ...p, nfr: p.nfr.map((x, i) => pt(x, m[i])), hld: sim(p.hld), hldWhy: w.hld,
-        deep: p.deep.map((d, k) => { const x = find(w.deep, "i", k); return x ? { ...d, why: { bad: x.bad, good: x.good, great: x.great } } : d; }) };
-    });
-    return { topics, sims: (window.SIMS || []).map(sim), problems };
-  }
-  const OLD = fromLegacy();
-  const BK = window.BK || { topics: [], sims: [], problems: [] };
-
-  // ── Index: nội dung (BK + bố cục cũ) + thứ tự học (ROADMAP) ──
-  const ALL = [...OLD.topics, ...BK.topics];
+  // ── Index: nội dung (registry BK của content/manifest.js) + thứ tự học (ROADMAP) ──
+  const BK = window.BK;
+  const ALL = BK.topics;
   const byId = Object.fromEntries(ALL.map((t) => [t.id, t]));
   const STAGES = window.ROADMAP.map((s) => ({ ...s, topics: (s.topics || []).filter((id) => byId[id]) }));
   const listed = new Set(STAGES.flatMap((s) => s.topics));
@@ -52,11 +15,11 @@
   // Thứ tự đọc: giai đoạn chính trước, nhánh song song sau
   const ORDER = [...STAGES.filter((s) => !s.parallel), ...STAGES.filter((s) => s.parallel)].flatMap((s) => s.topics.map((id) => byId[id]));
 
-  const SIMS = [...OLD.sims, ...BK.sims];
+  const SIMS = BK.sims;
   const simById = Object.fromEntries(SIMS.map((s) => [s.id, s]));
   const simsFor = (id) => SIMS.filter((s) => s.topics.includes(id));
   const LEVELS = { 1: "Khởi động", 2: "Trung bình", 3: "Nâng cao" };
-  const PROBLEMS = [...OLD.problems, ...BK.problems].sort((a, b) => a.level - b.level);
+  const PROBLEMS = BK.problems.slice().sort((a, b) => a.level - b.level);
   const pById = Object.fromEntries(PROBLEMS.map((p) => [p.id, p]));
   const problemsFor = (id) => PROBLEMS.filter((p) => p.topics.includes(id));
 
