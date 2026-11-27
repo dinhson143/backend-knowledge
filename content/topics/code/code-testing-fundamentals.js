@@ -74,7 +74,8 @@ BK.topic({
         head: ["Code", "Ý nghĩa"],
         rows: [
           ["`class InMemoryUsers:` có `save(user)` và `get(email)` dùng `dict`", "Fake: cùng interface với repository thật, chạy trong bộ nhớ."],
-          ["`service = SignupService(users=InMemoryUsers(), now=lambda: FIXED_TIME)`", "Phụ thuộc được truyền vào (dependency injection), kể cả đồng hồ."],
+          ["`users = InMemoryUsers()`", "Arrange: giữ tham chiếu tới fake để lát nữa kiểm state."],
+          ["`service = SignupService(users=users, now=lambda: FIXED_TIME)`", "Phụ thuộc được truyền vào (dependency injection), kể cả đồng hồ."],
           ["`service.signup(\"a@x.io\")`", "Act: gọi hành vi cần kiểm."],
           ["`assert users.get(\"a@x.io\").created_at == FIXED_TIME`", "Assert trên state, không assert \"đã gọi `save` một lần\"."],
           ["`with pytest.raises(EmailAlreadyUsedError): service.signup(\"a@x.io\")`", "Đường lỗi cũng là hành vi; `pytest.raises` kiểm loại exception (https://docs.pytest.org/en/stable/how-to/assert.html)."],

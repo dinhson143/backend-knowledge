@@ -52,7 +52,7 @@ BK.topic({
       why: "`raise ... from e` gán lỗi gốc vào `__cause__` và traceback in cả hai; khi ném lỗi mới trong `except` mà không có `from`, lỗi cũ vẫn được gắn vào `__context__`; `from None` ẩn nó khi hiển thị (https://docs.python.org/3/library/exceptions.html). Trong Go, `%w` tạo lỗi có `Unwrap` nên `errors.Is`/`errors.As` vẫn tìm được lỗi gốc (https://go.dev/blog/go1.13-errors).",
     },
     {
-      t: "**Dịch lỗi ở ranh giới tầng** — repository bắt `psycopg.errors.UniqueViolation` và ném `EmailAlreadyUsedError`; service không cần biết bên dưới là PostgreSQL. HTTP handler đổi `EmailAlreadyUsedError` thành 409.",
+      t: "**Dịch lỗi ở ranh giới tầng** — repository bắt `psycopg.errors.UniqueViolation` (SQLSTATE 23505 — https://www.psycopg.org/psycopg3/docs/api/errors.html) và ném `EmailAlreadyUsedError`; service không cần biết bên dưới là PostgreSQL. HTTP handler đổi `EmailAlreadyUsedError` thành 409.",
       why: "Blog Go 1.13 nói rõ: wrap một lỗi là biến nó thành một phần API của bạn; nếu không muốn lộ chi tiết cài đặt (ví dụ `sql.ErrNoRows`) thì đừng wrap bằng `%w`, để sau này đổi database không phá caller. Python cũng vậy: lớp trên bắt lỗi của driver là bị buộc chặt vào driver.",
     },
     {

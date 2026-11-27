@@ -45,7 +45,7 @@ BK.topic({
     },
     {
       t: "**Tự động hoá bằng `git bisect run <lệnh>`** — lệnh thoát 0 là good, 1–127 (trừ 125) là bad, 125 là bỏ qua commit không build được. Ví dụ: `git bisect run pytest tests/test_tax.py -x`.",
-      why: "Đây là quy ước mã thoát trong tài liệu `git bisect`; mã ngoài khoảng đó (ví dụ ≥ 128) làm dừng cả phiên bisect. Có test tái hiện ở bước 2 thì bisect chạy một mình, không cần người ngồi bấm.",
+      why: "Đây là quy ước mã thoát trong tài liệu `git bisect`; mã ngoài khoảng đó (ví dụ ≥ 128) làm dừng cả phiên bisect. Có test tái hiện ở bước 2 thì bisect chạy một mình, không cần người ngồi bấm. Lưu ý: file test mới viết không có ở các commit cũ, mà pytest không tìm thấy file thì thoát mã khác 0 (https://docs.pytest.org/en/stable/reference/exit-codes.html), nên bisect sẽ đánh dấu nhầm là bad; đặt script test ngoài repo (hoặc để untracked) để mọi commit đều chạy được nó.",
     },
     {
       t: "**Debugger thay vì `print` rải rác** — đặt `breakpoint()` (Python 3.7+) ở chỗ nghi ngờ; trong pdb: `p expr` xem giá trị, `n` sang dòng kế, `s` vào hàm, `w` xem stack, `u`/`d` lên/xuống khung, `c` chạy tiếp.",
