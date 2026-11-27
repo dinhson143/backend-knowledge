@@ -99,7 +99,7 @@ window.ROADMAP = [
   { id: "dsa", title: "Coding · DSA", goal: "Học xong bạn nhận dạng pattern thuật toán từ ràng buộc đề bài.", parallel: true,
     parts: [
       { id: "dsa.complexity", title: "Độ phức tạp", topics: ["bigo"] },
-      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees"] },
+      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees", "dsa-design-ds"] },
       { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs", "dsa-dp"] },
     ] },
 ];
