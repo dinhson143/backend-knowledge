@@ -83,6 +83,7 @@
     "content/topics/dsa/dsa-two-pointers.js",
     "content/topics/dsa/dsa-sliding-window.js",
     "content/topics/dsa/dsa-graphs.js",
+    "content/topics/dsa/dsa-dp.js",
     "content/topics/cs/os-process-lifecycle.js",
     "content/topics/cs/thr-thread-vs-process.js",
     "content/topics/cs/os-context-switch.js",
