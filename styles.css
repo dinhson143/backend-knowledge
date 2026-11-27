@@ -110,7 +110,20 @@ h2 { font-size: 18px; margin: 32px 0 10px; }
 .legend { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin: 8px 0 0; flex-wrap: wrap; }
 
 /* ── Tables ── */
-.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+/* Bảng cuộn ngang: bóng ở mép còn nội dung (lớp "local" che bóng khi đã cuộn tới mép) */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius);
+  background:
+    linear-gradient(to right, var(--surface) 30%, transparent) left / 32px 100% no-repeat local,
+    linear-gradient(to left, var(--surface) 30%, transparent) right / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent) right / 12px 100% no-repeat scroll,
+    var(--surface); }
+:root { --scroll-shadow: rgba(0,0,0,.18); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --scroll-shadow: rgba(255,255,255,.16); } }
+:root[data-theme="dark"] { --scroll-shadow: rgba(255,255,255,.16); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; }
+}
 table { border-collapse: collapse; width: 100%; font-size: 14px; }
 th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
 th { background: var(--surface-2); font-weight: 600; font-size: 13px; white-space: nowrap; }
