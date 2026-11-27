@@ -42,7 +42,7 @@ window.ROADMAP = [
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
-      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "bigdata-ds"] },
+      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "vector-search", "bigdata-ds"] },
       { id: "s4.choose", title: "Chọn công nghệ", topics: ["tech-cheatsheet"] },
     ] },
   { id: "s5", title: "Ghép pattern & luyện đề", goal: "Học xong bạn nhận ra dạng bài, gọi đúng pattern, tự giải từ Khởi động tới Nâng cao.", problems: true,
