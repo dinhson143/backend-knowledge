@@ -122,6 +122,7 @@ Trước khi dời bất kỳ nội dung nào, viết `scripts/check.mjs`. Scrip
 | Manifest khớp với các file trong `content/` | Quên đăng ký file mới |
 | File nằm đúng `content/topics/<track>/<id>.js` (problem, sim tương tự); `section` thuộc đúng `track` | File đặt nhầm chỗ, id khác tên file |
 | `diagrams[].src` trỏ tới file có thật trong `content/svg/` (so cả hoa/thường); mọi SVG đều được tham chiếu; SVG có `xmlns`, `viewBox`, nền trắng | Ảnh vỡ trên GitHub Pages, SVG mồ côi, sơ đồ chìm trong theme tối |
+| `title` của giai đoạn, chặng, track, section, topic, problem, sim không chứa cụm nào ở cột "Không dùng trong nhãn" của `docs/terminology.md` | Nhãn điều hướng dùng bản dịch khó hiểu thay cho key term mà phỏng vấn dùng (D106) |
 
 Chạy `node scripts/check.mjs` sau **mọi** lần sửa nội dung, trước khi commit. Nên đặt nó thành pre-commit hook hoặc bước GitHub Actions trước khi deploy Pages. Script thoát với mã 1 khi có lỗi và in `file:đường-dẫn → lỗi`.
 

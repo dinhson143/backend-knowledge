@@ -178,6 +178,30 @@ Object.values(topics).forEach((t) => pointLists(t).flat().forEach((p) => {
   if (/^[+!](?! )/.test(s)) E(t.id, `${t.id}.points`, `tiền tố sai (chỉ "+ " hoặc "! "): "${s.slice(0, 30)}"`);
 }));
 
+// ── Thuật ngữ: nhãn điều hướng không dùng cách dịch đã loại (docs/terminology.md §3, D106) ──
+// Đọc cột 4 "Không dùng trong nhãn" của bảng giữa <!-- terminology:start/end -->; mỗi cụm trong "…".
+// So nguyên cụm từ, không phân biệt hoa/thường (\b không hiểu chữ có dấu nên dùng \p{L}).
+const TERMS = "docs/terminology.md";
+const termTable = (() => { try { return read(TERMS); } catch { return ""; } })().match(/<!-- terminology:start -->([\s\S]*?)<!-- terminology:end -->/)?.[1] || "";
+const norm = (s) => s.normalize("NFC").toLowerCase();
+const banned = termTable.split("\n").filter((l) => l.startsWith("|")).flatMap((l) => {
+  const c = l.split("|").slice(1, -1);
+  if (c.length < 5) return [];
+  const term = c[0].replace(/\*\*/g, "").trim();
+  return [...c[3].matchAll(/"([^"]+)"/g)].map(([, p]) => [new RegExp(`(?<![\\p{L}\\p{N}])${norm(p).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "u"), p, term]);
+});
+if (!banned.length) at(TERMS, "", "không đọc được cụm nào ở cột \"Không dùng trong nhãn\" giữa <!-- terminology:start --> và <!-- terminology:end -->");
+const label = (file, path, title) => {
+  if (typeof title !== "string") return;
+  for (const [re, p, term] of banned) if (re.test(norm(title))) at(file, path, `nhãn "${title}" dùng "${p}" — dùng key term "${term}" (docs/terminology.md)`);
+};
+W.ROADMAP.forEach((st) => { label(RM, `${st.id}.title`, st.title); (st.parts || []).forEach((p) => label(RM, `${p.id}.title`, p.title)); });
+BK.tracks.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.sections.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.topics.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.problems.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+Object.values(sims).forEach((s) => label(whereOf[s.id], `${s.id}.title`, s.title));
+
 // ── Glossary: mỗi viết tắt một lần (mục sau ghi đè mục trước mà không báo) ──
 const glSeen = new Set();
 (W.GLOSSARY || []).forEach((g) => g.items.forEach(([k]) => {
