@@ -40,6 +40,10 @@ window.ROADMAP = [
       { id: "s3.contention", title: "Contention & Locking", topics: ["db-locking", "dist-lock", "consensus"] },
       { id: "s3.workflow", title: "Multi-step Processes", topics: ["outbox-cdc", "durable-execution"] },
     ] },
+  { id: "svc", title: "Hệ thống nhiều service", goal: "Học xong bạn tách được service theo nghiệp vụ, cho chúng tìm và gọi nhau an toàn, và giữ dữ liệu nhất quán giữa các service.",
+    parts: [
+      { id: "svc.comm", title: "Giao tiếp giữa service", topics: ["sync-vs-async-comm"] },
+    ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
       { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "vector-search", "bigdata-ds"] },
