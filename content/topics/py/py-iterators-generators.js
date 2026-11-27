@@ -4,7 +4,7 @@ BK.topic({
   track: "py",
   section: "py-core",
   title: "Iterators & Generators",
-  goal: "Xử lý dữ liệu lớn theo luồng bằng generator và tránh bẫy iterator chỉ duyệt được một lần",
+  goal: "Xử lý dữ liệu lớn từng phần bằng generator và tránh bẫy iterator chỉ duyệt được một lần",
   needs: ["py-data-model"],
   tldr: {
     t: "**Iterable** là thứ đưa vào `for` được (list, dict, file, range); gọi `iter()` trên nó cho ra một **iterator**: object có `__next__` trả từng phần tử và ném `StopIteration` khi hết. Iterator **chỉ duyệt được một lần**. **Generator** là cách viết iterator bằng một hàm có `yield`: mỗi `yield` tạm dừng hàm và giữ nguyên biến local, lần `next()` sau chạy tiếp từ đó. Vì sinh phần tử khi được hỏi (lazy), generator xử lý được dữ liệu lớn hơn RAM.",
