@@ -31,7 +31,7 @@ BK.sim({
           note: "Alice ghi trước: `UPDATE … SET v=2 WHERE v=1` → 1 row.",
           msgs: [["api", "db", "UPDATE WHERE v=1 (Alice)"], ["db", "api", "1 row ✓", "ok"]],
           set: { db: "A1: Alice · v=2" },
-          detail: "Alice thắng: `UPDATE seats SET owner='Alice', v=2 WHERE id='A1' AND v=1` khớp điều kiện `v=1`, nên DB cập nhật **1 row** và tăng version lên 2. Bản thân UPDATE vẫn khoá dòng trong chốc lát, nên hai UPDATE đồng thời luôn chạy tuần tự.",
+          detail: "Alice thắng: `UPDATE seats SET owner='Alice', v=2 WHERE id='A1' AND v=1` khớp điều kiện `v=1`, nên DB cập nhật **1 row** và tăng version lên 2. Bản thân UPDATE vẫn khoá dòng tới khi transaction kết thúc, nên hai UPDATE đồng thời trên cùng dòng luôn chạy tuần tự.",
         },
         {
           note: "Bob ghi `WHERE v=1` → **0 row** vì version đã là 2.",
@@ -65,7 +65,7 @@ BK.sim({
           note: "Bob cũng `FOR UPDATE` → bị **block**, phải chờ.",
           msgs: [["api", "db", "FOR UPDATE (Bob)", "warn"]],
           set: { bob: "⏳ chờ lock" },
-          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `lock_wait_timeout`.",
+          detail: "Bob bị DB **block**: cùng câu `FOR UPDATE`, transaction của Bob đứng chờ lock của Alice, giữ nguyên connection DB và thread của API. Nếu Alice giữ lock lâu (ví dụ gọi payment gateway bên trong transaction), Bob và mọi người phía sau xếp hàng tới khi hết `innodb_lock_wait_timeout` (MySQL, mặc định 50s — https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html); PostgreSQL mặc định `lock_timeout = 0` nên chờ không giới hạn.",
         },
         {
           note: "Alice UPDATE và COMMIT → nhả lock.",

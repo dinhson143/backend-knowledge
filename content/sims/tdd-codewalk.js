@@ -19,7 +19,7 @@ BK.sim({
             },
             { name: "shipping.py", role: "impl", code: "# chưa có gì" },
           ],
-          run: { ok: false, out: "ImportError: cannot import name 'shipping_fee'\n1 failed" },
+          run: { ok: false, out: "ImportError: cannot import name 'shipping_fee' from 'shipping'\n1 error" },
           note: "Viết **một** test nhỏ mô tả hành vi mong muốn trước khi có code. Chạy và thấy **đỏ** là bắt buộc: nó chứng minh test thật sự kiểm tra điều gì đó. Một test chưa từng đỏ có thể luôn xanh kể cả khi code sai.",
         },
         {
@@ -154,7 +154,7 @@ BK.sim({
               code: "from pytest_bdd import scenarios, given, when, then, parsers\nfrom shop import Cart, place_order\n\nscenarios(\"free_shipping.feature\")\n\n@given(parsers.parse(\"giỏ hàng có tổng {total:d}.000đ\"), target_fixture=\"cart\")\ndef cart(total):\n    return Cart(total * 1000)\n\n@when(\"khách thanh toán\", target_fixture=\"order\")\ndef checkout(cart):\n    return place_order(cart)\n\n@then(parsers.parse(\"phí ship là {fee:d}đ\"))\ndef check_fee(order, fee):\n    assert order.shipping_fee == fee",
             },
           ],
-          run: { ok: false, out: "ImportError: cannot import name 'Cart' from 'shop'\n1 failed" },
+          run: { ok: false, out: "ModuleNotFoundError: No module named 'shop'\n1 error" },
           note: "Mỗi dòng Given/When/Then nối với một **step definition** gọi vào hệ thống thật qua use case `place_order`. Kịch bản kiểm tra **hành vi nhìn từ ngoài**, không kiểm tra hàm nội bộ — nên refactor bên trong không làm vỡ nó.",
         },
         {
