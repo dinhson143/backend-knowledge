@@ -46,7 +46,7 @@ BK.topic({
     },
     {
       t: "+ **Scarcity** — chia tài nguyên có hạn: semaphore, connection pool, rate limiting, backpressure.",
-      why: "Không giới hạn số người dùng đồng thời thì hệ thống phía sau quá tải và sập, vì tài nguyên như connection DB, quota API là hữu hạn. Backpressure báo ngược cho bên gửi chậm lại, thay vì đẩy thêm vào hàng đợi vô hạn.",
+      why: "Không giới hạn số người dùng đồng thời thì hệ thống phía sau quá tải và sập, vì tài nguyên như connection DB, quota API là hữu hạn. Backpressure báo ngược cho bên gửi chậm lại, thay vì đẩy thêm vào queue vô hạn.",
     },
     {
       t: "**Race condition** — kết quả phụ thuộc thứ tự chạy của các thread khi cùng truy cập critical section.",

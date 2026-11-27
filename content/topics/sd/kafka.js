@@ -10,7 +10,7 @@ BK.topic({
     why: "Dữ liệu ở lại đủ lâu để đọc lại và mỗi consumer group đọc độc lập, vì producer chỉ **append** vào cuối file, consumer chỉ giữ một con số offset → broker không phải xoá hay đánh dấu từng message. Thứ tự chỉ định nghĩa được **bên trong** một partition, vì mỗi partition là một log riêng có offset tăng dần; hai partition trên hai broker khác nhau không có đồng hồ chung nào để so thứ tự.",
   },
   story: {
-    problem: "Nhiều service cần cùng một luồng event (order, click) thì gọi trực tiếp từng service tạo coupling chặt. Queue truyền thống xoá message sau khi đọc → consumer thứ hai, hay consumer cần đọc lại sau bug, không còn gì để đọc. Database thì không chịu nổi hàng trăm nghìn insert/s chỉ để làm hàng đợi.",
+    problem: "Nhiều service cần cùng một luồng event (order, click) thì gọi trực tiếp từng service tạo coupling chặt. Queue truyền thống xoá message sau khi đọc → consumer thứ hai, hay consumer cần đọc lại sau bug, không còn gì để đọc. Database thì không chịu nổi hàng trăm nghìn insert/s chỉ để làm queue.",
     idea: "Ghi mọi event vào một **log append-only** trên đĩa, chia thành nhiều partition trên nhiều broker; broker không theo dõi ai đã đọc gì, mỗi consumer tự giữ **offset** của mình. Thêm consumer hay replay chỉ là đọc từ một offset khác, vì log không bị xoá khi đọc.",
     tradeoff: "Thứ tự chỉ có trong partition, số partition khó đổi về sau, và consumer phải tự lo DLQ, retry, idempotency. Vận hành cluster (broker, replica, rebalance, lag) nặng hơn hẳn SQS hay RabbitMQ.",
   },
@@ -287,7 +287,7 @@ BK.topic({
   diagrams: [
     {
       src: "content/svg/kafka-topic-partitions.svg",
-      caption: "Producer băm key để chọn partition; trong một consumer group mỗi partition chỉ có một consumer, còn các group khác nhau đọc cùng log độc lập với offset riêng.",
+      caption: "Producer hash key để chọn partition; trong một consumer group mỗi partition chỉ có một consumer, còn các group khác nhau đọc cùng log độc lập với offset riêng.",
       source: "https://kafka.apache.org/documentation/#intro_concepts_and_terms",
     },
   ],

@@ -6,7 +6,7 @@ BK.topic({
   goal: "Đặt SLO, đo p99 và lần theo một request qua nhiều service",
   needs: ["numbers", "system-architecture"],
   tldr: {
-    t: "**Metric** trả lời \"có vấn đề không\", **trace** trả lời \"chậm ở đâu\", **log** trả lời \"chuyện gì đã xảy ra\". **SLI** là con số đo được, **SLO** là mục tiêu cho SLI, **SLA** là cam kết có hậu quả. **Error budget** (1 − SLO) quyết định khi nào được ra tính năng nhanh, khi nào phải dừng lại sửa độ ổn định.",
+    t: "**Observability** (nhìn được bên trong hệ thống đang chạy): **metric** trả lời \"có vấn đề không\", **trace** trả lời \"chậm ở đâu\", **log** trả lời \"chuyện gì đã xảy ra\". **SLI** là con số đo được, **SLO** là mục tiêu cho SLI, **SLA** là cam kết có hậu quả. **Error budget** (1 − SLO) quyết định khi nào được ra tính năng nhanh, khi nào phải dừng lại sửa độ ổn định.",
     why: "Ba tín hiệu có chi phí và độ chi tiết khác nhau: metric rẻ và gộp được nên dùng để phát hiện và cảnh báo; trace đắt hơn nhưng nối các service lại theo một request; log chi tiết nhất và đắt nhất khi lưu lâu. Dùng sai loại (đếm lỗi bằng cách grep log, báo động theo từng dòng log) thì hoặc tốn kém, hoặc chậm phát hiện.",
   },
   story: {
@@ -65,7 +65,7 @@ BK.topic({
     },
     {
       t: "**RED cho service, USE cho tài nguyên.** RED: **R**ate (request/giây), **E**rrors (số request lỗi), **D**uration (thời gian xử lý) (https://grafana.com/blog/2018/08/02/the-red-method-how-to-instrument-your-services/). USE: với mỗi tài nguyên, xem **U**tilization, **S**aturation (việc phải xếp hàng), **E**rrors (https://www.brendangregg.com/usemethod.html).",
-      why: "RED đo trải nghiệm mà service đem lại cho người gọi nó, USE đo sức khoẻ của máy, đĩa, mạng bên dưới. Bắt đầu từ RED để biết **có** vấn đề, rồi dùng USE để tìm **tài nguyên** nào gây ra. Saturation quan trọng vì tài nguyên dùng 70% vẫn có thể có hàng đợi dài.",
+      why: "RED đo trải nghiệm mà service đem lại cho người gọi nó, USE đo sức khoẻ của máy, đĩa, mạng bên dưới. Bắt đầu từ RED để biết **có** vấn đề, rồi dùng USE để tìm **tài nguyên** nào gây ra. Saturation quan trọng vì tài nguyên dùng 70% vẫn có thể có queue dài.",
     },
     {
       t: "**Distributed tracing**: trace id truyền qua header chuẩn W3C `traceparent` = `version-traceid-parentid-flags`, ví dụ `00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01`; trace id 16 byte, parent id 8 byte (https://github.com/w3c/trace-context/blob/main/spec/20-http_request_header_format.md).",

@@ -40,7 +40,7 @@ BK.problem({
     title: "HLD — Web Crawler",
     h: 340,
     scenario: "Pipeline 2 stage: Crawler fetch và lưu raw HTML; Parser trích text, lọc link đã thấy, đẩy link mới về frontier.",
-    context: "**URL Frontier** (SQS/Kafka) là hàng đợi URL cần crawl. **Crawler** lấy URL, kiểm quy tắc lịch sự (robots.txt, rate limit theo domain) trong **Domain + URL DB**, fetch trang từ **Internet** và lưu raw HTML lên **S3**. **Parser workers** là stage thứ hai: trích text và link, lọc link đã thấy rồi đẩy link mới về frontier. Theo dõi dòng chữ dưới S3 (đã lưu gì) và dưới Domain + URL DB (bao nhiêu URL đã đánh dấu “seen”).",
+    context: "**URL Frontier** (SQS/Kafka) là queue URL cần crawl. **Crawler** lấy URL, kiểm quy tắc lịch sự (robots.txt, rate limit theo domain) trong **Domain + URL DB**, fetch trang từ **Internet** và lưu raw HTML lên **S3**. **Parser workers** là stage thứ hai: trích text và link, lọc link đã thấy rồi đẩy link mới về frontier. Theo dõi dòng chữ dưới S3 (đã lưu gì) và dưới Domain + URL DB (bao nhiêu URL đã đánh dấu “seen”).",
     nodes: [
       { id: "frontier", x: 90, y: 170, label: "URL Frontier", s: "SQS / Kafka" },
       { id: "crawler", x: 300, y: 80, label: "Crawler" },

@@ -60,7 +60,7 @@ BK.sim({
           note: "Order Svc tạo order và phát event.",
           msgs: [["order", "orch", "OrderCreated"]],
           set: { order: "order#1 PENDING" },
-          detail: "Order Svc tạo `order#1` **PENDING** trong DB của nó và phát event `OrderCreated` lên Event Bus (Kafka) — không còn orchestrator. Để tránh ghi DB xong mà publish event thất bại (hoặc ngược lại), thực tế dùng **transactional outbox**: ghi order và event vào cùng một transaction DB, một tiến trình khác đẩy event lên Kafka. Order Svc không biết ai sẽ phản ứng với event này.",
+          detail: "Order Svc tạo `order#1` **PENDING** trong DB của nó và phát event `OrderCreated` lên Event Bus (Kafka) — không còn orchestrator. Để tránh ghi DB xong mà publish event thất bại (hoặc ngược lại), thực tế dùng **transactional outbox**: ghi order và event vào cùng một transaction DB, một process khác đẩy event lên Kafka. Order Svc không biết ai sẽ phản ứng với event này.",
         },
         {
           note: "Payment nghe event, tự trừ tiền, phát event mới.",

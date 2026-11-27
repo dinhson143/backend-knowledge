@@ -96,7 +96,7 @@ BK.sim({
           note: "Read Committed. T1 và T2 cùng **đọc** số dư 100 để trừ tiền ở tầng app.",
           msgs: [["T1", "db", "SELECT balance"], ["db", "T1", "100", "ok"], ["T2", "db", "SELECT balance"], ["db", "T2", "100", "ok"]],
           set: { T1: "đọc 100", T2: "đọc 100" },
-          detail: "Hai request rút tiền chạy song song, mỗi request mở một transaction ở **Read Committed** (mặc định PostgreSQL). Cả hai `SELECT` đều thấy 100 vì chưa ai ghi. Code app sẽ tính số dư mới **trong bộ nhớ**: T1 rút 30, T2 rút 50.",
+          detail: "Hai request rút tiền chạy đồng thời, mỗi request mở một transaction ở **Read Committed** (mặc định PostgreSQL). Cả hai `SELECT` đều thấy 100 vì chưa ai ghi. Code app sẽ tính số dư mới **trong bộ nhớ**: T1 rút 30, T2 rút 50.",
         },
         {
           note: "T1 ghi `balance = 70` (100 − 30) và COMMIT.",
@@ -136,7 +136,7 @@ BK.sim({
           detail: "T1 sửa dòng của Alice, T2 sửa dòng của Bob. Không ai ghi đè dòng của ai, nên Repeatable Read không thấy xung đột ghi–ghi và cho cả hai commit. Đây khác lost update: lost update là hai ghi trên **cùng** một dòng.",
         },
         {
-          note: "Mỗi transaction đúng khi chạy riêng, chạy song song thì vi phạm luật.",
+          note: "Mỗi transaction đúng khi chạy riêng, chạy đồng thời thì vi phạm luật.",
           bad: ["T1", "T2"],
           lesson: "Write skew: hai transaction đọc chung một điều kiện rồi ghi vào hai dòng khác nhau. Snapshot isolation không chặn; cần Serializable hoặc khoá tường minh.",
           detail: "Ca trực không còn ai: kết quả không trùng với bất kỳ thứ tự chạy lần lượt nào (chạy lần lượt thì người thứ hai sẽ đếm thấy 1 và bị từ chối). PostgreSQL gọi đây là **serialization anomaly**, và chỉ Serializable chặn được: nó theo dõi phụ thuộc đọc–ghi và huỷ một transaction với lỗi serialization (SQLSTATE `40001`), app phải retry. Ở level thấp hơn, khoá các dòng mà điều kiện đọc bằng `SELECT … FOR UPDATE`, hoặc biến điều kiện thành constraint của DB.",

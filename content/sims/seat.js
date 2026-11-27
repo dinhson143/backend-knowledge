@@ -3,7 +3,7 @@ BK.sim({
   title: "Hai người tranh ghế cuối cùng",
   topics: ["patterns"],
   scenario: "Alice và Bob cùng bấm đặt ghế A1 trong cùng một mili-giây.",
-  context: "Nếu cả Alice và Bob đọc “ghế trống” rồi cùng ghi, ghế A1 sẽ bị **bán hai lần** (lost update). Hai người đặt cùng một mili-giây; hai request chạy song song trên Booking API và cùng chạm một dòng trong DB. Hai cách chặn: **optimistic lock** (không khoá, kiểm tra cột `version` lúc ghi) và **pessimistic lock** (khoá dòng ngay khi đọc bằng `SELECT … FOR UPDATE`). Theo dõi trạng thái dòng A1 dưới DB: người giữ ghế, `v` và biểu tượng khoá.",
+  context: "Nếu cả Alice và Bob đọc “ghế trống” rồi cùng ghi, ghế A1 sẽ bị **bán hai lần** (lost update). Hai người đặt cùng một mili-giây; hai request chạy đồng thời trên Booking API và cùng chạm một dòng trong DB. Hai cách chặn: **optimistic lock** (không khoá, kiểm tra cột `version` lúc ghi) và **pessimistic lock** (khoá dòng ngay khi đọc bằng `SELECT … FOR UPDATE`). Theo dõi trạng thái dòng A1 dưới DB: người giữ ghế, `v` và biểu tượng khoá.",
   nodes: [
     { id: "alice", x: 90, y: 65, label: "Alice" },
     { id: "bob", x: 90, y: 225, label: "Bob" },
@@ -53,7 +53,7 @@ BK.sim({
         {
           note: "Hai request tới cùng lúc.",
           msgs: [{ par: [["alice", "api", "book A1"], ["bob", "api", "book A1"]] }],
-          detail: "Cùng hai request `book A1` tới song song như variant trước.",
+          detail: "Cùng hai request `book A1` tới đồng thời như variant trước.",
         },
         {
           note: "Alice tới trước: `SELECT … FOR UPDATE` **khoá dòng** A1.",

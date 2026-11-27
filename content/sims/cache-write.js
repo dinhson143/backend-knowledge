@@ -89,9 +89,9 @@ BK.sim({
           detail: "App trả `200` chỉ sau ~2ms — **không chờ DB**: app `SET price=99` vào cache và cache trả `ok` ngay. Cache đánh dấu entry là **dirty**: giá trị đã đổi nhưng chưa ghi xuống nơi lưu trữ bền. Với admin, thao tác đã thành công.",
         },
         {
-          note: "DB vẫn giữ giá cũ, chờ tiến trình nền flush sau vài giây.",
+          note: "DB vẫn giữ giá cũ, chờ process nền flush sau vài giây.",
           set: { db: "price=80 (cũ)" },
-          detail: "Trong cửa sổ chờ flush, **bản 99 duy nhất nằm trong RAM của cache node**; DB vẫn `price=80 (cũ)`. Một tiến trình nền gom các entry dirty và flush xuống DB định kỳ (mỗi vài giây) hoặc theo lô, nên nhiều lần ghi vào cùng key gộp thành một lần ghi DB — lý do write-back cho throughput ghi rất cao. Báo cáo, job hay service nào đọc thẳng DB đều thấy 80.",
+          detail: "Trong cửa sổ chờ flush, **bản 99 duy nhất nằm trong RAM của cache node**; DB vẫn `price=80 (cũ)`. Một process nền gom các entry dirty và flush xuống DB định kỳ (mỗi vài giây) hoặc theo lô, nên nhiều lần ghi vào cùng key gộp thành một lần ghi DB — lý do write-back cho throughput ghi rất cao. Báo cáo, job hay service nào đọc thẳng DB đều thấy 80.",
         },
         {
           note: "Cache node sập **trước khi flush** → giá 99 mất vĩnh viễn.",

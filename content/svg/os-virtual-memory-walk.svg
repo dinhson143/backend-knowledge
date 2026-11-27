@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 490" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
-  <title id="t">Dịch địa chỉ ảo: tra TLB trước, miss thì đi page table nhiều cấp PGD, P4D, PUD, PMD, PTE tới khung vật lý; mục không hợp lệ gây page fault để kernel xử lý</title>
+  <title id="t">Address translation: tra TLB trước, miss thì đi page table nhiều cấp PGD, P4D, PUD, PMD, PTE tới khung vật lý; mục không hợp lệ gây page fault để kernel xử lý</title>
   <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
@@ -25,7 +25,7 @@
   </defs>
   <rect x="1" y="1" width="758" height="488" rx="14" fill="#ffffff" stroke="#d6dde6"/>
 
-  <text class="h" x="20" y="30">Dịch địa chỉ ảo: TLB trước, page walk khi miss</text>
+  <text class="h" x="20" y="30">Address translation: TLB trước, page walk khi miss</text>
 
   <!-- Địa chỉ ảo: mỗi phần chỉ số cùng màu với bảng nó chọn -->
   <rect class="f" x="20" y="44" width="100" height="32" style="fill:#dbeafe"/><text class="code" x="70" y="65">chỉ số PGD</text>

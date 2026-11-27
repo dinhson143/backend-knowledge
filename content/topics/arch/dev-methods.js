@@ -2,7 +2,7 @@ BK.topic({
   id: "dev-methods",
   track: "arch",
   section: "arch-main",
-  title: "Phương pháp phát triển",
+  title: "TDD, BDD, DDD",
   goal: "Ghép TDD, BDD, DDD vào một quy trình làm việc",
   needs: ["code-architecture"],
   tldr: {

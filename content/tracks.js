@@ -33,7 +33,7 @@ BK.section({ id: "dsa-complexity", track: "dsa", title: "Complexity" });
 BK.section({ id: "dsa-ds", track: "dsa", title: "Data Structures" });
 BK.section({ id: "dsa-algo", track: "dsa", title: "Algorithms" });
 
-BK.track({ id: "cs", title: "Nền tảng CS", subtitle: "Process · Thread · Bộ nhớ · I/O · Concurrency" });
+BK.track({ id: "cs", title: "Nền tảng CS", subtitle: "Process · Thread · Memory · I/O · Concurrency" });
 BK.section({ id: "cs-os", track: "cs", title: "Hệ điều hành" });
 BK.section({ id: "cs-net", track: "cs", title: "Mạng máy tính" });
 

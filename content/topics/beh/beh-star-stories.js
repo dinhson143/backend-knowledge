@@ -69,7 +69,7 @@ BK.topic({
         head: ["Câu chuyện", "Chủ đề trả lời được", "Con số chốt"],
         rows: [
           {
-            cells: ["Tách gửi thông báo khỏi request đặt hàng bằng hàng đợi", "Dự án tự hào, quyết định kỹ thuật, ảnh hưởng không cần quyền", "p99 đặt hàng 1,8 s → 250 ms"],
+            cells: ["Tách gửi thông báo khỏi request đặt hàng bằng queue", "Dự án tự hào, quyết định kỹ thuật, ảnh hưởng không cần quyền", "p99 đặt hàng 1,8 s → 250 ms"],
             why: "Một chuyện kỹ thuật mạnh nên trả lời được cả câu \"dự án khó nhất\" lẫn \"thuyết phục team\" nếu bạn là người đề xuất. Đây cũng là ứng viên tốt cho phần kể sâu dự án (`beh-project-deep-dive`).",
           },
           {
@@ -109,7 +109,7 @@ BK.topic({
             why: "Tách rõ phần được giao và phần tự đặt mục tiêu; mục tiêu có số để cuối chuyện đối chiếu.",
           },
           {
-            cells: ["A", "Tôi đo bằng trace và thấy 70% thời gian nằm ở hai lần gọi nhà cung cấp email/push. Tôi đề xuất đưa chúng ra hàng đợi: request chỉ ghi đơn và một bản ghi outbox trong cùng transaction, worker gửi sau. Tôi cân nhắc gọi bất đồng bộ trong process nhưng loại vì process chết là mất thông báo. Tôi viết thiết kế một trang, thống nhất với team về retry và chống gửi trùng bằng idempotency key, rồi rollout sau feature flag cho 10% traffic."],
+            cells: ["A", "Tôi đo bằng trace và thấy 70% thời gian nằm ở hai lần gọi nhà cung cấp email/push. Tôi đề xuất đưa chúng ra queue: request chỉ ghi đơn và một bản ghi outbox trong cùng transaction, worker gửi sau. Tôi cân nhắc gọi bất đồng bộ trong process nhưng loại vì process chết là mất thông báo. Tôi viết thiết kế một trang, thống nhất với team về retry và chống gửi trùng bằng idempotency key, rồi rollout sau feature flag cho 10% traffic."],
             why: "Hành động cụ thể theo thứ tự (đo → tìm nguyên nhân → phương án → phương án bị loại và vì sao → triển khai an toàn). Mỗi động từ có chủ ngữ \"tôi\". Chi tiết kỹ thuật vừa đủ để người hỏi đào tiếp nếu muốn.",
           },
           {

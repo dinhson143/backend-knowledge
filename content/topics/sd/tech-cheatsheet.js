@@ -138,7 +138,7 @@ BK.topic({
   points: [
     {
       t: "+ **Dual-write problem** — ghi DB rồi ghi Kafka/ES trong code có thể lệch khi một bên lỗi. Giải bằng CDC hoặc **transactional outbox**.",
-      why: "Hai lệnh ghi vào hai hệ thống không nằm chung một transaction: DB commit xong mà app crash trước khi publish Kafka thì event mất vĩnh viễn. Outbox ghi event vào bảng outbox trong cùng transaction với dữ liệu, rồi một tiến trình riêng (hoặc CDC) đọc bảng đó để publish → hoặc cả hai cùng có, hoặc cả hai cùng không.",
+      why: "Hai lệnh ghi vào hai hệ thống không nằm chung một transaction: DB commit xong mà app crash trước khi publish Kafka thì event mất vĩnh viễn. Outbox ghi event vào bảng outbox trong cùng transaction với dữ liệu, rồi một process riêng (hoặc CDC) đọc bảng đó để publish → hoặc cả hai cùng có, hoặc cả hai cùng không.",
     },
     {
       t: "+ Chọn DB: bắt đầu từ PostgreSQL; chuyển sang DynamoDB/Cassandra khi nêu được lý do (write throughput, access pattern đơn giản theo key, scale ngang).",

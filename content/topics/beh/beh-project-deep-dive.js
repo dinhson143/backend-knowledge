@@ -48,8 +48,8 @@ BK.topic({
       title: "Các con số nên thuộc về hệ thống của bạn",
       points: [
         {
-          t: "Tải: request/giây trung bình và cao điểm; tỉ lệ đọc/ghi; số message/giây qua hàng đợi.",
-          why: "Đây là số đầu tiên người hỏi dùng để kiểm tra lựa chọn của bạn: 50 request/giây thì cần Kafka hay một bảng làm hàng đợi là đủ? Không biết số thì không bảo vệ được lựa chọn.",
+          t: "Tải: request/giây trung bình và cao điểm; tỉ lệ đọc/ghi; số message/giây qua queue.",
+          why: "Đây là số đầu tiên người hỏi dùng để kiểm tra lựa chọn của bạn: 50 request/giây thì cần Kafka hay một bảng làm queue là đủ? Không biết số thì không bảo vệ được lựa chọn.",
         },
         {
           t: "Dữ liệu: kích thước database, tốc độ tăng, bảng lớn nhất; thời gian giữ dữ liệu.",
@@ -66,7 +66,7 @@ BK.topic({
       ],
     },
     {
-      title: "Ví dụ khung: chuyển gửi thông báo sang hàng đợi",
+      title: "Ví dụ khung: chuyển gửi thông báo sang queue",
       table: {
         head: ["Phần", "Ghi chú chuẩn bị (gạch đầu dòng, không viết văn)"],
         rows: [
@@ -75,11 +75,11 @@ BK.topic({
             why: "Đủ số để người nghe hình dung tải và vấn đề trong 20 giây.",
           },
           {
-            cells: ["Kiến trúc", "API → PostgreSQL (đơn + bảng outbox, cùng transaction) → relay đọc outbox → hàng đợi → worker email/push → nhà cung cấp ngoài. Phần tôi làm: outbox, relay, worker."],
+            cells: ["Kiến trúc", "API → PostgreSQL (đơn + bảng outbox, cùng transaction) → relay đọc outbox → queue → worker email/push → nhà cung cấp ngoài. Phần tôi làm: outbox, relay, worker."],
             why: "Luồng một request vẽ được bằng 6 khối; khoanh phần của mình để người hỏi biết đào chỗ nào.",
           },
           {
-            cells: ["Quyết định 1", "Outbox thay vì gửi thẳng vào hàng đợi sau commit: tránh dual write (commit xong mà gửi hàng đợi lỗi là mất thông báo). Giá: thêm bảng và một relay phải vận hành."],
+            cells: ["Quyết định 1", "Outbox thay vì gửi thẳng vào queue sau commit: tránh dual write (commit xong mà gửi queue lỗi là mất thông báo). Giá: thêm bảng và một relay phải vận hành."],
             why: "Quyết định có phương án bị loại và cái giá rõ ràng; dẫn tự nhiên sang câu hỏi đào về exactly-once.",
           },
           {

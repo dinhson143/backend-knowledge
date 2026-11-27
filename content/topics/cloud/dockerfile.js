@@ -2,7 +2,7 @@ BK.topic({
   id: "dockerfile",
   track: "cloud",
   section: "cloud-k8s",
-  title: "Dockerfile & build cache",
+  title: "Dockerfile & Build Cache",
   goal: "Viết Dockerfile nhỏ, chạy non-root và build lại nhanh nhờ cache layer",
   needs: ["container-basics"],
   tldr: {

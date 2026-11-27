@@ -2,7 +2,7 @@ BK.topic({
   id: "os-memory-layout",
   track: "cs",
   section: "cs-os",
-  title: "Stack & heap",
+  title: "Stack & Heap",
   goal: "Biết biến nằm ở stack hay heap và vì sao đệ quy sâu tràn stack",
   tldr: {
     t: "Không gian địa chỉ của một process chia thành vùng: **text** (code), **data/bss** (biến global), **heap** (cấp phát động, sống tới khi được giải phóng), vùng **mmap** (thư viện, file map), và **stack** (frame của các hàm đang gọi). Stack cấp và trả tự động theo lời gọi hàm, cực rẻ nhưng nhỏ và có giới hạn cứng; heap linh hoạt nhưng phải có người dọn (bạn, hoặc GC). Đệ quy quá sâu làm stack chạm giới hạn và process nhận `SIGSEGV` (hoặc runtime báo `StackOverflowError`, `RecursionError`).",

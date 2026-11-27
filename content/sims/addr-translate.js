@@ -1,6 +1,6 @@
 BK.sim({
   id: "addr-translate",
-  title: "Dịch địa chỉ ảo: TLB, page table, page fault",
+  title: "Address translation: TLB, page table, page fault",
   topics: ["os-virtual-memory"],
   scenario: "Chương trình truy cập biến ở địa chỉ ảo `0x7f3a2c41` (trang ảo `0x7f3a2`, offset `0xc41`). Xem đường đi của một lần truy cập trong bốn tình huống: TLB hit, TLB miss, ghi lần đầu vào trang chưa có khung, trang đã bị đẩy ra swap.",
   context: "Với trang 4 KB, 12 bit thấp (`0xc41`) là offset, giữ nguyên khi dịch; chỉ số trang ảo cần tra. **TLB** là cache bản dịch trong CPU; **Page table** nằm trong RAM, nhiều cấp; **Kernel** chỉ vào cuộc khi có page fault. Để ý số lần phải đi tới RAM hay đĩa trong mỗi tình huống: đó chính là chi phí.",

@@ -122,6 +122,7 @@ Trước khi dời bất kỳ nội dung nào, viết `scripts/check.mjs`. Scrip
 | Manifest khớp với các file trong `content/` | Quên đăng ký file mới |
 | File nằm đúng `content/topics/<track>/<id>.js` (problem, sim tương tự); `section` thuộc đúng `track` | File đặt nhầm chỗ, id khác tên file |
 | `diagrams[].src` trỏ tới file có thật trong `content/svg/` (so cả hoa/thường); mọi SVG đều được tham chiếu; SVG có `xmlns`, `viewBox`, nền trắng | Ảnh vỡ trên GitHub Pages, SVG mồ côi, sơ đồ chìm trong theme tối |
+| `title` của giai đoạn, chặng, track, section, topic, problem, sim không chứa cụm nào ở cột "Không dùng trong nhãn" của `docs/terminology.md` | Nhãn điều hướng dùng bản dịch khó hiểu thay cho key term mà phỏng vấn dùng (D106) |
 
 Chạy `node scripts/check.mjs` sau **mọi** lần sửa nội dung, trước khi commit. Nên đặt nó thành pre-commit hook hoặc bước GitHub Actions trước khi deploy Pages. Script thoát với mã 1 khi có lỗi và in `file:đường-dẫn → lỗi`.
 
@@ -142,7 +143,7 @@ Kinh nghiệm: mỗi lần review phát hiện một loại lỗi mới, thêm m
 
 - **Bắt đầu từ mẫu**: copy `content/_TEMPLATE.js`. Mẫu ghi chú từng trường: trường nào bắt buộc, trường nào tuỳ chọn, giới hạn độ dài.
 - **Chi tiết đúng nằm ở nguồn chính thức** (tài liệu của Kafka, Redis, AWS…). Khi nêu một con số hay một hành vi, ghi URL nguồn ngay trong câu (trong `t`, `why`, `detail`…), vì app chưa có trường `src` riêng để hiển thị (D31). Sơ đồ SVG thì dùng `source` của `diagrams`. Không ghi giá tiền vì giá thay đổi.
-- **Một khái niệm, một thuật ngữ.** Chọn một cách gọi và dùng xuyên suốt. Thêm từ viết tắt vào `glossary.js`, không giải thích lại trong từng chủ đề.
+- **Một khái niệm, một thuật ngữ.** Mỗi khái niệm có một key term ghi trong `docs/terminology.md` (cách viết, giải nghĩa tiếng Việt, các cách dịch không dùng). Nhãn điều hướng và `goal` dùng key term; tiếng Việt giải nghĩa nó một lần ở `tldr` hoặc lần đầu xuất hiện. Khái niệm chưa có trong bảng thì thêm dòng trước khi viết. Thêm từ viết tắt vào `glossary.js`, không giải thích lại trong từng chủ đề.
 - **"Vì sao" nói về cơ chế, không lặp lại ý.** Câu mẫu: "X xảy ra vì Y; nếu không có Y thì Z". Mỗi câu "vì sao" nên trả lời được câu hỏi "nếu bỏ đi thì hỏng gì?".
 - **Link, đừng viết lại.** Hai chủ đề cùng cần một ý thì một chủ đề giữ nội dung, chủ đề kia link sang bằng `related`.
 - **Thư mục mới = track mới.** Thêm `BK.track({ id, title })`, tạo `content/topics/<id>/`, thêm các giai đoạn vào `roadmap.js`, rồi chạy kiểm tra.

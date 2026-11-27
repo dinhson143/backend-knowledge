@@ -1,7 +1,7 @@
 BK.sim({
   id: "vending",
   custom: "vending",
-  title: "State pattern: máy bán hàng",
+  title: "State pattern: Vending Machine",
   topics: ["patterns-gof"],
   scenario: "Bấm các nút để chuyển trạng thái. Máy từ chối hành động không hợp lệ ở trạng thái hiện tại.",
   initial: "Idle",

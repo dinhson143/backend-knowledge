@@ -115,8 +115,8 @@ BK.topic({
   },
   points: [
     {
-      t: "+ Cẩn thận với Singleton: đó là global state, khó test; môi trường đa luồng cần khởi tạo thread-safe.",
-      why: "Singleton khó test: truy cập qua `getInstance()` tĩnh nên test không inject mock được và state rò rỉ giữa các test case. Trong đa luồng, hai thread cùng thấy `instance == null` sẽ tạo hai instance → cần lock, double-checked locking hoặc khởi tạo sẵn.",
+      t: "+ Cẩn thận với Singleton: đó là global state, khó test; môi trường multi-thread cần khởi tạo thread-safe.",
+      why: "Singleton khó test: truy cập qua `getInstance()` tĩnh nên test không inject mock được và state rò rỉ giữa các test case. Khi chạy multi-thread, hai thread cùng thấy `instance == null` sẽ tạo hai instance → cần lock, double-checked locking hoặc khởi tạo sẵn.",
     },
     {
       t: "+ Strategy vs State: Strategy do **client chọn** thuật toán; State do **object tự chuyển** khi trạng thái đổi.",

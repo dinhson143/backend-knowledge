@@ -19,7 +19,7 @@
   <rect x="1" y="1" width="758" height="388" rx="14" fill="#ffffff" stroke="#d6dde6"/>
 
   <text class="h" x="20" y="30">d = 3 hàng (mỗi hàng một hàm hash) × w = 8 cột bộ đếm</text>
-  <text class="s" x="20" y="50">Thêm phần tử: mỗi hàng băm ra một cột rồi cộng vào ô đó.</text>
+  <text class="s" x="20" y="50">Thêm phần tử: mỗi hàng hash ra một cột rồi cộng vào ô đó.</text>
 
   <!-- Stream -->
   <rect class="grp" x="20" y="70" width="160" height="120" rx="10"/>

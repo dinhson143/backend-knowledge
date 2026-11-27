@@ -45,7 +45,7 @@
   <g stroke="#64748b" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#a)">
     <path d="M298,152 L298,190"/><path d="M474,152 L474,190"/><path d="M650,152 L650,190"/>
   </g>
-  <text class="s" x="306" y="176">sao chép bất đồng bộ</text>
+  <text class="s" x="306" y="176">replicate async</text>
   <rect class="box" x="226" y="192" width="144" height="44" rx="10"/>
   <text class="t" x="298" y="219" text-anchor="middle">Replica A</text>
   <rect class="box" x="402" y="192" width="144" height="44" rx="10"/>
@@ -54,6 +54,6 @@
   <text class="t" x="650" y="219" text-anchor="middle">Replica C</text>
 
   <text class="t" x="20" y="268">Gửi nhầm node → node trả MOVED &lt;slot&gt; &lt;host:port&gt;; client cập nhật bảng slot rồi gửi lại.</text>
-  <text class="t" x="20" y="290">Hash tag: {user:42}:cart và {user:42}:profile chỉ băm phần trong {…} → cùng slot, dùng được lệnh nhiều key.</text>
+  <text class="t" x="20" y="290">Hash tag: {user:42}:cart và {user:42}:profile chỉ hash phần trong {…} → cùng slot, dùng được lệnh nhiều key.</text>
   <text class="s" x="20" y="312">Cách chia slot ở đây là ví dụ chia đều cho 3 master; master sập thì replica của nó được bầu lên thay.</text>
 </svg>

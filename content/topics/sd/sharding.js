@@ -48,8 +48,8 @@ BK.topic({
   },
   points: [
     {
-      t: "**Horizontal partitioning** — giữ nguyên cột, chia dòng ra các phân vùng theo điều kiện.",
-      why: "Mỗi phân vùng chỉ chứa một phần các dòng, nên index và lượng dữ liệu phải quét nhỏ đi; query có điều kiện trên partition key được partition pruning bỏ qua các phân vùng không liên quan. Đây cũng là nền của sharding: mỗi phân vùng đặt được lên một máy.",
+      t: "**Horizontal partitioning** — giữ nguyên cột, chia dòng ra các partition theo điều kiện.",
+      why: "Mỗi partition chỉ chứa một phần các dòng, nên index và lượng dữ liệu phải quét nhỏ đi; query có điều kiện trên partition key được partition pruning bỏ qua các partition không liên quan. Đây cũng là nền của sharding: mỗi partition đặt được lên một máy.",
     },
     {
       t: "**Vertical partitioning** — giữ nguyên số dòng, tách cột ra bảng khác theo tần suất truy cập / kích thước.",

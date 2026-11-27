@@ -2,7 +2,7 @@ BK.topic({
   id: "k8s-core",
   track: "cloud",
   section: "cloud-k8s",
-  title: "Kubernetes cốt lõi",
+  title: "Kubernetes căn bản",
   goal: "Giải thích reconcile loop và vai trò Pod, Deployment, Service, Ingress",
   needs: ["container-basics"],
   tldr: {
