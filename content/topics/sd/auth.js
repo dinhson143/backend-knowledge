@@ -81,7 +81,7 @@ BK.topic({
       ["SPA, mobile (public client)", "Authorization code + PKCE (bắt buộc)", "Không nhúng secret; refresh token phải rotation hoặc sender-constrained"],
       ["Service ↔ service, cron job", "Client credentials", "Chỉ confidential client; token mang danh tính service, không có user"],
       ["Thiết bị không có bàn phím (TV, CLI)", "Device authorization grant (RFC 8628)", "User nhập mã trên điện thoại (https://www.rfc-editor.org/rfc/rfc8628)"],
-      { cells: ["Implicit, password grant", "Không dùng", "RFC 9700: implicit SHOULD NOT, password MUST NOT"], why: "Hai luồng này có trong RFC 6749 năm 2012 vì lúc đó trình duyệt chưa có CORS phổ biến và app cũ cần đường chuyển tiếp. Bản BCP 2025 ghi nhận các lỗ hổng thực tế và loại bỏ chúng." },
+      { cells: ["Implicit, password grant", "Không dùng", "RFC 9700: implicit SHOULD NOT, password MUST NOT"], why: "Cả hai có trong RFC 6749 (2012). RFC 9700 (2025) dựa trên các tấn công đã gặp: implicit grant trả token trên URL nên dễ lộ, password grant bắt user đưa mật khẩu cho client. Implicit chỉ là SHOULD NOT nên vẫn còn gặp ở hệ cũ; hệ mới dùng authorization code + PKCE." },
     ],
   },
   sections: [

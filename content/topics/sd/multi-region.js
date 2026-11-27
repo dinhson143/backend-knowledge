@@ -7,7 +7,7 @@ BK.topic({
   needs: ["replication", "lb-gateway-cdn"],
   tldr: {
     t: "**Multi-region** (chạy hệ thống trên nhiều region) phục vụ hai mục tiêu khác nhau: **disaster recovery** (DR, sống sót khi cả một region hỏng) và **latency thấp cho user ở xa**. Mức DR cần đạt đo bằng hai con số: **RPO** (được phép mất tối đa bao nhiêu dữ liệu, tính theo thời gian) và **RTO** (được phép ngừng phục vụ tối đa bao lâu). Bốn chiến lược theo thứ tự RPO/RTO giảm dần và độ phức tạp tăng dần: backup & restore → pilot light → warm standby → active/active.",
-    why: "Khoảng cách giữa các region làm mỗi lần gọi chéo tốn hàng chục tới hàng trăm mili giây, nên không thể đồng bộ mọi lần ghi mà vẫn nhanh. Vì vậy mọi thiết kế multi-region đều phải chọn: ghi chờ region khác xác nhận (RPO gần 0, ghi chậm) hay ghi bất đồng bộ (ghi nhanh, mất vài giây dữ liệu khi region chết).",
+    why: "Region cách nhau về địa lý nên mỗi lần gọi chéo region chậm hơn nhiều so với gọi trong một region, và chậm dần theo khoảng cách (DynamoDB ghi rõ latency ghi đồng bộ phụ thuộc round-trip giữa các region đã chọn), nên không thể đồng bộ mọi lần ghi mà vẫn nhanh. Vì vậy mọi thiết kế multi-region đều phải chọn: ghi chờ region khác xác nhận (RPO gần 0, ghi chậm) hay ghi bất đồng bộ (ghi nhanh, mất vài giây dữ liệu khi region chết).",
   },
   story: {
     problem: "Hệ thống chạy 3 AZ trong một region, chịu được mất một data center. Rồi cả region gặp sự cố vài giờ: DB, queue, object storage đều không truy cập được. Không có bản sao ở nơi khác thì không có cách nào phục vụ tiếp, và dữ liệu mới nhất có thể chỉ nằm ở region đó.",

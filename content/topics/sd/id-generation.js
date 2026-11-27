@@ -22,7 +22,7 @@ BK.topic({
         why: "Sequence của PostgreSQL không trả lại số khi transaction rollback, để các transaction đồng thời khỏi chờ nhau, nên dãy luôn có lỗ hổng và không dùng được cho số \"liên tục không thiếu\" như số hoá đơn (https://www.postgresql.org/docs/current/functions-sequence.html).",
       },
       {
-        cells: ["Bước nhảy theo node (`offset + N × increment`)", "64 bit", "Không theo thời gian giữa các node", "Cấu hình tĩnh", "Vài node cố định (multi-source MySQL)"],
+        cells: ["Bước nhảy theo node (`offset + N × increment`)", "64 bit", "Không theo thời gian giữa các node", "Cấu hình tĩnh", "Vài node cố định (MySQL circular replication)"],
         why: "MySQL có `auto_increment_increment` và `auto_increment_offset`: server A sinh 1, 3, 5…, server B sinh 2, 4, 6… (https://dev.mysql.com/doc/refman/8.4/en/replication-options-source.html). Thêm node thứ ba thì phải đổi cấu hình mọi node, nên không hợp với số shard thay đổi.",
       },
       {
@@ -50,7 +50,7 @@ BK.topic({
     },
     {
       t: "**Snowflake tin vào đồng hồ**: bản gốc khuyên chạy NTP và **từ chối sinh id** khi đồng hồ chạy lùi, cho tới khi thời gian vượt mốc của id cuối cùng đã sinh.",
-      why: "Nếu đồng hồ lùi 5ms mà vẫn sinh id, máy có thể ghép lại đúng timestamp + sequence đã dùng, ra id trùng. Chờ đồng hồ vượt qua mốc cũ giữ được tính duy nhất, đổi lại máy đứng hình trong khoảng lùi đó. Đây là lý do NTP nên chỉnh đồng hồ bằng cách chạy chậm dần (slew) thay vì nhảy lùi.",
+      why: "Nếu đồng hồ lùi 5ms mà vẫn sinh id, máy có thể ghép lại đúng timestamp + sequence đã dùng, ra id trùng. Chờ đồng hồ vượt qua mốc cũ giữ được tính duy nhất, đổi lại máy đứng hình trong khoảng lùi đó.",
     },
     {
       t: "**Machine id phải duy nhất tại mọi thời điểm**: cấp từ cấu hình, từ ordinal của StatefulSet, hoặc thuê (lease) từ một kho nhất quán như ZooKeeper/etcd. Hai process cùng machine id sinh trong cùng mili giây là trùng id.",
@@ -91,7 +91,7 @@ BK.topic({
     ],
     [
       "Cấu trúc 64 bit của Snowflake gốc?",
-      "1 bit dấu + 41 bit thời gian mili giây (khoảng 69 năm) + 10 bit machine id (1024 máy) + 12 bit sequence (4096 id/ms/máy).",
+      "41 bit thời gian mili giây (khoảng 69 năm) + 10 bit machine id (1024 máy) + 12 bit sequence (4096 id/ms/máy) = 63 bit, vừa một số nguyên 64 bit.",
     ],
     [
       "Đồng hồ máy sinh Snowflake chạy lùi 10ms. Chuyện gì xảy ra?",

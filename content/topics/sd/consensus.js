@@ -6,19 +6,19 @@ BK.topic({
   goal: "Giải thích Raft, lease, fencing và vì sao cluster cần đa số",
   needs: ["replication", "dist-lock"],
   tldr: {
-    t: "**Consensus** (đồng thuận): một nhóm node thống nhất **một giá trị** hoặc **một chuỗi lệnh** dù có node chết hay mạng chậm. **Leader election** là trường hợp hay gặp nhất: cả cluster đồng ý ai là leader trong một **term**. Raft và Paxos đạt điều đó bằng **quorum đa số**: quyết định chỉ có hiệu lực khi hơn nửa số node chấp nhận, nên 5 node chịu được 2 node chết.",
+    t: "**Consensus**: một nhóm node thống nhất **một giá trị** hoặc **một chuỗi lệnh** dù có node chết hay mạng chậm. **Leader election** là trường hợp hay gặp nhất: cả cluster đồng ý ai là leader trong một **term**. Raft và Paxos đạt điều đó bằng **quorum đa số**: quyết định chỉ có hiệu lực khi hơn nửa số node chấp nhận, nên 5 node chịu được 2 node chết.",
     why: "Hai tập đa số bất kỳ của cùng một cluster luôn có ít nhất một node chung. Node chung đó đã thấy quyết định trước và không chấp nhận quyết định trái ngược, nên không thể có hai leader cùng term hay hai giá trị khác nhau cùng được commit. Một nửa (2 trên 4) thì không có tính chất này: hai nửa bị cắt mạng sẽ mỗi bên tự quyết.",
   },
   story: {
     problem: "Replication leader–follower cần biết ai là leader. Nếu mỗi follower tự quyết \"leader im lặng 3 giây thì tôi lên làm leader\", mạng chập chờn sẽ sinh ra hai leader cùng nhận ghi (split brain) và dữ liệu rẽ hai nhánh. Cũng bài toán đó với cron chỉ được chạy ở một máy, hay lock chỉ được một client giữ.",
-    idea: "Không node nào tự phong mình: muốn làm leader phải xin phiếu và nhận được phiếu của đa số cho một term mới. Mỗi node chỉ bầu một lần mỗi term, và chỉ bầu cho node có log ít nhất mới bằng mình. Ghi chỉ commit khi đa số đã lưu. Các hệ thống ứng dụng thường không tự cài Raft mà dùng etcd, ZooKeeper, Consul hay Kubernetes Lease làm dịch vụ đồng thuận.",
+    idea: "Không node nào tự phong mình: muốn làm leader phải xin phiếu và nhận được phiếu của đa số cho một term mới. Mỗi node chỉ bầu một lần mỗi term, và chỉ bầu cho node có log ít nhất mới bằng mình. Ghi chỉ commit khi đa số đã lưu. Các hệ thống ứng dụng thường không tự cài Raft mà dùng etcd, ZooKeeper, Consul hay Kubernetes Lease làm dịch vụ consensus.",
     tradeoff: "Mỗi lần ghi tốn ít nhất một round-trip tới đa số node, nên consensus chậm hơn ghi một node và không đặt xa nhau quá được. Mất đa số (3 trên 5 node chết, hoặc bị cắt mạng ở phía thiểu số) thì cluster **ngừng nhận ghi**: chọn consistency hơn availability. Thêm node không làm nhanh hơn mà làm chậm đi.",
   },
   table: {
     head: ["Số node", "Quorum (đa số)", "Chịu được node chết", "Ghi chú"],
     rows: [
       ["1", "1", "0", "Không phải cluster"],
-      { cells: ["2", "2", "0", "Tệ hơn 1 node: hai máy, không chịu thêm lỗi nào"], why: "Quorum của 2 là 2, nên một node chết là mất đa số. etcd FAQ: thêm node để thành số chẵn không mua thêm khả năng chịu lỗi (https://etcd.io/docs/v3.5/faq/)." },
+      { cells: ["2", "2", "0", "Tệ hơn 1 node: hai máy, không chịu thêm lỗi nào"], why: "Quorum của 2 là 2, nên một node chết là mất đa số. etcd FAQ: thêm node để thành số chẵn không mua thêm khả năng chịu lỗi (fault tolerance) (https://etcd.io/docs/v3.5/faq/)." },
       ["3", "2", "1", "Mức tối thiểu hay dùng"],
       ["4", "3", "1", "Chịu lỗi như 3 node nhưng ghi chờ nhiều node hơn"],
       { cells: ["5", "3", "2", "Raft paper gọi là cỡ điển hình"], why: "Bài Raft: cluster năm server điển hình chịu được hai server lỗi (https://raft.github.io/raft.pdf). Hai lỗi cho phép một node đang bảo trì và một node hỏng bất ngờ cùng lúc." },
@@ -47,11 +47,11 @@ BK.topic({
       why: "Leader bị cắt mạng ở phía thiểu số vẫn tưởng mình là leader và trả dữ liệu cũ, trong khi phía đa số đã bầu leader mới và nhận ghi. Hỏi đa số trước khi đọc xác nhận mình vẫn là leader. Lease nhanh hơn (không cần round-trip) nhưng an toàn chỉ khi đồng hồ không trôi quá mức đã giả định.",
     },
     {
-      t: "**Lease + fencing token cho app**: leader election cho service của bạn (một instance chạy scheduler, một instance ghi vào kho) thường dùng lease có TTL trên etcd/ZooKeeper hoặc Kubernetes `Lease`; kube-controller-manager và kube-scheduler dùng chính cơ chế này (https://kubernetes.io/docs/concepts/architecture/leases/). Kèm theo **fencing token** (số tăng theo mỗi lần thắng, như term hay revision của etcd).",
-      why: "Consensus đảm bảo **dịch vụ đồng thuận** không có hai người giữ lease cùng lúc, nhưng process giữ lease vẫn có thể bị GC pause qua thời hạn rồi tiếp tục ghi như chưa có gì. Chỉ phía tài nguyên kiểm token mới chặn được lần ghi muộn đó, giống hệt bài toán ở `dist-lock`.",
+      t: "**Lease + fencing token cho app**: leader election cho service của bạn (một instance chạy scheduler, một instance ghi vào kho) thường dùng lease có TTL trên etcd/ZooKeeper hoặc Kubernetes `Lease`; kube-controller-manager và kube-scheduler dùng chính cơ chế này (https://kubernetes.io/docs/concepts/architecture/leases/). Kèm theo **fencing token** (số tăng theo mỗi lần thắng, ví dụ revision của etcd, vốn tăng đơn điệu suốt đời cluster — https://etcd.io/docs/v3.5/learning/data_model/).",
+      why: "Consensus đảm bảo **dịch vụ consensus** (kho lease) không có hai người giữ lease cùng lúc, nhưng process giữ lease vẫn có thể bị GC pause qua thời hạn rồi tiếp tục ghi như chưa có gì. Chỉ phía tài nguyên kiểm token mới chặn được lần ghi muộn đó, giống hệt bài toán ở `dist-lock`.",
     },
     {
-      t: "**Không tự cài consensus**: dùng thứ đã được kiểm chứng: etcd (Raft) cho Kubernetes, ZooKeeper (ZAB) cho hệ cũ, KRaft cho Kafka mới, Raft trong CockroachDB/TiKV cho từng range dữ liệu. Raft paper công bố đặc tả TLA+ và chứng minh an toàn chính vì chi tiết rất dễ sai.",
+      t: "**Không tự cài consensus**: dùng thứ đã được kiểm chứng: etcd (Raft) cho Kubernetes, ZooKeeper cho nhiều hệ cũ, KRaft cho Kafka mới, mỗi range dữ liệu của CockroachDB là một Raft group (https://docs.cockroachlabs.com/docs/stable/architecture/replication-layer). Raft paper công bố đặc tả TLA+ và chứng minh an toàn chính vì chi tiết rất dễ sai.",
       why: "Lỗi consensus chỉ lộ ra khi có tổ hợp hiếm của crash, mạng chậm và thứ tự tin nhắn, nên test thông thường không bắt được. Câu trả lời phỏng vấn tốt là \"dùng etcd/ZooKeeper cho leader election\" kèm hiểu vì sao nó an toàn, không phải tự viết thuật toán bầu cử.",
     },
     {
@@ -66,7 +66,7 @@ BK.topic({
       ["Leader election cho service (một instance chạy job)", "Lease trên etcd/ZooKeeper/Kubernetes `Lease` + fencing token", "Không có hai leader cùng lúc theo góc nhìn của kho lease"],
       ["Kho cấu hình, service discovery", "etcd, ZooKeeper, Consul", "Mọi client đọc cùng một phiên bản cấu hình, có watch"],
       ["Metadata của hệ phân tán", "KRaft (Kafka), etcd (Kubernetes)", "Ai là leader partition, pod nào ở node nào phải thống nhất"],
-      ["Dữ liệu nghiệp vụ nhất quán mạnh trên nhiều máy", "DB dùng Raft/Paxos cho từng shard (CockroachDB, Spanner, TiKV)", "Mỗi shard là một nhóm Raft; ghi commit khi đa số replica lưu"],
+      ["Dữ liệu nghiệp vụ nhất quán mạnh trên nhiều máy", "DB phân tán chạy consensus cho từng shard (ví dụ CockroachDB: mỗi range một Raft group)", "Mỗi shard là một nhóm Raft; ghi commit khi đa số replica lưu"],
       { cells: ["Đếm like, cache, log", "Không cần", "Chấp nhận eventual consistency rẻ hơn nhiều"], why: "Consensus trả bằng latency ghi và mất availability khi mất đa số; dữ liệu chịu được lệch tạm thời thì dùng replication bất đồng bộ hoặc quorum leaderless." },
     ],
   },

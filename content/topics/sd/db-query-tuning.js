@@ -38,12 +38,12 @@ BK.topic({
         why: "Nested loop rẻ khi bên ngoài ít dòng và bên trong có index. Thời gian và số dòng in ở node bên trong là **trung bình mỗi lần lặp**: phải nhân với `loops` mới ra tổng (tài liệu EXPLAIN của PostgreSQL). Ước lượng bên ngoài sai 1000 lần thì chi phí thật sai theo.",
       },
       {
-        cells: ["`Hash Join` / `Merge Join`", "Băm một bên vào bộ nhớ / trộn hai bên đã sắp", "Hash join tràn ra đĩa (`Batches` > 1) vì `work_mem` nhỏ"],
-        why: "Hash join hợp với hai tập lớn không có index phù hợp; khi bảng băm vượt `work_mem` thì phải chia lô ghi ra đĩa và chậm hẳn đi.",
+        cells: ["`Hash Join` / `Merge Join`", "Dựng bảng hash từ một bên trong bộ nhớ / trộn hai bên đã sắp", "Hash join tràn ra đĩa (`Batches` > 1) vì `work_mem` nhỏ"],
+        why: "Hash join hợp với hai tập lớn không có index phù hợp; khi bảng hash vượt `work_mem` thì phải chia lô; tài liệu PostgreSQL ghi số batch lớn hơn một nghĩa là có dùng đĩa (https://www.postgresql.org/docs/current/using-explain.html).",
       },
       {
-        cells: ["`Sort`", "Sắp kết quả cho `ORDER BY`, merge join, `DISTINCT`", "`Sort Method: external merge` (sort trên đĩa)"],
-        why: "Index B-Tree đã có thứ tự có thể thay hẳn bước sort: `ORDER BY created_at DESC LIMIT 20` với index trên `created_at` chỉ đọc 20 phần tử đầu thay vì sort cả bảng.",
+        cells: ["`Sort`", "Sắp kết quả cho `ORDER BY`, merge join, `DISTINCT`", "`Sort Method` cho thấy sort phải dùng đĩa"],
+        why: "Node `Sort` ghi phương pháp sort và sort chạy trong bộ nhớ hay trên đĩa. Index B-Tree đã có thứ tự có thể thay hẳn bước sort: `ORDER BY created_at DESC LIMIT 20` với index trên `created_at` chỉ đọc 20 phần tử đầu thay vì sort cả bảng.",
       },
     ],
   },

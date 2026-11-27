@@ -75,7 +75,7 @@ BK.topic({
       points: [
         {
           t: "Chạy migration ở lúc khởi động của mọi pod.",
-          why: "N pod khởi động cùng lúc là N tiến trình cùng chạy migration, tranh khoá hoặc chạy trùng. Chạy migration như một job riêng trước khi rollout (một lần, có khoá advisory hoặc công cụ migration tự khoá).",
+          why: "N pod khởi động cùng lúc là N process cùng chạy migration, tranh khoá hoặc chạy trùng. Chạy migration như một job riêng trước khi rollout (một lần, có khoá advisory hoặc công cụ migration tự khoá).",
         },
         {
           t: "Backfill hàng triệu dòng bằng một câu `UPDATE`.",
