@@ -24,6 +24,7 @@ window.ROADMAP = [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
       { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth"] },
       { id: "s1.data", title: "Database", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
+      { id: "s1.db-deep", title: "Đào sâu: Database Internals", optional: true, topics: ["db-query-tuning"] },
     ] },
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ consistency model.",
     parts: [
