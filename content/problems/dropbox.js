@@ -1,0 +1,180 @@
+BK.problem({
+  id: "dropbox",
+  level: 2,
+  title: "File Storage & Sync (Dropbox)",
+  hi: "dropbox",
+  summary: "Upload file rất lớn, resume được, đồng bộ nhanh giữa nhiều thiết bị chỉ bằng phần thay đổi.",
+  topics: ["blob", "patterns"],
+  fr: ["Upload file", "Download file", "Tự động đồng bộ file giữa các thiết bị", "Chia sẻ file cho người khác"],
+  nfr: [
+    {
+      t: "File tới 50GB, upload **resumable**",
+      why: "Không resume được thì user không bao giờ upload xong: file 50GB trên mạng gia đình mất hàng giờ, rớt mạng giữa chừng là làm lại từ đầu. Yêu cầu này dẫn tới chia chunk + multipart upload + lưu trạng thái từng chunk.",
+    },
+    {
+      t: "Availability > consistency",
+      why: "User cần mở được file ngay cả khi một phần hệ thống lỗi, còn thấy bản cũ vài giây thì không gây hại. Nhờ đó metadata được replicate bất đồng bộ; conflict xử lý bằng bản copy kiểu `conflicted copy` thay vì khoá toàn cục.",
+    },
+    {
+      t: "Sync nhanh, tiết kiệm băng thông",
+      why: "Sửa một byte trong file 1GB mà tải lại cả 1GB là phí băng thông và thời gian. Yêu cầu này dẫn tới delta sync theo chunk hash và push thông báo thay vì polling.",
+    },
+    {
+      t: "Bảo mật, chỉ người được chia sẻ mới truy cập",
+      why: "Link lộ ra là rò rỉ vĩnh viễn, vì file cá nhân/doanh nghiệp là dữ liệu nhạy cảm. Hệ quả: kiểm tra quyền trước khi cấp URL, URL ngắn hạn và mã hoá at rest.",
+    },
+  ],
+  capacity: "Dữ liệu file nằm ở blob storage (petabyte); DB chỉ giữ metadata nên nhỏ.",
+  entities: ["File (metadata)", "FileChunk", "User", "SharedFile"],
+  api: [
+    "POST /files { name, size, chunkHashes } → presigned URLs",
+    "GET /files/{id} → presigned download URL",
+    "POST /files/{id}/share { userId }",
+    "GET /changes?cursor → file thay đổi",
+  ],
+  hldWhy: "**S3** giữ nội dung file, **Metadata DB** chỉ giữ thông tin nhỏ (tên, chunk, version) → DB gọn, query nhanh dù file tới 50GB. **File Service** không truyền byte, chỉ cấp presigned URL: client upload/download thẳng S3, backend không thành bottleneck băng thông. **Sync Service** tách riêng vì nó giữ kết nối lâu (long-poll/WebSocket) để báo thay đổi cho thiết bị khác — kiểu tải khác hẳn API ghi metadata. **CDN** đứng trước S3 cho download để user tải file từ PoP gần mình, giảm latency và chi phí egress.",
+  hld: {
+    id: "hld-dropbox",
+    title: "HLD — File Storage & Sync",
+    h: 400,
+    scenario: "Byte của file đi thẳng giữa client và S3/CDN; backend chỉ quản lý metadata và thông báo thay đổi.",
+    context: "Nguyên tắc chính: **byte của file không bao giờ đi qua backend**. Client upload thẳng lên **S3** bằng presigned URL và tải về qua **CDN**; **File Service** chỉ cấp URL, ghi metadata và xác nhận upload; **Metadata DB** giữ cây thư mục, version và danh sách hash chunk của từng file. **Sync Service** báo cho các thiết bị khác biết có gì đổi kể từ cursor của chúng. Theo dõi số chunk đã có trên S3, trạng thái file trong Metadata DB (`uploading` → `v1 ✓` → `v2`) và trạng thái file trên Laptop B.",
+    nodes: [
+      { id: "a", x: 80, y: 80, label: "Laptop A" },
+      { id: "b", x: 80, y: 320, label: "Laptop B" },
+      { id: "gw", x: 280, y: 200, label: "API Gateway" },
+      { id: "file", x: 480, y: 150, label: "File Service" },
+      { id: "sync", x: 480, y: 270, label: "Sync Service" },
+      { id: "s3", x: 700, y: 60, label: "S3", s: "—" },
+      { id: "meta", x: 700, y: 200, label: "Metadata DB", s: "—" },
+      { id: "cdn", x: 700, y: 340, label: "CDN" },
+    ],
+    links: [
+      ["a", "gw"],
+      ["b", "gw"],
+      ["gw", "file"],
+      ["gw", "sync"],
+      ["file", "s3"],
+      ["file", "meta"],
+      ["sync", "meta"],
+      ["a", "s3"],
+      ["b", "cdn"],
+    ],
+    variants: [
+      {
+        name: "Upload file lớn",
+        steps: [
+          {
+            note: "Client chia file 2GB thành chunk 5MB, tính **fingerprint** (SHA-256) mỗi chunk.",
+            set: { a: "report.mov · 400 chunk" },
+            detail: "Client chia `report.mov` 2GB thành **400 chunk 5MB** và tính SHA-256 cho từng chunk ngay trên máy. Chunk nhỏ cho phép upload song song, chỉ gửi lại phần lỗi, và về sau chỉ đồng bộ phần thay đổi. Hash là **fingerprint**: hai chunk cùng hash thì cùng nội dung → server bỏ qua chunk đã có (dedup) và kiểm tra toàn vẹn sau khi tải. Con số 5MB có lý do: đó là kích thước part tối thiểu của S3 multipart upload (trừ part cuối).",
+          },
+          {
+            note: "Gửi metadata + danh sách hash; nhận **presigned URL** cho từng chunk.",
+            msgs: [
+              ["a", "gw", "POST /files {chunks}"],
+              ["gw", "file", "initUpload"],
+              ["file", "meta", "INSERT uploading"],
+              ["file", "a", "presigned URLs", "ok"],
+            ],
+            set: { meta: "report.mov · uploading" },
+            detail: "File Service ghi bản ghi `uploading` vào Metadata DB và trả **presigned URL** cho từng chunk. Cụ thể: client gửi `POST /files` với tên, kích thước và danh sách 400 hash; File Service ghi bản ghi rồi khởi tạo upload. Presigned URL là URL S3 ký sẵn bằng quyền của backend, chỉ cho đúng thao tác `PUT` lên đúng key đó và hết hạn sau một khoảng ngắn → client ghi được vào S3 mà không cần credential AWS. Bản ghi `uploading` cho biết upload nào đang dở để resume hoặc dọn dẹp.",
+          },
+          {
+            note: "Upload **thẳng lên S3**, song song nhiều chunk.",
+            msgs: [{ par: [["a", "s3", "chunk 1"], ["a", "s3", "chunk 2"], ["a", "s3", "chunk 3"]] }],
+            set: { s3: "312/400 chunk" },
+            detail: "Client `PUT` các chunk **thẳng lên S3**, vài chục chunk song song, tới khi S3 có 312/400. Nếu đi qua backend, 2GB này phải qua gateway và File Service — băng thông và CPU backend nhân theo số user, và request dài vài phút dễ timeout. S3 scale băng thông gần như vô hạn và tính phí theo dung lượng. Upload song song tận dụng hết đường truyền thay vì bị giới hạn bởi một TCP connection.",
+          },
+          {
+            note: "Mất mạng giữa chừng → hỏi lại trạng thái, chỉ gửi chunk còn thiếu (**resumable**).",
+            msgs: [
+              ["a", "gw", "GET /files/9/chunks"],
+              ["gw", "a", "thiếu 88 chunk", "warn"],
+              ["a", "s3", "chunk 313…400"],
+            ],
+            set: { s3: "400/400 chunk" },
+            detail: "Mạng rớt giữa chừng, nhưng client chỉ gửi lại **88 chunk còn thiếu**, không upload lại từ đầu. Client hỏi `GET /files/9/chunks` (backend tra từ S3, ví dụ `ListParts` của multipart upload), gửi chunk 313–400 và S3 đủ 400/400. File 2GB trên Wi-Fi chập chờn mà không có resumable thì user có thể không bao giờ upload xong. Upload dở không bao giờ hoàn tất phải dọn bằng lifecycle rule `AbortIncompleteMultipartUpload` để khỏi tốn tiền lưu trữ.",
+          },
+          {
+            note: "S3 báo event hoàn tất → đánh dấu `uploaded`. Không tin client tự báo.",
+            msgs: [["s3", "file", "ObjectCreated", "ok"], ["file", "meta", "status=uploaded", "ok"]],
+            set: { meta: "report.mov v1 ✓" },
+            lesson: "Chunk + presigned + multipart: file cực lớn, resume được, backend không tốn băng thông.",
+            detail: "File chuyển sang `uploaded`, `report.mov v1 ✓` dựa trên event của S3, không dựa trên lời client. Khi upload hoàn tất (với multipart, client gọi `CompleteMultipartUpload` — animation lược bước này), S3 phát event `ObjectCreated` qua S3 Event Notification (thường vào SQS/Lambda) và File Service cập nhật metadata. Client có thể crash, gửi sai hoặc cố tình nói dối khi báo “xong rồi”, còn event của S3 chứng minh object **thật sự tồn tại**. Từ lúc này file mới hiện ra cho các thiết bị khác → không ai tải phải file dở dang.",
+          },
+        ],
+      },
+      {
+        name: "Đồng bộ sang máy khác",
+        steps: [
+          {
+            note: "Sửa một đoạn file trên Laptop A → chỉ **1 chunk** đổi hash, chỉ upload chunk đó.",
+            msgs: [
+              ["a", "s3", "chunk 57 (mới)"],
+              ["s3", "file", "ObjectCreated", "ok"],
+              ["file", "meta", "report.mov v2", "ok"],
+            ],
+            set: { meta: "report.mov v2 (chunk 57)" },
+            detail: "User sửa một đoạn `report.mov` trên Laptop A, và client chỉ upload **chunk 57** (5MB) thay vì 2GB. Client chia lại và tính hash, chỉ chunk 57 có hash khác; S3 báo `ObjectCreated`, File Service ghi `report.mov v2` gồm danh sách hash mới (399 hash cũ + hash chunk 57). Mô hình này cần lưu chunk **thành object riêng theo hash** (content-addressed), khác với một object multipart duy nhất ở luồng upload — Dropbox thật lưu block theo hash. Lưu ý: chunk kích thước cố định chỉ hiệu quả khi sửa tại chỗ; chèn byte vào giữa sẽ dịch mọi chunk phía sau, nên hệ thống thật dùng content-defined chunking.",
+          },
+          {
+            note: "Laptop B giữ **long-poll / WebSocket** với Sync Service và nhận thông báo thay đổi.",
+            msgs: [
+              ["b", "gw", "GET /changes?cursor=881"],
+              ["gw", "sync", "changes since 881"],
+              ["sync", "meta", "query"],
+              ["meta", "sync", "report.mov v2", "ok"],
+              ["sync", "b", "1 file đổi", "ok"],
+            ],
+            detail: "Sync Service báo Laptop B có “1 file đổi” kể từ cursor 881. B giữ kết nối **long-poll / WebSocket** với Sync Service và hỏi `changes since 881` — 881 là mốc thay đổi cuối B đã xử lý; Sync Service tra Metadata DB các thay đổi sau mốc đó. Long-poll giữ request mở tới khi có thay đổi → B biết gần như ngay, không phải poll mỗi vài giây gây tải vô ích. Nhờ cursor, B offline cả tuần rồi online lại vẫn lấy đủ phần bỏ lỡ, không cần quét lại cả cây thư mục.",
+          },
+          {
+            note: "B so hash từng chunk với bản local → chỉ tải **chunk 57** qua CDN.",
+            msgs: [["b", "cdn", "GET chunk 57"], ["cdn", "b", "5MB", "ok"]],
+            set: { b: "report.mov v2 ✓" },
+            good: ["b"],
+            lesson: "Delta sync theo chunk tiết kiệm băng thông; cursor giúp client lấy đúng phần thay đổi.",
+            detail: "Laptop B chỉ tải **5MB qua CDN** rồi ghép thành `report.mov v2`. B so danh sách hash của v2 với chunk đã có trên máy, thấy chỉ khác chunk 57. CDN đặt chunk gần user → tải nhanh và giảm chi phí egress từ S3; file riêng tư phải dùng signed URL/cookie của CDN để người khác không tải được. Sau khi tải, B kiểm hash chunk để chắc dữ liệu không hỏng. Delta sync biến một lần đồng bộ 2GB thành 5MB — khác biệt lớn với laptop dùng 4G.",
+          },
+        ],
+      },
+    ],
+  },
+  deep: [
+    {
+      q: "Upload file 50GB?",
+      bad: "POST cả file qua backend.",
+      good: "Presigned URL upload thẳng lên S3.",
+      great: "Chunk ≥ 8MB (S3 giới hạn 10,000 part/file) + multipart upload song song + lưu trạng thái từng chunk để resume; xác nhận bằng S3 event.",
+      why: {
+        bad: "Mọi byte đi qua backend → file 50GB chiếm một worker và băng thông server hàng giờ; nhiều user cùng upload là backend cạn băng thông. Request HTTP đơn lẻ còn dính timeout và giới hạn body (API Gateway thường giới hạn 10MB), rớt mạng là mất hết.",
+        good: "Presigned URL cho client đẩy thẳng lên S3, backend hết gánh băng thông. Nhưng một PUT đơn của S3 giới hạn 5GB, và rớt mạng vẫn phải upload lại từ đầu.",
+        great: "Multipart upload chia file thành part độc lập: các part chạy song song (tăng throughput), part lỗi chỉ cần gửi lại chính nó. Lưu trạng thái chunk để resume sau khi tắt máy; S3 event xác nhận để metadata chỉ đánh dấu xong khi object thật sự tồn tại.",
+      },
+    },
+    {
+      q: "Đồng bộ nhanh giữa thiết bị?",
+      bad: "Tải lại toàn bộ file mỗi lần đổi.",
+      good: "Polling /changes định kỳ, tải file đã đổi.",
+      great: "Long-poll/WebSocket báo thay đổi + delta sync theo chunk hash (content-defined chunking).",
+      why: {
+        bad: "Mỗi thay đổi nhỏ kéo theo tải lại nguyên file: file 1GB sửa 1KB vẫn tốn 1GB băng thông cho mỗi thiết bị.",
+        good: "Polling `/changes` chỉ tải file đã đổi nên bớt lãng phí. Nhưng chu kỳ poll tạo độ trễ (poll 30s thì trễ tới 30s), hàng triệu client poll liên tục tạo tải vô ích, và vẫn tải lại cả file.",
+        great: "Độ trễ còn vài giây mà không tốn request rỗng, vì long-poll/WebSocket đẩy thông báo ngay khi có thay đổi. Content-defined chunking cắt chunk theo nội dung nên chèn byte ở đầu file chỉ đổi vài chunk; client so hash và chỉ tải chunk mới.",
+      },
+    },
+    {
+      q: "Chia sẻ an toàn?",
+      bad: "Link public vĩnh viễn.",
+      good: "Bảng SharedFiles kiểm tra quyền trước khi cấp URL.",
+      great: "Kiểm tra quyền + presigned URL ngắn hạn qua CDN (signed cookie/URL), mã hoá at rest.",
+      why: {
+        bad: "Ai có link (forward, lộ log) đều tải được mãi mãi và không thu hồi được quyền, vì link public không hết hạn và không kiểm tra người truy cập.",
+        good: "Bảng `SharedFiles` kiểm tra đúng người có quyền trước khi cấp URL. Nhưng URL cấp ra dài hạn thì sau khi thu hồi quyền, URL cũ vẫn dùng được.",
+        great: "URL lộ ra cũng nhanh chóng vô dụng, vì presigned/signed URL có chữ ký và hạn ngắn (vài phút); thu hồi quyền có hiệu lực ngay từ lần cấp sau. Mã hoá at rest bảo vệ cả khi storage bị truy cập trái phép.",
+      },
+    },
+  ],
+  sims: ["presigned"],
+});
