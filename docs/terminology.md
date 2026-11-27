@@ -145,6 +145,8 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Context Manager | context manager, `with`; `__enter__`/`__exit__` | object lo việc mở/đóng resource quanh một khối code | "Trình quản lý ngữ cảnh", "Quản lý ngữ cảnh" | `py-context-managers` |
 | Fixture | fixture (pytest); scope, `conftest.py`, yield fixture | hàm chuẩn bị và dọn dẹp dữ liệu/resource cho test, được tiêm vào test theo tên tham số | "Đồ gá kiểm thử", "Dữ liệu cố định" | `py-pytest` |
 | Mock / Patch | mock, `patch`, autospec, `monkeypatch` | object giả ghi lại lời gọi; thay tạm một tên bằng object giả trong lúc test | "Đối tượng giả", "Vá tạm thời" | `py-pytest` |
+| WSGI / ASGI | WSGI, ASGI (glossary); app server, worker; Gunicorn, Uvicorn | giao diện giữa web server và app Python: đồng bộ (WSGI) / async (ASGI) | "Giao diện cổng máy chủ" | `py-wsgi-asgi` |
+| Worker Model | worker, worker process; `sync`, `gthread`, `gevent`, Uvicorn worker | cách app server chia request cho process, thread, event loop | "Mô hình tiến trình" | `py-wsgi-asgi` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật
