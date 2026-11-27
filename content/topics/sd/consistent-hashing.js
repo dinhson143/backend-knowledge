@@ -26,7 +26,7 @@ BK.topic({
       why: "Mọi node tự tính được bản sao nằm đâu mà không cần bảng tra cứu, vì key đã có server 「chủ」 xác định trên ring và quy tắc chỉ là đi tiếp theo chiều kim đồng hồ. Server chủ chết thì server kế tiếp vốn đã có bản sao, vừa là chủ mới vừa phục vụ được ngay (dùng vnode thì phải bỏ qua các vnode cùng máy vật lý để bản sao nằm trên máy khác).",
     },
     {
-      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database (Cassandra, DynamoDB): tiến trình nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
+      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database kiểu Dynamo (Cassandra, Riak — ring xuất phát từ paper Dynamo; dịch vụ DynamoDB không cho thấy ring): tiến trình nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
       why: "Consistent hashing chỉ trả lời 「key giờ thuộc ai」, dữ liệu vẫn phải chép qua mạng. Với cache, mất bản sao chỉ là miss → server mới cứ rỗng rồi đầy dần từ DB; với DB, dữ liệu là bản gốc → phải stream sang server mới trong nền, trong lúc đó server cũ vẫn phục vụ để không gián đoạn.",
     },
     {
@@ -45,7 +45,7 @@ BK.topic({
     ],
     [
       "Khi thêm 1 server vào ring N server, bao nhiêu key bị di chuyển?",
-      "Khoảng K/N key (chỉ đoạn ring mà server mới nhận), so với gần như toàn bộ khi dùng `hash % N`.",
+      "Khoảng K/(N+1) key với N là số server trước khi thêm (chỉ đoạn ring mà server mới nhận), so với gần như toàn bộ khi dùng `hash % N`.",
     ],
   ],
 });
