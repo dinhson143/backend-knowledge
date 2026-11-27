@@ -163,13 +163,21 @@
   });
 
   // ── Sidebar theo ngữ cảnh ──
+  // Giai đoạn "đang học": chứa bước Học tiếp; xong lộ trình chính thì là giai đoạn luyện bài
+  const currentStage = () => { const st = nextStep(); return st.topic ? st.topic.stage : STAGES.find((s) => s.problems); };
+  // Sidebar (A7): mỗi giai đoạn là <details>, chỉ mở giai đoạn chứa topic đang xem (không có thì giai đoạn đang học).
+  // Lọc theo "có topic" chứ không theo `problems`, để giai đoạn vừa có topic vừa có bài vẫn hiện (B0)
   function sideKnowledge(active) {
-    return STAGES.filter((s) => !s.problems).map((s) => `
-      <div class="sb-track">
-        <div class="sb-track-title">${stageNum(s)} · ${esc(s.title)}</div>
-        ${s.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}">
+    const open = active ? byId[active].stage : currentStage();
+    const block = (s) => `
+      <details class="sb-track" ${s === open ? "open" : ""}>
+        <summary class="sb-track-title"><span>${stageNum(s)} · ${esc(s.title)}</span><span class="sb-count">${s.topics.filter((id) => done.has(id)).length}/${s.topics.length}</span></summary>
+        ${s.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}"${id === active ? ' aria-current="page"' : ""}>
           <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")}
-      </div>`).join("");
+      </details>`;
+    const withTopics = STAGES.filter((s) => s.topics.length);
+    return `<div class="sb-group">Lộ trình chính</div>${withTopics.filter((s) => !s.parallel).map(block).join("")}
+      <div class="sb-group">Nhánh song song</div>${withTopics.filter((s) => s.parallel).map(block).join("")}`;
   }
   function sideProblems(active) {
     return `<div class="sb-track"><a class="sb-topic ${active === "all" ? "active" : ""}" href="#/problems"><span class="sb-dot"></span>Tất cả bài & cách luyện</a></div>` +
@@ -190,41 +198,55 @@
     setNav("home", sideKnowledge(null));
     const tDone = ALL.filter((t) => done.has(t.id)).length;
     const pDone = PROBLEMS.filter((p) => done.has(`p:${p.id}`)).length;
-    const step = nextStep();
+    const step = nextStep(), cur = currentStage();
+    // Mỗi giai đoạn là <details> (A6); chỉ mở sẵn giai đoạn đang học. Summary không chứa heading (trình đọc màn hình đọc summary là nút)
+    const stage = (s) => {
+      const keys = stageKeys(s), d = keys.filter((k) => done.has(k)).length;
+      const items = s.problems
+        ? PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")
+        : s.topics.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
+      return `<div class="rm-stage ${s.parallel ? "parallel" : ""} ${d === keys.length ? "complete" : ""}">
+        <div class="rm-num" aria-hidden="true">${stageNum(s)}</div>
+        <details class="rm-body" ${s === cur ? "open" : ""}>
+          <summary class="rm-head"><span class="rm-title"><span class="sr-only">${s.parallel ? "Nhánh song song" : `Giai đoạn ${stageNum(s)}`}: </span>${esc(s.title)}</span><span class="muted">${d}/${keys.length}</span></summary>
+          <p class="muted">${esc(s.goal)}</p>
+          <div class="rm-chips">${items}</div>
+          ${checkpoint(s).length ? `<div class="rm-check"><span class="muted">✔ Kiểm tra chặng:</span> ${checkpoint(s).map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")}</div>` : ""}
+        </details>
+      </div>`;
+    };
+    const where = step.topic ? `${step.topic.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(step.topic.stage)}`} · ${esc(step.topic.stage.title)}`
+      : step.problem ? `Luyện đề · ${LEVELS[step.problem.level]}` : "Luyện đề";
     main.innerHTML = `
       <h1>Lộ trình ôn System Design & Backend</h1>
       <p class="lead">Học theo giai đoạn 1 → 5; Low-Level Design và DSA học song song. Mọi chủ đề dùng chung một khung nên ôn lại nhanh.</p>
 
-      <div class="kpis kpis-3">
-        <div class="panel kpi"><div class="n">${tDone}/${ALL.length}</div><div class="l">Chủ đề đã nắm</div><div class="bar"><i style="width:${pct(tDone, ALL.length)}%"></i></div></div>
-        <div class="panel kpi"><div class="n">${pDone}/${PROBLEMS.length}</div><div class="l">Bài đã luyện</div><div class="bar"><i style="width:${pct(pDone, PROBLEMS.length)}%"></i></div></div>
-        <a class="panel kpi kpi-next" href="${step.href}"><div class="l">Học tiếp</div><div class="n-sm">${esc(step.title)} →</div></a>
+      <div class="home-top">
+        <a class="panel continue" href="${step.href}">
+          <div class="l">Tiếp tục</div>
+          <div class="crumb">${where}</div>
+          <div class="c-title">${esc(step.title)}</div>
+          <span class="btn primary">${step.topic ? "Học tiếp" : "Luyện tiếp"} →</span>
+        </a>
+        ${practiceBox()}
+      </div>
+      <div class="progress-line">
+        <div><b>Chủ đề ${tDone}/${ALL.length}</b><div class="bar"><i style="width:${pct(tDone, ALL.length)}%"></i></div></div>
+        <div><b>Bài luyện ${pDone}/${PROBLEMS.length}</b><div class="bar"><i style="width:${pct(pDone, PROBLEMS.length)}%"></i></div></div>
       </div>
 
-      ${practiceBox()}
+      <h2 class="rm-group">Lộ trình chính</h2>
+      <div class="roadmap">${STAGES.filter((s) => !s.parallel).map(stage).join("")}</div>
+      <h2 class="rm-group">Nhánh song song <span class="small">· học xen kẽ khi cần</span></h2>
+      <div class="roadmap">${STAGES.filter((s) => s.parallel).map(stage).join("")}</div>
 
-      <div class="method panel">
-        <div><b>Cách ôn một chủ đề</b><ol><li>Đọc “Nói trong 30 giây”</li><li>Chạy mô phỏng</li><li>Đọc kiến thức cốt lõi</li><li>Tự trả lời phần Tự kiểm tra</li><li>Xem chủ đề dùng trong bài nào, rồi đánh dấu đã nắm</li></ol></div>
-        <div><b>Cách luyện một bài</b><ol><li>Đọc đề, chưa xem lời giải</li><li>Tự nói Requirements → Entities → API → HLD trong 15–20 phút</li><li>So với HLD mẫu, chạy từng luồng</li><li>Trả lời Deep Dives trước khi mở 3 mức đáp án</li></ol></div>
-      </div>
-
-      <div class="roadmap">
-        ${STAGES.map((s) => {
-          const keys = stageKeys(s), d = keys.filter((k) => done.has(k)).length;
-          const items = s.problems
-            ? PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")
-            : s.topics.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
-          return `<div class="rm-stage ${s.parallel ? "parallel" : ""} ${d === keys.length ? "complete" : ""}">
-            <div class="rm-num">${stageNum(s)}</div>
-            <div class="rm-body">
-              <div class="rm-head"><h3>${esc(s.title)}</h3><span class="muted">${d}/${keys.length}</span></div>
-              <p class="muted">${esc(s.goal)}</p>
-              <div class="rm-chips">${items}</div>
-              ${checkpoint(s).length ? `<div class="rm-check"><span class="muted">✔ Kiểm tra chặng:</span> ${checkpoint(s).map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")}</div>` : ""}
-            </div>
-          </div>`;
-        }).join("")}
-      </div>
+      <details class="panel scope">
+        <summary>Cách ôn một chủ đề / một bài</summary>
+        <div class="method">
+          <div><b>Cách ôn một chủ đề</b><ol><li>Đọc “Nói trong 30 giây”</li><li>Chạy mô phỏng</li><li>Đọc kiến thức cốt lõi</li><li>Tự trả lời phần Tự kiểm tra</li><li>Xem chủ đề dùng trong bài nào, rồi đánh dấu đã nắm</li></ol></div>
+          <div><b>Cách luyện một bài</b><ol><li>Đọc đề, chưa xem lời giải</li><li>Tự nói Requirements → Entities → API → HLD trong 15–20 phút</li><li>So với HLD mẫu, chạy từng luồng</li><li>Trả lời Deep Dives trước khi mở 3 mức đáp án</li></ol></div>
+        </div>
+      </details>
 
       <details class="panel scope">
         <summary>Nguồn & phạm vi nội dung</summary>
