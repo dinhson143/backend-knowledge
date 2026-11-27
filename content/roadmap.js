@@ -37,7 +37,7 @@ window.ROADMAP = [
     parts: [
       { id: "s3.async", title: "Message Queue & Streaming", topics: ["queue", "streams", "kafka"] },
       { id: "s3.resilience", title: "Resilience & Idempotency", topics: ["resilience", "idempotency"] },
-      { id: "s3.contention", title: "Contention & Locking", topics: ["dist-lock"] },
+      { id: "s3.contention", title: "Contention & Locking", topics: ["db-locking", "dist-lock"] },
       { id: "s3.workflow", title: "Multi-step Processes", topics: ["outbox-cdc", "durable-execution"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
