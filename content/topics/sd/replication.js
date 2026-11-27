@@ -6,7 +6,7 @@ BK.topic({
   goal: "Chọn leader–follower, multi-leader hay quorum và xử lý replica lag",
   needs: ["core-db", "cap"],
   tldr: {
-    t: "Replication giữ nhiều bản sao dữ liệu để **chịu lỗi** và **scale đọc**. Ghi **đồng bộ**: commit chờ replica xác nhận, đổi lại latency ghi. Ghi **bất đồng bộ** (mặc định của PostgreSQL streaming replication): ghi nhanh, nhưng failover có thể mất vài commit cuối và đọc replica có thể thấy dữ liệu cũ.",
+    t: "Replication giữ nhiều bản sao dữ liệu để **chịu lỗi** (fault tolerance) và **scale đọc**. Ghi **đồng bộ**: commit chờ replica xác nhận, đổi lại latency ghi. Ghi **bất đồng bộ** (mặc định của PostgreSQL streaming replication): ghi nhanh, nhưng failover có thể mất vài commit cuối và đọc replica có thể thấy dữ liệu cũ.",
     why: "Mọi đánh đổi của replication đến từ một câu hỏi: leader trả \"ok\" cho client **trước** hay **sau** khi bản sao đã có thay đổi. Trả trước thì nhanh nhưng có khoảng thời gian chỉ leader giữ dữ liệu; leader chết đúng lúc đó là mất. Trả sau thì an toàn nhưng mỗi lần ghi phải chờ thêm một vòng mạng và replica chậm làm chậm cả hệ thống.",
   },
   story: {
@@ -68,8 +68,8 @@ BK.topic({
       why: "R + W > N nghĩa là tập node đọc và tập node ghi luôn giao nhau ít nhất một node, nên lần đọc chạm ít nhất một bản có ghi mới nhất. Sloppy quorum phá điều kiện đó để luôn ghi được: các node ghi tạm có thể không nằm trong tập R node mà lần đọc sau hỏi, nên đọc vẫn có thể thấy bản cũ cho tới khi handoff xong.",
     },
     {
-      t: "**Xung đột khi nhiều nơi cùng ghi**: **last-writer-wins** (LWW, giữ bản có timestamp lớn hơn) đơn giản nhưng âm thầm bỏ ghi; **vector clock** phát hiện hai bản song song và trả cả hai cho app gộp (giỏ hàng của Dynamo); **CRDT** là kiểu dữ liệu tự gộp được (xem bài Collaborative Editor).",
-      why: "LWW mất ghi vì hai ghi song song không có cái nào thật sự \"sau\", timestamp chỉ chọn ngẫu nhiên theo đồng hồ từng máy (vốn lệch nhau). Vector clock là danh sách cặp (node, bộ đếm) nên biết được hai bản có quan hệ trước–sau hay song song, đổi lại đẩy việc gộp sang app.",
+      t: "**Xung đột khi nhiều nơi cùng ghi**: **last-writer-wins** (LWW, giữ bản có timestamp lớn hơn) đơn giản nhưng âm thầm bỏ ghi; **vector clock** phát hiện hai phiên bản được ghi đồng thời (concurrent) và trả cả hai cho app gộp (giỏ hàng của Dynamo); **CRDT** là kiểu dữ liệu tự gộp được (xem bài Collaborative Editor).",
+      why: "LWW mất ghi vì hai lần ghi đồng thời không có cái nào thật sự \"sau\", timestamp chỉ chọn ngẫu nhiên theo đồng hồ từng máy (vốn lệch nhau). Vector clock là danh sách cặp (node, bộ đếm) nên biết được hai bản có quan hệ trước–sau hay đồng thời, đổi lại đẩy việc gộp sang app.",
     },
     {
       t: "**Replication không thay backup.** Lệnh `DELETE` nhầm hay migration hỏng cũng được replicate sang mọi bản sao trong vài trăm mili giây.",
@@ -86,10 +86,10 @@ BK.topic({
       },
       {
         cells: ["Kafka", "Leader mỗi partition + ISR", "Ghi được coi là commit khi **mọi** replica trong ISR đã có; `min.insync.replicas` chỉ có tác dụng với `acks=all`"],
-        why: "Kafka không dùng quorum đa số: đa số cần 2f+1 bản để chịu f lỗi, còn ISR chỉ cần f+1 bản. Đổi lại, một replica chậm trong ISR làm chậm commit. Khi mọi replica chết, Kafka mặc định chờ một replica trong ISR quay lại thay vì bầu replica lệch (`unclean.leader.election.enable`), tức chọn nhất quán hơn sẵn sàng (https://kafka.apache.org/44/design/design/#replication).",
+        why: "Kafka không dùng quorum đa số: đa số cần 2f+1 bản để chịu f lỗi, còn ISR chỉ cần f+1 bản. Đổi lại, một replica chậm trong ISR làm chậm commit. Khi mọi replica chết, Kafka mặc định chờ một replica trong ISR quay lại thay vì bầu replica lệch (`unclean.leader.election.enable`), tức chọn consistency hơn availability (https://kafka.apache.org/44/design/design/#replication).",
       },
       {
-        cells: ["Redis", "Master–replica bất đồng bộ", "`WAIT n timeout` chờ n replica nhận ghi nhưng **không** biến Redis thành store nhất quán mạnh"],
+        cells: ["Redis", "Master–replica bất đồng bộ", "`WAIT n timeout` chờ n replica nhận ghi nhưng **không** biến Redis thành store có strong consistency"],
         why: "Tài liệu `WAIT` nói rõ: failover qua Sentinel hay Cluster chỉ cố gắng chọn replica tốt nhất, nên vẫn có thể mất một ghi đã được replicate đồng bộ tới nhiều replica (https://redis.io/docs/latest/commands/wait/).",
       },
       {
@@ -119,7 +119,7 @@ BK.topic({
     ],
     [
       "Vì sao R + W > N cho đọc thấy ghi mới nhất? Khi nào vẫn không?",
-      "Tập R node đọc và W node ghi luôn giao nhau nên chạm ít nhất một bản mới. Không còn đúng với sloppy quorum (ghi vào node thay thế), hoặc khi hai ghi song song được giải bằng LWW.",
+      "Tập R node đọc và W node ghi luôn giao nhau nên chạm ít nhất một bản mới. Không còn đúng với sloppy quorum (ghi vào node thay thế), hoặc khi hai lần ghi đồng thời được giải bằng LWW.",
     ],
     [
       "Split brain là gì, chặn thế nào?",

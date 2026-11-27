@@ -52,7 +52,7 @@ BK.topic({
   },
   points: [
     {
-      t: "**Retry nhân tải theo cấp số.** Mỗi tầng thử 3 lần, 5 tầng xếp chồng thì DB có thể nhận tải gấp 3⁵ = 243 lần (Builders' Library). Google SRE: 3 tầng, mỗi tầng 4 lần thử → một thao tác của user thành 64 lần gọi DB. Chỉ retry ở **một** tầng, thường là tầng gần user nhất hoặc tầng có thông tin tốt nhất.",
+      t: "**Retry storm: retry nhân tải theo cấp số.** Mỗi tầng thử 3 lần, 5 tầng xếp chồng thì DB có thể nhận tải gấp 3⁵ = 243 lần (Builders' Library). Google SRE: 3 tầng, mỗi tầng 4 lần thử → một thao tác của user thành 64 lần gọi DB. Chỉ retry ở **một** tầng, thường là tầng gần user nhất hoặc tầng có thông tin tốt nhất.",
       why: "Mỗi tầng không biết tầng trên cũng retry, nên số lần thử nhân với nhau chứ không cộng. Tải tăng đúng lúc phụ thuộc đang yếu, kéo dài sự cố thay vì giúp nó qua. Retry ở một tầng giữ hệ số nhân ở mức số lần thử của tầng đó.",
     },
     {

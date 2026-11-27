@@ -6,13 +6,13 @@ BK.topic({
   goal: "Nhận ra lost update, write skew và chọn isolation level chặn được nó",
   needs: ["core-db"],
   tldr: {
-    t: "Isolation level quyết định transaction thấy gì từ các transaction chạy song song. Mức càng cao thì càng ít **anomaly** nhưng càng nhiều chờ hoặc lỗi phải retry. Mặc định **không** chặn hết: PostgreSQL mặc định Read Committed vẫn để lọt **lost update** (đọc–sửa–ghi ở app) và **write skew**; chỉ **Serializable** đảm bảo kết quả như chạy lần lượt.",
+    t: "Isolation level quyết định transaction thấy gì từ các transaction chạy đồng thời. Mức càng cao thì càng ít **anomaly** nhưng càng nhiều chờ hoặc lỗi phải retry. Mặc định **không** chặn hết: PostgreSQL mặc định Read Committed vẫn để lọt **lost update** (đọc–sửa–ghi ở app) và **write skew**; chỉ **Serializable** đảm bảo kết quả như chạy lần lượt.",
     why: "Mặc định được chọn cho hiệu năng: chặn mọi anomaly nghĩa là phải khoá nhiều hoặc huỷ transaction khi phát hiện xung đột. Vì vậy app phải tự biết đoạn code nào là đọc–kiểm tra–ghi, rồi chọn công cụ: ghi tương đối, khoá dòng, version, hay nâng level cho riêng transaction đó.",
   },
   story: {
-    problem: "Hai request rút tiền chạy song song, cùng đọc số dư 100, mỗi bên trừ trong code rồi ghi lại: một lần rút biến mất. Hai bác sĩ cùng xin nghỉ, mỗi người kiểm tra \"còn người khác trực\" rồi cùng được duyệt: ca trực trống. Không có lỗi nào được báo, test đơn luồng đều xanh.",
+    problem: "Hai request rút tiền chạy đồng thời, cùng đọc số dư 100, mỗi bên trừ trong code rồi ghi lại: một lần rút biến mất. Hai bác sĩ cùng xin nghỉ, mỗi người kiểm tra \"còn người khác trực\" rồi cùng được duyệt: ca trực trống. Không có lỗi nào được báo, test single-thread đều xanh.",
     idea: "Gọi đúng tên anomaly rồi chọn biện pháp rẻ nhất chặn được nó. Cùng một dòng bị ghi đè (lost update): ghi tương đối, `SELECT … FOR UPDATE`, version, hoặc Repeatable Read của PostgreSQL. Hai dòng khác nhau dựa trên cùng một điều kiện (write skew): Serializable, khoá tường minh, hoặc biến điều kiện thành constraint.",
-    tradeoff: "Level cao hơn hoặc khoá nhiều hơn làm giảm song song: transaction chờ nhau, deadlock nhiều hơn, hoặc bị huỷ với lỗi serialization và app phải retry toàn bộ transaction. Mỗi DB cài cùng một tên level theo cách khác nhau, nên phải nói rõ đang nói về DB nào.",
+    tradeoff: "Level cao hơn hoặc khoá nhiều hơn làm giảm concurrency: transaction chờ nhau, deadlock nhiều hơn, hoặc bị huỷ với lỗi serialization và app phải retry toàn bộ transaction. Mỗi DB cài cùng một tên level theo cách khác nhau, nên phải nói rõ đang nói về DB nào.",
   },
   table: {
     head: ["Level (PostgreSQL)", "Dirty read", "Non-repeatable read", "Phantom", "Serialization anomaly"],
@@ -69,7 +69,7 @@ BK.topic({
   table2: {
     head: ["Anomaly", "Ví dụ", "Chặn được bằng"],
     rows: [
-      ["Dirty read", "Đọc số dư 0 của giao dịch rồi bị rollback", "Read Committed trở lên (mọi DB phổ biến mặc định đã chặn)"],
+      ["Dirty read", "Đọc số dư 0 của transaction rồi bị rollback", "Read Committed trở lên (mọi DB phổ biến mặc định đã chặn)"],
       ["Non-repeatable read", "Báo cáo đọc một dòng hai lần ra hai số", "Repeatable Read (snapshot)"],
       ["Phantom", "Đếm đơn hai lần trong một transaction, lần hai có thêm đơn mới", "PostgreSQL: Repeatable Read; InnoDB: next-key lock khi đọc có khoá"],
       { cells: ["Lost update", "Hai lần rút tiền đọc–sửa–ghi cùng số dư", "Ghi tương đối, `FOR UPDATE`, version; PostgreSQL Repeatable Read + retry"], why: "Biện pháp ở tầng câu lệnh (ghi tương đối, version) chạy được trên mọi DB và mọi level, nên là lựa chọn đầu tiên. Nâng level chỉ khi logic đọc–sửa–ghi quá phức tạp để gộp vào một câu lệnh." },
@@ -83,7 +83,7 @@ BK.topic({
     },
     {
       t: "Ưu tiên biện pháp hẹp nhất: một câu `UPDATE … WHERE stock >= 1` atomic thường tốt hơn nâng cả hệ thống lên Serializable.",
-      why: "Câu lệnh điều kiện vừa kiểm tra vừa ghi trong một bước, không cần retry, không giảm song song của các luồng khác. Nâng level toàn cục làm mọi transaction trả giá cho vài chỗ cần.",
+      why: "Câu lệnh điều kiện vừa kiểm tra vừa ghi trong một bước, không cần retry, không giảm concurrency của các transaction khác. Nâng level toàn cục làm mọi transaction trả giá cho vài chỗ cần.",
     },
     "Xem bài Ticket Booking và sim Hai người tranh ghế cuối cùng để thấy cùng bài toán ở mức hệ thống phân tán.",
   ],

@@ -11,7 +11,7 @@ BK.topic({
   },
   story: {
     problem: "Bài system design nào cũng trông mới lạ; thiết kế lại từ đầu mỗi lần thì dễ sót vấn đề cốt lõi và hết giờ phỏng vấn.",
-    idea: "Nhận ra vấn đề là gọi được lời giải đã kiểm chứng, vì phần lớn bài toán lặp lại cùng một số vấn đề (đẩy realtime, việc chạy lâu, tranh chấp ghi, đọc nhiều, ghi nhiều, file lớn, giao dịch nhiều bước, tìm gần).",
+    idea: "Nhận ra vấn đề là gọi được lời giải đã kiểm chứng, vì phần lớn bài toán lặp lại cùng một số vấn đề (đẩy realtime, việc chạy lâu, contention khi ghi, đọc nhiều, ghi nhiều, file lớn, workflow nhiều bước, tìm gần).",
     tradeoff: "Áp pattern máy móc dễ thêm thành phần không cần. Mỗi pattern có chi phí riêng (lock giảm throughput, saga phức tạp, replica có lag), nên phải nói được vì sao dùng và đánh đổi gì.",
   },
   table: {
@@ -86,7 +86,7 @@ BK.topic({
   points: [
     {
       t: "**Optimistic locking** — mọi người cùng đọc; khi ghi kiểm tra version, sai version thì bị từ chối và làm lại. Hợp khi xung đột ít.",
-      why: "Không khoá lúc đọc nên mọi người chạy song song, không chờ nhau; lệnh `UPDATE ... SET version = v+1 WHERE version = v` chỉ thành công cho người ghi đầu tiên, người sau thấy 0 dòng bị ảnh hưởng và phải đọc lại. Xung đột hiếm thì gần như không ai phải làm lại; xung đột dày thì retry liên tục, phí công.",
+      why: "Không khoá lúc đọc nên mọi người chạy đồng thời, không chờ nhau; lệnh `UPDATE ... SET version = v+1 WHERE version = v` chỉ thành công cho người ghi đầu tiên, người sau thấy 0 dòng bị ảnh hưởng và phải đọc lại. Xung đột hiếm thì gần như không ai phải làm lại; xung đột dày thì retry liên tục, phí công.",
     },
     {
       t: "**Pessimistic locking** — khoá dòng, người sau xếp hàng chờ. Đúng nhưng tốn tài nguyên, dễ nghẽn khi xung đột nhiều.",

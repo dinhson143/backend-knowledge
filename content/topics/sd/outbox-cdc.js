@@ -6,13 +6,13 @@ BK.topic({
   goal: "Ghi DB và phát event mà không mất hay lệch nhau",
   needs: ["core-db", "kafka"],
   tldr: {
-    t: "Ghi DB rồi publish lên Kafka là **dual write**: không transaction nào bao cả hai, nên crash ở giữa làm DB và event lệch nhau mãi mãi. **Outbox**: ghi event vào bảng `outbox` **trong cùng transaction** với dữ liệu nghiệp vụ; một tiến trình khác (polling hoặc **CDC** đọc WAL/binlog) đẩy event ra broker. Event được giao ít nhất một lần, nên consumer phải idempotent.",
+    t: "Ghi DB rồi publish lên Kafka là **dual write**: không transaction nào bao cả hai, nên crash ở giữa làm DB và event lệch nhau mãi mãi. **Outbox**: ghi event vào bảng `outbox` **trong cùng transaction** với dữ liệu nghiệp vụ; một process khác (polling hoặc **CDC** đọc WAL/binlog) đẩy event ra broker. Event được giao ít nhất một lần, nên consumer phải idempotent.",
     why: "Transaction của DB chỉ bao những gì nằm trong DB. Đưa event vào DB (bảng outbox) biến hai lần ghi vào hai hệ thống thành một lần ghi vào một hệ thống, nên DB đảm bảo hoặc cả hai cùng có, hoặc không có gì. Phần còn lại, chép từ outbox sang broker, có thể retry vô hạn vì event đã nằm an toàn trong DB.",
   },
   story: {
     problem: "Service đặt hàng `INSERT orders` rồi `publish(OrderCreated)`. Process chết sau khi commit DB, trước khi publish: đơn tồn tại nhưng kho, email, search index không bao giờ biết. Đảo thứ tự (publish trước) thì DB rollback mà event đã đi: kho giữ hàng cho một đơn không tồn tại.",
     idea: "Coi event là một phần của dữ liệu nghiệp vụ: ghi nó vào bảng `outbox` cùng transaction. Một relay đọc outbox (quét định kỳ, hoặc đọc log thay đổi của DB như Debezium) và publish. Relay gửi lại được bao nhiêu lần cũng được; consumer dedupe theo id của event.",
-    tradeoff: "Thêm một bảng, một tiến trình relay (hoặc cả hạ tầng CDC: Kafka Connect, replication slot) phải vận hành và giám sát. Event tới consumer trễ hơn publish trực tiếp một chút, và có thể trùng. Outbox chỉ giải chuyện ghi tin cậy, không giải chuyện các service khác xử lý đúng.",
+    tradeoff: "Thêm một bảng, một process relay (hoặc cả hạ tầng CDC: Kafka Connect, replication slot) phải vận hành và giám sát. Event tới consumer trễ hơn publish trực tiếp một chút, và có thể trùng. Outbox chỉ giải chuyện ghi tin cậy, không giải chuyện các service khác xử lý đúng.",
   },
   diagrams: [
     {

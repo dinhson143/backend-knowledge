@@ -30,7 +30,7 @@ BK.topic({
         why: "Tránh được cảnh thấy câu trả lời trước câu hỏi mà vẫn rẻ hơn strong: hệ theo dõi quan hệ phụ thuộc (comment trả lời 「phụ thuộc」 comment gốc), replica chỉ hiện thao tác sau khi đã có đủ thao tác nó phụ thuộc; các thao tác không liên quan thì không cần chờ nhau.",
       },
       {
-        cells: ["Read-your-own-writes", "User luôn thấy dữ liệu chính mình vừa ghi", "Sửa profile xong thấy ngay"],
+        cells: ["Read-your-writes", "User luôn thấy dữ liệu chính mình vừa ghi", "Sửa profile xong thấy ngay"],
         why: "Người vừa sửa profile mà reload thấy dữ liệu cũ sẽ tưởng thao tác thất bại và sửa lại. Chỉ cần định tuyến đọc của chính user đó về primary (hoặc replica đã bắt kịp version vừa ghi) trong một khoảng ngắn; người khác vẫn đọc replica bình thường.",
       },
       {
@@ -66,7 +66,7 @@ BK.topic({
       "Network partition chắc chắn xảy ra trong hệ phân tán, nên P là bắt buộc; khi partition xảy ra phải chọn trả lỗi (C) hay trả dữ liệu có thể cũ (A).",
     ],
     [
-      "Read-your-own-writes là gì?",
+      "Read-your-writes là gì?",
       "User luôn đọc được thay đổi của chính mình (ví dụ đọc từ primary trong vài giây sau khi ghi), dù người khác có thể thấy trễ.",
     ],
   ],

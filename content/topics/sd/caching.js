@@ -38,7 +38,7 @@ BK.topic({
       {
         cells: [
           "Write-Back",
-          "Ghi cache rồi trả lời ngay; tiến trình nền ghi DB sau",
+          "Ghi cache rồi trả lời ngay; process nền ghi DB sau",
           "Ghi cực nhanh",
           "Mất dữ liệu nếu cache sập trước khi flush",
         ],
@@ -65,7 +65,7 @@ BK.topic({
     },
     {
       t: "**Cache consistency** — xoá cache sau khi update DB; TTL ngắn nếu chấp nhận stale; chấp nhận eventual consistency cho feed, metrics.",
-      why: "Xoá cache an toàn hơn **ghi lại** cache: ghi lại thì hai request ghi song song có thể đặt giá trị cũ đè lên giá trị mới, còn xoá buộc lần đọc kế tiếp lấy bản mới từ DB. TTL ngắn là lưới an toàn: kể cả khi lỡ lệnh xoá, dữ liệu cũ chỉ sống tối đa bằng TTL — đủ chấp nhận cho feed hay metrics vốn không cần chính xác từng giây.",
+      why: "Xoá cache an toàn hơn **ghi lại** cache: ghi lại thì hai request ghi đồng thời có thể đặt giá trị cũ đè lên giá trị mới, còn xoá buộc lần đọc kế tiếp lấy bản mới từ DB. TTL ngắn là lưới an toàn: kể cả khi lỡ lệnh xoá, dữ liệu cũ chỉ sống tối đa bằng TTL — đủ chấp nhận cho feed hay metrics vốn không cần chính xác từng giây.",
     },
     {
       t: "**Cache stampede (thundering herd)** — **request coalescing / single flight**: chỉ một request rebuild cache, các request khác chờ kết quả.",

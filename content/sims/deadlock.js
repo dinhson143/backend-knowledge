@@ -2,7 +2,7 @@ BK.sim({
   id: "deadlock",
   title: "Deadlock và lock ordering",
   topics: ["concurrency"],
-  scenario: "T1 chuyển tiền A → B, T2 chuyển tiền B → A cùng lúc. Mỗi giao dịch cần khoá cả hai tài khoản.",
+  scenario: "T1 chuyển tiền A → B, T2 chuyển tiền B → A cùng lúc. Mỗi transaction cần khoá cả hai tài khoản.",
   context: "Chuyển tiền phải khoá **cả hai tài khoản** để không ai đọc/ghi số dư giữa chừng. **Deadlock** xảy ra khi đủ 4 điều kiện Coffman: mutual exclusion (lock chỉ 1 người giữ), hold & wait (giữ lock này trong khi chờ lock khác), no preemption (không ai cướp được lock), circular wait (chờ nhau thành vòng). Dòng chữ dưới T1, T2 (\"giữ X · chờ Y\") chính là hold & wait; dòng dưới Lock A, Lock B cho biết ai đang giữ.",
   nodes: [
     { id: "T1", x: 120, y: 65, label: "Thread T1" },
@@ -63,7 +63,7 @@ BK.sim({
             { par: [["T1", "A", "release", "ok"], ["T1", "B", "release", "ok"]] },
           ],
           set: { T1: "xong ✓", A: "free", B: "free" },
-          detail: "Giao dịch T1 hoàn tất bình thường: lấy B (đang free vì T2 chưa đụng vào), chuyển tiền, rồi nhả cả A và B. Cái giá duy nhất: T2 chờ thêm thời gian T1 chạy — tuần tự hoá giữa hai giao dịch chạm cùng tài khoản, điều vốn cần cho tính đúng.",
+          detail: "Transaction T1 hoàn tất bình thường: lấy B (đang free vì T2 chưa đụng vào), chuyển tiền, rồi nhả cả A và B. Cái giá duy nhất: T2 chờ thêm thời gian T1 chạy — tuần tự hoá giữa hai transaction chạm cùng tài khoản, điều vốn cần cho tính đúng.",
         },
         {
           note: "T2 lấy A rồi B — không có vòng chờ.",

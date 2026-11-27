@@ -59,7 +59,7 @@ BK.problem({
             note: "Chạy **Lua script** trên Redis: refill theo thời gian rồi lấy 1 token — atomic, không race giữa các gateway.",
             msgs: [["gw", "redis", "EVAL token_bucket u42"], ["redis", "gw", "allowed · còn 4", "ok"]],
             set: { redis: "bucket:u42 = 4/10" },
-            detail: "Lua script trên Redis cho phép request và bucket giảm từ 5 xuống **4/10**. Gateway gửi `EVAL token_bucket u42`; script đọc `tokens` và `last_refill`, cộng token theo thời gian đã trôi (10 token/phút = 1 token mỗi 6s, tối đa 10), còn ≥1 token thì trừ 1 và trả `allowed`. Phải dùng Lua vì Redis chạy script đơn luồng, không lệnh nào chen vào giữa; nếu gateway tự `GET` rồi `SET`, hai gateway có thể cùng đọc `5`, cùng ghi `4` → user dùng 2 request chỉ mất 1 token (**race condition**). Trên Redis Cluster, mọi key của một bucket phải nằm cùng slot (dùng hash tag như `{u42}`).",
+            detail: "Lua script trên Redis cho phép request và bucket giảm từ 5 xuống **4/10**. Gateway gửi `EVAL token_bucket u42`; script đọc `tokens` và `last_refill`, cộng token theo thời gian đã trôi (10 token/phút = 1 token mỗi 6s, tối đa 10), còn ≥1 token thì trừ 1 và trả `allowed`. Phải dùng Lua vì Redis chạy script single-thread, không lệnh nào chen vào giữa; nếu gateway tự `GET` rồi `SET`, hai gateway có thể cùng đọc `5`, cùng ghi `4` → user dùng 2 request chỉ mất 1 token (**race condition**). Trên Redis Cluster, mọi key của một bucket phải nằm cùng slot (dùng hash tag như `{u42}`).",
           },
           {
             note: "Cho qua backend; trả header để client tự điều tiết.",
@@ -133,7 +133,7 @@ BK.problem({
       why: {
         bad: "Cả hai request đều lọt (lost update): GET và SET là hai lệnh riêng, hai gateway cùng GET thấy còn 1 token, cùng trừ rồi cùng SET.",
         good: "`INCR` atomic nên fixed window không mất cập nhật. Nhưng chỉ dùng được cho thuật toán chỉ cần cộng, không áp dụng cho token bucket (cần đọc-tính-ghi); crash giữa `INCR` và `EXPIRE` thì key không bao giờ hết hạn.",
-        great: "Đọc bucket, tính refill, trừ token và ghi lại thành một thao tác atomic, vì Redis chạy Lua script đơn luồng — không lệnh nào chen vào giữa. Toàn bộ chỉ tốn một round-trip, giữ được ngân sách latency < 10ms.",
+        great: "Đọc bucket, tính refill, trừ token và ghi lại thành một thao tác atomic, vì Redis chạy Lua script single-thread — không lệnh nào chen vào giữa. Toàn bộ chỉ tốn một round-trip, giữ được ngân sách latency < 10ms.",
       },
     },
     {

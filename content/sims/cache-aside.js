@@ -53,7 +53,7 @@ BK.sim({
       ],
       set: { cache: "trống", db: "name mới ✓" },
       lesson: "Cache-aside: đọc cache → miss thì đọc DB → ghi cache với TTL. Ghi DB xong thì xoá cache (không ghi đè) để thu hẹp race; TTL là chốt chặn cuối cho dữ liệu cũ.",
-      detail: "Khi user đổi tên, app `UPDATE users` trên PostgreSQL trước (DB là nguồn sự thật, phải đúng trước), rồi `DEL user:42` thay vì `SET` giá trị mới. Xoá chứ không ghi đè vì hai request ghi chạy song song có thể `SET` vào cache theo thứ tự ngược với thứ tự commit vào DB, để lại tên sai tới hết TTL; xoá thì lần đọc kế tiếp miss và nạp bản mới từ DB. Vẫn còn một race nhỏ: request đọc lấy bản cũ từ DB ngay trước UPDATE rồi `SET` vào cache ngay sau DEL — nên vẫn cần TTL làm giới hạn trên cho dữ liệu sai, hoặc xoá thêm lần nữa sau vài trăm ms (delayed double delete).",
+      detail: "Khi user đổi tên, app `UPDATE users` trên PostgreSQL trước (DB là nguồn sự thật, phải đúng trước), rồi `DEL user:42` thay vì `SET` giá trị mới. Xoá chứ không ghi đè vì hai request ghi chạy đồng thời có thể `SET` vào cache theo thứ tự ngược với thứ tự commit vào DB, để lại tên sai tới hết TTL; xoá thì lần đọc kế tiếp miss và nạp bản mới từ DB. Vẫn còn một race nhỏ: request đọc lấy bản cũ từ DB ngay trước UPDATE rồi `SET` vào cache ngay sau DEL — nên vẫn cần TTL làm giới hạn trên cho dữ liệu sai, hoặc xoá thêm lần nữa sau vài trăm ms (delayed double delete).",
     },
   ],
 });

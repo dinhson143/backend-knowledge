@@ -51,7 +51,7 @@ BK.topic({
   cards: [
     [
       "Dead Letter Queue dùng để làm gì?",
-      "Chứa message xử lý lỗi quá số lần retry, tránh poison message chặn hàng đợi và cho phép điều tra/xử lý lại.",
+      "Chứa message xử lý lỗi quá số lần retry, tránh poison message chặn queue và cho phép điều tra/xử lý lại.",
     ],
     [
       "Queue đảm bảo thứ tự thế nào khi scale?",

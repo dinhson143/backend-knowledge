@@ -65,7 +65,7 @@ BK.topic({
     },
     {
       t: "**RED cho service, USE cho tài nguyên.** RED: **R**ate (request/giây), **E**rrors (số request lỗi), **D**uration (thời gian xử lý) (https://grafana.com/blog/2018/08/02/the-red-method-how-to-instrument-your-services/). USE: với mỗi tài nguyên, xem **U**tilization, **S**aturation (việc phải xếp hàng), **E**rrors (https://www.brendangregg.com/usemethod.html).",
-      why: "RED đo trải nghiệm mà service đem lại cho người gọi nó, USE đo sức khoẻ của máy, đĩa, mạng bên dưới. Bắt đầu từ RED để biết **có** vấn đề, rồi dùng USE để tìm **tài nguyên** nào gây ra. Saturation quan trọng vì tài nguyên dùng 70% vẫn có thể có hàng đợi dài.",
+      why: "RED đo trải nghiệm mà service đem lại cho người gọi nó, USE đo sức khoẻ của máy, đĩa, mạng bên dưới. Bắt đầu từ RED để biết **có** vấn đề, rồi dùng USE để tìm **tài nguyên** nào gây ra. Saturation quan trọng vì tài nguyên dùng 70% vẫn có thể có queue dài.",
     },
     {
       t: "**Distributed tracing**: trace id truyền qua header chuẩn W3C `traceparent` = `version-traceid-parentid-flags`, ví dụ `00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01`; trace id 16 byte, parent id 8 byte (https://github.com/w3c/trace-context/blob/main/spec/20-http_request_header_format.md).",

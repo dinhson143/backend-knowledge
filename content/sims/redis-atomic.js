@@ -33,7 +33,7 @@ BK.sim({
           set: { redis: "views = 11 ❌ (đúng là 12)" },
           bad: ["redis"],
           lesson: "Đọc–tính–ghi từ phía client không atomic, dù Redis chạy một thread.",
-          detail: "Counter là **11 thay vì 12** — một lượt tăng biến mất. A gửi `SET views 11`, B cũng gửi `SET views 11`, lệnh của B ghi đè lệnh của A bằng chính giá trị đó. Lỗi **im lặng**: cả hai lệnh đều trả OK, không xung đột nào được báo. Lượt view, tồn kho hay số dư lệch dần theo tải; tải càng cao, mất càng nhiều. Redis đơn luồng không cứu được vì vấn đề nằm ở khoảng hở giữa hai lệnh, không phải trong một lệnh. Cách khác ngoài INCR là `WATCH`/`MULTI`/`EXEC` (optimistic lock: EXEC thất bại nếu key bị đổi, client retry).",
+          detail: "Counter là **11 thay vì 12** — một lượt tăng biến mất. A gửi `SET views 11`, B cũng gửi `SET views 11`, lệnh của B ghi đè lệnh của A bằng chính giá trị đó. Lỗi **im lặng**: cả hai lệnh đều trả OK, không xung đột nào được báo. Lượt view, tồn kho hay số dư lệch dần theo tải; tải càng cao, mất càng nhiều. Redis single-thread không cứu được vì vấn đề nằm ở khoảng hở giữa hai lệnh, không phải trong một lệnh. Cách khác ngoài INCR là `WATCH`/`MULTI`/`EXEC` (optimistic lock: EXEC thất bại nếu key bị đổi, client retry).",
         },
       ],
     },

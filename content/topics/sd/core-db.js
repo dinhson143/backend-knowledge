@@ -23,7 +23,7 @@ BK.topic({
       },
       {
         cells: ["Transaction", "ACID, nhiều bảng tuỳ ý", "Có nhưng giới hạn (số item, phạm vi, độ trễ); đọc thường eventual"],
-        why: "ACID trên một node dễ vì chỉ có một bộ quản lý lock và log. Với NoSQL, dữ liệu nằm trên nhiều replica/node, strong consistency phải chờ đồng thuận giữa các node nên tăng latency → nhiều hệ chọn eventual mặc định và cho bật strong khi cần (DynamoDB strongly consistent read). Transaction thì đã có nhưng bị giới hạn: DynamoDB `TransactWriteItems` tối đa 100 item, 4 MB, trong một account và một region (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html); MongoDB có transaction nhiều document nhưng tốn hơn ghi một document và không thay được thiết kế schema tốt (https://www.mongodb.com/docs/manual/core/transactions/).",
+        why: "ACID trên một node dễ vì chỉ có một bộ quản lý lock và log. Với NoSQL, dữ liệu nằm trên nhiều replica/node, strong consistency phải chờ consensus giữa các node nên tăng latency → nhiều hệ chọn eventual mặc định và cho bật strong khi cần (DynamoDB strongly consistent read). Transaction thì đã có nhưng bị giới hạn: DynamoDB `TransactWriteItems` tối đa 100 item, 4 MB, trong một account và một region (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html); MongoDB có transaction nhiều document nhưng tốn hơn ghi một document và không thay được thiết kế schema tốt (https://www.mongodb.com/docs/manual/core/transactions/).",
       },
       {
         cells: [

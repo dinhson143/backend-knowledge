@@ -71,7 +71,7 @@ BK.sim({
           note: "B không nhận được cập nhật.",
           set: { B: "stock=1 (chưa biết)" },
           msgs: [["A", "B", "replicate ✗", "err"]],
-          detail: "Replicate từ A sang B thất bại (mũi tên đỏ), cập nhật nằm chờ trong hàng đợi của A. B vẫn tin `stock=1` và không có cách nào biết điều ngược lại.",
+          detail: "Replicate từ A sang B thất bại (mũi tên đỏ), cập nhật nằm chờ trong queue của A. B vẫn tin `stock=1` và không có cách nào biết điều ngược lại.",
         },
         {
           note: "Hệ **AP**: B vẫn trả lời bằng dữ liệu cũ → User HCM mua được sản phẩm không còn (oversell).",

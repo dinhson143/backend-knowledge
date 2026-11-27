@@ -19,7 +19,7 @@ BK.topic({
     rows: [
       {
         cells: ["Redis (1 node)", "~100k+ ops/s, latency < 1ms, RAM tới hàng trăm GB"],
-        why: "Redis giữ toàn bộ dữ liệu trong RAM và xử lý lệnh trên một luồng chính bằng event loop → không tốn chi phí lock, mỗi lệnh chỉ là thao tác cấu trúc dữ liệu trong bộ nhớ. Vì thế latency chủ yếu là round-trip mạng, còn dung lượng bị giới hạn bởi RAM của máy.",
+        why: "Redis giữ toàn bộ dữ liệu trong RAM và xử lý lệnh trên một thread chính bằng event loop → không tốn chi phí lock, mỗi lệnh chỉ là thao tác cấu trúc dữ liệu trong bộ nhớ. Vì thế latency chủ yếu là round-trip mạng, còn dung lượng bị giới hạn bởi RAM của máy.",
       },
       {
         cells: ["PostgreSQL / MySQL (1 node tốt)", "~10k–50k TPS đơn giản, lưu được vài TB"],
