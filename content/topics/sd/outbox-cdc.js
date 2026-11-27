@@ -45,7 +45,7 @@ BK.topic({
       why: "`SKIP LOCKED` bỏ qua các dòng worker khác đang khoá, nên mỗi worker lấy một lô khác nhau mà không chờ lock. Đổi lại, polling thêm tải truy vấn đều đặn lên DB và độ trễ bằng chu kỳ quét. Nhiều worker cùng lúc thì thứ tự giữa các lô không còn được đảm bảo, nên thường chia theo `aggregateid`.",
     },
     {
-      t: "**Relay bằng CDC** (Change Data Capture): đọc log thay đổi của DB thay vì truy vấn bảng. PostgreSQL gọi đây là **logical decoding**: giải mã WAL thành luồng thay đổi theo dòng, cần `wal_level = logical` và một **replication slot** (https://www.postgresql.org/docs/current/logicaldecoding-explanation.html). Debezium đọc slot đó và ghi vào Kafka.",
+      t: "**Relay bằng CDC** (Change Data Capture): đọc log thay đổi của DB thay vì truy vấn bảng. PostgreSQL gọi đây là **logical decoding**: giải mã WAL thành luồng thay đổi theo dòng, cần `wal_level = logical` (hoặc `replica` kèm ít nhất một logical replication slot, khi đó PostgreSQL tự bật) và một **replication slot** (https://www.postgresql.org/docs/current/logicaldecoding-explanation.html). Debezium đọc slot đó và ghi vào Kafka.",
       why: "WAL vốn đã ghi mọi thay đổi theo đúng thứ tự commit, nên đọc WAL cho độ trễ thấp và không thêm truy vấn quét bảng. Cái giá là hạ tầng: Kafka Connect, slot phải được theo dõi, và quyền đọc replication.",
     },
     {
@@ -61,7 +61,7 @@ BK.topic({
       why: "Đổi tên một cột trong bảng `orders` sẽ làm vỡ consumer ở service khác, vì họ đọc trực tiếp hình dạng dòng. Outbox tách hai thứ: bảng nghiệp vụ đổi thoải mái, còn `payload` của event là hợp đồng được thiết kế và đánh version riêng. Event outbox còn mang ý nghĩa nghiệp vụ (`OrderPaid`) thay vì chỉ \"dòng này đổi cột status\".",
     },
     {
-      t: "**Dọn outbox**: polling thì xoá hoặc đánh dấu sau khi gửi rồi dọn định kỳ. Với CDC, có thể `INSERT` rồi xoá ngay trong cùng transaction: dòng insert vẫn nằm trong WAL nên CDC vẫn thấy event, còn bảng không lớn dần. Debezium Outbox Event Router chỉ xử lý thao tác `INSERT` và bỏ qua `DELETE`.",
+      t: "**Dọn outbox**: polling thì xoá hoặc đánh dấu sau khi gửi rồi dọn định kỳ. Với CDC, có thể xoá dòng ngay sau khi insert: extension outbox của Debezium cho Quarkus có tuỳ chọn `remove-after-insert` (mặc định `true`) và nói việc xoá không cản connector phát event CDC (https://debezium.io/documentation/reference/stable/integrations/outbox.html). Outbox Event Router chỉ xử lý `INSERT` và bỏ qua `DELETE`.",
       why: "CDC đọc log chứ không đọc bảng, nên dòng chỉ cần tồn tại trong log. Với polling thì ngược lại: relay đọc bảng, xoá trước khi gửi là mất event.",
     },
     {
@@ -72,7 +72,7 @@ BK.topic({
   tips: [
     {
       t: "Khi bạn vẽ \"service ghi DB rồi bắn event vào Kafka\", tự hỏi luôn: \"crash giữa hai bước thì sao?\" rồi trả lời bằng outbox. Interviewer rất hay hỏi câu này.",
-      why: "Dual write là lỗi phổ biến nhất trong sơ đồ event-driven, vì nó chạy đúng 99,9% thời gian và chỉ hỏng khi crash đúng khe hở. Nêu nó trước cho thấy bạn nghĩ về failure mode chứ không chỉ happy path.",
+      why: "Dual write là lỗi phổ biến nhất trong sơ đồ event-driven, vì nó chạy đúng gần như mọi lúc và chỉ hỏng khi crash đúng khe hở. Nêu nó trước cho thấy bạn nghĩ về failure mode chứ không chỉ happy path.",
     },
     {
       t: "Nói rõ chọn relay nào: polling cho hệ nhỏ, ít hạ tầng; CDC (Debezium) khi đã có Kafka Connect và cần độ trễ thấp.",
