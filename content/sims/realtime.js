@@ -39,14 +39,14 @@ BK.sim({
         },
         {
           note: "Server đẩy event bất cứ lúc nào.",
-          msgs: [["server", "client", "event: 1-0", "ok"], ["server", "client", "event: 2-0", "ok"]],
+          msgs: [["server", "client", "data: 1-0", "ok"], ["server", "client", "data: 2-0", "ok"]],
           detail: "Browser nhận event gần như tức thì, không request rỗng nào: có bàn thắng là server ghi ngay vào response đang mở các dòng `data: 1-0` rồi `data: 2-0`, mỗi event kết thúc bằng một dòng trống. Kết nối đứt thì `EventSource` **tự reconnect** và gửi header `Last-Event-ID` để server phát lại event bị lỡ (nếu server có lưu). Proxy phải tắt buffering, và cần gửi comment heartbeat định kỳ để kết nối không bị timeout đóng.",
         },
         {
           note: "Client muốn gửi lên phải dùng **request riêng** (SSE chỉ một chiều).",
           msgs: [["client", "server", "POST /vote", "warn"]],
           lesson: "SSE: server → client trên HTTP thường, tự reconnect. Hợp live score, notification.",
-          detail: "Muốn bình chọn, browser phải mở một `POST /vote` riêng, vì SSE **chỉ một chiều** server → client. Với live score điều này không thành vấn đề vì client hiếm khi gửi lên. Lưu ý: trên HTTP/1.1 trình duyệt chỉ mở tối đa khoảng 6 kết nối mỗi domain, nên mở nhiều tab SSE có thể chặn request khác; HTTP/2 ghép kênh nên hết giới hạn này.",
+          detail: "Muốn bình chọn, browser phải mở một `POST /vote` riêng, vì SSE **chỉ một chiều** server → client. Với live score điều này không thành vấn đề vì client hiếm khi gửi lên. Lưu ý: trên HTTP/1.1 trình duyệt chỉ mở tối đa khoảng 6 kết nối mỗi domain, nên mở nhiều tab SSE có thể chặn request khác; HTTP/2 ghép kênh nên giới hạn này được nới rộng nhiều (số stream đồng thời do hai bên thoả thuận qua `SETTINGS_MAX_CONCURRENT_STREAMS` — https://www.rfc-editor.org/rfc/rfc9113).",
         },
       ],
     },
@@ -70,7 +70,7 @@ BK.sim({
         {
           note: "Khi scale nhiều server, dùng **Pub/Sub** (Redis) để chuyển tin giữa các server đang giữ kết nối.",
           set: { server: "N server + Redis Pub/Sub" },
-          lesson: "WebSocket: hai chiều, stateful — cần sticky connection và pub/sub khi scale.",
+          lesson: "WebSocket: hai chiều, stateful — LB phải hỗ trợ Upgrade, cần pub/sub khi scale.",
           detail: "Với N server, mọi server subscribe một kênh **Redis Pub/Sub** (hoặc Kafka/NATS) để sự kiện tới được đúng socket. Vấn đề: user X nối vào server 1 nhưng bàn thắng được xử lý ở server 3 — server 3 không có socket của X. Server nhận sự kiện publish lên kênh, mỗi server đẩy xuống các socket nó đang giữ. Load balancer cũng phải hỗ trợ Upgrade, và khi deploy hay scale down, hàng nghìn client bị ngắt cùng lúc rồi reconnect dồn dập — cần jitter khi reconnect. Redis Pub/Sub là fire-and-forget: server nào đang mất kết nối Redis sẽ lỡ tin luôn.",
         },
       ],
