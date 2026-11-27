@@ -23,7 +23,7 @@ BK.topic({
       },
       {
         cells: ["I/O-bound", "CPU thấp, thời gian thực ≫ thời gian CPU; thread phần lớn ở trạng thái chờ", "`ThreadPoolExecutor`, hoặc `asyncio` khi có rất nhiều kết nối", "Nhiều thread hoặc virtual thread (Java 21+); Go: mỗi việc một goroutine"],
-        why: "Trong lúc thread chờ socket, kernel cho thread khác chạy, nên nhiều thread chờ cùng lúc là cách dùng hết khoảng chờ. CPython nhả GIL khi một thread chờ I/O, vì vậy tài liệu `threading` nói thread vẫn hợp với việc I/O-bound.",
+        why: "Trong lúc thread chờ socket, kernel cho thread khác chạy, nên nhiều thread chờ cùng lúc là cách dùng hết khoảng chờ. Glossary của Python ghi GIL luôn được nhả khi làm I/O (https://docs.python.org/3/glossary.html#term-global-interpreter-lock), vì vậy tài liệu `threading` nói thread vẫn hợp với việc I/O-bound.",
       },
       {
         cells: ["Lẫn lộn (gọi API rồi xử lý nặng)", "Có cả hai pha trong một request", "Event loop hoặc thread cho I/O; phần nặng đẩy sang process pool (`loop.run_in_executor`)", "Tách hai pool, mỗi pool cỡ theo loại việc của nó"],

@@ -50,7 +50,7 @@ BK.topic({
     },
     {
       t: "**Exception bị nuốt** — exception trong task được giữ trong `Future`; không ai gọi `result()` thì không ai thấy lỗi.",
-      why: "`Future.result()` ném lại đúng exception mà task đã ném. Kiểu `pool.submit(job)` rồi bỏ quên future làm lỗi biến mất. Luôn gom future lại và đọc kết quả, hoặc gắn `add_done_callback` để log lỗi.",
+      why: "Tài liệu `concurrent.futures`: nếu lời gọi ném exception thì `result()` ném lại exception đó, và `add_done_callback` gọi callback cả khi future bị huỷ lẫn khi chạy xong (https://docs.python.org/3/library/concurrent.futures.html). Kiểu `pool.submit(job)` rồi bỏ quên future làm lỗi biến mất. Luôn gom future lại và đọc kết quả, hoặc gắn `add_done_callback` để log lỗi.",
     },
     {
       t: "**Dừng pool** — `shutdown(wait=True, cancel_futures=False)`: không nhận việc mới; `cancel_futures=True` huỷ các task chưa bắt đầu, task đang chạy vẫn chạy tới hết.",
@@ -73,7 +73,7 @@ BK.topic({
           },
           {
             cells: ["`slots = threading.BoundedSemaphore(100)`", "Cho tối đa 100 việc trong pool (20 chạy + 80 chờ)", "Thay cho queue giới hạn mà Python không có"],
-            why: "Semaphore đếm số việc đã nhận mà chưa xong. `BoundedSemaphore` báo lỗi nếu `release()` nhiều hơn `acquire()`, bắt được bug release hai lần.",
+            why: "Semaphore đếm số việc đã nhận mà chưa xong. `BoundedSemaphore` ném `ValueError` nếu giá trị vượt giá trị ban đầu, tức `release()` nhiều hơn `acquire()`; bắt được bug release hai lần (https://docs.python.org/3/library/threading.html).",
           },
           {
             cells: ["`if not slots.acquire(timeout=0.5): raise Overloaded()`", "Đầy quá 0,5 giây thì từ chối", "Tương đương `AbortPolicy`: báo lỗi sớm thay vì để client chờ mãi"],

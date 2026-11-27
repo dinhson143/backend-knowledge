@@ -73,7 +73,7 @@ BK.topic({
         rows: [
           {
             cells: ["Đếm request, tranh chấp vừa", "`AtomicLong.incrementAndGet()` / `atomic.AddInt64`", "Một lệnh atomic, không lock, không ngủ"],
-            why: "Thao tác fetch-and-add làm trọn đọc–cộng–ghi trong phần cứng; không cần vòng CAS.",
+            why: "Thư viện cung cấp sẵn một thao tác atomic làm trọn đọc–cộng–ghi; bạn không phải tự viết vòng CAS (bên dưới là lệnh fetch-and-add hay vòng CAS tuỳ kiến trúc CPU).",
           },
           {
             cells: ["Đếm cực nóng (metric mọi request, nhiều core)", "`LongAdder`", "Chia ô, ít va chạm cache line"],

@@ -53,7 +53,7 @@ BK.topic({
       why: "Trang Pod termination không bảo đảm thứ tự giữa gỡ endpoint và gửi TERM. Cách thường dùng: `preStop` ngủ vài giây, hoặc app vẫn phục vụ vài giây sau `SIGTERM` rồi mới đóng listener, để các thành phần mạng kịp cập nhật. Phải trừ khoảng này khỏi grace period.",
     },
     {
-      t: "**Các bước drain trong app** — (1) báo không sẵn sàng (readiness trả lỗi); (2) ngừng nhận việc mới: đóng listener, consumer ngừng `poll`; (3) chờ việc đang chạy xong, có **deadline** ngắn hơn grace period; (4) đóng DB pool, flush log và metric, commit offset; (5) thoát mã 0.",
+      t: "**Các bước drain trong app** — (1) báo không sẵn sàng (readiness trả lỗi); (2) vẫn phục vụ thêm vài giây cho load balancer kịp gỡ endpoint, rồi ngừng nhận việc mới: đóng listener, consumer ngừng `poll`; (3) chờ việc đang chạy xong, có **deadline** ngắn hơn grace period; (4) đóng DB pool, flush log và metric, commit offset; (5) thoát mã 0.",
       why: "Bước (3) không có deadline thì một request treo giữ pod tới khi bị `SIGKILL`, mất luôn bước (4). Consumer queue nên commit sau khi xử lý xong; message đang dở mà bị kill sẽ được giao lại, vì vậy handler phải idempotent (bài `idempotency`).",
     },
     {
@@ -121,7 +121,7 @@ BK.topic({
     ["Signal nào không bắt được?", "`SIGKILL` và `SIGSTOP`: không bắt, không chặn, không bỏ qua được."],
     ["Kubernetes dừng container theo thứ tự nào?", "Chạy `preStop` (nếu có) → gửi TERM tới PID 1 → chờ `terminationGracePeriodSeconds` (mặc định 30 giây, tính cả preStop) → `SIGKILL`. Gỡ endpoint diễn ra đồng thời."],
     ["Vì sao app làm PID 1 trong container có thể không chết khi nhận `SIGTERM`?", "Kernel chỉ giao cho init của PID namespace những signal nó đã cài handler (trừ `SIGKILL`/`SIGSTOP` từ namespace cha); không có handler thì `SIGTERM` bị bỏ qua."],
-    ["Các bước drain khi nhận `SIGTERM`?", "Báo không sẵn sàng, ngừng nhận việc mới, chờ việc dở xong với deadline < grace period, đóng tài nguyên và flush, thoát mã 0."],
+    ["Các bước drain khi nhận `SIGTERM`?", "Báo không sẵn sàng, phục vụ thêm vài giây cho endpoint kịp gỡ, ngừng nhận việc mới, chờ việc dở xong với deadline < grace period, đóng tài nguyên và flush, thoát mã 0."],
     ["Mã thoát 137 và 143 nghĩa là gì?", "128 + số signal: 137 = bị `SIGKILL` (9), 143 = bị `SIGTERM` (15) mà không tự xử lý."],
     ["Python chạy signal handler ở đâu?", "Luôn ở main thread, sau khi C handler đặt cờ, tại lệnh bytecode tiếp theo; một lời gọi C dài sẽ hoãn handler."],
     ["Vì sao trong signal handler chỉ nên đặt cờ?", "Handler có thể chen vào giữa bất kỳ lệnh nào, kể cả giữa `malloc` hay `printf`; gọi hàm không async-signal-safe trong handler có thể làm hỏng trạng thái."],

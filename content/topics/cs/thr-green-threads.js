@@ -19,7 +19,7 @@ BK.topic({
     rows: [
       {
         cells: ["Ai lập lịch", "Kernel (1:1)", "Runtime Go, M:N lên tối đa `GOMAXPROCS` thread chạy cùng lúc", "Scheduler của JDK (ForkJoinPool) lên carrier thread, M:N", "Event loop, trên một thread"],
-        why: "Go FAQ: `GOMAXPROCS` mặc định bằng số core và chỉ giới hạn số goroutine chạy cùng lúc; runtime có thể tạo thêm thread cho các goroutine đang kẹt trong syscall (https://go.dev/doc/faq). JEP 444: scheduler là ForkJoinPool work-stealing, parallelism mặc định bằng số processor.",
+        why: "Go FAQ: `GOMAXPROCS` mặc định bằng số core (từ Go 1.25 còn xét CPU limit của cgroup — https://go.dev/doc/go1.25) và chỉ giới hạn số goroutine chạy cùng lúc; runtime có thể tạo thêm thread cho các goroutine đang kẹt trong syscall (https://go.dev/doc/faq). JEP 444: scheduler là ForkJoinPool work-stealing, parallelism mặc định bằng số processor.",
       },
       {
         cells: ["Chuyển việc ở đâu", "Bất kỳ lúc nào (timer interrupt)", "Ở điểm chặn, và từ Go 1.14 có thể preempt cả vòng lặp không gọi hàm", "Khi chặn trên I/O, lock, `sleep`; không có preempt theo time slice", "Chỉ ở `await`"],
@@ -45,8 +45,8 @@ BK.topic({
       why: "Go FAQ: khi một coroutine chặn, runtime tự chuyển các coroutine khác trên cùng OS thread sang thread khác chạy được. JEP 444: một số thao tác (nhiều thao tác filesystem) không unmount được, và JDK bù bằng cách tạm tăng số platform thread trong scheduler.",
     },
     {
-      t: "**Pinning (Java)** — virtual thread bị **ghim** vào carrier: chặn lúc này thì chặn luôn OS thread. JDK 21: ghim khi chạy trong `synchronized` hoặc trong native method/foreign function. **JDK 24 (JEP 491)** bỏ ghim do `synchronized`; native code gọi ngược lại Java rồi chặn thì vẫn ghim.",
-      why: "JEP 444 liệt kê hai trường hợp ghim và khuyên thay `synchronized` quanh I/O dài bằng `ReentrantLock` (https://openjdk.org/jeps/444). JEP 491 đổi cách JVM cài `synchronized` để virtual thread giữ monitor độc lập với carrier, loại bỏ \"gần như mọi\" trường hợp ghim (https://openjdk.org/jeps/491). Vì vậy lời khuyên \"tránh `synchronized`\" chỉ còn đúng với JDK 21–23.",
+      t: "**Pinning (Java)** — virtual thread bị **ghim** vào carrier: chặn lúc này thì chặn luôn OS thread. JDK 21: ghim khi chạy trong `synchronized` hoặc trong native method/foreign function. **JDK 24 (JEP 491)** bỏ ghim do `synchronized`; vẫn ghim khi native code gọi ngược lại Java rồi chặn, khi chặn lúc đang nạp class, và khi chặn trong class initializer.",
+      why: "JEP 444 liệt kê hai trường hợp ghim và khuyên thay `synchronized` quanh I/O dài bằng `ReentrantLock` (https://openjdk.org/jeps/444). JEP 491 đổi cách JVM cài `synchronized` để virtual thread giữ monitor độc lập với carrier, loại bỏ \"gần như mọi\" trường hợp ghim; mục Future Work của JEP 491 liệt kê các trường hợp còn lại, đều do có native frame trên stack (https://openjdk.org/jeps/491). Vì vậy lời khuyên \"tránh `synchronized`\" chỉ còn đúng với JDK 21–23.",
     },
     {
       t: "**Không phải thread nhanh hơn** — việc CPU-bound không lợi gì: thêm virtual thread hay goroutine vượt số core không tăng throughput.",
@@ -97,7 +97,7 @@ BK.topic({
       why: "Interviewer hay hỏi tiếp \"vậy virtual thread có làm API nhanh hơn không?\"; trả lời đúng là không giảm latency của từng request, chỉ tăng số request phục vụ được cùng lúc.",
     },
     {
-      t: "Nhắc pinning kèm phiên bản JDK: 21–23 ghim trong `synchronized`, 24 trở đi không còn.",
+      t: "Nhắc pinning kèm phiên bản JDK: 21–23 ghim trong `synchronized`, 24 trở đi `synchronized` không còn ghim (vẫn còn vài trường hợp do native frame).",
       why: "Nhiều bài viết cũ vẫn khuyên bỏ `synchronized`; nêu được JEP 491 cho thấy kiến thức của bạn cập nhật.",
     },
   ],
@@ -106,7 +106,7 @@ BK.topic({
     ["M:N scheduling là gì?", "M thread của runtime (goroutine, virtual thread) được lập lịch lên N OS thread, N thường bằng số core."],
     ["Vì sao goroutine rẻ hơn OS thread?", "Stack khởi đầu vài KB và co giãn; chuyển goroutine trong user space, không qua kernel; runtime gom nhiều goroutine lên ít thread."],
     ["Virtual thread có làm từng request nhanh hơn không?", "Không. JEP 444: chúng tăng throughput (nhiều việc đồng thời hơn), không giảm latency; việc CPU-bound không lợi gì."],
-    ["Pinning là gì và khi nào xảy ra?", "Virtual thread không gỡ được khỏi carrier, nên chặn là chặn cả OS thread. JDK 21–23: trong `synchronized` hoặc native; JDK 24+ (JEP 491): chỉ còn trường hợp native/foreign function."],
+    ["Pinning là gì và khi nào xảy ra?", "Virtual thread không gỡ được khỏi carrier, nên chặn là chặn cả OS thread. JDK 21–23: trong `synchronized` hoặc native; JDK 24+ (JEP 491): `synchronized` hết ghim; còn ghim khi native code gọi ngược lại Java rồi chặn, khi nạp class, và trong class initializer."],
     ["Muốn giới hạn 20 lời gọi đồng thời tới một service khi dùng virtual thread?", "Dùng semaphore 20 permit, không dùng pool virtual thread cỡ 20."],
     ["Go 1.14 thay đổi gì về preemption?", "Goroutine được preempt bất đồng bộ, vòng lặp không gọi hàm không còn làm kẹt scheduler hay GC."],
   ],

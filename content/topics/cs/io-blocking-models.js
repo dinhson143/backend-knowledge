@@ -49,7 +49,7 @@ BK.topic({
     },
     {
       t: "**File thường không non-blocking được** — `O_NONBLOCK` không có tác dụng với file thường và block device: đọc đĩa vẫn chặn (ngắn) khi cần truy cập thiết bị.",
-      why: "Trích open(2). Vì vậy event loop không \"chờ\" file như chờ socket: file luôn được báo sẵn sàng, nhưng `read()` vẫn có thể chặn khi dữ liệu chưa có trong page cache. Event loop thường đẩy việc đọc file sang thread pool (`asyncio.to_thread`), hoặc dùng async I/O thật.",
+      why: "Trích open(2). Vì vậy event loop không \"chờ\" file như chờ socket: poll(2) nói `poll()` trên file thường luôn trả về ngay là sẵn sàng (https://man7.org/linux/man-pages/man2/poll.2.html), còn `epoll_ctl` từ chối file thường với lỗi `EPERM` (https://man7.org/linux/man-pages/man2/epoll_ctl.2.html); nhưng `read()` vẫn có thể chặn khi dữ liệu chưa có trong page cache. Event loop thường đẩy việc đọc file sang thread pool (`asyncio.to_thread`), hoặc dùng async I/O thật.",
     },
     {
       t: "**POSIX AIO trên Linux là thread của glibc** — `aio_read()` có trong chuẩn POSIX, nhưng bản trên Linux do glibc cài bằng thread trong user space, tốn và khó scale. io_uring là async I/O thật của kernel Linux.",

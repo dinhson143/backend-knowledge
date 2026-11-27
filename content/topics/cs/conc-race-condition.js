@@ -6,7 +6,7 @@ BK.topic({
   goal: "Nhận ra check-then-act và phân biệt race condition với data race",
   needs: ["thr-thread-vs-process"],
   tldr: {
-    t: "**Race condition**: kết quả đúng hay sai phụ thuộc vào thứ tự chạy xen kẽ của các thread (hoặc process, request, server). Hai dạng hay gặp nhất: **read-modify-write** (`count += 1`: đọc, cộng, ghi) và **check-then-act** (kiểm tra \"ghế còn trống\" rồi mới đặt; giữa hai bước, bên khác đã đặt). **Data race** là khái niệm hẹp hơn, ở mức bộ nhớ: hai thread truy cập cùng một ô nhớ đồng thời, ít nhất một bên ghi, không có đồng bộ. Có thể có race condition mà không có data race (mỗi bước đều có lock nhưng hai bước tách rời), và ngược lại.",
+    t: "**Race condition**: kết quả đúng hay sai phụ thuộc vào thứ tự chạy xen kẽ của các thread (hoặc process, request, server). Hai dạng hay gặp nhất: **read-modify-write** (`count += 1`: đọc, cộng, ghi) và **check-then-act** (kiểm tra \"ghế còn trống\" rồi mới đặt; giữa hai bước, bên khác đã đặt). **Data race** là khái niệm hẹp hơn, ở mức bộ nhớ: hai thread truy cập cùng một ô nhớ đồng thời, ít nhất một bên ghi, không có đồng bộ. Có thể có race condition mà không có data race: mỗi bước đều có lock, nhưng hai bước tách rời.",
     why: "Race condition là lỗi logic: một chuỗi thao tác cần chạy liền mạch lại bị chen vào giữa. Data race là lỗi đồng bộ bộ nhớ: Go memory model định nghĩa nó là một lần ghi vào một vị trí nhớ xảy ra đồng thời với một lần đọc hoặc ghi khác vào cùng vị trí, trừ khi mọi truy cập đều là atomic của `sync/atomic` (https://go.dev/ref/mem). Sửa data race (thêm lock cho từng truy cập) chưa chắc đã sửa race condition, nếu lock không bao trọn cả chuỗi kiểm tra và hành động.",
   },
   story: {
@@ -45,7 +45,7 @@ BK.topic({
       why: "Python FAQ: Python chỉ đổi thread giữa các lệnh bytecode, nên các thao tác trên kiểu built-in \"trông atomic\" thì atomic thật (https://docs.python.org/3/faq/library.html). Mục này dựa vào GIL; trên bản free-threaded (3.13+, không mặc định) đừng dựa vào nó. Lỗi logic thì GIL chưa bao giờ ngăn.",
     },
     {
-      t: "**Data race nguy hiểm hơn \"sai một con số\"** — trong Go, Java, C/C++, chương trình có data race có thể đọc giá trị bị trộn từ nhiều lần ghi hoặc thấy object khởi tạo dở, vì compiler và CPU được phép sắp xếp lại lệnh khi không có đồng bộ.",
+      t: "**Data race nguy hiểm hơn \"sai một con số\"** — trong Go, chương trình có data race mất đảm bảo \"chạy như thể tuần tự\": compiler và CPU được phép sắp xếp lại truy cập bộ nhớ khi không có đồng bộ, nên một goroutine có thể thấy các lần ghi của goroutine khác theo thứ tự khác với thứ tự trong code.",
       why: "Go memory model: chương trình **không** có data race chạy như thể mọi goroutine được ghép lên một processor (DRF-SC); có data race thì mất đảm bảo đó, và tài liệu khuyên \"Don't be clever\": chương trình sửa dữ liệu được nhiều goroutine truy cập đồng thời phải tuần tự hoá truy cập đó (https://go.dev/ref/mem). Visibility và reordering là bài `conc-memory-model` (sắp viết).",
     },
     {
@@ -57,8 +57,8 @@ BK.topic({
       why: "Kết quả phụ thuộc lịch chạy của scheduler, thứ test không điều khiển được. Công cụ giúp: Go race detector (`go test -race`) chỉ tìm race **thực sự xảy ra** lúc chạy, và tốn khoảng 5–10 lần bộ nhớ, 2–20 lần thời gian (https://go.dev/doc/articles/race_detector). Stress test và review theo mẫu \"check-then-act\" vẫn cần.",
     },
     {
-      t: "**Check-then-act trên collection thread-safe vẫn race** — `ConcurrentHashMap` hay `dict` có lock bên trong bảo vệ từng lời gọi, không bảo vệ chuỗi `get` rồi `put` của bạn. Dùng thao tác gộp có sẵn: `putIfAbsent`, `computeIfAbsent` (Java), `dict.setdefault` (Python).",
-      why: "Collection thread-safe hứa mỗi phương thức không làm hỏng cấu trúc, không hứa gì về chuỗi phương thức. Thao tác gộp làm cả check và act bên trong cùng một lần giữ lock. Chọn loại collection nào ở bài `conc-thread-safe-collections` (sắp viết).",
+      t: "**Check-then-act trên collection thread-safe vẫn race** — `ConcurrentHashMap` hay `dict` có lock bên trong bảo vệ từng lời gọi, không bảo vệ chuỗi `get` rồi `put` của bạn. Java có thao tác gộp: `putIfAbsent`, `computeIfAbsent` của `ConcurrentHashMap`. Python: lock bao cả hai bước.",
+      why: "Collection thread-safe hứa mỗi phương thức không làm hỏng cấu trúc, không hứa gì về chuỗi phương thức. Javadoc `ConcurrentHashMap` ghi các phương thức này tương đương chuỗi check-then-act \"ngoại trừ việc hành động được thực hiện atomic\" (https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html). Chọn loại collection nào ở bài `conc-thread-safe-collections` (sắp viết).",
     },
   ],
   sections: [
@@ -77,7 +77,7 @@ BK.topic({
           },
           {
             cells: ["`if user_id not in sessions: sessions[user_id] = create()`", "Sai: hai thread có thể cùng `create()`", "Check và act là hai lệnh riêng"],
-            why: "Hậu quả tuỳ `create()`: tạo hai session, mở hai connection, gửi hai email. Dùng `sessions.setdefault(user_id, …)` nếu tạo object rẻ, hoặc lock bao cả hai bước nếu `create()` đắt hay có side effect.",
+            why: "Hậu quả tuỳ `create()`: tạo hai session, mở hai connection, gửi hai email. Sửa bằng lock bao cả hai bước: `with lock:` rồi mới kiểm tra và tạo. Tài liệu Python không liệt kê `setdefault` trong các thao tác được hứa atomic, nên đừng dựa vào nó.",
           },
           {
             cells: ["`UPDATE seats SET user_id = %s WHERE id = %s AND user_id IS NULL` rồi kiểm tra `rowcount == 1`", "Đúng trên nhiều server", "DB làm check và act trong một câu lệnh atomic"],
