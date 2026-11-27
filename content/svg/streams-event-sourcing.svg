@@ -43,7 +43,7 @@
   <rect class="ev" x="244" y="68" width="272" height="26" rx="5"/><text class="e" x="254" y="86">v1 · AccountOpened</text><text class="n" x="506" y="86">0</text>
   <rect class="ev" x="244" y="98" width="272" height="26" rx="5"/><text class="e" x="254" y="116">v2 · Deposited(100)</text><text class="n" x="506" y="116">100</text>
   <rect class="ev" x="244" y="128" width="272" height="26" rx="5"/><text class="e" x="254" y="146">v3 · Withdrawn(20)</text><text class="n" x="506" y="146">80</text>
-  <rect class="snap" x="244" y="158" width="272" height="26" rx="5"/><text class="e" x="254" y="176" fill="#0f7a5f">snapshot @v3 · balance = 80</text>
+  <rect class="snap" x="244" y="158" width="272" height="26" rx="5"/><text class="e" x="254" y="176" style="fill:#0f7a5f">snapshot @v3 · balance = 80</text>
   <rect class="ev" x="244" y="188" width="272" height="26" rx="5"/><text class="e" x="254" y="206">v4 · Deposited(50)</text><text class="n" x="506" y="206">130</text>
   <rect class="new" x="244" y="218" width="272" height="26" rx="5"/><text class="e" x="254" y="236">v5 · Withdrawn(30) · mới</text><text class="n" x="506" y="236">100</text>
 

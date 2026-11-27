@@ -164,6 +164,15 @@ svgOnDisk.forEach((f) => {
   if (!/<svg[^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/.test(s)) at(f, "", 'thẻ <svg> thiếu xmlns="http://www.w3.org/2000/svg"');
   if (!/<svg[^>]*viewBox=/.test(s)) at(f, "", "thẻ <svg> thiếu viewBox");
   if (!/<rect[^>]*fill="#fff(fff)?"/i.test(s)) at(f, "", 'thiếu rect nền sáng (fill="#ffffff") — xem D11');
+  // CSS của class thắng thuộc tính fill/stroke trên phần tử → màu riêng bị mất, phải dùng style="" (D50)
+  const cls = {};
+  for (const [, sel, body] of (s.match(/<style>([\s\S]*?)<\/style>/)?.[1] || "").matchAll(/([^{}]+)\{([^}]*)\}/g))
+    for (const [, c] of sel.matchAll(/\.([\w-]+)/g)) body.split(";").forEach((p) => (cls[c] ||= new Set()).add(p.split(":")[0].trim()));
+  for (const [tag] of s.matchAll(/<\w+\b[^>]*\bclass="[^"]+"[^>]*>/g)) {
+    const set = tag.match(/class="([^"]+)"/)[1].split(/\s+/).flatMap((c) => [...(cls[c] || [])]);
+    for (const a of ["fill", "stroke", "stroke-width"])
+      if (set.includes(a) && new RegExp(`\\s${a}="`).test(tag)) at(f, "", `thuộc tính ${a}="…" bị CSS của class ghi đè, dùng style="${a}:…": ${tag.slice(0, 80)}`);
+  }
   if (statSync(new URL(f, root)).size > MAX) at(f, "", "SVG > 40 KB");
 });
 if (loaded.at(-1) !== "app.js") at("content/manifest.js", "FILES", "app.js phải là file nạp cuối cùng");

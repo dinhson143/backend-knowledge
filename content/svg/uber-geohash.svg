@@ -37,9 +37,9 @@
   <rect x="101" y="121" width="98" height="48" fill="none" stroke="#e0562b" stroke-width="2"/>
   <text class="s" x="150" y="288" text-anchor="middle">kinh độ →</text>
   <text class="s" x="258" y="80">↑ vĩ độ</text>
-  <text class="s" x="258" y="140" fill="#c2410c">sát nhau</text>
-  <text class="s" x="258" y="156" fill="#c2410c">nhưng khác</text>
-  <text class="s" x="258" y="172" fill="#c2410c">prefix</text>
+  <text class="s" x="258" y="140" style="fill:#c2410c">sát nhau</text>
+  <text class="s" x="258" y="156" style="fill:#c2410c">nhưng khác</text>
+  <text class="s" x="258" y="172" style="fill:#c2410c">prefix</text>
   <text class="s" x="34" y="310">Thêm bit → ô nhỏ đi một nửa. Redis GEO: 52 bit,</text>
   <text class="s" x="34" y="326">lưu làm score của sorted set.</text>
 
@@ -56,7 +56,7 @@
   <circle cx="540" cy="156" r="62" fill="#3b7ff5" fill-opacity="0.08" stroke="#3b7ff5" stroke-width="1.6" stroke-dasharray="6 4"/>
   <!-- Rider -->
   <circle cx="540" cy="156" r="6" fill="#3b7ff5"/>
-  <text class="lab" x="534" y="134" text-anchor="end" fill="#1d4ed8">điểm đón</text>
+  <text class="lab" x="534" y="134" text-anchor="end" style="fill:#1d4ed8">điểm đón</text>
   <!-- Tài xế -->
   <circle cx="515" cy="183" r="5.5" fill="#14a37f"/><text class="lab" x="524" y="196">d42</text>
   <circle cx="580" cy="112" r="5.5" fill="#14a37f"/><text class="lab" x="590" y="108">d7</text>

@@ -68,10 +68,10 @@
   <text class="c" x="576" y="163">SYN,ACK · seq=300 ack=101</text>
   <text class="c" x="576" y="215">ACK · seq=101 ack=301</text>
   <path d="M472,262 L678,288" stroke="#3b7ff5" stroke-width="1.6" fill="none" marker-end="url(#b)"/>
-  <text class="c" x="576" y="265" fill="#1d4ed8">dữ liệu: GET /orders</text>
+  <text class="c" x="576" y="265" style="fill:#1d4ed8">dữ liệu: GET /orders</text>
   <!-- 1 RTT -->
   <path d="M458,108 L452,108 L452,186 L458,186" stroke="#e08a00" stroke-width="1.5" fill="none"/>
-  <text class="s" x="440" y="152" text-anchor="end" fill="#b45309">1 RTT</text>
+  <text class="s" x="440" y="152" text-anchor="end" style="fill:#b45309">1 RTT</text>
   <text class="s" x="424" y="320">Hai bên thống nhất số thứ tự ban đầu,</text>
   <text class="s" x="424" y="336">rồi mới gửi dữ liệu (thêm 1 RTT; TLS thêm nữa).</text>
   <text class="s" x="424" y="362">UDP: không bắt tay, không ACK, không gửi lại.</text>

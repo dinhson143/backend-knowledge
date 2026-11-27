@@ -45,11 +45,11 @@
   <rect class="grp" x="548" y="20" width="192" height="300" rx="12"/>
   <text class="h" x="562" y="44">Khi n = 10⁵</text>
   <text class="s" x="562" y="62">máy chạy ~10⁸ phép tính/giây</text>
-  <text class="t" x="562" y="96" fill="#475569">O(1)</text><text class="ok" x="726" y="96" text-anchor="end">1 ✓</text>
-  <text class="t" x="562" y="128" fill="#0f7a5f">O(log n)</text><text class="ok" x="726" y="128" text-anchor="end">≈ 17 ✓</text>
-  <text class="t" x="562" y="160" fill="#1d4ed8">O(n)</text><text class="ok" x="726" y="160" text-anchor="end">10⁵ ✓</text>
-  <text class="t" x="562" y="192" fill="#b45309">O(n log n)</text><text class="ok" x="726" y="192" text-anchor="end">≈ 1,7×10⁶ ✓</text>
-  <text class="t" x="562" y="224" fill="#c2410c">O(n²)</text><text class="no" x="726" y="224" text-anchor="end">10¹⁰ ✗</text>
+  <text class="t" x="562" y="96" style="fill:#475569">O(1)</text><text class="ok" x="726" y="96" text-anchor="end">1 ✓</text>
+  <text class="t" x="562" y="128" style="fill:#0f7a5f">O(log n)</text><text class="ok" x="726" y="128" text-anchor="end">≈ 17 ✓</text>
+  <text class="t" x="562" y="160" style="fill:#1d4ed8">O(n)</text><text class="ok" x="726" y="160" text-anchor="end">10⁵ ✓</text>
+  <text class="t" x="562" y="192" style="fill:#b45309">O(n log n)</text><text class="ok" x="726" y="192" text-anchor="end">≈ 1,7×10⁶ ✓</text>
+  <text class="t" x="562" y="224" style="fill:#c2410c">O(n²)</text><text class="no" x="726" y="224" text-anchor="end">10¹⁰ ✗</text>
   <text class="s" x="562" y="256">n² chậm hơn ngân sách</text>
   <text class="s" x="562" y="272">1 giây khoảng 100 lần</text>
   <text class="s" x="562" y="300">→ n ≤ 10⁵: cần O(n log n)</text>
