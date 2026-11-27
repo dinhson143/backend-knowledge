@@ -72,6 +72,7 @@ window.ROADMAP = [
   { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa.", parallel: true,
     parts: [
       { id: "ops.observe", title: "Observability", topics: ["observability"] },
+      { id: "ops.deploy", title: "Deployment", topics: ["deployment-safety"] },
     ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
     parts: [

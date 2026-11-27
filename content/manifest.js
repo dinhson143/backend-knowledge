@@ -54,6 +54,7 @@
     "content/topics/sd/db-locking.js",
     "content/topics/sd/consensus.js",
     "content/topics/sd/vector-search.js",
+    "content/topics/sd/deployment-safety.js",
     "content/topics/lld/lld-delivery.js",
     "content/topics/lld/oop-pillars.js",
     "content/topics/lld/solid.js",
