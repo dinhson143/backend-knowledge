@@ -84,7 +84,7 @@ BK.topic({
       points: [
         {
           t: "**Memory** — `memory.max` là trần cứng: vượt mà kernel không thu hồi được bộ nhớ thì **OOM killer** giết process trong cgroup (container thoát với exit code 137, Kubernetes ghi `OOMKilled`).",
-          why: "Kernel không thể \"cho nợ\" RAM: khi không còn trang nào thu hồi được trong giới hạn, cách duy nhất để giữ trần là giết process. Tài liệu cgroup v2: \"If a cgroup's memory usage reaches this limit and can't be reduced, the OOM killer is invoked in the cgroup\" (https://docs.kernel.org/admin-guide/cgroup-v2.html). `memory.high` thì khác: vượt nó chỉ bị throttle và thu hồi mạnh, không bao giờ bị OOM kill.",
+          why: "Kernel không thể \"cho nợ\" RAM: khi không còn trang nào thu hồi được trong giới hạn, cách duy nhất để giữ trần là giết process. Tài liệu cgroup v2: \"If a cgroup's memory usage reaches this limit and can't be reduced, the OOM killer is invoked in the cgroup\" (https://docs.kernel.org/admin-guide/cgroup-v2.html). `memory.high` thì khác: vượt nó chỉ bị throttle và thu hồi mạnh, không bao giờ bị OOM kill. Ví dụ chính thức của Kubernetes cho container vượt limit hiện `reason: OOMKilled`, `exitCode: 137` và kubelet khởi động lại nó liên tục (https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource/).",
         },
         {
           t: "**CPU** — `cpu.max` dạng `$MAX $PERIOD` (mặc định chu kỳ 100 ms): dùng hết quota trong chu kỳ thì bị **throttle** tới chu kỳ sau, **không bị kill**.",

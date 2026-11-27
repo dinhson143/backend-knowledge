@@ -58,7 +58,7 @@ BK.topic({
           },
           {
             cells: ["`USER 10001:10001`", "Chạy bằng UID không phải root"],
-            why: "Root trong container vẫn là UID 0 trên kernel chung nếu không bật user namespace (xem `container-basics`), nên app bị chiếm có nhiều đường thoát hơn. Dùng UID dạng số vì image distroless không cần dòng tương ứng trong `/etc/passwd`, và Kubernetes `runAsNonRoot` chỉ kiểm được UID dạng số.",
+            why: "Root trong container vẫn là UID 0 trên kernel chung nếu không bật user namespace (xem `container-basics`), nên app bị chiếm có nhiều đường thoát hơn. Ghi UID dạng số để không phụ thuộc vào tên user có sẵn trong image. Cách khác: dùng tag `:nonroot` của distroless (https://github.com/GoogleContainerTools/distroless), đã chạy sẵn bằng user không phải root; README không ghi UID của user này.",
           },
           {
             cells: ["`EXPOSE 8080`", "Ghi chú port app nghe"],
@@ -111,7 +111,7 @@ BK.topic({
           },
           {
             cells: ["Shell form `CMD npm start`", "`docker stop` chờ 10 giây rồi kill cứng; request đang xử lý bị cắt", "Exec form, chạy thẳng `node`"],
-            why: "`npm` và `sh` làm process cha không chuyển `SIGTERM` cho app. App không biết mình sắp bị dừng nên không đóng kết nối, không hoàn tất request. Script khởi động dùng `exec \"$@\"` ở dòng cuối để app thay thế shell thành PID 1 (https://docs.docker.com/build/building/best-practices/).",
+            why: "`npm` và `sh` làm process cha không chuyển `SIGTERM` cho app. App không biết mình sắp bị dừng nên không đóng kết nối, không hoàn tất request. Script khởi động dùng `exec \"$@\"` ở dòng cuối để app thay thế shell thành PID 1 (https://docs.docker.com/build/building/best-practices/). Thời gian chờ mặc định của `docker stop` trên Linux là 10 giây, Windows 30 giây (https://docs.docker.com/reference/cli/docker/container/stop/).",
           },
         ],
       },
@@ -128,8 +128,8 @@ BK.topic({
           why: "`HEALTHCHECK CMD curl …` cần `curl` và shell form cần `/bin/sh`; cả hai không có trong distroless, nên health check sẽ luôn fail và container bị đánh dấu `unhealthy`.",
         },
         {
-          t: "Trên Kubernetes, `HEALTHCHECK` của image không được dùng: khai báo **liveness/readiness/startup probe** trong pod spec.",
-          why: "Kubelet tự chạy probe theo pod spec và quyết định restart container hay rút pod khỏi Service; trạng thái health của image không tham gia. `HEALTHCHECK` vẫn có ích với `docker run`, Docker Compose, Swarm.",
+          t: "Trên Kubernetes, đừng dựa vào `HEALTHCHECK` của image: khai báo **liveness/readiness/startup probe** trong pod spec.",
+          why: "Kubelet tự chạy probe khai báo trong pod spec và dựa vào kết quả để restart container hay rút pod khỏi Service (https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). `HEALTHCHECK` hữu ích khi chạy bằng `docker run` hay Docker Compose.",
         },
         {
           t: "`STOPSIGNAL` mặc định là `SIGTERM`. App phải bắt nó: ngừng nhận request mới, xử lý xong request đang chạy, đóng kết nối, rồi thoát.",

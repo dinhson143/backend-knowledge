@@ -163,7 +163,7 @@ BK.topic({
       points: [
         {
           t: "**ConfigMap** giữ cấu hình không bí mật; **Secret** giữ mật khẩu, token. Cả hai gắn vào pod dưới dạng biến môi trường hoặc file.",
-          why: "Tách cấu hình khỏi image nên cùng một image chạy ở dev và prod. Gắn dạng file thì giá trị mới được cập nhật vào pod mà không cần build lại image (biến môi trường thì chỉ đọc lúc container khởi động).",
+          why: "Tách cấu hình khỏi image nên cùng một image chạy ở dev và prod. Gắn dạng volume thì file trong pod **dần dần** được cập nhật khi ConfigMap đổi (trễ tới một chu kỳ sync của kubelet cộng thời gian cache); dùng làm biến môi trường thì phải restart pod; mount bằng `subPath` thì **không** nhận cập nhật (https://kubernetes.io/docs/concepts/configuration/configmap/).",
         },
         {
           t: "Secret mặc định **không mã hoá** trong etcd (chỉ base64). Ai tạo được pod (hay Deployment) trong một namespace thì đọc được mọi Secret của namespace đó.",
