@@ -76,6 +76,7 @@
     "content/topics/cloud/ecs.js",
     "content/topics/cloud/eks.js",
     "content/topics/cloud/ecs-vs-eks.js",
+    "content/topics/cloud/k8s-operations.js",
     "content/topics/arch/code-architecture.js",
     "content/topics/arch/system-architecture.js",
     "content/topics/arch/dev-methods.js",
