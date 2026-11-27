@@ -20,7 +20,7 @@ Giữ tiếng Việt khi nhãn **không phải tên một khái niệm kỹ thu�
 
 1. **Hoạt động, điều hướng, giao diện**: Lộ trình, Luyện bài, Mô phỏng, Khung trả lời, Luyện đề LLD, Vòng coding, Câu chuyện của bạn, Chọn công nghệ, Trên AWS, Kể sâu về dự án, Đào sâu.
 2. **Câu hỏi hoặc so sánh để chọn**: "SQL hay NoSQL?", "ECS hay EKS?", "Thread hay Process?", "Container là gì?", "Gõ URL thì chuyện gì xảy ra".
-3. **Tên môn học CS chuẩn tiếng Việt**: Cấu trúc dữ liệu, Thuật toán, Độ phức tạp, Hệ điều hành, Mạng máy tính, Đệ quy, Kiểm thử. Thêm vào danh sách này phải ghi một dòng D.
+3. **Tên môn học CS chuẩn tiếng Việt**: Cấu trúc dữ liệu, Thuật toán, Độ phức tạp, Hệ điều hành, Mạng máy tính, Kiến trúc máy tính, Bảo mật, Mật mã, Đệ quy, Kiểm thử. Thêm vào danh sách này phải ghi một dòng D (Kiến trúc máy tính, Bảo mật, Mật mã: D180).
 4. **Từ thường ngày ghép với key term**: căn bản, chuyên sâu, kinh điển, hay gặp, trong thực tế, ở mức code.
 5. **Nhãn mô tả không dịch từ một thuật ngữ nào**: Nền móng, Scale dữ liệu, Lưu trữ chuyên dụng, Kỹ năng viết code, Vận hành production.
 
@@ -49,17 +49,20 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | API Design | API Design; REST, GraphQL, gRPC | thiết kế API | — | `api-design` |
 | Pagination | pagination; cursor-based, offset-based | phân trang kết quả API | "Phân trang" | `api-design` |
 | Load Balancer / Load Balancing | load balancer (thiết bị), load balancing (việc); L4, L7 | chia request cho nhiều server | "Cân bằng tải" | `lb-gateway-cdn` |
-| API Gateway | API Gateway | cửa vào duy nhất: auth, rate limit, routing | "Cổng API" | `lb-gateway-cdn` |
+| API Gateway | API Gateway | cửa vào duy nhất: auth, rate limit, routing | "Cổng API" | `lb-gateway-cdn`, `api-gateway-bff` |
 | CDN | CDN (glossary) | mạng máy chủ biên cache nội dung gần user | "Mạng phân phối nội dung" | `lb-gateway-cdn` |
-| Authentication / Authorization | authentication (authn), authorization (authz) | xác thực (là ai) / phân quyền (được làm gì) | "Xác thực & phân quyền" | `auth` (sắp viết) |
-| Rate Limiting | rate limiting (việc), rate limiter (thành phần); token bucket, sliding window | giới hạn số request mỗi khoảng thời gian | "Giới hạn tốc độ", "Giới hạn tần suất" | `rate-limiter` (problem) |
+| Authentication / Authorization | authentication (authn), authorization (authz) | xác thực (là ai) / phân quyền (được làm gì) | "Xác thực & phân quyền" | `auth` |
+| Rate Limiting | rate limiting (việc), rate limiter (thành phần); token bucket, leaky bucket, fixed window, sliding window | giới hạn số request mỗi khoảng thời gian | "Giới hạn tốc độ", "Giới hạn tần suất" | `rate-limiting`, `rate-limiter` (problem) |
+| Sync / Async Communication | sync (synchronous), async (asynchronous) communication; request/response, messaging, command, event | service gọi nhau rồi chờ response / gửi message qua broker rồi đi tiếp | "Giao tiếp đồng bộ", "Giao tiếp bất đồng bộ" | `sync-vs-async-comm` |
+| Service Discovery | service discovery; service registry, client-side / server-side discovery, self-registration, third-party registration | tìm địa chỉ các instance đang sống của một service | "Khám phá dịch vụ", "Phát hiện dịch vụ" | `service-discovery` |
+| BFF / API Composition | Backend for Frontend (BFF), API composition, gateway aggregation, gateway offloading | backend riêng cho từng loại client; gom kết quả của nhiều service thành một response | "Tổng hợp API", "Hậu phương cho giao diện" | `api-gateway-bff` |
 | **Database** | | | | |
 | Data Modeling | Data Modeling | đi từ requirement tới bảng, khoá, quan hệ | "Mô hình hoá dữ liệu", "Mô hình dữ liệu" | `data-modeling` |
 | Database Indexing | index (số nhiều: indexes); B-Tree, composite index | cấu trúc phụ giúp tìm dòng không phải quét cả bảng | "Chỉ mục", "Lập chỉ mục" | `indexing` |
 | Transaction | transaction; ACID | nhóm thao tác chạy trọn hoặc không chạy gì | "Giao dịch" (khi nói về DB) | `db-isolation-anomalies` |
 | Isolation Level | isolation level; Read Committed, Repeatable Read, Serializable | transaction thấy gì từ transaction chạy đồng thời | "Mức cô lập" | `db-isolation-anomalies` |
-| Database Locking | optimistic lock, pessimistic lock; `SELECT … FOR UPDATE` | khoá dòng trong một database | "Khoá lạc quan", "Khoá bi quan" | `db-locking` (sắp viết) |
-| Query Tuning | query plan, `EXPLAIN` | đọc kế hoạch thực thi và sửa truy vấn chậm | "Tối ưu truy vấn" | `db-query-tuning` (sắp viết) |
+| Database Locking | optimistic lock, pessimistic lock; `SELECT … FOR UPDATE` | khoá dòng trong một database | "Khoá lạc quan", "Khoá bi quan" | `db-locking` |
+| Query Tuning | query plan, `EXPLAIN` | đọc kế hoạch thực thi và sửa truy vấn chậm | "Tối ưu truy vấn" | `db-query-tuning` |
 | **Scale dữ liệu** | | | | |
 | Caching | caching (việc), cache (nơi lưu); cache-aside, write-through, write-around, write-back | giữ bản sao dữ liệu hay đọc ở chỗ nhanh hơn | "Bộ nhớ đệm", "Bộ đệm" | `caching` |
 | Cache Stampede | cache stampede; single flight | nhiều request cùng miss một key và cùng đập vào DB | "Dồn cache" | `caching` |
@@ -76,8 +79,8 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Network Partition | network partition | mạng giữa các node bị đứt, hai phía không thấy nhau | "Phân vùng mạng", "Mạng chia cắt" | `cap` |
 | CAP / PACELC | CAP, PACELC (glossary) | khi partition phải chọn C hay A; khi không partition chọn latency hay C | "Định lý CAP" | `cap` |
 | Fault Tolerance | fault tolerance | hệ chạy tiếp khi một thành phần hỏng | "Khả năng chịu lỗi" | `replication` |
-| Multi-region | multi-region; RPO, RTO | chạy hệ thống trên nhiều region | "Đa vùng" | `multi-region` (sắp viết) |
-| Distributed ID Generation | Snowflake, UUIDv7 | sinh id duy nhất không cần điểm trung tâm | "Sinh ID phân tán" | `id-generation` (sắp viết) |
+| Multi-region | multi-region; RPO, RTO | chạy hệ thống trên nhiều region | "Đa vùng" | `multi-region` |
+| Distributed ID Generation | Snowflake, UUIDv7 | sinh id duy nhất không cần điểm trung tâm | "Sinh ID phân tán" | `id-generation` |
 | **Async & Coordination** | | | | |
 | Async Processing | async (tính từ); asynchronous processing | request trả lời ngay, việc chậm chạy sau qua queue/worker | "Bất đồng bộ", "Xử lý bất đồng bộ" | `queue` |
 | Message Queue | message queue, queue; producer, consumer, DLQ | hàng đợi message giữa producer và consumer | "Hàng đợi", "Hàng đợi tin nhắn" | `queue` |
@@ -93,7 +96,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Idempotency | idempotency (danh từ), idempotent (tính từ); idempotency key | làm lại nhiều lần cho cùng kết quả như một lần | "Luỹ đẳng", "Lũy đẳng", "Tính bất biến khi lặp" | `idempotency` |
 | Contention | contention | nhiều bên cùng tranh một tài nguyên | "Tranh chấp tài nguyên", "Tranh chấp" | `dist-lock` |
 | Distributed Lock | distributed lock; TTL, lease, fencing token, Redlock | khoá tài nguyên xuyên nhiều máy | "Khoá phân tán", "Khóa phân tán" | `dist-lock` |
-| Consensus / Leader Election | consensus, leader election; Raft, quorum | các node thống nhất một giá trị hoặc một leader | "Đồng thuận", "Bầu leader", "Bầu chọn leader" | `consensus` (sắp viết) |
+| Consensus / Leader Election | consensus, leader election; Raft, quorum | các node thống nhất một giá trị hoặc một leader | "Đồng thuận", "Bầu leader", "Bầu chọn leader" | `consensus` |
 | Multi-step Processes | workflow; saga, orchestration, choreography, compensation | quy trình nhiều bước qua nhiều service | "Quy trình nhiều bước", "Điều phối dịch vụ" | `durable-execution` |
 | Transactional Outbox / CDC | outbox, CDC (glossary); dual write | ghi DB và phát event trong cùng một transaction | "Hộp thư đi" | `outbox-cdc` |
 | Durable Execution | Durable Execution; event history, replay | quy trình nhiều bước sống qua crash nhờ ghi lại lịch sử | "Thực thi bền" | `durable-execution` |
@@ -101,10 +104,15 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Blob Storage | blob storage, object storage; presigned URL, multipart upload | kho file lớn ngoài database | "Kho đối tượng" | `blob` |
 | Full-text Search | full-text search; inverted index | tìm kiếm theo từ trong văn bản | "Tìm kiếm toàn văn" | `search` |
 | Probabilistic Data Structures | Bloom filter, Count-Min Sketch, HyperLogLog | cấu trúc đổi một ít sai số lấy bộ nhớ rất nhỏ | "Cấu trúc dữ liệu xác suất" | `bigdata-ds` |
-| Vector Search | vector search; embedding, ANN | tìm theo độ tương đồng | "Tìm kiếm vector" | `vector-search` (sắp viết) |
+| Vector Search | vector search; embedding, ANN | tìm theo độ tương đồng | "Tìm kiếm vector" | `vector-search` |
 | **Vận hành** | | | | |
 | Observability | observability; log, metric, trace; SLI, SLO, SLA | đo và lần theo hệ thống đang chạy | "Quan sát hệ thống", "Khả năng quan sát", "Giám sát hệ thống" | `observability` |
-| Zero-downtime Deployment | zero-downtime deployment; rolling, blue/green, canary, feature flag | deploy mà không ngừng phục vụ | "Triển khai an toàn", "Triển khai không gián đoạn" | `deployment-safety` (sắp viết) |
+| Zero-downtime Deployment | zero-downtime deployment; rolling, blue/green, canary, feature flag | deploy mà không ngừng phục vụ | "Triển khai an toàn", "Triển khai không gián đoạn" | `deployment-safety` |
+| Probe / Health Check | liveness, readiness, startup probe; health check | kubelet hỏi container còn sống không, sẵn sàng nhận traffic chưa | "Kiểm tra sức khoẻ", "Kiểm tra sức khỏe" | `k8s-operations` |
+| Requests / Limits | resource requests, limits; QoS class (Guaranteed, Burstable, BestEffort) | CPU/RAM xin để scheduler xếp pod / trần cứng kernel áp | "Yêu cầu tài nguyên", "Giới hạn tài nguyên" | `k8s-operations` |
+| Autoscaling | autoscaling; HPA, VPA (glossary) | tự thêm bớt pod hay node theo tải | "Tự động co giãn", "Tự động mở rộng" | `k8s-operations` |
+| Image Digest / Tag | digest (`sha256:…`), tag, container registry; image index | định danh image theo nội dung (không đổi) / tên dễ đọc trỏ tới một digest (đổi được) | "Mã băm image", "Kho image" | `image-delivery` |
+| Supply Chain Security | SBOM, provenance, image signing, vulnerability scanning | biết image chứa gì, build từ đâu, ai ký | "Chuỗi cung ứng phần mềm", "Danh mục phần mềm" | `image-delivery` |
 | **Nền tảng CS** | | | | |
 | Process | process; PID, fork, exec | chương trình đang chạy, có không gian địa chỉ riêng | "Tiến trình" | `os-process-lifecycle` |
 | Thread | thread; single-thread, multi-thread | luồng thực thi trong một process, dùng chung bộ nhớ | "Đa luồng", "Đơn luồng", "Luồng thực thi" | `thr-thread-vs-process` |
@@ -115,15 +123,51 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Garbage Collection | garbage collection, GC (glossary) | runtime tự dọn bộ nhớ không còn dùng | "Thu gom rác" | `code-memory-gc` (sắp viết) |
 | Concurrency | concurrency; race condition, deadlock | nhiều việc tiến triển xen kẽ, không nhất thiết cùng lúc | "Xử lý đồng thời", "Lập trình đồng thời", "Tương tranh" | `concurrency` |
 | Parallelism | parallelism | nhiều việc chạy cùng lúc thật trên nhiều core | "Xử lý song song", "Song song" | `conc-parallelism-amdahl` (sắp viết) |
-| Async Programming | async/await, event loop, coroutine, Promise | viết code không chặn thread khi chờ I/O | "Lập trình bất đồng bộ", "Bất đồng bộ" | `async-event-loop` (sắp viết) |
+| Async Programming | async/await, event loop, coroutine, Promise | viết code không chặn thread khi chờ I/O | "Lập trình bất đồng bộ", "Bất đồng bộ" | `async-event-loop` |
+| Event Loop | event loop; task queue, microtask | vòng lặp trên một thread: chờ I/O sẵn sàng rồi chạy lần lượt từng callback/task | "Vòng lặp sự kiện" | `async-event-loop` |
+| Coroutine | coroutine; suspend, resume; goroutine, virtual thread (họ hàng) | hàm tạm dừng được ở điểm `await` rồi chạy tiếp, không giữ thread khi chờ | "Đồng thủ tục", "Hàm cộng tác" | `async-coroutine` |
+| Cancellation / Timeout / Deadline | cancellation, timeout (khoảng thời gian), deadline (mốc thời gian) | huỷ việc đang chạy; giới hạn thời gian chờ và truyền nó xuống các lời gọi con | "Hạn chót", "Thời hạn chờ" | `async-cancellation-timeout` |
 | Deadlock | deadlock; lock ordering | các bên chờ nhau vòng tròn, không ai chạy tiếp | "Bế tắc", "Khoá chết" | `concurrency` |
 | Thread-safe | thread-safe (gạch nối) | dùng từ nhiều thread mà không sai | "An toàn luồng" | `concurrency` |
+| I/O-bound / CPU-bound | I/O-bound, CPU-bound (gạch nối) | việc chủ yếu chờ I/O / việc chủ yếu tính toán trên CPU | "Nặng I/O", "Nặng CPU" | `thr-io-vs-cpu-bound` |
+| Thread Pool | thread pool; worker, task queue, rejection policy | nhóm thread dựng sẵn, lấy task từ queue để chạy | "Nhóm luồng", "Bể luồng" | `thr-thread-pool` |
+| Green Thread / Virtual Thread | green thread, goroutine, virtual thread, platform thread; M:N scheduling, carrier thread, pinning | thread do runtime quản lý, nhiều cái chạy trên ít OS thread | "Luồng xanh", "Luồng ảo" | `thr-green-threads` |
+| Blocking / Non-blocking I/O | blocking I/O, non-blocking I/O, I/O multiplexing, async I/O; readiness, completion | lời gọi I/O chờ hay trả về ngay; một thread chờ nhiều fd cùng lúc | "I/O chặn", "Ghép kênh I/O", "Đa hợp I/O" | `io-blocking-models` |
+| Signal | signal; SIGTERM, SIGKILL, SIGINT; signal handler | thông báo kernel gửi tới process vào thời điểm bất kỳ | "Tín hiệu hệ điều hành" | `os-signals-shutdown` |
+| Graceful Shutdown | graceful shutdown; drain | dừng app sau khi làm xong việc đang dở, không rớt request | "Tắt nhẹ nhàng", "Dừng an toàn" | `os-signals-shutdown` |
+| Race Condition / Data Race | race condition, data race; check-then-act, read-modify-write, TOCTOU (glossary) | kết quả phụ thuộc thứ tự chạy / hai truy cập cùng ô nhớ không đồng bộ, ít nhất một ghi | "Điều kiện tranh chấp", "Tranh chấp dữ liệu" | `conc-race-condition` |
+| Livelock / Starvation | livelock, starvation, fairness, priority inversion | vẫn chạy mà không tiến / chờ mãi không tới lượt | "Khoá sống", "Chết đói", "Đảo ngược ưu tiên" | `conc-livelock-starvation` |
+| Atomic / CAS | atomic, compare-and-swap, CAS (glossary), lock-free; ABA | thao tác không bị chen ngang; chỉ ghi khi giá trị còn như lúc đọc | "So sánh và hoán đổi", "Không khoá" | `conc-atomic-cas` |
+| Memory Model / Happens-before | memory model, happens-before, visibility, reordering, `volatile`, DRF-SC; release/acquire | luật ngôn ngữ nói một lần đọc được thấy lần ghi nào; quan hệ "chắc chắn thấy" giữa hai hành động | "Mô hình bộ nhớ", "Xảy ra trước" | `conc-memory-model` |
+| Flow Control / Congestion Control | flow control, congestion control; receive window, congestion window (cwnd), slow start; TIME_WAIT (gạch dưới, như trong `ss`/`netstat`) | bên nhận báo còn chứa được bao nhiêu / bên gửi tự giới hạn để không làm tắc mạng | "Điều khiển luồng", "Kiểm soát luồng", "Kiểm soát tắc nghẽn", "Điều khiển tắc nghẽn" | `net-tcp-deep` |
+| Multiplexing / Head-of-line Blocking | multiplexing, stream; head-of-line blocking (HOL); HTTP/2, HTTP/3, QUIC | nhiều request dùng chung một kết nối / việc đứng đầu hàng chặn mọi việc phía sau | "Ghép kênh", "Đa hợp", "Chặn đầu hàng", "Nghẽn đầu hàng" | `net-http-versions` |
+| TLS / mTLS | TLS, mTLS (glossary); handshake, certificate chain, CA, trust store | mã hoá và xác thực kết nối; mTLS: hai bên cùng đưa chứng chỉ | "Xác thực hai chiều", "Xác thực lẫn nhau", "Bảo mật tầng giao vận" | `net-tls` |
+| Integer Overflow / Floating Point | integer overflow, two's complement; floating point, IEEE 754, float, double; Decimal | số nguyên tràn khi vượt số bit / số thực nhị phân gần đúng / số thập phân chính xác | "Tràn số nguyên", "Bù hai", "Dấu phẩy động", "Số thực dấu phẩy động", "Số chấm động" | `hw-numbers-float` |
+| MAC / Encryption / Digital Signature | MAC, HMAC; symmetric, asymmetric encryption; AEAD; digital signature; password hashing (Argon2id, scrypt, bcrypt) | mã xác thực bằng khoá chung / mã hoá để giấu nội dung / chữ ký bằng private key, kiểm bằng public key | "Mã xác thực thông điệp", "Mã hoá đối xứng", "Mã hoá bất đối xứng", "Chữ ký số", "Chữ ký điện tử", "Băm mật khẩu" | `sec-crypto-primitives` |
 | **LLD & kiến trúc** | | | | |
 | Design Principles | SOLID, KISS, DRY, YAGNI, SoC, LoD | nguyên tắc giữ code dễ đổi | "Nguyên tắc thiết kế", "Giữ thiết kế đơn giản" | `solid`, `principles-other` |
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
 | Event-driven Architecture | event-driven | service giao tiếp bằng event | "Kiến trúc hướng sự kiện" | `system-architecture` |
 | Clean Code | clean code | code dễ đọc, dễ đổi | "Code sạch" | (chặng sắp có) |
-| Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` (sắp viết) |
+| Error Handling | error handling | xử lý lỗi | "Xử lý lỗi" | `code-error-handling` |
+| Machine Coding | machine coding round | vòng phỏng vấn viết code LLD chạy được trong thời gian giới hạn | "Lập trình máy" | `mc-machine-coding-round` |
+| **DSA** | | | | |
+| Dynamic Programming | dynamic programming, DP (glossary); memoization, tabulation, state, transition | chia bài thành subproblem chồng nhau, lưu kết quả để không tính lại | "Quy hoạch động" | `dsa-dp` |
+| **Python** | | | | |
+| Mutability | mutable, immutable; identity, aliasing | object sửa được tại chỗ hay không; nhiều tên cùng trỏ một object | "Tính khả biến", "Tính bất biến" | `py-object-model` |
+| Data Model / Dunder Method | data model, special method, dunder method (`__eq__`, `__hash__`…) | method hai gạch dưới mà interpreter gọi ngầm cho `len()`, `==`, `for`… | "Phương thức đặc biệt", "Phương thức ma thuật" | `py-data-model` |
+| Closure / Late Binding | closure, free variable, late binding; LEGB | hàm con nhớ biến của hàm ngoài; biến được đọc lúc gọi, không lúc tạo | "Bao đóng", "Ràng buộc muộn" | `py-scope-closures` |
+| Iterator / Generator | iterator, iterable, generator, `yield`, generator expression | đối tượng trả từng phần tử khi được hỏi; hàm có `yield` tạm dừng và chạy tiếp | "Bộ lặp", "Hàm sinh", "Trình sinh" | `py-iterators-generators` |
+| Decorator | decorator (Python, PEP 318) | hàm nhận một hàm và trả hàm thay thế, viết bằng `@` | "Hàm trang trí", "Bộ trang trí" | `py-decorators` |
+| Context Manager | context manager, `with`; `__enter__`/`__exit__` | object lo việc mở/đóng resource quanh một khối code | "Trình quản lý ngữ cảnh", "Quản lý ngữ cảnh" | `py-context-managers` |
+| Reference Counting | reference counting, refcount; cyclic GC, weak reference (`weakref`) | mỗi object đếm số tham chiếu tới nó, về 0 thì được giải phóng; GC riêng dọn vòng tham chiếu | "Đếm tham chiếu", "Tham chiếu yếu" | `py-memory-gc` |
+| GIL / Free-threading | GIL (glossary), free-threading, free-threaded build; `PYTHON_GIL` | khoá của CPython cho một thread chạy bytecode tại một thời điểm; bản build tắt khoá đó | "Khoá thông dịch toàn cục", "Phân luồng tự do" | `thr-gil` |
+| Fixture | fixture (pytest); scope, `conftest.py`, yield fixture | hàm chuẩn bị và dọn dẹp dữ liệu/resource cho test, được tiêm vào test theo tên tham số | "Đồ gá kiểm thử", "Dữ liệu cố định" | `py-pytest` |
+| Mock / Patch | mock, `patch`, autospec, `monkeypatch` | object giả ghi lại lời gọi; thay tạm một tên bằng object giả trong lúc test | "Đối tượng giả", "Vá tạm thời" | `py-pytest` |
+| WSGI / ASGI | WSGI, ASGI (glossary); app server, worker; Gunicorn, Uvicorn | giao diện giữa web server và app Python: đồng bộ (WSGI) / async (ASGI) | "Giao diện cổng máy chủ" | `py-wsgi-asgi` |
+| Worker Model | worker, worker process; `sync`, `gthread`, `gevent`, Uvicorn worker | cách app server chia request cho process, thread, event loop | "Mô hình tiến trình" | `py-wsgi-asgi` |
+| Dependency Injection | dependency injection, DI (glossary); `Depends` (FastAPI) | framework tự tạo và truyền phụ thuộc vào hàm thay vì hàm tự tạo | "Tiêm phụ thuộc", "Tiêm phụ thuộc vào" | `py-fastapi` |
+| Lifespan | lifespan (ASGI, FastAPI); startup, shutdown | code chạy một lần khi app khởi động và khi tắt, mỗi process một lần | "Vòng đời ứng dụng" | `py-wsgi-asgi`, `py-fastapi` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật

@@ -22,26 +22,31 @@ window.ROADMAP = [
   { id: "s1", title: "Nền móng", goal: "Học xong bạn trình bày được một bài theo khung 6 bước và chọn giao thức, API, database cho bài đơn giản.",
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
-      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn"] },
+      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth", "rate-limiting"] },
       { id: "s1.data", title: "Database", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
+      { id: "s1.db-deep", title: "Đào sâu: Database Internals", optional: true, topics: ["db-query-tuning"] },
     ] },
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ consistency model.",
     parts: [
       { id: "s2.cache", title: "Caching", topics: ["caching", "dist-cache"] },
-      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing"] },
-      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication"] },
+      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing", "id-generation"] },
+      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication", "multi-region"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
   { id: "s3", title: "Async & Coordination", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và xử lý contention giữa nhiều máy.",
     parts: [
       { id: "s3.async", title: "Message Queue & Streaming", topics: ["queue", "streams", "kafka"] },
       { id: "s3.resilience", title: "Resilience & Idempotency", topics: ["resilience", "idempotency"] },
-      { id: "s3.contention", title: "Contention & Locking", topics: ["dist-lock"] },
+      { id: "s3.contention", title: "Contention & Locking", topics: ["db-locking", "dist-lock", "consensus"] },
       { id: "s3.workflow", title: "Multi-step Processes", topics: ["outbox-cdc", "durable-execution"] },
+    ] },
+  { id: "svc", title: "Hệ thống nhiều service", goal: "Học xong bạn tách được service theo nghiệp vụ, cho chúng tìm và gọi nhau an toàn, và giữ dữ liệu nhất quán giữa các service.",
+    parts: [
+      { id: "svc.comm", title: "Giao tiếp giữa service", topics: ["sync-vs-async-comm", "service-discovery", "api-gateway-bff"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
-      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "bigdata-ds"] },
+      { id: "s4.stores", title: "Kho chuyên dụng", topics: ["blob", "search", "vector-search", "bigdata-ds"] },
       { id: "s4.choose", title: "Chọn công nghệ", topics: ["tech-cheatsheet"] },
     ] },
   { id: "s5", title: "Ghép pattern & luyện đề", goal: "Học xong bạn nhận ra dạng bài, gọi đúng pattern, tự giải từ Khởi động tới Nâng cao.", problems: true,
@@ -51,12 +56,27 @@ window.ROADMAP = [
   { id: "cs", title: "Nền tảng CS", goal: "Học xong bạn giải thích được process, thread, I/O và viết code chạy đồng thời không race, không deadlock.", parallel: true,
     parts: [
       { id: "cs.process", title: "Process, Thread & Memory", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
-      { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
-      { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
+      { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound", "thr-thread-pool", "thr-green-threads"] },
+      { id: "cs.io", title: "I/O & hệ điều hành", topics: ["io-blocking-models", "os-signals-shutdown"] },
+      { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas", "conc-memory-model", "conc-classic-problems"] },
+      { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure", "async-blocking-in-loop"] },
+      { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page", "net-tcp-deep", "net-http-versions", "net-tls"] },
+      { id: "cs.arch", title: "Kiến trúc máy tính", topics: ["hw-numbers-float"] },
+      { id: "cs.security", title: "Bảo mật & mật mã", topics: ["sec-crypto-primitives"] },
     ] },
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [
       { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication", "code-language-choice"] },
+      { id: "code.clean", title: "Clean Code", topics: ["code-clean-naming", "code-error-handling"] },
+      { id: "code.testing", title: "Kiểm thử & debug", topics: ["code-testing-fundamentals", "code-debugging"] },
+    ] },
+  { id: "py", title: "Python", goal: "Học xong bạn giải thích được Python chạy code thế nào, viết Python đúng idiom và trả lời được câu hỏi về GIL, asyncio, framework backend.", parallel: true,
+    parts: [
+      { id: "py.core", title: "Ngôn ngữ cốt lõi", topics: ["py-object-model", "py-builtin-types-complexity", "py-data-model", "py-scope-closures", "py-iterators-generators", "py-decorators", "py-context-managers", "py-pitfalls"] },
+      { id: "py.runtime", title: "Bên trong CPython", topics: ["py-memory-gc"] },
+      { id: "py.concurrency", title: "Concurrency trong Python", topics: ["thr-gil", "py-threading-multiprocessing", "py-asyncio"] },
+      { id: "py.tooling", title: "Đóng gói & kiểm thử", topics: ["py-pytest"] },
+      { id: "py.backend", title: "Python cho backend", topics: ["py-wsgi-asgi", "py-fastapi"] },
     ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [
@@ -65,19 +85,21 @@ window.ROADMAP = [
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn giải thích được container, Kubernetes và chọn nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
       { id: "cloud.basics", title: "Container cơ bản", topics: ["container-basics", "dockerfile"] },
-      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core"] },
+      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core", "k8s-operations"] },
+      { id: "cloud.delivery", title: "Từ build tới deploy", topics: ["image-delivery"] },
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
     ] },
-  { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa.", parallel: true,
+  { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa, và deploy bản mới mà không làm gián đoạn người dùng.", parallel: true,
     parts: [
       { id: "ops.observe", title: "Observability", topics: ["observability"] },
+      { id: "ops.deploy", title: "Deployment", topics: ["deployment-safety"] },
     ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
     parts: [
       { id: "lld.oop", title: "Khung trả lời & OOP", topics: ["lld-delivery", "oop-pillars"] },
       { id: "lld.principles", title: "Design Principles", topics: ["solid", "principles-other"] },
       { id: "lld.patterns", title: "Design Patterns", topics: ["patterns-gof"] },
-      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list"] },
+      { id: "lld.practice", title: "Luyện đề LLD", topics: ["lld-problems-list", "mc-machine-coding-round"] },
     ] },
   { id: "arch", title: "Kiến trúc & phương pháp", goal: "Học xong bạn giải thích được code phụ thuộc theo hướng nào, khi nào tách service và cách TDD/DDD khớp với nhau.", parallel: true,
     parts: [
@@ -88,8 +110,8 @@ window.ROADMAP = [
   { id: "dsa", title: "Coding · DSA", goal: "Học xong bạn nhận dạng pattern thuật toán từ ràng buộc đề bài.", parallel: true,
     parts: [
       { id: "dsa.complexity", title: "Độ phức tạp", topics: ["bigo"] },
-      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds"] },
-      { id: "dsa.algo", title: "Thuật toán", topics: ["algo"] },
+      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees", "dsa-design-ds"] },
+      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs", "dsa-dp"] },
     ] },
 ];
 
