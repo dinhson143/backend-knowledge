@@ -147,6 +147,8 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Mock / Patch | mock, `patch`, autospec, `monkeypatch` | object giả ghi lại lời gọi; thay tạm một tên bằng object giả trong lúc test | "Đối tượng giả", "Vá tạm thời" | `py-pytest` |
 | WSGI / ASGI | WSGI, ASGI (glossary); app server, worker; Gunicorn, Uvicorn | giao diện giữa web server và app Python: đồng bộ (WSGI) / async (ASGI) | "Giao diện cổng máy chủ" | `py-wsgi-asgi` |
 | Worker Model | worker, worker process; `sync`, `gthread`, `gevent`, Uvicorn worker | cách app server chia request cho process, thread, event loop | "Mô hình tiến trình" | `py-wsgi-asgi` |
+| Dependency Injection | dependency injection, DI (glossary); `Depends` (FastAPI) | framework tự tạo và truyền phụ thuộc vào hàm thay vì hàm tự tạo | "Tiêm phụ thuộc", "Tiêm phụ thuộc vào" | `py-fastapi` |
+| Lifespan | lifespan (ASGI, FastAPI); startup, shutdown | code chạy một lần khi app khởi động và khi tắt, mỗi process một lần | "Vòng đời ứng dụng" | `py-wsgi-asgi`, `py-fastapi` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật
