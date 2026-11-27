@@ -42,7 +42,7 @@ window.ROADMAP = [
     ] },
   { id: "svc", title: "Hệ thống nhiều service", goal: "Học xong bạn tách được service theo nghiệp vụ, cho chúng tìm và gọi nhau an toàn, và giữ dữ liệu nhất quán giữa các service.",
     parts: [
-      { id: "svc.comm", title: "Giao tiếp giữa service", topics: ["sync-vs-async-comm"] },
+      { id: "svc.comm", title: "Giao tiếp giữa service", topics: ["sync-vs-async-comm", "service-discovery"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
