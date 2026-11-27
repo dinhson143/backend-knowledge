@@ -39,3 +39,6 @@ BK.section({ id: "cs-net", track: "cs", title: "Mạng máy tính" });
 
 BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding · Code sạch · Kiểm thử" });
 BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });
+
+BK.track({ id: "py", title: "Python", subtitle: "Ngôn ngữ cốt lõi · CPython · Python cho backend" });
+BK.section({ id: "py-core", track: "py", title: "Ngôn ngữ cốt lõi" });
