@@ -183,6 +183,8 @@ window.GLOSSARY = [
     ["TLB", "Translation Lookaside Buffer", "Cache nhỏ trong CPU giữ các bản dịch địa chỉ ảo → vật lý vừa dùng, để khỏi đọc page table mỗi lần truy cập bộ nhớ."],
     ["ASID", "Address Space Identifier", "Nhãn process gắn vào mỗi mục TLB, để TLB giữ được bản dịch của nhiều process mà không phải xoá sạch khi chuyển process."],
     ["RSS", "Resident Set Size", "Phần bộ nhớ của process đang thật sự nằm trong RAM (dòng `VmRSS` trong `/proc/<pid>/status`)."],
+    ["VSZ", "Virtual Set Size", "Tổng không gian địa chỉ ảo process đã map (`VmSize`); lớn không có nghĩa là tốn RAM."],
+    ["PTE", "Page Table Entry", "Một mục trong page table: số khung vật lý cùng các bit present, quyền, dirty, accessed."],
     ["COW", "Copy-On-Write", "Hai bên dùng chung một trang nhớ chỉ đọc; bên nào ghi thì mới chép riêng trang đó. `fork()` dùng cách này."],
     ["OOM", "Out Of Memory", "Hết bộ nhớ — tiến trình/container bị kill."],
     ["GC", "Garbage Collection", "Runtime tự dọn bộ nhớ không dùng; có thể làm chương trình dừng (pause) tạm thời."],
