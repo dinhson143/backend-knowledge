@@ -58,7 +58,7 @@ Các ý về luồng/điều hướng, không tự sửa:
 | A5 | **Đồng ý, ghi chú** | Trên roadmap hiện tại, trang chủ hiện 9 bài ở "Kiểm tra chặng" của GĐ4 cũ, ngay trên GĐ5 liệt kê đủ 13 bài, nên bị trùng. Quy ước: giai đoạn `problems: true` không có hàng "Kiểm tra chặng" (nó chính là chỗ luyện). Sau bước 3, GĐ4 cũ gộp vào GĐ5 thì chỗ trùng tự hết. Chấp nhận trùng tạm thời. |
 | A6 | **Đồng ý** | Giải quyết mục "Trang chủ trên mobile": thẻ "Tiếp tục" lên đầu, "Cách ôn" và "Nguồn & phạm vi" gập lại. Mỗi giai đoạn là `<details>`; `<summary>` không chứa heading (trình đọc màn hình đọc summary là nút). Tiêu đề giai đoạn là chữ thường trong summary, còn số `d/n` là text thật, không chỉ là thanh. |
 | A7 | **Đồng ý** | Sidebar gập theo giai đoạn: mở GĐ chứa topic đang xem, nếu không có thì mở GĐ hiện tại. Mục "Sidebar trang Mô phỏng/Thuật ngữ" **chưa được giải quyết**: đề xuất giữ mục lục (để nhất quán) nhưng gập hết trừ GĐ hiện tại, đúng như A7 cho trường hợp không có topic đang xem. |
-| A8 | **Đồng ý, điều chỉnh** | Kết quả thuật ngữ hiện ngay định nghĩa trong kết quả (tên đầy đủ, nghĩa), có link "Mở trong Thuật ngữ" truyền từ khoá **trong bộ nhớ** sang ô lọc, **không thêm route** (đặc tả giữ router). Kèm sửa mục "Gửi Product" về Back: khi đang ở `#/search/…` thì gõ tiếp dùng `location.replace`, chỉ lần đầu vào trang tìm kiếm mới tạo mục lịch sử. |
+| A8 | **Đồng ý, điều chỉnh** | Kết quả thuật ngữ hiện ngay định nghĩa trong kết quả (tên đầy đủ, nghĩa); cả thẻ là link sang Thuật ngữ, truyền từ khoá **trong bộ nhớ** sang ô lọc, **không thêm route** (đặc tả giữ router). Kèm sửa mục "Gửi Product" về Back: khi đang ở `#/search/…` thì gõ tiếp dùng `location.replace`, chỉ lần đầu vào trang tìm kiếm mới tạo mục lịch sử. |
 | A9 | **Đồng ý** | Không có ý kiến thêm. |
 
 ### Nhóm B
@@ -86,14 +86,27 @@ Các ý về luồng/điều hướng, không tự sửa:
 
 ## Giai đoạn 2 — đã triển khai
 
-Nhóm A (A1–A9) và các mục 16, 19, 20, cùng Back khi tìm kiếm. Quyết định: D41–D43. Mỗi cụm một commit, có số A trong tiêu đề commit. Đã kiểm tra:
-- **Tương tác** (Back khi gõ tìm kiếm, `#/learn` không kẹt Back, ô lọc Thuật ngữ điền sẵn từ kết quả tìm kiếm, nút "Đã nắm, sang bài tiếp" không đảo trạng thái, nhóm sim, "Dùng trong bài"): bằng script trong iframe cùng origin, chạy Chrome headless.
-- **Giao diện**: chụp Chrome headless ở 1440px và khung iframe 375px, sáng và tối, với 4 trạng thái `ip.done`: rỗng, xong GĐ1–2, xong lộ trình chính, xong hết.
+Nhóm A (A1–A9), B0–B5 (phần render), các mục 16, 19, 20, và Back khi tìm kiếm. Quyết định: D41–D44. Mỗi cụm một commit, có số A/B trong tiêu đề commit.
+
+**Cách kiểm tra.** Extension trình duyệt bị ngắt giữa chừng (lỗi lệch tài khoản OAuth), nên từ A6 trở đi dùng Chrome headless chạy cục bộ:
+- **Chụp màn hình**: 1440px, 870px và khung iframe 375px; sáng và tối; 4 trạng thái `ip.done` (rỗng, xong GĐ1–2, xong lộ trình chính, xong hết).
+- **Script trong iframe cùng origin**, đọc kết quả bằng `--dump-dom`:
+  - Back khi gõ tìm kiếm.
+  - Ô lọc Thuật ngữ điền sẵn.
+  - Nhóm sim, "Dùng trong bài".
+  - Mọi topic, sim và bài render không lỗi.
+  - Giảm chuyển động: không có gói tin bay, mũi tên vẫn vẽ.
+- **Kiểm bằng extension trước khi bị ngắt**: A1/A2 (pager, Back từ `#/learn`), A3 (bộ lọc, chip) và nút một chạm "Đã nắm, sang bài tiếp" không đảo trạng thái.
+- **Roadmap hiện tại render như cũ**: so DOM sidebar + `main` của 12 route × 2 trạng thái giữa commit trước B và sau B. Chỉ khác markup crumb (thêm `span`); chữ hiển thị giống hệt.
+- **B1–B5**: dùng fixture `roadmap.js` theo §3.1/§3.5 của đặc tả, kèm `goal`/`needs` mẫu, chỉ nằm trong scratchpad, không commit. Đã xem crumb "GĐ › chặng · i/n", sidebar và trang chủ theo chặng, "Đào sâu", GĐ5 vừa có topic vừa có bài (0/14), "Mở đường cho", nhóm sim theo chặng, đường dẫn trong tìm kiếm.
 - **Mở qua `file://`**: trang topic render đủ (H1, khối Tiếp theo, sim, `document.title`).
+
+**Sim tự vẽ sau #16** (chữ 16px): hash ring, ECS/EKS (stack), consumer group xem ở desktop; hash ring xem thêm ở 375px. ECS/EKS (decide) có chụp nhưng chưa xem ảnh.
 
 Còn lại:
 - Trang chủ hiện 9 bài trùng giữa "Kiểm tra chặng" của GĐ4 cũ và GĐ5 (xem A5). Tự hết sau bước 3.
-- Các mục B chờ `roadmap.js` mới.
+- Khi chặng cuối của giai đoạn là "Đào sâu", khối "Hết giai đoạn" nằm ở topic Đào sâu, không ở topic bắt buộc cuối cùng. "Học tiếp" bỏ qua Đào sâu nên người học có thể không thấy khối này. Chờ Product chọn.
+- Topbar 375px: câu hỏi cho Product (xem bảng đối chiếu).
 
 ## Chưa kiểm tra được
 
