@@ -23,7 +23,7 @@ BK.topic({
       },
       {
         cells: ["Retry + backoff + jitter", "Lỗi thoáng qua (mất gói, một instance khởi động lại)", "Chỉ lỗi tạm thời; chờ tăng dần có ngẫu nhiên; giới hạn số lần và có retry budget"],
-        why: "Retry \"ích kỷ\": nó dùng thêm thời gian của server để tăng cơ hội cho chính caller, nên chỉ ổn khi lỗi hiếm và tai hại khi server đang quá tải (Builders' Library). Backoff giãn khoảng cách giữa các lần thử; jitter làm lệch thời điểm để hàng nghìn client không retry cùng một nhịp. Lỗi phía client (4xx) gửi lại y nguyên thì vẫn lỗi, nên không retry.",
+        why: "Retry \"ích kỷ\": nó dùng thêm thời gian của server để tăng cơ hội cho chính caller, nên chỉ ổn khi lỗi hiếm và tai hại khi server đang quá tải (Builders' Library). Backoff giãn khoảng cách giữa các lần thử; jitter làm lệch thời điểm để hàng nghìn client không retry cùng một nhịp. Lỗi phía client (4xx) gửi lại y nguyên thì vẫn lỗi, nên không retry; ngoại lệ là `429` (bị giới hạn tốc độ), retry được sau khoảng chờ server gợi ý.",
       },
       {
         cells: ["Circuit breaker", "Tiếp tục đập vào phụ thuộc đang chết, chờ timeout mỗi lần", "Ba trạng thái closed → open → half-open theo ngưỡng lỗi và thời gian chờ"],
