@@ -36,7 +36,7 @@ BK.sim({
         {
           note: "Bob ghi `WHERE v=1` → **0 row** vì version đã là 2.",
           msgs: [["api", "db", "UPDATE WHERE v=1 (Bob)"], ["db", "api", "0 rows", "err"]],
-          detail: "Bob cập nhật **0 row**: cùng câu lệnh `WHERE v=1`, nhưng version giờ là 2 nên điều kiện sai. Không có lỗi SQL nào; API phải **kiểm tra số row bị ảnh hưởng** để biết mình thua. Quên kiểm tra là lỗi kinh điển: code coi như đặt thành công và Bob nhận vé ảo.",
+          detail: "Bob cập nhật **0 row** (ở Read Committed, mặc định của PostgreSQL; ở Repeatable Read, PostgreSQL báo lỗi `could not serialize access due to concurrent update` thay vì 0 row — https://www.postgresql.org/docs/current/transaction-iso.html): cùng câu lệnh `WHERE v=1`, nhưng version giờ là 2 nên điều kiện sai. Không có lỗi SQL nào; API phải **kiểm tra số row bị ảnh hưởng** để biết mình thua. Quên kiểm tra là lỗi kinh điển: code coi như đặt thành công và Bob nhận vé ảo.",
         },
         {
           note: "Bob nhận 409, client báo “ghế đã có người đặt”.",
