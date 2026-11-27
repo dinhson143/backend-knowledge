@@ -7,13 +7,23 @@
   const BK = window.BK;
   const ALL = BK.topics;
   const byId = Object.fromEntries(ALL.map((t) => [t.id, t]));
-  const STAGES = window.ROADMAP.map((s) => ({ ...s, topics: (s.topics || []).filter((id) => byId[id]) }));
+  // Giai đoạn có `parts` (chặng) thì `topics` suy từ các chặng; không có thì dùng `topics` như cũ (B1). Mọi trường mới đều tuỳ chọn
+  const STAGES = window.ROADMAP.map((s) => {
+    if (!s.parts) return { ...s, topics: (s.topics || []).filter((id) => byId[id]) };
+    const parts = s.parts.map((p) => ({ ...p, topics: (p.topics || []).filter((id) => byId[id]) })).filter((p) => p.topics.length);
+    return { ...s, parts, topics: parts.flatMap((p) => p.topics) };
+  });
   const listed = new Set(STAGES.flatMap((s) => s.topics));
   const orphans = ALL.filter((t) => !listed.has(t.id)).map((t) => t.id);
   if (orphans.length) STAGES.push({ id: "other", title: "Khác", goal: "", topics: orphans, parallel: true });
   STAGES.forEach((s) => s.topics.forEach((id) => (byId[id].stage = s)));
+  STAGES.forEach((s) => (s.parts || []).forEach((p) => p.topics.forEach((id) => (byId[id].part = p))));
   // Thứ tự đọc: giai đoạn chính trước, nhánh song song sau
   const ORDER = [...STAGES.filter((s) => !s.parallel), ...STAGES.filter((s) => s.parallel)].flatMap((s) => s.topics.map((id) => byId[id]));
+  // Lộ trình chính = topic của mọi giai đoạn không song song (kể cả giai đoạn có bài luyện, B0).
+  // Pager đi trong nhóm: lộ trình chính, hoặc riêng một nhánh song song (A1)
+  const MAIN = ORDER.filter((t) => !t.stage.parallel);
+  const groupOf = (t) => (t.stage.parallel ? t.stage.topics.map((id) => byId[id]) : MAIN);
 
   const SIMS = BK.sims;
   const simById = Object.fromEntries(SIMS.map((s) => [s.id, s]));
@@ -30,6 +40,30 @@
   };
   const done = new Set(store.get("ip.done", []));
   const toggleDone = (key) => { done.has(key) ? done.delete(key) : done.add(key); store.set("ip.done", [...done]); };
+  // "Đủ nền" (A3): mọi topic của bài đã nắm. Tính từ p.topics + ip.done, không cần dữ liệu mới
+  const missing = (p) => p.topics.filter((id) => !done.has(id));
+  const isReady = (p) => !missing(p).length;
+  // Chặng kiểm tra (A5): bài thuộc giai đoạn chứa topic muộn nhất của nó trong lộ trình chính.
+  // Giai đoạn có bài luyện (problems) không có hàng kiểm tra riêng — nó chính là chỗ luyện
+  const mainIdx = (id) => MAIN.indexOf(byId[id]);
+  const checkpointOf = (p) => { const last = p.topics.filter((id) => mainIdx(id) >= 0).sort((a, b) => mainIdx(b) - mainIdx(a))[0]; return last && byId[last].stage; };
+  const checkpoint = (s) => (s.problems ? [] : PROBLEMS.filter((p) => checkpointOf(p) === s));
+  // Gợi ý luyện: bài đủ nền chưa luyện; chưa có thì bài thiếu ít chủ đề nhất (người mới vẫn thấy hướng đi)
+  function practiceHint() {
+    const open = PROBLEMS.filter((p) => !done.has(`p:${p.id}`));
+    if (!open.length) return null;
+    const ready = open.filter(isReady);
+    if (ready.length) return { title: `Bài đã đủ nền (${ready.length})`, list: ready.slice(0, 3) };
+    const min = Math.min(...open.map((p) => missing(p).length));
+    return { title: min === 1 ? "Sắp mở bài luyện" : "Gần đủ nền nhất", list: open.filter((p) => missing(p).length === min).slice(0, 2), showMissing: true };
+  }
+  // "Học tiếp" (A2): topic chưa nắm đầu tiên của lộ trình chính; xong hết thì bài đủ nền chưa luyện đầu tiên
+  function nextStep() {
+    const t = MAIN.find((x) => !done.has(x.id) && !(x.part && x.part.optional)); // bỏ qua chặng "Đào sâu" (B4)
+    if (t) return { href: `#/t/${t.id}`, title: t.title, topic: t };
+    const p = PROBLEMS.find((x) => !done.has(`p:${x.id}`) && isReady(x));
+    return p ? { href: `#/p/${p.id}`, title: p.title, problem: p } : { href: "#/problems", title: "Ôn lại bài luyện" };
+  }
 
   // ── Theme & mobile menu ──
   const theme = store.get("ip.theme", null);
@@ -40,8 +74,11 @@
     document.documentElement.dataset.theme = next;
     store.set("ip.theme", next);
   };
-  $("#menuBtn").onclick = () => sidebar.classList.toggle("open");
-  main.addEventListener("click", () => sidebar.classList.remove("open"));
+  const menuBtn = $("#menuBtn");
+  const setMenu = (open) => { sidebar.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open); };
+  menuBtn.onclick = () => setMenu(!sidebar.classList.contains("open"));
+  // Bấm ra ngoài sidebar (kể cả nền mờ) thì đóng
+  document.addEventListener("click", (e) => { if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) setMenu(false); });
 
   // ── Helpers ──
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -61,6 +98,10 @@
   const inline = (s) => esc(s).split(/(`[^`]+`)/).map((part) => (/^`[^`]+`$/.test(part) ? `<code>${part.slice(1, -1)}</code>` : glossify(part))).join("")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   window.glossInline = inline;
+  // Chữ trong thẻ <a> (thẻ sim/bài): không chèn <abbr tabindex> để tránh phần tử tương tác lồng trong link
+  const noTip = (s) => plain(s).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1");
+  // Đánh dấu xong: render lại nhưng giữ vị trí đọc và focus của nút
+  const keepPlace = (render) => { const y = window.scrollY; render(); window.scrollTo(0, y); $("#doneBtn").focus(); };
   const tagged = (s) => {
     if (s.startsWith("+ ")) return `<span class="tag added">Bổ sung</span>${inline(s.slice(2))}`;
     if (s.startsWith("! ")) return `<span class="tag fix">Đính chính</span>${inline(s.slice(2))}`;
@@ -81,7 +122,19 @@
   const simBox = (sim) => `<div class="panel sim-box" id="sim-${sim.id}"></div>`;
   const mountAll = (sims) => sims.forEach((sim) => window.mountSim(document.getElementById(`sim-${sim.id}`), sim));
   const levelBadge = (l) => `<span class="lvl lvl-${l}">${LEVELS[l]}</span>`;
-  const stageKeys = (s) => (s.problems ? PROBLEMS.map((p) => `p:${p.id}`) : s.topics);
+  // Chip chủ đề có trạng thái: ✓/○ + chữ ẩn cho trình đọc màn hình + viền khác nhau, không chỉ khác màu.
+  // Trong thẻ <a> thì dùng <span> (tag = "span") để không lồng link
+  const needChip = (id, tag = "a") => { const ok = done.has(id); return `<${tag} class="chip need-chip ${ok ? "ok" : ""}"${tag === "a" ? ` href="#/t/${id}"` : ""}><span aria-hidden="true">${ok ? "✓" : "○"}</span> ${esc(byId[id].title)}<span class="sr-only">${ok ? " (đã nắm)" : " (chưa nắm)"}</span></${tag}>`; };
+  const readyBadge = (p) => { const m = missing(p).length; return m ? `<span class="ready miss">Còn thiếu ${m}</span>` : `<span class="ready ok">✓ Đủ nền</span>`; };
+  const practiceBox = () => { const h = practiceHint(); return !h ? "" : `<div class="panel practice-box"><div class="l">${h.title}</div>
+    ${h.list.map((p) => `<div class="pb-item"><a href="#/p/${p.id}">${esc(p.title)}</a> ${levelBadge(p.level)}${h.showMissing ? `<div class="muted small">Còn thiếu: ${missing(p).map((id) => esc(byId[id].title)).join(", ")}</div>` : ""}</div>`).join("")}</div>`; };
+  // Tiến độ giai đoạn: topic + bài (giai đoạn có `problems`) — B0, Q7
+  const stageKeys = (s) => (s.problems ? [...s.topics, ...PROBLEMS.map((p) => `p:${p.id}`)] : s.topics);
+  const deepTag = (p) => (p && p.optional && p.title !== "Đào sâu" ? `<span class="tag deep">Đào sâu</span>` : ""); // chặng tên "Đào sâu" thì không lặp nhãn
+  // Vị trí topic: "Giai đoạn N · tên" (+ " › chặng") — dùng cho crumb, thẻ Tiếp tục, tìm kiếm
+  const stageText = (s) => `${s.parallel ? "Song song" : `Giai đoạn ${stageNum(s)}`} · ${s.title}`;
+  const placeText = (t) => stageText(t.stage) + (t.part ? ` › ${t.part.title}` : "");
+  const goalLine = (t) => (t.goal ? `<p class="goal"><b>Làm được:</b> ${inline(t.goal)}</p>` : "");
   const stageNum = (s) => (s.parallel ? "∥" : STAGES.filter((x) => !x.parallel).indexOf(s) + 1);
 
   // Hộp "Viết tắt trong bài này" chèn sau phần mở đầu của trang
@@ -114,15 +167,30 @@
   document.addEventListener("focusin", (e) => { const a = e.target.closest("abbr.g"); if (a) showTip(a); });
   document.addEventListener("focusout", hideTip);
   window.addEventListener("scroll", hideTip, { passive: true });
+  // Esc: ẩn tooltip (WCAG 1.4.13), đóng sidebar mobile và trả focus về nút ☰
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    hideTip();
+    if (sidebar.classList.contains("open")) { setMenu(false); menuBtn.focus(); }
+  });
 
   // ── Sidebar theo ngữ cảnh ──
+  // Giai đoạn "đang học": chứa bước Học tiếp; xong lộ trình chính thì là giai đoạn luyện bài
+  const currentStage = () => { const st = nextStep(); return st.topic ? st.topic.stage : STAGES.find((s) => s.problems); };
+  // Sidebar (A7): mỗi giai đoạn là <details>, chỉ mở giai đoạn chứa topic đang xem (không có thì giai đoạn đang học).
+  // Lọc theo "có topic" chứ không theo `problems`, để giai đoạn vừa có topic vừa có bài vẫn hiện (B0)
   function sideKnowledge(active) {
-    return STAGES.filter((s) => !s.problems).map((s) => `
-      <div class="sb-track">
-        <div class="sb-track-title">${stageNum(s)} · ${esc(s.title)}</div>
-        ${s.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}">
-          <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")}
-      </div>`).join("");
+    const open = active && byId[active] ? byId[active].stage : currentStage();
+    const block = (s) => `
+      <details class="sb-track" ${s === open ? "open" : ""}>
+        <summary class="sb-track-title"><span>${stageNum(s)} · ${esc(s.title)}</span><span class="sb-count">${s.topics.filter((id) => done.has(id)).length}/${s.topics.length}</span></summary>
+        ${(s.parts || [{ topics: s.topics }]).map((p) => (p.title ? `<div class="sb-section">${esc(p.title)}${deepTag(p)}</div>` : "") +
+          p.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}"${id === active ? ' aria-current="page"' : ""}>
+          <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")).join("")}
+      </details>`;
+    const withTopics = STAGES.filter((s) => s.topics.length);
+    return `<div class="sb-group">Lộ trình chính</div>${withTopics.filter((s) => !s.parallel).map(block).join("")}
+      <div class="sb-group">Nhánh song song</div>${withTopics.filter((s) => s.parallel).map(block).join("")}`;
   }
   function sideProblems(active) {
     return `<div class="sb-track"><a class="sb-topic ${active === "all" ? "active" : ""}" href="#/problems"><span class="sb-dot"></span>Tất cả bài & cách luyện</a></div>` +
@@ -132,9 +200,9 @@
   }
   function setNav(mode, side) {
     glSeen = mode === "glossary" ? null : new Set();
-    document.querySelectorAll(".modes a").forEach((a) => a.classList.toggle("active", a.dataset.mode === mode));
+    document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
     sidebar.innerHTML = side;
-    sidebar.classList.remove("open");
+    setMenu(false);
     window.scrollTo(0, 0);
   }
 
@@ -143,38 +211,59 @@
     setNav("home", sideKnowledge(null));
     const tDone = ALL.filter((t) => done.has(t.id)).length;
     const pDone = PROBLEMS.filter((p) => done.has(`p:${p.id}`)).length;
-    const nextTopic = ORDER.find((t) => !done.has(t.id));
+    const step = nextStep(), cur = currentStage();
+    // Mỗi giai đoạn là <details> (A6); chỉ mở sẵn giai đoạn đang học. Summary không chứa heading (trình đọc màn hình đọc summary là nút)
+    const stage = (s) => {
+      const keys = stageKeys(s), d = keys.filter((k) => done.has(k)).length;
+      const tChips = (ids) => ids.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
+      const pChips = PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("");
+      // Có chặng: mỗi chặng một hàng có nhãn; giai đoạn có cả topic lẫn bài: thêm hàng "Luyện đề" (B0, B1)
+      const rows = [...(s.parts || (s.topics.length ? [{ topics: s.topics }] : [])).map((p) => [p.title ? esc(p.title) + deepTag(p) : "", tChips(p.topics)]),
+        ...(s.problems ? [[s.topics.length ? "Luyện đề" : "", pChips]] : [])];
+      const items = rows.map(([label, chips]) => (label ? `<div class="rm-part"><div class="rm-part-t">${label}</div><div class="rm-chips">${chips}</div></div>` : `<div class="rm-chips">${chips}</div>`)).join("");
+      return `<div class="rm-stage ${s.parallel ? "parallel" : ""} ${d === keys.length ? "complete" : ""}">
+        <div class="rm-num" aria-hidden="true">${stageNum(s)}</div>
+        <details class="rm-body" ${s === cur ? "open" : ""}>
+          <summary class="rm-head"><span class="rm-title"><span class="sr-only">${s.parallel ? "Nhánh song song" : `Giai đoạn ${stageNum(s)}`}: </span>${esc(s.title)}</span><span class="muted">${d}/${keys.length}</span></summary>
+          <p class="muted">${esc(s.goal)}</p>
+          ${items}
+          ${checkpoint(s).length ? `<div class="rm-check"><span class="muted">✔ Kiểm tra chặng:</span> ${checkpoint(s).map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")}</div>` : ""}
+        </details>
+      </div>`;
+    };
+    const where = step.topic ? esc(placeText(step.topic))
+      : step.problem ? `Luyện đề · ${LEVELS[step.problem.level]}` : "Đã xong lộ trình chính và các bài đủ nền";
     main.innerHTML = `
       <h1>Lộ trình ôn System Design & Backend</h1>
       <p class="lead">Học theo giai đoạn 1 → 5; Low-Level Design và DSA học song song. Mọi chủ đề dùng chung một khung nên ôn lại nhanh.</p>
 
-      <div class="kpis kpis-3">
-        <div class="panel kpi"><div class="n">${tDone}/${ALL.length}</div><div class="l">Chủ đề đã nắm</div><div class="bar"><i style="width:${pct(tDone, ALL.length)}%"></i></div></div>
-        <div class="panel kpi"><div class="n">${pDone}/${PROBLEMS.length}</div><div class="l">Bài đã luyện</div><div class="bar"><i style="width:${pct(pDone, PROBLEMS.length)}%"></i></div></div>
-        <a class="panel kpi kpi-next" href="${nextTopic ? `#/t/${nextTopic.id}` : "#/problems"}"><div class="l">Học tiếp</div><div class="n-sm">${esc(nextTopic ? nextTopic.title : "Luyện bài")} →</div></a>
+      <div class="home-top">
+        <a class="panel continue" href="${step.href}">
+          <div class="l">Tiếp tục</div>
+          <div class="crumb">${where}</div>
+          <div class="c-title">${esc(step.title)}</div>
+          ${step.topic && step.topic.goal ? `<div class="c-goal">Làm được: ${noTip(step.topic.goal)}</div>` : ""}
+          <span class="btn primary">${step.topic ? "Học tiếp" : step.problem ? "Luyện tiếp" : "Xem bài luyện"} →</span>
+        </a>
+        ${practiceBox()}
+      </div>
+      <div class="progress-line">
+        <div><b>Chủ đề ${tDone}/${ALL.length}</b><div class="bar"><i style="width:${pct(tDone, ALL.length)}%"></i></div></div>
+        <div><b>Bài luyện ${pDone}/${PROBLEMS.length}</b><div class="bar"><i style="width:${pct(pDone, PROBLEMS.length)}%"></i></div></div>
       </div>
 
-      <div class="method panel">
-        <div><b>Cách ôn một chủ đề</b><ol><li>Đọc “Nói trong 30 giây”</li><li>Chạy mô phỏng</li><li>Đọc kiến thức cốt lõi</li><li>Tự trả lời phần Tự kiểm tra</li><li>Xem chủ đề dùng trong bài nào, rồi đánh dấu đã nắm</li></ol></div>
-        <div><b>Cách luyện một bài</b><ol><li>Đọc đề, chưa xem lời giải</li><li>Tự nói Requirements → Entities → API → HLD trong 15–20 phút</li><li>So với HLD mẫu, chạy từng luồng</li><li>Trả lời Deep Dives trước khi mở 3 mức đáp án</li></ol></div>
-      </div>
+      <h2 class="rm-group">Lộ trình chính</h2>
+      <div class="roadmap">${STAGES.filter((s) => !s.parallel).map(stage).join("")}</div>
+      <h2 class="rm-group">Nhánh song song <span class="small">· học xen kẽ khi cần</span></h2>
+      <div class="roadmap">${STAGES.filter((s) => s.parallel).map(stage).join("")}</div>
 
-      <div class="roadmap">
-        ${STAGES.map((s) => {
-          const keys = stageKeys(s), d = keys.filter((k) => done.has(k)).length;
-          const items = s.problems
-            ? PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")
-            : s.topics.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
-          return `<div class="rm-stage ${s.parallel ? "parallel" : ""} ${d === keys.length ? "complete" : ""}">
-            <div class="rm-num">${stageNum(s)}</div>
-            <div class="rm-body">
-              <div class="rm-head"><h3>${esc(s.title)}</h3><span class="muted">${d}/${keys.length}</span></div>
-              <p class="muted">${esc(s.goal)}</p>
-              <div class="rm-chips">${items}</div>
-            </div>
-          </div>`;
-        }).join("")}
-      </div>
+      <details class="panel scope">
+        <summary>Cách ôn một chủ đề / một bài</summary>
+        <div class="method">
+          <div><b>Cách ôn một chủ đề</b><ol><li>Đọc “Nói trong 30 giây”</li><li>Chạy mô phỏng</li><li>Đọc kiến thức cốt lõi</li><li>Tự trả lời phần Tự kiểm tra</li><li>Xem chủ đề dùng trong bài nào, rồi đánh dấu đã nắm</li></ol></div>
+          <div><b>Cách luyện một bài</b><ol><li>Đọc đề, chưa xem lời giải</li><li>Tự nói Requirements → Entities → API → HLD trong 15–20 phút</li><li>So với HLD mẫu, chạy từng luồng</li><li>Trả lời Deep Dives trước khi mở 3 mức đáp án</li></ol></div>
+        </div>
+      </details>
 
       <details class="panel scope">
         <summary>Nguồn & phạm vi nội dung</summary>
@@ -193,15 +282,20 @@
     const t = byId[id];
     if (!t) return viewHome();
     setNav("learn", sideKnowledge(id));
-    const i = ORDER.indexOf(t), prev = ORDER[i - 1], next = ORDER[i + 1];
+    const group = groupOf(t), i = group.indexOf(t), prev = group[i - 1], next = group[i + 1];
+    // Cuối nhóm: lộ trình chính sang luyện đề, nhánh song song về trang chủ (không nhảy sang nhánh khác)
+    const end = t.stage.parallel ? { href: "#/", label: "Về lộ trình →" } : { href: "#/problems", label: "Sang luyện đề →" };
     const sims = simsFor(id);
     const related = (t.related || []).map((sid) => simById[sid]).filter(Boolean);
     const probs = problemsFor(id);
     let n = 0;
     const h = (title) => `<h2><span class="h-n">${++n}</span>${esc(title)}</h2>`;
     main.innerHTML = `
-      <div class="crumb">${t.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(t.stage)}`} · ${esc(t.stage.title)}</div>
+      <div class="crumb t-crumb ${t.part ? "has-part" : ""}"><span class="cr-long">${esc(stageText(t.stage))}</span><span class="cr-short">${t.stage.parallel ? "∥" : `GĐ${stageNum(t.stage)}`}</span>${t.part
+        ? ` › <span class="cr-part">${esc(t.part.title)}</span><span class="cr-n">&nbsp;· ${t.part.topics.indexOf(id) + 1}/${t.part.topics.length}</span>` : ""}</div>
       <h1>${esc(t.title)}</h1>
+      ${goalLine(t)}
+      ${(t.needs || []).filter((x) => byId[x]).length ? `<div class="needs"><span class="muted">Cần trước:</span> ${t.needs.filter((x) => byId[x]).map((x) => needChip(x)).join("")}</div>` : ""}
       <div class="panel tldr"><b>Nói trong 30 giây</b>${tagged(txt(t.tldr))}${whyLine(t.tldr.why)}</div>
 
       ${t.story ? `${h("Vì sao cần biết")}<div class="story">
@@ -226,14 +320,41 @@
         ${probs.length ? `<div class="apply"><span class="muted">Dùng trong bài:</span> ${probs.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""}
         ${related.length ? `<div class="apply"><span class="muted">Mô phỏng liên quan:</span> ${related.map((s) => `<a class="chip" href="#/sim/${s.id}">${esc(s.title)}</a>`).join("")}</div>` : ""}` : ""}
 
-      <div class="topic-actions"><button class="btn ${done.has(id) ? "done" : "primary"}" id="doneBtn">${done.has(id) ? "✓ Đã nắm" : "Đánh dấu đã nắm"}</button></div>
+      ${nextCard(t, next, end)}
       <div class="pager">
         ${prev ? `<a href="#/t/${prev.id}">← ${esc(prev.title)}</a>` : "<span></span>"}
-        ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="#/problems" style="text-align:right">Sang luyện bài →</a>`}
+        ${next ? `<a href="#/t/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : `<a href="${end.href}" style="text-align:right">${end.label}</a>`}
       </div>`;
     mountAll(sims);
     abbrBox(main.querySelector(".tldr"));
-    $("#doneBtn").onclick = () => { toggleDone(id); viewTopic(id); };
+    $("#doneBtn").onclick = () => { toggleDone(id); keepPlace(() => viewTopic(id)); };
+    // Một chạm: chỉ THÊM vào done (không đảo), rồi để link chuyển trang
+    $("#goNext").onclick = () => { if (!done.has(id)) { done.add(id); store.set("ip.done", [...done]); } };
+  }
+
+  // Khối "Tiếp theo" cuối trang topic (A4); topic cuối giai đoạn thì thành "Hết giai đoạn" kèm chặng kiểm tra (A5)
+  function nextCard(t, next, end) {
+    const id = t.id, isDone = done.has(id);
+    const lastOfStage = !t.stage.parallel && t.stage.topics[t.stage.topics.length - 1] === id;
+    const ck = lastOfStage ? checkpoint(t.stage) : [];
+    const verb = !next ? end.label.replace(" →", "").toLowerCase()
+      : lastOfStage ? `sang Giai đoạn ${stageNum(next.stage)}: ${next.stage.title}` : "sang bài tiếp";
+    const label = (isDone ? verb[0].toUpperCase() + verb.slice(1) : `✓ Đã nắm, ${verb}`) + " →";
+    // Bài sắp mở: dùng topic này và chỉ còn thiếu tối đa 1 chủ đề khác
+    const soon = problemsFor(id).filter((p) => !done.has(`p:${p.id}`) && missing(p).filter((x) => x !== id).length <= 1).slice(0, 2);
+    return `<section class="panel next-card" aria-labelledby="nextH">
+      <h2 id="nextH" class="nc-h">${lastOfStage ? `Hết giai đoạn ${stageNum(t.stage)} · ${esc(t.stage.title)}` : "Tiếp theo"}</h2>
+      ${ck.length ? `<p class="small">Kiểm tra chặng trước khi đi tiếp (tự làm 15–20 phút mỗi bài):</p>
+        <div class="rm-chips">${ck.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)} · ${LEVELS[p.level]}</a>`).join("")}</div>` : ""}
+      <div class="nc-btns">
+        <a class="btn primary" id="goNext" href="${next ? `#/t/${next.id}` : end.href}">${esc(label)}</a>
+        <button class="btn ${isDone ? "done" : ""}" id="doneBtn" aria-pressed="${isDone}">${isDone ? "✓ Đã nắm" : "Chỉ đánh dấu đã nắm"}</button>
+      </div>
+      ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}${next.goal ? ` — ${inline(next.goal)}` : ""}</div>` : ""}
+      ${(() => { const opens = ALL.filter((x) => (x.needs || []).includes(id)); return opens.length ? `<div class="small"><span class="muted">Bài này mở đường cho:</span> ${opens.map((x) => `<a href="#/t/${x.id}">${esc(x.title)}</a>`).join(", ")}</div>` : ""; })()}
+      ${soon.length ? `<div class="small"><span class="muted">Sắp mở:</span> ${soon.map((p) => { const rest = missing(p).filter((x) => x !== id);
+        return `<a href="#/p/${p.id}">${esc(p.title)}</a> · ${LEVELS[p.level]} ${rest.length ? `(còn ${esc(byId[rest[0]].title)})` : isDone ? "(đã đủ nền)" : "(đủ nền sau bài này)"}`; }).join("; ")}</div>` : ""}
+    </section>`;
   }
 
   // ── Bài luyện ──
@@ -242,14 +363,36 @@
     main.innerHTML = `
       <h1>Luyện bài System Design</h1>
       <p class="lead">Tự làm trước, xem lời giải sau: nói Requirements → HLD trong 15–20 phút, rồi so với HLD mẫu và đáp án Deep Dives. Bài nào cũng đi đủ Delivery Framework.</p>
-      ${[1, 2, 3].map((l) => `
+      <div class="filter" role="group" aria-label="Lọc bài">
+        ${[["all", `Tất cả (${PROBLEMS.length})`], ["ready", `Đã đủ nền (${PROBLEMS.filter(isReady).length})`], ["todo", `Chưa luyện (${PROBLEMS.filter((p) => !done.has(`p:${p.id}`)).length})`]]
+          .map(([f, l]) => `<button class="chip ${f === "all" ? "on" : ""}" data-f="${f}" aria-pressed="${f === "all"}">${l}</button>`).join("")}
+      </div>
+      ${[1, 2, 3].map((l) => `<section class="lvl-sec">
         <h2>${levelBadge(l)} <span class="muted small">${{ 1: "ít thành phần, một pattern chính", 2: "nhiều luồng, phải chọn trade-off rõ", 3: "nhiều pattern kết hợp, deep dive khó" }[l]}</span></h2>
         <div class="grid">${PROBLEMS.filter((p) => p.level === l).map((p) => `
-          <a class="panel sim-card" href="#/p/${p.id}">
-            <div class="t"><span class="sb-dot ${done.has(`p:${p.id}`) ? "done" : ""}" style="display:inline-block;margin-right:6px"></span>${esc(p.title)}</div>
-            <div class="s">${inline(p.summary)}</div>
-            <div class="tags">${p.topics.map((id) => `<span class="chip">${esc(byId[id].title)}</span>`).join("")}</div>
-          </a>`).join("")}</div>`).join("")}`;
+          <a class="panel sim-card" href="#/p/${p.id}" data-ready="${isReady(p)}" data-done="${done.has(`p:${p.id}`)}">
+            <div class="t"><span class="sb-dot ${done.has(`p:${p.id}`) ? "done" : ""}" style="display:inline-block;margin-right:6px"></span>${esc(p.title)} ${readyBadge(p)}</div>
+            <div class="s">${noTip(p.summary)}</div>
+            <div class="tags">${p.topics.map((id) => needChip(id, "span")).join("")}</div>
+          </a>`).join("")}</div></section>`).join("")}
+      <div class="empty" id="filterEmpty" hidden></div>`;
+    // Lọc trong trang, không ghi vào URL (Q5)
+    main.querySelector(".filter").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-f]");
+      if (!b) return;
+      const f = b.dataset.f;
+      main.querySelectorAll(".filter [data-f]").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); });
+      main.querySelectorAll(".sim-card").forEach((c) => (c.hidden = (f === "ready" && c.dataset.ready !== "true") || (f === "todo" && c.dataset.done === "true")));
+      main.querySelectorAll(".lvl-sec").forEach((s) => (s.hidden = !s.querySelector(".sim-card:not([hidden])")));
+      const empty = $("#filterEmpty"), none = !main.querySelector(".sim-card:not([hidden])");
+      empty.hidden = !none;
+      if (none) {
+        const h = practiceHint();
+        empty.innerHTML = f === "ready"
+          ? `Chưa bài nào đủ nền: bấm “Đã nắm” ở cuối mỗi chủ đề để mở bài.${h ? ` Gần nhất: ${h.list.map((p) => `<a href="#/p/${p.id}">${esc(p.title)}</a> (còn thiếu ${missing(p).length})`).join(", ")}.` : ""}`
+          : "Đã luyện hết mọi bài.";
+      }
+    });
   }
 
   function viewProblem(id) {
@@ -266,9 +409,10 @@
       <p class="lead">${inline(p.summary)}</p>
       <div class="prob-meta">
         ${levelBadge(p.level)}
-        ${p.topics.map((tid) => `<a class="chip" href="#/t/${tid}">${esc(byId[tid].title)}</a>`).join("")}
         <a class="chip" href="https://www.hellointerview.com/learn/system-design/problem-breakdowns/${p.hi}" target="_blank" rel="noopener">Bản gốc Hello Interview ↗</a>
       </div>
+      <div class="needs"><span class="muted">Cần nắm trước:</span> ${p.topics.map((tid) => needChip(tid)).join("")}</div>
+      ${(() => { const m = missing(p).sort((a, b) => mainIdx(a) - mainIdx(b))[0]; return m ? `<p class="muted small needs-hint">Nên đọc <a href="#/t/${m}">${esc(byId[m].title)}</a> trước (không bắt buộc).</p>` : ""; })()}
       <div class="panel practice-hint">Tự làm 15–20 phút trước khi đọc tiếp: liệt kê requirements, entities, API, phác HLD ra giấy.</div>
 
       <h2><span class="h-n">1</span>Requirements</h2>
@@ -301,25 +445,31 @@
         ${next ? `<a href="#/p/${next.id}" style="text-align:right">${esc(next.title)} →</a>` : "<span></span>"}
       </div>`;
     mountAll([p.hld, ...sims]);
-    abbrBox(main.querySelector(".prob-meta"));
-    $("#doneBtn").onclick = () => { toggleDone(key); viewProblem(id); };
+    abbrBox(main.querySelector(".needs-hint") || main.querySelector(".needs"));
+    $("#doneBtn").onclick = () => { toggleDone(key); keepPlace(() => viewProblem(id)); };
   }
 
   // ── Thư viện mô phỏng ──
+  // A9: sim thuộc giai đoạn của topic đứng sớm nhất trong ORDER (không theo topics[0])
+  const simTopic = (s) => s.topics.map((id) => byId[id]).filter(Boolean).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b))[0];
+  const simStage = (s) => { const t = simTopic(s); return t && t.stage; };
   function viewSims() {
     setNav("sims", sideKnowledge(null));
     main.innerHTML = `
       <h1>Thư viện mô phỏng</h1>
       <p class="lead">${SIMS.length} mô phỏng chạy trực tiếp, xếp theo giai đoạn lộ trình. Mỗi mô phỏng cũng có trong trang chủ đề tương ứng.</p>
-      ${STAGES.filter((s) => !s.problems).map((st) => {
-        const list = SIMS.filter((s) => byId[s.topics[0]] && byId[s.topics[0]].stage === st);
+      ${STAGES.filter((s) => s.topics.length).map((st) => {
+        const list = SIMS.filter((s) => simStage(s) === st);
         if (!list.length) return "";
-        return `<h2>${stageNum(st)} · ${esc(st.title)}</h2><div class="grid">${list.map((s) => `
+        const card = (s) => `
           <a class="panel sim-card" href="#/sim/${s.id}">
             <div class="t">${esc(s.title)}</div>
-            <div class="s">${inline(s.scenario)}</div>
+            <div class="s">${noTip(s.scenario)}</div>
             <div class="tags">${s.topics.filter((id) => byId[id]).map((id) => `<span class="chip">${esc(byId[id].title)}</span>`).join("")}</div>
-          </a>`).join("")}</div>`;
+          </a>`;
+        // Có chặng: nhóm con theo chặng của topic đứng sớm nhất (B1)
+        const groups = st.parts ? st.parts.map((p) => [p, list.filter((s) => simTopic(s).part === p)]).filter(([, l]) => l.length) : [[null, list]];
+        return `<h2>${stageNum(st)} · ${esc(st.title)}</h2>${groups.map(([p, l]) => `${p ? `<h3>${esc(p.title)}</h3>` : ""}<div class="grid">${l.map(card).join("")}</div>`).join("")}`;
       }).join("")}`;
   }
 
@@ -329,8 +479,10 @@
     setNav("sims", sideKnowledge(sim.topics[0]));
     main.innerHTML = `
       <div class="crumb"><a href="#/sims">Mô phỏng</a> · ${esc(sim.title)}</div>
+      <h1 class="sr-only">${esc(sim.title)}</h1>
       ${simBox(sim)}
-      <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>`;
+      <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>
+      ${(() => { const uses = PROBLEMS.filter((p) => (p.sims || []).includes(id)); return uses.length ? `<div class="apply sim-uses"><span class="muted">Dùng trong bài:</span> ${uses.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""; })()}`;
     mountAll([sim]);
   }
 
@@ -341,8 +493,11 @@
     main.innerHTML = `
       <h1>Thuật ngữ viết tắt</h1>
       <p class="lead">${total} từ viết tắt. Ở mọi trang, rê chuột hoặc chạm vào từ gạch chấm để xem nghĩa.</p>
-      <input id="glFilter" class="gl-filter" type="search" placeholder="Lọc: LRU, TTL, Kafka…" autocomplete="off">
+      <input id="glFilter" class="gl-filter" type="search" aria-label="Lọc thuật ngữ" placeholder="Lọc: LRU, TTL, Kafka…" autocomplete="off">
       <div id="glList"></div>`;
+    // Từ khoá truyền từ kết quả tìm kiếm (trong bộ nhớ, không thêm route)
+    const q0 = glPrefill;
+    glPrefill = "";
     const render = (q) => {
       const n = q.trim().toLowerCase();
       $("#glList").innerHTML = (window.GLOSSARY || []).map((g) => {
@@ -353,34 +508,55 @@
         </tbody></table></div>`;
       }).join("") || `<div class="empty">Không có thuật ngữ khớp.</div>`;
     };
-    render("");
+    $("#glFilter").value = q0;
+    render(q0);
     $("#glFilter").addEventListener("input", (e) => render(e.target.value));
   }
 
   // ── Tìm kiếm ──
   function viewSearch(q) {
     setNav(null, sideKnowledge(null));
+    if ($("#search").value.trim() !== q) $("#search").value = q; // mở thẳng #/search/x thì ô tìm vẫn hiện từ khoá
     const needle = q.toLowerCase();
     const textOf = (t) => [t.title, txt(t.tldr), ...(t.points || []).map(txt), ...(t.tips || []).map(txt),
       ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flatMap(cellsOf)]),
       ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || []).map(txt)]), ...(t.cards || []).flat()];
-    const hits = ORDER.map((t) => ({ href: `#/t/${t.id}`, title: t.title, where: t.stage.title, m: textOf(t).filter((s) => s.toLowerCase().includes(needle)) }))
-      .concat(PROBLEMS.map((p) => ({ href: `#/p/${p.id}`, title: p.title, where: "Bài luyện", m: [p.title, p.summary, ...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])].filter((s) => s.toLowerCase().includes(needle)) })))
-      .filter((x) => x.m.length);
+    // A8: chủ đề, bài, mô phỏng, thuật ngữ. Xếp hạng: khớp tiêu đề (0) > khớp tóm tắt (1) > khớp thân (2); cùng hạng giữ thứ tự gốc
+    const has = (s) => !!s && s.toLowerCase().includes(needle);
+    const hit = (type, href, title, where, head, lead, body, gl) => {
+      const m = [...new Set([lead, ...body])].filter((s) => s !== title && has(s));
+      // Chỉ khớp tiêu đề thì hiện tóm tắt (với thuật ngữ: nghĩa) làm đoạn trích
+      return (m.length || has(head)) && { type, href, title, where, m: m.length ? m : [lead].filter(Boolean), gl, rank: has(head) ? 0 : has(lead) ? 1 : 2 };
+    };
+    const hits = [
+      ...ORDER.map((t) => hit("Chủ đề", `#/t/${t.id}`, t.title, placeText(t), t.title, t.goal || txt(t.tldr), [txt(t.tldr), ...textOf(t)])),
+      ...PROBLEMS.map((p) => hit("Bài", `#/p/${p.id}`, p.title, LEVELS[p.level], p.title, p.summary, [...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])])),
+      ...SIMS.map((s) => hit("Mô phỏng", `#/sim/${s.id}`, s.title, byId[s.topics[0]] ? byId[s.topics[0]].title : "", s.title, s.scenario, [s.context])),
+      ...Object.values(GL).map((g) => hit("Thuật ngữ", "#/glossary", `${g.k} · ${g.full}`, g.group, `${g.k} ${g.full}`, g.vi, [g.ex], g.k)),
+    ].filter(Boolean).sort((a, b) => a.rank - b.rank);
     // Bỏ tooltip trong kết quả tìm kiếm và chỉ tô sáng phần chữ, không đụng vào thẻ HTML
     const hl = (s) => plain(s.replace(/^[+!] /, "")).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1")
       .replace(new RegExp(`(${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})(?![^<]*>)`, "gi"), "<mark>$1</mark>");
     main.innerHTML = `<h1>Kết quả cho “${esc(q)}”</h1><p class="lead">${hits.length} kết quả</p>
-      ${hits.map((x) => `<a class="panel search-hit" href="${x.href}">
-        <div class="t">${esc(x.title)} <span class="s">· ${esc(x.where)}</span></div>
-        <div class="s">${x.m.slice(0, 2).map(hl).join(" · ")}</div></a>`).join("") || `<div class="empty">Không tìm thấy.</div>`}`;
+      ${hits.map((x) => `<a class="panel search-hit" href="${x.href}"${x.gl ? ` data-gl="${esc(x.gl)}"` : ""}>
+        <div class="t"><span class="type-badge">${x.type}</span>${esc(x.title)} <span class="s">· ${esc(x.where)}</span></div>
+        <div class="s">${x.m.slice(0, 2).map(hl).join(" · ")}</div></a>`).join("") || `<div class="empty">Không tìm thấy “${esc(q)}”.<br>Thử từ khoá ngắn hơn hoặc tên tiếng Anh (vd. <a href="#/search/cache">cache</a>, <a href="#/search/kafka">kafka</a>), hoặc tra từ viết tắt ở <a href="#/glossary">Thuật ngữ</a>.</div>`}`;
   }
+
+  let glPrefill = "";
+  main.addEventListener("click", (e) => { const a = e.target.closest("[data-gl]"); if (a) glPrefill = a.dataset.gl; });
 
   // ── Router ──
   function route() {
+    render();
+    const h1 = main.querySelector("h1");
+    document.title = h1 ? `${h1.textContent} · Backend Knowledge` : "Backend Knowledge";
+  }
+  function render() {
     const h = decodeURIComponent(location.hash.slice(1) || "/");
     if (h.startsWith("/t/")) return viewTopic(h.slice(3));
-    if (h === "/learn") { location.hash = `#/t/${(ORDER.find((t) => !done.has(t.id)) || ORDER[0]).id}`; return; }
+    // replace: không để lại mục #/learn trong lịch sử, nếu không Back sẽ bị đẩy tới lại
+    if (h === "/learn") { location.replace(nextStep().href); return; }
     if (h === "/problems") return viewProblems();
     if (h.startsWith("/p/")) return viewProblem(h.slice(3));
     if (h === "/sims") return viewSims();
@@ -395,7 +571,11 @@
   $("#search").addEventListener("input", (e) => {
     clearTimeout(searchTimer);
     const v = e.target.value.trim();
-    searchTimer = setTimeout(() => { location.hash = v ? `#/search/${encodeURIComponent(v)}` : "#/"; }, 200);
+    searchTimer = setTimeout(() => {
+      const h = v ? `#/search/${encodeURIComponent(v)}` : "#/";
+      // Đang ở trang tìm kiếm thì thay mục lịch sử: Back đưa về trang trước khi tìm, không đi qua từng lần gõ
+      if (location.hash.startsWith("#/search/")) location.replace(h); else location.hash = h;
+    }, 200);
   });
 
   route();
