@@ -46,7 +46,7 @@ BK.topic({
     },
     {
       t: "**Data race nguy hiểm hơn \"sai một con số\"** — trong Go, chương trình có data race mất đảm bảo \"chạy như thể tuần tự\": compiler và CPU được phép sắp xếp lại truy cập bộ nhớ khi không có đồng bộ, nên một goroutine có thể thấy các lần ghi của goroutine khác theo thứ tự khác với thứ tự trong code.",
-      why: "Go memory model: chương trình **không** có data race chạy như thể mọi goroutine được ghép lên một processor (DRF-SC); có data race thì mất đảm bảo đó, và tài liệu khuyên \"Don't be clever\": chương trình sửa dữ liệu được nhiều goroutine truy cập đồng thời phải tuần tự hoá truy cập đó (https://go.dev/ref/mem). Visibility và reordering là bài `conc-memory-model` (sắp viết).",
+      why: "Go memory model: chương trình **không** có data race chạy như thể mọi goroutine được ghép lên một processor (DRF-SC); có data race thì mất đảm bảo đó, và tài liệu khuyên \"Don't be clever\": chương trình sửa dữ liệu được nhiều goroutine truy cập đồng thời phải tuần tự hoá truy cập đó (https://go.dev/ref/mem). Visibility và reordering là bài `conc-memory-model`.",
     },
     {
       t: "**Bốn cách loại bỏ** — (1) **atomic hoá** cả chuỗi bằng lock hoặc thao tác atomic; (2) **không chia sẻ**: mỗi dữ liệu chỉ một thread sở hữu, gửi việc qua queue/channel; (3) **bất biến**: dữ liệu không đổi thì đọc thoải mái; (4) **đẩy xuống nơi có atomic**: DB, Redis.",
