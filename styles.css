@@ -171,8 +171,6 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   #search { order: 5; flex: 1 1 100%; margin-left: 0; }
   .face { padding: 28px 20px; }
   .nc-btns .btn { flex: 1 1 100%; }
-  .rm-part { grid-template-columns: 1fr; gap: 4px; }
-  .t-crumb.has-part .cr-long { display: none; } .t-crumb.has-part .cr-short { display: inline; }
   .pager { flex-direction: column; }
   .pager a { max-width: none; }
   .face .q { font-size: 18px; }
@@ -412,6 +410,10 @@ a.need-chip:hover { border-color: var(--accent); }
 .t-crumb > span { white-space: nowrap; }
 .cr-part { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .cr-short { display: none; }
+@media (max-width: 860px) { /* đặt sau luật desktop để thắng thứ tự */
+  .rm-part { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .t-crumb.has-part .cr-long { display: none; } .t-crumb.has-part .cr-short { display: inline; }
+}
 .practice-hint { margin: 10px 0 0; font-size: 14px; border-left: 3px solid var(--fix); }
 
 /* Kafka consumer group */
