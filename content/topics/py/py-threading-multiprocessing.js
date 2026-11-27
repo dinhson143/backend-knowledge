@@ -57,7 +57,7 @@ BK.topic({
       },
       {
         cells: ["`fork`", "`os.fork()` sao chép process cha, con có sẵn mọi thứ cha đang có", "Linux và POSIX khác **tới 3.13**; từ 3.14 không còn là mặc định ở đâu", "Không an toàn khi process cha có nhiều thread: từ 3.12 `os.fork()` cảnh báo `DeprecationWarning` khi phát hiện điều đó"],
-        why: "Docs: \"safely forking a multithreaded process is problematic\" (https://docs.python.org/3/library/multiprocessing.html). Cơ chế: `fork` chỉ chép thread gọi nó; lock mà thread khác đang giữ lúc fork nằm trong con ở trạng thái đã khoá và không ai mở (bài Process Lifecycle nói về `fork`). Muốn dùng `fork` từ 3.14 phải chọn tường minh qua `get_context(\"fork\")`.",
+        why: "Docs: \"safely forking a multithreaded process is problematic\" (https://docs.python.org/3/library/multiprocessing.html). Cơ chế: `fork` chỉ chép thread gọi nó; lock mà thread khác đang giữ lúc fork nằm trong con ở trạng thái đã khoá và không ai mở (bài Process: fork, exec, zombie). Muốn dùng `fork` từ 3.14 phải chọn tường minh qua `get_context(\"fork\")`.",
       },
       {
         cells: ["`forkserver`", "Một server process đơn thread được dựng trước; mỗi lần cần process mới thì server fork ra", "POSIX hỗ trợ truyền fd qua Unix pipe (Linux…) **từ 3.14**", "Như `spawn`: cần pickle và guard `__main__`; từ 3.15.1 tự lùi về `spawn` khi không có thư mục tạm ghi được"],

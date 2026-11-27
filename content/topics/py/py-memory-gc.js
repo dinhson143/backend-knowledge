@@ -52,7 +52,7 @@ BK.topic({
     },
     {
       t: "**`gc.freeze()` trước khi `fork`** — server pre-fork (nạp app trong process cha rồi fork worker) nên `gc.disable()` sớm ở process cha, `gc.freeze()` ngay trước `fork()`, rồi `gc.enable()` trong process con. Object đã freeze nằm ở thế hệ \"permanent\" và GC bỏ qua chúng.",
-      why: "Đây là khuyến nghị nguyên văn của docs `gc`: mục tiêu là tránh \"unnecessary copy-on-write in child processes\", bằng cách không để GC ở process con chạm vào bộ đếm `gc_refs` của object sống lâu từ process cha (https://docs.python.org/3/library/gc.html). Sau `fork`, cha và con dùng chung trang nhớ cho tới khi một bên ghi (bài Virtual Memory); GC ghi vào header của object là trang đó bị chép riêng cho từng worker.",
+      why: "Đây là khuyến nghị nguyên văn của docs `gc`: mục tiêu là tránh \"unnecessary copy-on-write in child processes\", bằng cách không để GC ở process con chạm vào bộ đếm `gc_refs` của object sống lâu từ process cha (https://docs.python.org/3/library/gc.html). Sau `fork`, cha và con dùng chung trang nhớ cho tới khi một bên ghi (bài Virtual Memory & Paging); GC ghi vào header của object là trang đó bị chép riêng cho từng worker.",
     },
     {
       t: "**`gc.disable()` chỉ an toàn khi chắc chắn không tạo vòng.** Exception bắt vào biến cục bộ là nguồn vòng hay gặp: frame giữ exception, exception giữ traceback, traceback giữ frame. Python tự `del` biến trong `except E as e:` khi ra khỏi khối, nhưng nếu bạn gán `self.last_error = e` thì vòng sống tiếp.",
