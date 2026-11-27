@@ -52,6 +52,7 @@ window.ROADMAP = [
     parts: [
       { id: "cs.process", title: "Process, Thread & Memory", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
       { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
+      { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,

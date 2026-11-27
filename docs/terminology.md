@@ -115,7 +115,10 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Garbage Collection | garbage collection, GC (glossary) | runtime tự dọn bộ nhớ không còn dùng | "Thu gom rác" | `code-memory-gc` (sắp viết) |
 | Concurrency | concurrency; race condition, deadlock | nhiều việc tiến triển xen kẽ, không nhất thiết cùng lúc | "Xử lý đồng thời", "Lập trình đồng thời", "Tương tranh" | `concurrency` |
 | Parallelism | parallelism | nhiều việc chạy cùng lúc thật trên nhiều core | "Xử lý song song", "Song song" | `conc-parallelism-amdahl` (sắp viết) |
-| Async Programming | async/await, event loop, coroutine, Promise | viết code không chặn thread khi chờ I/O | "Lập trình bất đồng bộ", "Bất đồng bộ" | `async-event-loop` (sắp viết) |
+| Async Programming | async/await, event loop, coroutine, Promise | viết code không chặn thread khi chờ I/O | "Lập trình bất đồng bộ", "Bất đồng bộ" | `async-event-loop` |
+| Event Loop | event loop; task queue, microtask | vòng lặp trên một thread: chờ I/O sẵn sàng rồi chạy lần lượt từng callback/task | "Vòng lặp sự kiện" | `async-event-loop` |
+| Coroutine | coroutine; suspend, resume; goroutine, virtual thread (họ hàng) | hàm tạm dừng được ở điểm `await` rồi chạy tiếp, không giữ thread khi chờ | "Đồng thủ tục", "Hàm cộng tác" | `async-coroutine` |
+| Cancellation / Timeout / Deadline | cancellation, timeout (khoảng thời gian), deadline (mốc thời gian) | huỷ việc đang chạy; giới hạn thời gian chờ và truyền nó xuống các lời gọi con | "Hạn chót", "Thời hạn chờ" | `async-cancellation-timeout` |
 | Deadlock | deadlock; lock ordering | các bên chờ nhau vòng tròn, không ai chạy tiếp | "Bế tắc", "Khoá chết" | `concurrency` |
 | Thread-safe | thread-safe (gạch nối) | dùng từ nhiều thread mà không sai | "An toàn luồng" | `concurrency` |
 | **LLD & kiến trúc** | | | | |
