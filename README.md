@@ -2,7 +2,7 @@
 
 Xem trực tiếp: **https://dinhson143.github.io/backend-knowledge/**
 
-Lộ trình ôn System Design và Backend theo khung Hello Interview: 5 giai đoạn, 39 chủ đề, 13 bài luyện có HLD chạy trực tiếp, kèm Kafka/Redis chi tiết, ECS vs EKS, kiến trúc phần mềm (Layered, Hexagonal, Onion, Clean) và phương pháp (TDD, BDD, DDD). Mỗi ý có phần "vì sao", mỗi bước mô phỏng có giải thích "chuyện gì xảy ra".
+Lộ trình ôn phỏng vấn Backend theo khung Hello Interview: lộ trình chính 5 giai đoạn System Design (kèm bài luyện có HLD chạy trực tiếp) và các nhánh song song: Nền tảng CS (process, thread, bộ nhớ, mạng), Kỹ năng viết code, Behavioral, Container & Kubernetes, Vận hành production, Low-Level Design, kiến trúc phần mềm và DSA. Mỗi ý có phần "vì sao", mỗi bước mô phỏng có giải thích "chuyện gì xảy ra". Số chủ đề tăng dần theo các đợt viết trong `docs/proposals/product-learning-flow.md`.
 
 ## Chạy local
 

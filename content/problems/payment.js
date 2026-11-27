@@ -4,7 +4,7 @@ BK.problem({
   title: "Payment System",
   hi: "payment-system",
   summary: "Không bao giờ trừ tiền hai lần, không mất giao dịch, và biết chắc kết quả kể cả khi gọi ra ngoài bị timeout.",
-  topics: ["patterns", "core-db", "api-design"],
+  topics: ["patterns", "core-db", "api-design", "idempotency", "outbox-cdc", "durable-execution"],
   fr: [
     "Merchant tạo payment intent",
     "Khách thanh toán bằng thẻ",

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Máy trạng thái circuit breaker: closed, open, half-open và điều kiện chuyển giữa chúng</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d64545"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#14a37f"/></marker>
+    <style>
+      .st { fill: #fff; stroke-width: 2; }
+      .hc { font-size: 15px; font-weight: 700; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lr { font-size: 12px; font-weight: 600; fill: #b42318; }
+      .lo { font-size: 12px; font-weight: 600; fill: #b45309; }
+      .lg { font-size: 12px; font-weight: 600; fill: #0f7a5f; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="398" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Closed -->
+  <rect class="st" x="24" y="30" width="230" height="104" rx="14" style="stroke:#14a37f;fill:#f0faf6"/>
+  <text class="hc" x="139" y="56" style="fill:#0f7a5f">Closed</text>
+  <text class="c" x="139" y="78">request đi qua tới phụ thuộc</text>
+  <text class="sc" x="139" y="98">đếm lỗi gần đây; bộ đếm tự reset</text>
+  <text class="sc" x="139" y="114">theo chu kỳ, lỗi lẻ tẻ không làm mở</text>
+
+  <!-- Open -->
+  <rect class="st" x="506" y="30" width="230" height="104" rx="14" style="stroke:#d64545;fill:#fdf1f0"/>
+  <text class="hc" x="621" y="56" style="fill:#b42318">Open</text>
+  <text class="c" x="621" y="78">trả lỗi ngay, không gọi phụ thuộc</text>
+  <text class="sc" x="621" y="98">có thể trả giá trị mặc định (fallback)</text>
+  <text class="sc" x="621" y="114">timer đang chạy</text>
+
+  <!-- Half-open -->
+  <rect class="st" x="265" y="250" width="230" height="104" rx="14" style="stroke:#e08a00;fill:#fff8ea"/>
+  <text class="hc" x="380" y="276" style="fill:#b45309">Half-open</text>
+  <text class="c" x="380" y="298">cho một số ít request đi thử</text>
+  <text class="sc" x="380" y="318">đếm số lần thành công liên tiếp</text>
+  <text class="sc" x="380" y="334">để phụ thuộc vừa hồi phục không bị dồn tải</text>
+
+  <!-- Closed → Open -->
+  <path d="M254,62 L504,62" stroke="#d64545" stroke-width="1.8" marker-end="url(#r)"/>
+  <text class="lr" x="379" y="52" text-anchor="middle">số lỗi trong khoảng thời gian vượt ngưỡng</text>
+  <text class="s" x="379" y="82" text-anchor="middle">→ bật timer</text>
+
+  <!-- Open → Half-open -->
+  <path d="M640,134 C640,210 560,262 497,278" stroke="#e08a00" stroke-width="1.8" fill="none" marker-end="url(#o)"/>
+  <text class="lo" x="588" y="200" text-anchor="end">hết timer (timeout)</text>
+
+  <!-- Half-open → Open -->
+  <path d="M495,322 C600,322 700,240 700,136" stroke="#d64545" stroke-width="1.8" fill="none" marker-end="url(#r)"/>
+  <text class="lr" x="560" y="350">một request thử lỗi</text>
+  <text class="s" x="560" y="366">→ bật lại timer</text>
+
+  <!-- Half-open → Closed -->
+  <path d="M265,300 C150,300 120,220 120,136" stroke="#14a37f" stroke-width="1.8" fill="none" marker-end="url(#g)"/>
+  <text class="lg" x="150" y="184">đủ số lần thành công liên tiếp</text>
+  <text class="s" x="150" y="202">→ reset bộ đếm lỗi</text>
+
+  <text class="s" x="20" y="388">Retry đặt ngoài breaker phải dừng khi breaker báo lỗi không tạm thời (đang open).</text>
+</svg>

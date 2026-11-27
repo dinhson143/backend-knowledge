@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Không gian địa chỉ của một process: text, data/bss, heap mọc lên, vùng mmap cho thư viện và stack thread phụ, stack mọc xuống, kernel space ở trên; đối chiếu với các dòng /proc/pid/maps</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <style>
+      .ker { fill: #e2e8f0; stroke: #64748b; stroke-width: 1.2; }
+      .stk { fill: #e8f0fe; stroke: #3b7ff5; stroke-width: 1.4; }
+      .mm { fill: #f3e8ff; stroke: #9333ea; stroke-width: 1.2; }
+      .hp { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.4; }
+      .dat { fill: #fff3db; stroke: #e08a00; stroke-width: 1.2; }
+      .txt { fill: #fde8e8; stroke: #dc2626; stroke-width: 1.2; }
+      .free { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; stroke-dasharray: 4 4; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .n { font-size: 13px; font-weight: 650; fill: #1f2937; }
+      .sc { font-size: 11.5px; fill: #475569; }
+      .ax { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="438" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="h" x="20" y="30">Không gian địa chỉ ảo của một process</text>
+
+  <!-- Trục địa chỉ -->
+  <text class="ax" x="34" y="56">cao</text>
+  <path d="M34,350 L34,64" stroke="#94a3b8" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+  <text class="ax" x="34" y="368">thấp</text>
+
+  <!-- Các vùng, địa chỉ cao ở trên -->
+  <rect class="ker" x="52" y="44" width="200" height="40" rx="5"/>
+  <text class="n" x="62" y="61">Kernel space</text>
+  <text class="sc" x="62" y="77">user mode không đụng được</text>
+
+  <rect class="stk" x="52" y="92" width="200" height="40" rx="5"/>
+  <text class="n" x="62" y="109">Stack (thread chính)</text>
+  <text class="sc" x="62" y="125">frame hàm, mọc xuống ↓</text>
+  <rect class="free" x="52" y="132" width="200" height="24"/>
+
+  <rect class="mm" x="52" y="156" width="200" height="74" rx="5"/>
+  <text class="n" x="62" y="174">Vùng mmap</text>
+  <text class="sc" x="62" y="191">thư viện .so (libc, ld)</text>
+  <text class="sc" x="62" y="206">stack của thread phụ</text>
+  <text class="sc" x="62" y="221">file map, khối malloc lớn</text>
+  <rect class="free" x="52" y="230" width="200" height="34"/>
+  <text class="ax" x="152" y="252">trống (chưa cần khung)</text>
+
+  <rect class="hp" x="52" y="264" width="200" height="40" rx="5"/>
+  <text class="n" x="62" y="281">Heap</text>
+  <text class="sc" x="62" y="297">malloc / new, mọc lên ↑</text>
+
+  <rect class="dat" x="52" y="308" width="200" height="22" rx="5"/>
+  <text class="n" x="62" y="324">Data / BSS: biến global</text>
+  <rect class="txt" x="52" y="334" width="200" height="22" rx="5"/>
+  <text class="n" x="62" y="350">Text: mã máy</text>
+
+  <!-- /proc/<pid>/maps -->
+  <rect class="grp" x="290" y="44" width="450" height="312" rx="12"/>
+  <text class="h" x="304" y="66">cat /proc/&lt;pid&gt;/maps (trích)</text>
+  <text class="s" x="304" y="84">địa chỉ · quyền · file; bỏ cột offset, dev, inode; xếp ngược để khớp hình</text>
+  <text class="code" x="304" y="116">7fffb2c0d000-7fffb2c2e000 rw-p [stack]</text>
+  <text class="code" x="304" y="180">35b1c00000-35b1dac000 r-xp …/libc-2.15.so</text>
+  <text class="code" x="304" y="200">35b1800000-35b1820000 r-xp …/ld-2.15.so</text>
+  <text class="s" x="304" y="220">stack thread phụ: dòng không tên (mmap ẩn danh)</text>
+  <text class="code" x="304" y="288">00e03000-00e24000 rw-p [heap]</text>
+  <text class="code" x="304" y="323">00652000-00655000 rw-p /usr/bin/dbus-daemon</text>
+  <text class="code" x="304" y="349">00400000-00452000 r-xp /usr/bin/dbus-daemon</text>
+
+  <g stroke="#3b7ff5" stroke-width="1.2" fill="none" stroke-dasharray="3 3">
+    <path d="M252,112 L298,112"/>
+    <path d="M252,190 L298,190"/>
+    <path d="M252,284 L298,284"/>
+    <path d="M252,319 L298,319"/>
+    <path d="M252,345 L298,345"/>
+  </g>
+
+  <text class="t" x="20" y="392">r-xp: đọc + thực thi, private (copy-on-write); rw-p: đọc + ghi. Kernel space chỉ vào được qua trap.</text>
+  <text class="t" x="20" y="412"><tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12.5px">int *p = malloc(4);</tspan> biến p nằm trên stack, 4 byte nó trỏ tới nằm trên heap.</text>
+  <text class="s" x="20" y="430">Dòng maps lấy từ ví dụ trong proc_pid_maps(5); vị trí vùng theo OSTEP (Address Spaces, Linux VM).</text>
+</svg>

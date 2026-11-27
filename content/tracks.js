@@ -14,7 +14,11 @@ BK.section({ id: "lld-patterns", track: "lld", title: "Design Patterns" });
 BK.section({ id: "lld-concurrency", track: "lld", title: "Concurrency" });
 BK.section({ id: "lld-problems", track: "lld", title: "Problem Breakdowns" });
 
+BK.track({ id: "beh", title: "Behavioral", subtitle: "STAR · câu hỏi hay gặp · kể sâu dự án" });
+BK.section({ id: "beh-stories", track: "beh", title: "Câu chuyện của bạn" });
+
 BK.track({ id: "cloud", title: "Container trên AWS", subtitle: "ECS · EKS · Fargate" });
+BK.section({ id: "cloud-k8s", track: "cloud", title: "Container & Kubernetes" });
 BK.section({ id: "cloud-containers", track: "cloud", title: "ECS & EKS" });
 
 BK.track({
@@ -28,3 +32,10 @@ BK.track({ id: "dsa", title: "Coding · DSA", subtitle: "Algorithms & Data Struc
 BK.section({ id: "dsa-complexity", track: "dsa", title: "Complexity" });
 BK.section({ id: "dsa-ds", track: "dsa", title: "Data Structures" });
 BK.section({ id: "dsa-algo", track: "dsa", title: "Algorithms" });
+
+BK.track({ id: "cs", title: "Nền tảng CS", subtitle: "Process · Thread · Bộ nhớ · I/O · Concurrency" });
+BK.section({ id: "cs-os", track: "cs", title: "Hệ điều hành" });
+BK.section({ id: "cs-net", track: "cs", title: "Mạng máy tính" });
+
+BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding · Code sạch · Kiểm thử" });
+BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });

@@ -1,7 +1,7 @@
 BK.sim({
   id: "isolation",
-  title: "Isolation levels: dirty read, non-repeatable read và snapshot",
-  topics: ["core-db"],
+  title: "Isolation levels: dirty read, lost update, write skew",
+  topics: ["core-db", "db-isolation-anomalies"],
   scenario: "Hai transaction cùng đụng vào số dư tài khoản 100.",
   context: "**Isolation level** quyết định một transaction thấy gì từ thay đổi của transaction khác: thay đổi chưa commit, thay đổi đã commit giữa chừng, hay chỉ một snapshot cố định. Hai transaction **T1** và **T2** chạy đồng thời trên cùng row `balance=100`; mỗi variant là một level và anomaly mà nó cho phép hoặc chặn. Theo dõi dòng dưới T1 (T1 đã đọc được gì) so với dòng dưới Database (giá trị thật đang có).",
   nodes: [
@@ -86,6 +86,60 @@ BK.sim({
           good: ["T1"],
           lesson: "Repeatable Read (mặc định MySQL) chặn non-repeatable read nhờ MVCC snapshot.",
           detail: "T1 đọc lại vẫn thấy 100 — nhất quán trong suốt transaction. DB chọn phiên bản row nhìn thấy được từ snapshot của T1, tức bản 100, vì T2 commit sau thời điểm snapshot. Lưu ý: 100 đã là dữ liệu cũ so với DB thật. Nếu T1 tiếp tục `UPDATE` row này dựa trên số 100, PostgreSQL báo lỗi serialization và buộc retry, còn MySQL ghi lên bản mới nhất (UPDATE đọc bản hiện tại) — tính sai ở tầng app vẫn có thể gây **lost update** nếu không dùng `SELECT … FOR UPDATE`. Repeatable Read là mặc định của MySQL InnoDB.",
+        },
+      ],
+    },
+    {
+      name: "Lost update",
+      steps: [
+        {
+          note: "Read Committed. T1 và T2 cùng **đọc** số dư 100 để trừ tiền ở tầng app.",
+          msgs: [["T1", "db", "SELECT balance"], ["db", "T1", "100", "ok"], ["T2", "db", "SELECT balance"], ["db", "T2", "100", "ok"]],
+          set: { T1: "đọc 100", T2: "đọc 100" },
+          detail: "Hai request rút tiền chạy song song, mỗi request mở một transaction ở **Read Committed** (mặc định PostgreSQL). Cả hai `SELECT` đều thấy 100 vì chưa ai ghi. Code app sẽ tính số dư mới **trong bộ nhớ**: T1 rút 30, T2 rút 50.",
+        },
+        {
+          note: "T1 ghi `balance = 70` (100 − 30) và COMMIT.",
+          msgs: [["T1", "db", "UPDATE balance=70; COMMIT"]],
+          set: { db: "balance=70" },
+          detail: "T1 ghi **giá trị tuyệt đối** 70 tính từ lần đọc của nó, rồi commit.",
+        },
+        {
+          note: "T2 ghi `balance = 50` (100 − 50) và COMMIT → đè mất lần trừ của T1.",
+          msgs: [["T2", "db", "UPDATE balance=50; COMMIT", "warn"]],
+          set: { db: "balance=50 ❌ (đúng phải là 20)" },
+          bad: ["db"],
+          lesson: "Lost update: đọc–sửa–ghi ở tầng app, hai transaction ghi đè nhau. Read Committed không chặn.",
+          detail: "T2 không biết T1 đã ghi, nên ghi 50 tính từ số 100 cũ. Kết quả 50 thay vì 20: lần rút 30 của T1 **biến mất**, không có lỗi nào. Chữa: ghi tương đối `UPDATE … SET balance = balance - 50` (DB tính trên bản mới nhất); khoá dòng khi đọc bằng `SELECT … FOR UPDATE`; optimistic lock `WHERE version = …`; hoặc ở PostgreSQL dùng Repeatable Read, nơi T2 nhận lỗi `could not serialize access due to concurrent update` và phải retry.",
+        },
+      ],
+    },
+    {
+      name: "Write skew",
+      nodes: [
+        { id: "T1", x: 120, y: 65, label: "T1: Alice nghỉ" },
+        { id: "db", x: 470, y: 145, label: "Database", w: 190, s: "trực: Alice, Bob" },
+        { id: "T2", x: 120, y: 225, label: "T2: Bob nghỉ" },
+      ],
+      steps: [
+        {
+          note: "Repeatable Read (snapshot). Luật: luôn phải có ≥ 1 bác sĩ trực. Cả hai cùng kiểm tra.",
+          msgs: [["T1", "db", "SELECT count(*) trực"], ["db", "T1", "2", "ok"], ["T2", "db", "SELECT count(*) trực"], ["db", "T2", "2", "ok"]],
+          set: { T1: "thấy 2 người trực", T2: "thấy 2 người trực" },
+          detail: "Alice và Bob cùng bấm \"xin nghỉ\" gần như cùng lúc. Mỗi transaction kiểm tra luật \"sau khi tôi nghỉ vẫn còn ít nhất 1 người\": đếm thấy 2, nên được phép. Hai snapshot đều thấy trạng thái trước khi ai đổi gì.",
+        },
+        {
+          note: "T1 bỏ Alice khỏi ca, T2 bỏ Bob khỏi ca: **hai dòng khác nhau**.",
+          msgs: [["T1", "db", "UPDATE Alice off; COMMIT"], ["T2", "db", "UPDATE Bob off; COMMIT", "warn"]],
+          set: { db: "trực: (không ai) ❌" },
+          bad: ["db"],
+          detail: "T1 sửa dòng của Alice, T2 sửa dòng của Bob. Không ai ghi đè dòng của ai, nên Repeatable Read không thấy xung đột ghi–ghi và cho cả hai commit. Đây khác lost update: lost update là hai ghi trên **cùng** một dòng.",
+        },
+        {
+          note: "Mỗi transaction đúng khi chạy riêng, chạy song song thì vi phạm luật.",
+          bad: ["T1", "T2"],
+          lesson: "Write skew: hai transaction đọc chung một điều kiện rồi ghi vào hai dòng khác nhau. Snapshot isolation không chặn; cần Serializable hoặc khoá tường minh.",
+          detail: "Ca trực không còn ai: kết quả không trùng với bất kỳ thứ tự chạy lần lượt nào (chạy lần lượt thì người thứ hai sẽ đếm thấy 1 và bị từ chối). PostgreSQL gọi đây là **serialization anomaly**, và chỉ Serializable chặn được: nó theo dõi phụ thuộc đọc–ghi và huỷ một transaction với lỗi serialization (SQLSTATE `40001`), app phải retry. Ở level thấp hơn, khoá các dòng mà điều kiện đọc bằng `SELECT … FOR UPDATE`, hoặc biến điều kiện thành constraint của DB.",
         },
       ],
     },

@@ -1,7 +1,7 @@
 BK.sim({
   id: "replica-lag",
   title: "Read replica và replication lag",
-  topics: ["patterns", "cap"],
+  topics: ["patterns", "cap", "replication"],
   scenario: "User đổi tên rồi reload trang ngay. Lần đọc rơi vào replica đang trễ 2 giây.",
   context: "**Replication lag** là khoảng thời gian replica chậm hơn primary — ở đây ~2 giây. Hệ có một **Primary DB** nhận mọi lệnh ghi và một **Read Replica** nhận bản sao qua replication **bất đồng bộ** (primary commit xong là trả lời, rồi mới gửi WAL/binlog sang replica). App route đọc sang replica để giảm tải cho primary. Theo dõi dòng `name=` dưới hai DB và xem request đọc đi vào DB nào.",
   nodes: [

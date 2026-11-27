@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Ba cách giữ trạng thái của một quy trình nhiều bước: queue cộng bảng trạng thái cộng cron, saga choreography qua event, workflow engine với event history và replay</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .ev { fill: #ffffff; stroke: #cbd5e1; }
+      .done { fill: #e4f5ef; stroke: #14a37f; }
+      .bad { fill: #fdecea; stroke: #d64545; stroke-dasharray: 5 3; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .lb { font-size: 11.5px; font-weight: 600; fill: #1d4ed8; }
+      .lr { font-size: 11.5px; fill: #b42318; }
+      .lg { font-size: 11.5px; fill: #0f7a5f; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; fill: #1f2937; }
+      .codec { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; fill: #1f2937; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="418" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="t" x="20" y="26">Cùng một quy trình: trừ tiền → giữ hàng → chờ khách xác nhận 7 ngày. Worker chết sau bước trừ tiền.</text>
+
+  <!-- 1. Queue + bảng + cron -->
+  <rect class="grp" x="16" y="38" width="216" height="372" rx="12"/>
+  <text class="hc" x="124" y="60">Queue + bảng + cron</text>
+  <text class="sc" x="124" y="77">trạng thái: cột orders.status</text>
+  <rect class="box" x="28" y="88" width="192" height="30" rx="7"/>
+  <text class="c" x="124" y="107">Queue: mỗi bước một message</text>
+  <path d="M124,118 L124,134" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="box" x="28" y="136" width="192" height="30" rx="7"/>
+  <text class="c" x="124" y="155">Worker làm bước, ghi status</text>
+  <path d="M124,166 L124,182" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="box" x="28" y="184" width="192" height="70" rx="7"/>
+  <text class="codec" x="124" y="202">orders</text>
+  <rect class="ev" x="40" y="210" width="168" height="18" rx="3"/><text class="code" x="48" y="223">42 · PAID</text>
+  <rect class="ev" x="40" y="230" width="168" height="18" rx="3"/><text class="code" x="48" y="243">43 · WAITING_CONFIRM</text>
+  <path d="M124,276 L124,256" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="box" x="28" y="278" width="192" height="30" rx="7"/>
+  <text class="c" x="124" y="297">cron quét đơn quá hạn</text>
+  <text class="lr" x="28" y="332">Worker chết: đơn 42 kẹt ở PAID,</text>
+  <text class="lr" x="28" y="348">cần code khôi phục viết tay.</text>
+  <text class="s" x="28" y="374">Hợp: 2–3 bước, ít nhánh.</text>
+  <text class="s" x="28" y="392">Mỗi bước thêm một trạng thái.</text>
+
+  <!-- 2. Saga choreography -->
+  <rect class="grp" x="240" y="38" width="216" height="372" rx="12"/>
+  <text class="hc" x="348" y="60">Saga choreography</text>
+  <text class="sc" x="348" y="77">trạng thái: rải ở từng service</text>
+  <rect class="box" x="252" y="88" width="192" height="34" rx="7"/>
+  <text class="c" x="348" y="110">Payment · DB riêng</text>
+  <path d="M300,122 L300,158" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <text class="code" x="310" y="144">PaymentDone</text>
+  <rect class="box" x="252" y="160" width="192" height="34" rx="7"/>
+  <text class="c" x="348" y="182">Inventory · DB riêng</text>
+  <path d="M300,194 L300,230" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <text class="code" x="310" y="216">StockReserved</text>
+  <rect class="box" x="252" y="232" width="192" height="34" rx="7"/>
+  <text class="c" x="348" y="254">Shipping · DB riêng</text>
+  <rect class="bad" x="252" y="280" width="192" height="30" rx="7"/>
+  <text class="sc" x="348" y="299" style="fill:#b42318">đơn 42 đang ở bước nào?</text>
+  <text class="lr" x="252" y="332">Không chỗ nào giữ toàn bộ luồng;</text>
+  <text class="lr" x="252" y="348">debug phải ghép event nhiều service.</text>
+  <text class="s" x="252" y="374">Hợp: ít bước, service độc lập.</text>
+  <text class="s" x="252" y="392">Mỗi service cần outbox để phát event.</text>
+
+  <!-- 3. Workflow engine -->
+  <rect class="grp" x="464" y="38" width="280" height="372" rx="12" style="stroke:#3b7ff5;stroke-width:1.4"/>
+  <text class="hc" x="604" y="60">Workflow engine</text>
+  <text class="sc" x="604" y="77">trạng thái: event history của workflow</text>
+  <rect class="done" x="476" y="88" width="256" height="20" rx="3"/><text class="code" x="484" y="102">WorkflowExecutionStarted</text>
+  <rect class="done" x="476" y="110" width="256" height="20" rx="3"/><text class="code" x="484" y="124">ActivityTaskScheduled · charge</text>
+  <rect class="done" x="476" y="132" width="256" height="20" rx="3"/><text class="code" x="484" y="146">ActivityTaskCompleted · charge</text>
+  <rect class="bad" x="476" y="156" width="256" height="20" rx="3"/><text class="sc" x="604" y="170" style="fill:#b42318">worker 1 chết</text>
+  <text class="lb" x="476" y="194">worker 2 replay code từ đầu:</text>
+  <text class="s" x="476" y="210">charge đã có kết quả trong history → không</text>
+  <text class="s" x="476" y="226">gọi lại PSP, code chạy tiếp tới reserve</text>
+  <rect class="ev" x="476" y="236" width="256" height="20" rx="3"/><text class="code" x="484" y="250">ActivityTaskScheduled · reserve</text>
+  <rect class="ev" x="476" y="258" width="256" height="20" rx="3"/><text class="code" x="484" y="272">ActivityTaskCompleted · reserve</text>
+  <rect class="ev" x="476" y="280" width="256" height="20" rx="3"/><text class="code" x="484" y="294">TimerStarted · 7 ngày</text>
+  <rect class="ev" x="476" y="302" width="256" height="20" rx="3"/><text class="code" x="484" y="316">TimerFired</text>
+  <text class="lg" x="476" y="342">Chờ 7 ngày là timer bền, không giữ thread.</text>
+  <text class="s" x="476" y="374">Hợp: nhiều bước, chờ lâu, cần bù và audit.</text>
+  <text class="s" x="476" y="392">Giá: code deterministic, versioning khi đổi.</text>
+</svg>

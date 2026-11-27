@@ -4,7 +4,7 @@ BK.problem({
   title: "News Feed (Facebook)",
   hi: "fb-news-feed",
   summary: "Đọc feed trong < 500ms cho 2 tỷ user; xử lý celebrity có hàng trăm triệu follower.",
-  topics: ["kafka", "patterns", "queue", "caching"],
+  topics: ["kafka", "patterns", "queue", "caching", "outbox-cdc"],
   fr: ["Đăng bài", "Follow người khác", "Xem feed (bài của người mình follow, mới nhất trước), phân trang"],
   nfr: [
     {

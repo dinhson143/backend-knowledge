@@ -4,7 +4,7 @@ BK.problem({
   title: "Ride Sharing (Uber)",
   hi: "uber",
   summary: "Ghi vị trí cực nhiều, tìm tài xế gần nhất, và không bao giờ gửi một tài xế cho hai chuyến cùng lúc.",
-  topics: ["redis", "patterns", "dist-lock", "caching"],
+  topics: ["redis", "patterns", "dist-lock", "caching", "durable-execution"],
   fr: ["Rider xem giá ước tính", "Rider đặt xe", "Ghép với tài xế gần nhất", "Tài xế nhận/từ chối và dẫn đường"],
   nfr: [
     {

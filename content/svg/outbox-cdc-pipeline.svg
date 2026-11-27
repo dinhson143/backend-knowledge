@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Outbox qua CDC: ghi bảng nghiệp vụ và bảng outbox trong một transaction, WAL, replication slot, Debezium Outbox Event Router, topic Kafka và các consumer</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .tx { fill: #eef4ff; stroke: #3b7ff5; stroke-width: 1.4; stroke-dasharray: 6 4; }
+      .new { fill: #fff3db; stroke: #e08a00; stroke-width: 1.4; }
+      .log { fill: #eef2f7; stroke: #94a3b8; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .lb { font-size: 11.5px; font-weight: 600; fill: #1d4ed8; }
+      .lo { font-size: 11.5px; fill: #b45309; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; }
+      .codec { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="418" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- PostgreSQL -->
+  <rect class="grp" x="16" y="16" width="282" height="314" rx="12"/>
+  <text class="h" x="30" y="38">PostgreSQL (primary)</text>
+  <rect class="tx" x="28" y="50" width="258" height="120" rx="9"/>
+  <text class="lb" x="40" y="67">BEGIN … COMMIT: cùng có hoặc cùng không</text>
+  <rect class="box" x="40" y="76" width="234" height="32" rx="6"/>
+  <text class="code" x="52" y="97">INSERT orders (id = 42)</text>
+  <rect class="new" x="40" y="114" width="234" height="46" rx="6"/>
+  <text class="code" x="52" y="133">INSERT outbox</text>
+  <text class="s" x="52" y="151">type OrderCreated · aggregateid 42</text>
+
+  <path d="M157,170 L157,194" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <text class="s" x="166" y="186">commit ghi vào WAL</text>
+  <text class="h" x="30" y="216">WAL</text>
+  <rect class="log" x="72" y="198" width="50" height="28" rx="4"/><text class="sc" x="97" y="216">…</text>
+  <rect class="log" x="126" y="198" width="50" height="28" rx="4"/><text class="sc" x="151" y="216">orders</text>
+  <rect class="new" x="180" y="198" width="50" height="28" rx="4"/><text class="sc" x="205" y="216" style="fill:#b45309">outbox</text>
+  <rect class="log" x="234" y="198" width="52" height="28" rx="4"/><text class="sc" x="260" y="216">COMMIT</text>
+
+  <path d="M157,226 L157,248" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="box" x="28" y="250" width="258" height="72" rx="9" style="stroke:#3b7ff5;stroke-width:1.6"/>
+  <text class="hc" x="157" y="268">Replication slot</text>
+  <text class="sc" x="157" y="285">giữ WAL tới khi bên đọc xác nhận xong</text>
+  <text class="sc" x="157" y="300">vị trí chỉ lưu bền ở checkpoint:</text>
+  <text class="sc" x="157" y="315">sau crash có thể gửi lại thay đổi gần đây</text>
+
+  <!-- Debezium -->
+  <path d="M286,286 L318,286" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="box" x="320" y="196" width="204" height="134" rx="10"/>
+  <text class="hc" x="422" y="216">Debezium</text>
+  <text class="sc" x="422" y="232">đọc slot bằng logical decoding</text>
+  <text class="lb" x="332" y="254">Outbox Event Router</text>
+  <text class="s" x="332" y="272">chỉ xử lý INSERT, bỏ DELETE</text>
+  <text class="s" x="332" y="290">aggregatetype → tên topic</text>
+  <text class="s" x="332" y="306">aggregateid → message key</text>
+  <text class="s" x="332" y="322">id → header (để dedupe)</text>
+
+  <!-- Kafka -->
+  <path d="M422,196 L422,154" stroke="#e08a00" stroke-width="1.6" marker-end="url(#o)"/>
+  <rect class="box" x="320" y="30" width="204" height="122" rx="10" style="stroke:#e08a00;stroke-width:1.6"/>
+  <text class="hc" x="422" y="51">Kafka</text>
+  <text class="codec" x="422" y="70">outbox.event.order</text>
+  <rect class="log" x="334" y="80" width="56" height="24" rx="4"/><text class="sc" x="362" y="96">P0</text>
+  <rect class="new" x="394" y="80" width="56" height="24" rx="4"/><text class="sc" x="422" y="96" style="fill:#b45309">P1 · 42</text>
+  <rect class="log" x="454" y="80" width="56" height="24" rx="4"/><text class="sc" x="482" y="96">P2</text>
+  <text class="sc" x="422" y="122">key 42: mọi event của đơn 42</text>
+  <text class="sc" x="422" y="138">vào cùng partition, giữ thứ tự</text>
+
+  <!-- Consumers -->
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M524,72 C538,72 536,54 550,54"/>
+    <path d="M524,92 C538,92 536,118 550,118"/>
+    <path d="M524,112 C540,112 534,182 550,182"/>
+  </g>
+  <rect class="box" x="552" y="30" width="190" height="48" rx="10"/>
+  <text class="hc" x="647" y="51">Search index</text>
+  <text class="sc" x="647" y="68">cập nhật Elasticsearch</text>
+  <rect class="box" x="552" y="94" width="190" height="48" rx="10"/>
+  <text class="hc" x="647" y="115">Cache</text>
+  <text class="sc" x="647" y="132">xoá key của đơn 42</text>
+  <rect class="box" x="552" y="158" width="190" height="48" rx="10"/>
+  <text class="hc" x="647" y="179">Inventory service</text>
+  <text class="sc" x="647" y="196">giữ hàng cho đơn 42</text>
+  <text class="s" x="552" y="232">Mỗi consumer dedupe theo header id</text>
+  <text class="s" x="552" y="248">(bảng processed_events hoặc upsert),</text>
+  <text class="s" x="552" y="264">vì event tới ít nhất một lần.</text>
+
+  <text class="t" x="20" y="358">Service chỉ ghi DB, không gọi Kafka: event đi ra nhờ đọc WAL, không cần truy vấn quét bảng outbox.</text>
+  <text class="s" x="20" y="380">Logical decoding cần wal_level = logical (hoặc replica kèm ít nhất một logical slot).</text>
+  <text class="s" x="20" y="400" style="fill:#b45309">Connector dừng lâu: slot giữ WAL không giới hạn (max_slot_wal_keep_size = -1 mặc định) → WAL dồn tới đầy đĩa primary.</text>
+</svg>

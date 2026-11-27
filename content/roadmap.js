@@ -23,19 +23,21 @@ window.ROADMAP = [
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
       { id: "s1.io", title: "Giao tiếp & cửa vào", topics: ["networking", "api-design", "lb-gateway-cdn"] },
-      { id: "s1.data", title: "Lưu & truy vấn dữ liệu", topics: ["data-modeling", "core-db", "indexing"] },
+      { id: "s1.data", title: "Lưu & truy vấn dữ liệu", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
     ] },
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ mức nhất quán.",
     parts: [
       { id: "s2.cache", title: "Đọc nhanh hơn với cache", topics: ["caching", "dist-cache"] },
       { id: "s2.split", title: "Chia dữ liệu ra nhiều máy", topics: ["sharding", "consistent-hashing"] },
-      { id: "s2.consistency", title: "Nhất quán & sao chép", topics: ["cap"] },
+      { id: "s2.consistency", title: "Nhất quán & sao chép", topics: ["cap", "replication"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
   { id: "s3", title: "Bất đồng bộ & phối hợp", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và chống tranh chấp giữa nhiều máy.",
     parts: [
       { id: "s3.async", title: "Hàng đợi & luồng sự kiện", topics: ["queue", "streams", "kafka"] },
+      { id: "s3.resilience", title: "Gọi nhau an toàn khi có lỗi", topics: ["resilience", "idempotency"] },
       { id: "s3.contention", title: "Tranh chấp tài nguyên", topics: ["dist-lock"] },
+      { id: "s3.workflow", title: "Quy trình nhiều bước đáng tin", topics: ["outbox-cdc", "durable-execution"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
@@ -48,11 +50,27 @@ window.ROADMAP = [
     ] },
   { id: "cs", title: "Nền tảng CS", goal: "Học xong bạn giải thích được process, thread, I/O và viết code chạy đồng thời không race, không deadlock.", parallel: true,
     parts: [
+      { id: "cs.process", title: "Process, thread & bộ nhớ", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
       { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
+      { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },
-  { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn chọn được nền chạy container cho một hệ thống trên AWS.", parallel: true,
+  { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [
+      { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication", "code-language-choice"] },
+    ] },
+  { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
+    parts: [
+      { id: "beh.stories", title: "Câu chuyện của bạn", topics: ["beh-star-stories", "beh-common-questions", "beh-project-deep-dive"] },
+    ] },
+  { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn giải thích được container, Kubernetes và chọn nền chạy container cho một hệ thống trên AWS.", parallel: true,
+    parts: [
+      { id: "cloud.basics", title: "Container cơ bản", topics: ["container-basics", "dockerfile"] },
+      { id: "cloud.k8s", title: "Kubernetes", topics: ["k8s-core"] },
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
+    ] },
+  { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa.", parallel: true,
+    parts: [
+      { id: "ops.observe", title: "Quan sát hệ thống", topics: ["observability"] },
     ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
     parts: [
