@@ -22,7 +22,7 @@ BK.topic({
         why: "Thread bị chặn trong syscall `read()` vẫn giữ nguyên stack và một chỗ trong scheduler của kernel. Khi thread chạy trở lại, kernel phải context switch (xem `os-context-switch`). Không có cách nào \"chờ\" rẻ hơn một thread trong mô hình này.",
       },
       {
-        cells: ["Event loop + callback", "Một callback đăng ký sẵn; dữ liệu nằm trong closure", "Node.js, Nginx, Redis, Python `asyncio` ở tầng thấp", "Một thread phục vụ rất nhiều kết nối; không có race giữa các callback (chỉ một cái chạy tại một thời điểm)", "Callback lồng nhau khó đọc; một callback chậm chặn tất cả"],
+        cells: ["Event loop + callback", "Một callback đăng ký sẵn; dữ liệu nằm trong closure", "Node.js, Nginx, Redis, Python `asyncio` ở tầng thấp", "Một thread phục vụ rất nhiều kết nối; không có race bên trong một callback (chỉ một cái chạy tại một thời điểm)", "Callback lồng nhau khó đọc; một callback chậm chặn tất cả"],
         why: "Event loop gom mọi socket vào một lần chờ của kernel: `epoll` \"theo dõi nhiều file descriptor để xem cái nào làm I/O được\" và \"scale tốt với số lượng lớn\" (epoll(7) — https://man7.org/linux/man-pages/man7/epoll.7.html). Node.js dùng một thread JavaScript và đẩy I/O xuống kernel khi có thể (https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick).",
       },
       {
@@ -30,8 +30,8 @@ BK.topic({
         why: "Coroutine là \"một phép tính tạm dừng được\" (Kotlin — https://kotlinlang.org/docs/coroutines-basics.html). Python, JS, Kotlin chạy coroutine trên event loop hoặc thread pool; Go và Java giấu luôn chữ `await`: goroutine \"được multiplex lên nhiều OS thread nên khi một cái chặn, ví dụ chờ I/O, các cái khác vẫn chạy\" (Effective Go — https://go.dev/doc/effective_go), virtual thread tự gỡ khỏi carrier thread khi chặn I/O (Oracle docs).",
       },
       {
-        cells: ["Actor", "Tin nhắn nằm trong hàng đợi (mailbox) của actor", "Erlang/Elixir process, Akka", "Không chia sẻ bộ nhớ nên không cần lock; lỗi cô lập trong từng actor", "Phải thiết kế tin nhắn; hàng đợi có thể đầy; khó gọi kiểu request/response"],
-        why: "Trong Erlang mọi giao tiếp giữa các process là gửi tín hiệu bất đồng bộ, và process lấy tin từ message queue của nó (https://www.erlang.org/doc/system/ref_man_processes.html). Mỗi actor chỉ xử lý một tin tại một thời điểm, nên trạng thái bên trong actor không bao giờ bị hai việc chạm cùng lúc. Chi tiết ở topic Actor Model (sắp viết).",
+        cells: ["Actor", "Tin nhắn nằm trong message queue của actor", "Erlang/Elixir process", "Giao tiếp bằng tin nhắn thay vì sửa chung một vùng nhớ, nên ít cần lock", "Phải thiết kế tin nhắn; hàng đợi có thể đầy; gọi kiểu request/response vòng hơn"],
+        why: "Trong Erlang mọi giao tiếp giữa các process là gửi tín hiệu bất đồng bộ, và process lấy tin từ message queue của nó bằng `receive` (https://www.erlang.org/doc/system/ref_man_processes.html). Trạng thái của actor chỉ do chính nó sửa khi xử lý tin, nên không có hai việc cùng ghi một biến. Chi tiết ở topic Actor Model (sắp viết).",
       },
     ],
   },
@@ -46,7 +46,7 @@ BK.topic({
     },
     {
       t: "**Cooperative và preemptive.** Thread của OS bị kernel giành CPU bất cứ lúc nào (preemptive). Callback và coroutine trên event loop chỉ nhường ở điểm `await` hoặc khi callback trả về (cooperative).",
-      why: "Cooperative nên không có race giữa hai điểm `await`: code chạy liền một mạch. Đổi lại, nếu một đoạn không bao giờ nhường (vòng lặp CPU dài, hàm blocking) thì mọi việc khác trên event loop phải đợi. Go runtime và JVM tự xử lý chỗ này cho goroutine/virtual thread nên lập trình viên ít thấy.",
+      why: "Cooperative nên không có race giữa hai điểm `await`: code chạy liền một mạch. Đổi lại, nếu một đoạn không bao giờ nhường (vòng lặp CPU dài, hàm blocking) thì mọi việc khác trên event loop phải đợi. Với goroutine và virtual thread, khi một việc chặn ở I/O thì runtime tự chạy việc khác (Go FAQ — https://go.dev/doc/faq#goroutines; Oracle virtual threads), nên không cần viết `await`.",
     },
     {
       t: "**Các mô hình hay trộn với nhau.** Node.js: một event loop + worker pool (thread pool của libuv) cho file system, `dns.lookup`, một số hàm `crypto`, `zlib`. Python: `asyncio` + `asyncio.to_thread`/`run_in_executor` cho code blocking. Server Go: goroutine-per-request trên một số ít OS thread.",
@@ -88,7 +88,7 @@ BK.topic({
     ["Vì sao thread-per-request khó phục vụ 10.000 kết nối chờ I/O?", "Mỗi kết nối chờ giữ một OS thread: tốn stack và mỗi lần chạy lại là một context switch của kernel; phần lớn thread chỉ ngủ."],
     ["Event loop có làm việc CPU-bound nhanh hơn không?", "Không. Nó chỉ tiết kiệm thời gian chờ; việc CPU-bound chạy trên event loop còn chặn mọi việc khác."],
     ["Cooperative scheduling nghĩa là gì?", "Việc đang chạy tự nhường (ở `await` hoặc khi callback trả về); không ai giành CPU giữa chừng. Đối lập với preemptive của OS thread."],
-    ["Actor tránh lock bằng cách nào?", "Không chia sẻ bộ nhớ; mỗi actor giữ trạng thái riêng và xử lý tin nhắn trong hàng đợi của mình lần lượt từng cái."],
+    ["Actor tránh lock bằng cách nào?", "Giao tiếp bằng tin nhắn bất đồng bộ thay vì sửa chung bộ nhớ; trạng thái của actor chỉ do chính nó sửa khi lấy tin từ message queue."],
     ["Virtual thread của Java làm request nhanh hơn không?", "Không. Theo tài liệu Oracle, chúng cho scale (throughput cao hơn) chứ không cho speed (latency thấp hơn)."],
   ],
 });

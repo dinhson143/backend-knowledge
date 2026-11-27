@@ -38,7 +38,7 @@ BK.topic({
     },
     {
       t: "**Queue đầy thì làm gì: chọn một trong bốn.** (1) **Chặn** bên gửi (`await put()`): đúng cho pipeline nội bộ. (2) **Từ chối** ngay (`put_nowait` → trả 429/503): đúng khi bên gửi là client bên ngoài. (3) **Bỏ** phần tử cũ hoặc mới: đúng cho dữ liệu chỉ cần bản mới nhất (metric, vị trí GPS). (4) **Tràn ra đĩa/broker**: khi không được mất dữ liệu.",
-      why: "Chặn truyền áp lực ngược lên trên tới tận nguồn; nhưng chặn một HTTP request thì chỉ dời việc xếp hàng vào socket backlog và làm client timeout. Từ chối sớm rẻ hơn để request chờ rồi timeout (cùng ý với load shedding ở `resilience`). Không chọn gì = queue vô hạn = chọn \"chết vì hết bộ nhớ\".",
+      why: "Chặn truyền backpressure lên trên tới tận nguồn; nhưng chặn một HTTP request thì chỉ dời việc xếp hàng vào socket backlog và làm client timeout. Từ chối sớm rẻ hơn để request chờ rồi timeout (cùng ý với load shedding ở `resilience`). Không chọn gì = queue vô hạn = chọn \"chết vì hết bộ nhớ\".",
     },
     {
       t: "**Đặt giới hạn ở đâu.** Ở chỗ tài nguyên khan hiếm: số kết nối tới DB (bằng cỡ pool), số lời gọi đồng thời tới API bên ngoài (theo rate limit của họ), số job CPU (bằng số core). Một semaphore cho mỗi tài nguyên, không phải một con số chung cho cả app.",
@@ -50,7 +50,7 @@ BK.topic({
     },
     {
       t: "**Backpressure ở mức hệ thống dùng cùng ý tưởng.** Kafka consumer tự `poll` theo nhịp của mình (pull); HTTP/2 và TCP có flow control theo window; API trả 429 kèm `Retry-After`. Code async của bạn là mắt xích cuối: nếu nó buffer vô hạn thì mọi cơ chế phía trên vô dụng.",
-      why: "Áp lực ngược chỉ có tác dụng nếu truyền được từ khâu chậm nhất về nguồn mà không bị một buffer vô hạn nào ở giữa \"nuốt\" mất. Reactive Streams nói rõ: lợi ích của xử lý bất đồng bộ mất đi nếu chính việc báo backpressure lại đồng bộ (https://www.reactive-streams.org/). Mức hệ thống xem `queue`.",
+      why: "Backpressure chỉ có tác dụng nếu truyền được từ khâu chậm nhất về nguồn mà không bị một buffer vô hạn nào ở giữa \"nuốt\" mất. Reactive Streams nói rõ: lợi ích của xử lý bất đồng bộ mất đi nếu chính việc báo backpressure lại đồng bộ (https://www.reactive-streams.org/). Mức hệ thống xem `queue`.",
     },
   ],
   sections: [

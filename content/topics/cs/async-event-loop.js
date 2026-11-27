@@ -33,11 +33,11 @@ BK.topic({
   },
   points: [
     {
-      t: "**Readiness, không phải kết quả.** Trên Linux, `epoll` báo \"socket này đọc được rồi\"; event loop tự gọi `read()` không chặn. Windows IOCP thì ngược lại: báo \"thao tác đã xong\". Hai kiểu này được thư viện (libuv, asyncio) giấu sau cùng một API.",
+      t: "**Readiness, không phải kết quả.** Trên Linux, `epoll` báo \"socket này đọc được rồi\"; event loop tự gọi `read()` không chặn. Mỗi hệ điều hành có cơ chế riêng (epoll trên Linux, kqueue trên macOS/BSD, IOCP trên Windows); thư viện như libuv chọn cơ chế tốt nhất của nền tảng và giấu sau cùng một API (https://docs.libuv.org/en/v1.x/design.html).",
       why: "Vì là readiness nên socket phải ở chế độ non-blocking: lỡ `read()` gặp lúc dữ liệu đã bị lấy hết thì trả `EAGAIN` thay vì chặn cả loop. epoll(7) khuyên dùng fd non-blocking với chế độ edge-triggered và chỉ chờ tiếp sau khi `read`/`write` trả `EAGAIN`.",
     },
     {
-      t: "**File thường không có readiness.** `epoll` không dùng được cho file trên đĩa, nên Node.js chạy file system API, `dns.lookup()`, một số hàm `crypto` và `zlib` trên **worker pool** (thread pool của libuv); asyncio thì bảo bạn tự dùng `run_in_executor`.",
+      t: "**File trên đĩa thì khác.** Không có cơ chế file I/O bất đồng bộ chung cho mọi nền tảng, nên libuv chạy thao tác file dạng blocking trong thread pool (https://docs.libuv.org/en/v1.x/design.html). Vì vậy Node.js chạy file system API, `dns.lookup()`, một số hàm `crypto` và `zlib` trên **worker pool** (thread pool của libuv); asyncio thì bảo bạn tự dùng `run_in_executor`.",
       why: "Node.js liệt kê các API dùng worker pool (https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop). asyncio ghi \"không có file I/O bất đồng bộ trong asyncio\" và khuyên dùng `loop.run_in_executor()` để đọc ghi file thường (https://docs.python.org/3/library/asyncio-eventloop.html). Vì vậy \"Node.js single-thread\" chỉ đúng với code JavaScript.",
     },
     {
@@ -53,8 +53,8 @@ BK.topic({
       why: "Một loop gắn với một thread; gọi vào loop từ thread khác phải dùng `loop.call_soon_threadsafe()` hoặc `asyncio.run_coroutine_threadsafe()` vì các đối tượng asyncio không thread-safe (https://docs.python.org/3/library/asyncio-dev.html). API chi tiết (`create_task`, `TaskGroup`…) để nhánh Python.",
     },
     {
-      t: "**Đo xem loop có bị chặn không.** asyncio debug mode (`asyncio.run(main(), debug=True)` hoặc `PYTHONASYNCIODEBUG=1`) ghi log các callback chạy lâu hơn `loop.slow_callback_duration`, mặc định 100 ms. Node.js có `perf_hooks.monitorEventLoopDelay()` để đo độ trễ của loop.",
-      why: "Ngưỡng 100 ms và cách bật debug mode theo tài liệu asyncio (https://docs.python.org/3/library/asyncio-eventloop.html; https://docs.python.org/3/library/asyncio-dev.html). Event loop chậm hiếm khi hiện ra là CPU cao; nó hiện ra là latency p99 tăng cho mọi endpoint cùng lúc, vì mọi request xếp hàng sau đoạn code chặn (https://nodejs.org/api/perf_hooks.html).",
+      t: "**Đo xem loop có bị chặn không.** asyncio debug mode (`asyncio.run(main(), debug=True)` hoặc `PYTHONASYNCIODEBUG=1`) ghi log các callback chạy lâu hơn `loop.slow_callback_duration`, mặc định 100 ms. Node.js có `perf_hooks.monitorEventLoopDelay()` để đo độ trễ của loop (https://nodejs.org/api/perf_hooks.html).",
+      why: "Ngưỡng 100 ms và cách bật debug mode theo tài liệu asyncio (https://docs.python.org/3/library/asyncio-eventloop.html; https://docs.python.org/3/library/asyncio-dev.html). Event loop chậm hiếm khi hiện ra là CPU cao; nó hiện ra là latency p99 tăng cho mọi endpoint cùng lúc, vì mọi request xếp hàng sau đoạn code chặn.",
     },
   ],
   sections: [
@@ -84,7 +84,6 @@ BK.topic({
       why: "Hai từ hay bị dùng lẫn. Phân biệt rõ giúp trả lời câu hỏi kiểu \"đọc file trong Node có thật sự non-blocking không?\": API là async, bên dưới là thread của worker pool thực hiện lời gọi blocking.",
     },
   ],
-  related: ["ctx-switch"],
   cards: [
     ["Một vòng của event loop gồm những bước nào?", "Chờ kernel báo I/O sẵn sàng (timeout tới timer gần nhất) → đưa callback/task tương ứng vào hàng đợi → chạy lần lượt từng cái tới khi trả về hoặc gặp `await` → lặp lại."],
     ["Vì sao một callback chậm làm chậm mọi request?", "Event loop chạy một việc tại một thời điểm trên một thread và không thể giành lại thread giữa chừng; mọi việc khác phải đợi nó xong."],

@@ -67,7 +67,7 @@ BK.topic({
           ["JavaScript", "`async function`, `await`", "Event loop của trình duyệt / Node.js", "Chạy ngay tới `await` đầu tiên; luôn trả Promise"],
           ["Kotlin", "`suspend fun`, `launch`, `async`", "Dispatcher (thread pool)", "Dừng trên thread này, chạy tiếp trên thread khác được"],
           ["Go", "`go f()`", "Go runtime, nhiều OS thread", "Không có `await`; code blocking bình thường, runtime tự đổi"],
-          ["Java 21+", "`Thread.ofVirtual()`, `Executors.newVirtualThreadPerTaskExecutor()`", "JVM, trên carrier thread", "Code blocking bình thường; `synchronized` có thể ghim (pin) virtual thread vào carrier"],
+          ["Java 21","`Thread.ofVirtual()`, `Executors.newVirtualThreadPerTaskExecutor()`", "JVM, trên carrier thread", "Code blocking bình thường; `synchronized` có thể ghim (pin) virtual thread vào carrier"],
         ],
       },
       points: [
