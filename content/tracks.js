@@ -14,7 +14,11 @@ BK.section({ id: "lld-patterns", track: "lld", title: "Design Patterns" });
 BK.section({ id: "lld-concurrency", track: "lld", title: "Concurrency" });
 BK.section({ id: "lld-problems", track: "lld", title: "Problem Breakdowns" });
 
+BK.track({ id: "beh", title: "Behavioral", subtitle: "STAR · câu hỏi hay gặp · kể sâu dự án" });
+BK.section({ id: "beh-stories", track: "beh", title: "Câu chuyện của bạn" });
+
 BK.track({ id: "cloud", title: "Container trên AWS", subtitle: "ECS · EKS · Fargate" });
+BK.section({ id: "cloud-k8s", track: "cloud", title: "Container & Kubernetes" });
 BK.section({ id: "cloud-containers", track: "cloud", title: "ECS & EKS" });
 
 BK.track({
