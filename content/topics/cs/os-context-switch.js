@@ -11,7 +11,7 @@ BK.topic({
   },
   story: {
     problem: "Server Java một thread mỗi request, 2.000 thread trên máy 8 core. CPU báo 70% nhưng throughput không tăng khi thêm thread; `vmstat` cho thấy cột `cs` hàng trăm nghìn mỗi giây và `sy` (thời gian trong kernel) cao. Máy bận chuyển qua lại hơn là làm việc.",
-    idea: "Mỗi lần chuyển ngữ cảnh có giá cố định và một giá ẩn (cache, TLB lạnh). Giảm số lần chuyển: ít thread hơn số core cho việc CPU-bound, dùng event loop hoặc coroutine cho việc I/O-bound để chờ I/O mà không cần một OS thread đứng chờ.",
+    idea: "Mỗi lần context switch có giá cố định và một giá ẩn (cache, TLB lạnh). Giảm số lần chuyển: ít thread hơn số core cho việc CPU-bound, dùng event loop hoặc coroutine cho việc I/O-bound để chờ I/O mà không cần một OS thread đứng chờ.",
     tradeoff: "Giảm thread thì mỗi lời gọi blocking chặn nhiều việc hơn; dùng async/coroutine thì code phức tạp hơn và một đoạn CPU nặng chặn cả event loop. Không có cấu hình đúng cho mọi loại tải.",
   },
   diagrams: [

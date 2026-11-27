@@ -83,7 +83,7 @@ BK.topic({
           },
           {
             cells: ["Python `multiprocessing`", "Ba cách: `spawn` (interpreter mới), `fork`, `forkserver`. Từ 3.14, mặc định trên Linux là `forkserver`; macOS và Windows là `spawn`", "Từ 3.12, `os.fork()` trong process có nhiều thread phát `DeprecationWarning`"],
-            why: "Python đổi mặc định khỏi `fork` để giữ tốc độ mà tránh lỗi fork process nhiều thread nêu ở trên: forkserver là một process đơn luồng chuyên fork theo yêu cầu (https://docs.python.org/3/library/multiprocessing.html). Hệ quả thực tế: code chạy với `spawn`/`forkserver` phải để phần khởi tạo trong `if __name__ == \"__main__\":` và đối số truyền cho con phải pickle được.",
+            why: "Python đổi mặc định khỏi `fork` để giữ tốc độ mà tránh lỗi fork process nhiều thread nêu ở trên: forkserver là một process single-thread chuyên fork theo yêu cầu (https://docs.python.org/3/library/multiprocessing.html). Hệ quả thực tế: code chạy với `spawn`/`forkserver` phải để phần khởi tạo trong `if __name__ == \"__main__\":` và đối số truyền cho con phải pickle được.",
           },
           {
             cells: ["Node.js", "`child_process.spawn/exec/fork` tạo process mới chạy chương trình khác hoặc một Node khác", "Nghe sự kiện `exit` (con đã kết thúc) hoặc `close` (con kết thúc và stdio đã đóng); đọc hoặc bỏ qua stdout"],

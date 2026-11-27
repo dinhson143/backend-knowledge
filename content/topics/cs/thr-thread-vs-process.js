@@ -33,7 +33,7 @@ BK.topic({
         why: "Trên Linux cả hai đều tạo bằng `clone()`; khác nhau ở cờ: thread dùng `CLONE_VM | CLONE_FILES | CLONE_SIGHAND | CLONE_THREAD` để dùng chung thay vì chép (clone(2) — https://man7.org/linux/man-pages/man2/clone.2.html). Không phải chép thì nhanh hơn, và process lớn càng thấy rõ vì page table lớn theo bộ nhớ.",
       },
       {
-        cells: ["Chuyển ngữ cảnh", "Đổi thanh ghi + đổi bảng trang", "Chỉ đổi thanh ghi và stack"],
+        cells: ["Context switch", "Đổi thanh ghi + đổi bảng trang", "Chỉ đổi thanh ghi và stack"],
         why: "Đổi bảng trang làm các bản dịch địa chỉ đang có trong TLB không còn dùng được cho process mới (trừ khi phần cứng gắn ASID), nên process mới chạy chậm một lúc vì TLB miss (OSTEP, TLBs — https://pages.cs.wisc.edu/~remzi/OSTEP/vm-tlbs.pdf). Chi tiết ở topic Context switch.",
       },
       {
@@ -57,7 +57,7 @@ BK.topic({
     },
     {
       t: "**Thread không miễn phí** — mỗi thread cần một stack (với pthread, mặc định lấy theo `RLIMIT_STACK`; nếu limit là unlimited thì 2 MB trên đa số kiến trúc), một task trong kernel, và chịu giới hạn `RLIMIT_NPROC`, `threads-max`, `pid_max`.",
-      why: "Stack được dành sẵn trong không gian địa chỉ ảo (RAM thật chỉ cấp khi chạm tới), nhưng nghìn thread vẫn là nghìn task cho scheduler và nghìn lần chuyển ngữ cảnh. Vượt giới hạn thì `pthread_create` trả `EAGAIN` (pthread_create(3) — https://man7.org/linux/man-pages/man3/pthread_create.3.html). Đây là lý do server nhiều kết nối dùng event loop hoặc green thread thay vì một thread mỗi kết nối.",
+      why: "Stack được dành sẵn trong không gian địa chỉ ảo (RAM thật chỉ cấp khi chạm tới), nhưng nghìn thread vẫn là nghìn task cho scheduler và nghìn lần context switch. Vượt giới hạn thì `pthread_create` trả `EAGAIN` (pthread_create(3) — https://man7.org/linux/man-pages/man3/pthread_create.3.html). Đây là lý do server nhiều kết nối dùng event loop hoặc green thread thay vì một thread mỗi kết nối.",
     },
     {
       t: "**Ví dụ thật: process làm ranh giới, bên trong dùng mô hình nhẹ** — Nginx: một master đọc cấu hình và quản các worker, nhiều worker process (cố định hoặc bằng số core) xử lý request theo mô hình event. PostgreSQL: mỗi kết nối một backend process, phối hợp qua shared memory và semaphore.",
