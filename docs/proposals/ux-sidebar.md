@@ -36,7 +36,7 @@ NHÁNH SONG SONG
 
 - Giai đoạn: dòng `<summary>` có huy hiệu số (đặc khi xong), tiêu đề chữ thường 15px đậm, thanh tiến độ mảnh + `d/n`. Gập/mở bằng `<details>`.
 - Chặng: nhãn 13px đậm vừa, màu chữ chính (không in hoa), kèm `d/n` của chặng; topic của chặng thụt vào, có đường kẻ dọc dẫn hướng.
-- Topic: 14.5px, xuống dòng được (không cắt `…`), biểu tượng ✓ / ○ + chữ ẩn "đã nắm"/"chưa nắm"; đang xem: thanh accent bên trái + nền + chữ đậm + `aria-current="page"`.
+- Topic: 15px, xuống dòng được (không cắt `…`), biểu tượng ✓ / ○ + chữ ẩn "đã nắm" (chỉ đọc cho mục đã nắm, để danh sách 170 mục không lặp "chưa nắm"); đang xem: thanh accent bên trái + nền + chữ đậm + `aria-current="page"`.
 - Ô lọc ở đầu (dính khi cuộn): lọc theo tiêu đề topic và tên chặng, không phân biệt dấu (gõ `bo nho` khớp "bộ nhớ"); khi lọc thì mở mọi giai đoạn có kết quả, ẩn phần không khớp, đọc số kết quả qua vùng live; Esc xoá lọc.
 - Giữ trạng thái khi đổi trang: giai đoạn người dùng đã mở/gập, chữ đang lọc; cuộn topic đang xem vào giữa khung sidebar (chỉ cuộn sidebar, không cuộn trang).
 - **Ưu:** thấy cả cấu trúc lẫn tiến độ trong một cột; ít đổi hành vi so với hiện tại (vẫn `<details>`, vẫn mở giai đoạn đang xem); bàn phím và trình đọc màn hình dùng phần tử gốc. **Nhược:** giai đoạn lớn (30+ topic) mở ra vẫn dài — ô lọc và việc chỉ mở một giai đoạn mặc định bù lại.
@@ -63,4 +63,4 @@ Sidebar trang Luyện bài (`sideProblems`) dùng cùng kiểu: ba mức như ba
 
 ## Kiểm tra
 
-Desktop 1440px và drawer 375px, sáng/tối; Tab qua ô lọc → giai đoạn → topic; Esc trong ô lọc; trình đọc màn hình: tên giai đoạn kèm "d trên n đã nắm", topic kèm "đã nắm"/"chưa nắm", topic đang xem có `aria-current`.
+Desktop 1440px và drawer 375px, sáng/tối; Tab qua ô lọc → giai đoạn → topic; Esc trong ô lọc; trình đọc màn hình: tên giai đoạn kèm "d trên n đã nắm", topic đã nắm kèm "đã nắm", topic đang xem có `aria-current`.

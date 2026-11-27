@@ -238,6 +238,7 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   .nc-btns .btn { flex: 1 1 100%; }
   .pager { flex-direction: column; }
   .pager a { max-width: none; }
+  .panel { padding: 14px; } /* D91: chữ 17px ở 375px, bớt lề panel để dòng không quá ngắn */
   .face .q { font-size: 18px; }
 }
 
