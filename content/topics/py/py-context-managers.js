@@ -1,4 +1,5 @@
-// Ví dụ code: một dòng chạy được, kết quả sau "→" (D161). Đã chạy trên CPython 3.14.6.
+// Ví dụ code ngắn: một dòng chạy được trong câu, kết quả sau "→" (D161). Đã chạy trên CPython 3.14.6.
+// Context manager nhiều dòng là khối code (D13, D201): thụt lề thật, "vì sao" thành chú thích dòng.
 // Title không có backtick quanh `with` vì nhãn điều hướng không render markup (D160).
 BK.topic({
   id: "py-context-managers",
@@ -15,23 +16,6 @@ BK.topic({
     problem: "Worker lấy connection từ pool, chạy query, rồi `pool.release(conn)` ở dòng cuối. Mỗi khi query lỗi, dòng release bị bỏ qua. Sau vài giờ pool cạn, mọi request treo chờ connection: lỗi không nằm ở query mà ở connection không được trả.",
     idea: "Gói cặp lấy/trả vào một context manager. Code gọi chỉ viết `with pool.connection() as conn:`; việc trả connection nằm trong `__exit__` hoặc `finally`, chạy trên mọi đường ra khỏi khối.",
     tradeoff: "`with` chỉ bảo vệ trong phạm vi một khối lệnh. Resource cần sống lâu hơn một khối (connection dùng suốt đời app) phải quản lý bằng vòng đời app (lifespan của framework), và `__exit__` nuốt exception sai chỗ thì bug biến mất không dấu vết.",
-  },
-  table: {
-    head: ["Dòng · nằm trong", "Code (`@contextmanager` cho transaction)", "Vì sao viết vậy"],
-    rows: [
-      ["1 · module", "`@contextlib.contextmanager`", "Biến generator function thành context manager"],
-      ["2 · module", "`def transaction(conn):`", "Nhận resource cần bọc"],
-      ["3 · thân `transaction`", "`conn.execute(\"BEGIN\")`", "Phần trước `yield` = `__enter__`"],
-      {
-        cells: ["4 · thân `transaction`", "`try: yield conn`", "Giá trị `yield` được gán vào biến sau `as`"],
-        why: "Generator phải yield **đúng một lần**. Exception xảy ra trong khối `with` được ném lại vào generator **ngay tại `yield`** (https://docs.python.org/3/library/contextlib.html). Không có `try` quanh `yield` thì phần dọn dẹp phía dưới không bao giờ chạy khi khối lỗi: generator chỉ có `log.append(\"open\"); yield; log.append(\"close\")` cho ra `['open']` sau một khối ném `ValueError`.",
-      },
-      {
-        cells: ["5 · thân `transaction`, ngang `try`", "`except Exception: conn.execute(\"ROLLBACK\"); raise`", "Lỗi thì rollback rồi **ném lại**"],
-        why: "Docs: nếu bắt exception chỉ để log hay dọn dẹp, generator \"must reraise that exception\"; không thì `with` coi như đã xử lý xong và chạy tiếp lệnh sau khối (https://docs.python.org/3/library/contextlib.html). Quên `raise` ở đây là nuốt lỗi.",
-      },
-      ["6 · thân `transaction`, ngang `try`", "`else: conn.execute(\"COMMIT\")`", "Không lỗi thì commit. Thử với một list làm log: khối chạy bình thường → `['BEGIN', 'UPDATE', 'COMMIT']`; khối ném `KeyError` → `['BEGIN', 'ROLLBACK']` và `KeyError` vẫn ra ngoài"],
-    ],
   },
   points: [
     {
@@ -65,6 +49,47 @@ BK.topic({
     {
       t: "**Phần lớn context manager chỉ dùng một lần** — object tạo bởi `@contextmanager` dùng lần hai trong `with` sẽ lỗi; tạo mới mỗi lần (gọi lại hàm).",
       why: "Docs chia ba loại: single use, reusable và reentrant (dùng lồng trong chính nó). Generator đã chạy hết thì không yield lại được, nên context manager từ generator là single use (https://docs.python.org/3/library/contextlib.html).",
+    },
+  ],
+  sections: [
+    {
+      title: "@contextmanager cho transaction",
+      code: {
+        lang: "python",
+        lines: [
+          "import contextlib",
+          "",
+          ["@contextlib.contextmanager", "Biến generator function thành context manager."],
+          ["def transaction(conn):", "Nhận resource cần bọc."],
+          ["    conn.execute(\"BEGIN\")", "Phần trước `yield` = `__enter__`."],
+          "    try:",
+          ["        yield conn", "Giá trị `yield` được gán vào biến sau `as`. Generator phải yield **đúng một lần**. Exception xảy ra trong khối `with` được ném lại vào generator **ngay tại `yield`** (https://docs.python.org/3/library/contextlib.html). Không có `try` quanh `yield` thì phần dọn dẹp phía dưới không bao giờ chạy khi khối lỗi: generator chỉ có `log.append(\"open\"); yield; log.append(\"close\")` cho ra `['open']` sau một khối ném `ValueError`."],
+          "    except Exception:",
+          "        conn.execute(\"ROLLBACK\")",
+          ["        raise", "Lỗi thì rollback rồi **ném lại**. Docs: nếu bắt exception chỉ để log hay dọn dẹp, generator \"must reraise that exception\"; không thì `with` coi như đã xử lý xong và chạy tiếp lệnh sau khối (https://docs.python.org/3/library/contextlib.html). Quên `raise` ở đây là nuốt lỗi."],
+          "    else:",
+          ["        conn.execute(\"COMMIT\")", "Không lỗi thì commit."],
+          "",
+          ["class FakeConn:", "Connection giả ghi lại câu lệnh vào một list làm log, để thử cả hai nhánh."],
+          "    def __init__(self):",
+          "        self.log = []",
+          "",
+          "    def execute(self, sql):",
+          "        self.log.append(sql)",
+          "",
+          "c = FakeConn()",
+          "with transaction(c) as conn:",
+          "    conn.execute(\"UPDATE\")",
+          ["print(c.log)", "Khối chạy bình thường → `['BEGIN', 'UPDATE', 'COMMIT']`."],
+          "",
+          "c = FakeConn()",
+          "try:",
+          "    with transaction(c):",
+          "        raise KeyError(\"x\")",
+          "except KeyError:",
+          ["    print(c.log)", "Khối ném `KeyError` → `['BEGIN', 'ROLLBACK']`, và `KeyError` vẫn ra ngoài `with` nên `except` này bắt được."],
+        ],
+      },
     },
   ],
   tips: [
