@@ -60,15 +60,14 @@
     const variants = sim.variants || [{ name: null, steps: sim.steps }];
     let vi = 0, i = -1, playing = false, speed = 1, runId = 0;
     let nodes, byId, svg, uid, gLinks, gArrows, gNodes, gLbl, gPk;
-    // Phần giải thích chi tiết (sim-detail.js): bối cảnh + "chuyện gì xảy ra" ở từng bước
-    const D = (window.SIM_DETAIL || {})[sim.id] || {};
-    const detailOf = (v, k) => (((D.variants || []).find((x) => x.v === v) || {}).steps || []).find((x) => x.i === k);
+    // Giải thích chi tiết: sim.context (bối cảnh) + step.detail ("chuyện gì xảy ra" ở từng bước)
+    const detailOf = (v, k) => variants[v].steps[k]?.detail;
 
     root.classList.add("sim");
     root.innerHTML = `
       <div class="sim-title">${esc(sim.title)}</div>
       <div class="sim-scn">${inline(sim.scenario)}</div>
-      ${D.context ? `<details class="sim-context" open><summary>Bối cảnh — cần để ý gì</summary><div>${inline(D.context)}</div></details>` : ""}
+      ${sim.context ? `<details class="sim-context" open><summary>Bối cảnh — cần để ý gì</summary><div>${inline(sim.context)}</div></details>` : ""}
       ${variants.length > 1 ? `<div class="sim-variants">${variants.map((v, k) => `<button class="chip" data-v="${k}">${esc(v.name)}</button>`).join("")}</div>` : ""}
       <div class="sim-stage"></div>
       <div class="sim-note"></div>
@@ -144,7 +143,7 @@
       } else {
         const det = detailOf(vi, i);
         noteEl.innerHTML = `<span class="sim-n">Bước ${i + 1}</span>${inline(s.note || "")}` +
-          (det ? `<div class="sim-detail"><b>Chuyện gì xảy ra</b>${inline(det.detail)}</div>` : "") +
+          (det ? `<div class="sim-detail"><b>Chuyện gì xảy ra</b>${inline(det)}</div>` : "") +
           (s.lesson ? `<div class="sim-lesson"><b>Bài học</b>${inline(s.lesson)}</div>` : "");
       }
     }
@@ -232,7 +231,7 @@
       }
       if (playing && my === runId) {
         const det = detailOf(vi, i);
-        await sleep((1500 + (det ? det.detail.length * 28 : 0)) / speed);
+        await sleep((1500 + (det ? det.length * 28 : 0)) / speed);
         if (!playing || my !== runId || !alive()) return;
         if (i < steps().length - 1) show(i + 1, true);
         else { playing = false; syncBtn(); }

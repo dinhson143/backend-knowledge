@@ -3,9 +3,46 @@
   const main = $("#main");
   const sidebar = $("#sidebar");
 
-  // ── Index: nội dung (TRACKS) + thứ tự học (ROADMAP) ──
-  const ALL = [];
-  window.TRACKS.forEach((tr) => tr.sections.forEach((sec) => sec.topics.forEach((tp) => ALL.push({ ...tp, track: tr }))));
+  // ── Bố cục cũ → dạng mới (TRACKS + WHY, SIMS + SIM_DETAIL, PROBLEMS + PWHY ghép theo chỉ số). Xoá ở bước 5. ──
+  function fromLegacy() {
+    const WHY = window.WHY || {}, PWHY = window.PWHY || {}, SD = window.SIM_DETAIL || {};
+    const find = (arr, k, v) => (arr || []).find((x) => x[k] === v);
+    const wm = (arr, k = "i") => Object.fromEntries((arr || []).map((w) => [w[k], w.why]));
+    const pt = (s, why) => (why == null ? s : { t: s, why });
+    const tb = (t, m) => t && { head: t.head, rows: t.rows.map((r, i) => (m[i] == null ? r : { cells: r, why: m[i] })) };
+    const topics = [];
+    (window.TRACKS || []).forEach((tr) => tr.sections.forEach((sec) => sec.topics.forEach((tp) => {
+      const w = WHY[tp.id] || {};
+      const o = { ...tp, track: tr.id, section: sec.id, tldr: pt(tp.tldr, w.tldr), story: w.story };
+      if (tp.points) { const m = wm(w.points); o.points = tp.points.map((p, i) => pt(p, m[i])); }
+      if (tp.tips) { const m = wm(w.tips); o.tips = tp.tips.map((p, i) => pt(p, m[i])); }
+      o.table = tb(tp.table, wm(w.table, "row"));
+      o.table2 = tb(tp.table2, wm(w.table2, "row"));
+      if (tp.sections) o.sections = tp.sections.map((s, si) => {
+        const ws = find(w.sections, "s", si) || {};
+        const m = wm(ws.points);
+        return { ...s, points: s.points && s.points.map((p, i) => pt(p, m[i])), table: tb(s.table, wm(ws.table, "row")) };
+      });
+      topics.push(o);
+    })));
+    const sim = (s) => {
+      if (s.custom) return s;
+      const d = SD[s.id] || {};
+      const steps = (arr, v) => arr.map((st, k) => { const x = find(find(d.variants, "v", v)?.steps, "i", k); return x ? { ...st, detail: x.detail } : st; });
+      return { ...s, context: d.context, ...(s.variants ? { variants: s.variants.map((v, vi) => ({ ...v, steps: steps(v.steps, vi) })) } : { steps: steps(s.steps, 0) }) };
+    };
+    const problems = (window.PROBLEMS || []).map((p) => {
+      const w = PWHY[p.id] || {}, m = wm(w.nfr);
+      return { ...p, nfr: p.nfr.map((x, i) => pt(x, m[i])), hld: sim(p.hld), hldWhy: w.hld,
+        deep: p.deep.map((d, k) => { const x = find(w.deep, "i", k); return x ? { ...d, why: { bad: x.bad, good: x.good, great: x.great } } : d; }) };
+    });
+    return { topics, sims: (window.SIMS || []).map(sim), problems };
+  }
+  const OLD = fromLegacy();
+  const BK = window.BK || { topics: [], sims: [], problems: [] };
+
+  // ── Index: nội dung (BK + bố cục cũ) + thứ tự học (ROADMAP) ──
+  const ALL = [...OLD.topics, ...BK.topics];
   const byId = Object.fromEntries(ALL.map((t) => [t.id, t]));
   const STAGES = window.ROADMAP.map((s) => ({ ...s, topics: (s.topics || []).filter((id) => byId[id]) }));
   const listed = new Set(STAGES.flatMap((s) => s.topics));
@@ -15,11 +52,11 @@
   // Thứ tự đọc: giai đoạn chính trước, nhánh song song sau
   const ORDER = [...STAGES.filter((s) => !s.parallel), ...STAGES.filter((s) => s.parallel)].flatMap((s) => s.topics.map((id) => byId[id]));
 
-  const SIMS = window.SIMS || [];
+  const SIMS = [...OLD.sims, ...BK.sims];
   const simById = Object.fromEntries(SIMS.map((s) => [s.id, s]));
   const simsFor = (id) => SIMS.filter((s) => s.topics.includes(id));
   const LEVELS = { 1: "Khởi động", 2: "Trung bình", 3: "Nâng cao" };
-  const PROBLEMS = (window.PROBLEMS || []).slice().sort((a, b) => a.level - b.level);
+  const PROBLEMS = [...OLD.problems, ...BK.problems].sort((a, b) => a.level - b.level);
   const pById = Object.fromEntries(PROBLEMS.map((p) => [p.id, p]));
   const problemsFor = (id) => PROBLEMS.filter((p) => p.topics.includes(id));
 
@@ -66,14 +103,14 @@
     if (s.startsWith("! ")) return `<span class="tag fix">Đính chính</span>${inline(s.slice(2))}`;
     return inline(s);
   };
-  // Giải thích "vì sao" (why.js) gắn theo index; thiếu thì chỉ hiện nội dung gốc
-  const whyMap = (arr, k = "i") => Object.fromEntries((arr || []).map((w) => [w[k], w.why]));
+  // Một ý là chuỗi, hoặc { t, why } khi có giải thích "vì sao"; dòng bảng là mảng ô, hoặc { cells, why }
+  const txt = (p) => (typeof p === "string" ? p : p.t);
+  const cellsOf = (r) => (Array.isArray(r) ? r : r.cells);
   const whyLine = (w) => (w ? `<div class="why"><b>Vì sao</b>${inline(w)}</div>` : "");
-  const table = (t, whys = {}) => !t ? "" : `<div class="table-wrap"><table><thead><tr>${t.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
-    <tbody>${t.rows.map((r, ri) => `<tr class="${whys[ri] ? "has-why" : ""}">${r.map((c) => `<td>${tagged(c)}</td>`).join("")}</tr>` +
-      (whys[ri] ? `<tr class="why-row"><td colspan="${r.length}">${whyLine(whys[ri])}</td></tr>` : "")).join("")}</tbody></table></div>`;
-  const points = (ps, whys = {}) => !ps || !ps.length ? "" : `<div class="panel"><ul class="points">${ps.map((p, i) => `<li>${tagged(p)}${whyLine(whys[i])}</li>`).join("")}</ul></div>`;
-  const WHY = window.WHY || {}, PWHY = window.PWHY || {};
+  const table = (t) => !t ? "" : `<div class="table-wrap"><table><thead><tr>${t.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
+    <tbody>${t.rows.map((r) => `<tr class="${r.why ? "has-why" : ""}">${cellsOf(r).map((c) => `<td>${tagged(c)}</td>`).join("")}</tr>` +
+      (r.why ? `<tr class="why-row"><td colspan="${cellsOf(r).length}">${whyLine(r.why)}</td></tr>` : "")).join("")}</tbody></table></div>`;
+  const points = (ps) => !ps || !ps.length ? "" : `<div class="panel"><ul class="points">${ps.map((p) => `<li>${tagged(txt(p))}${whyLine(p.why)}</li>`).join("")}</ul></div>`;
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
   const simBox = (sim) => `<div class="panel sim-box" id="sim-${sim.id}"></div>`;
   const mountAll = (sims) => sims.forEach((sim) => window.mountSim(document.getElementById(`sim-${sim.id}`), sim));
@@ -196,27 +233,25 @@
     const probs = problemsFor(id);
     let n = 0;
     const h = (title) => `<h2><span class="h-n">${++n}</span>${esc(title)}</h2>`;
-    const W = WHY[id] || {};
-    const secW = (si) => (W.sections || []).find((x) => x.s === si) || {};
     main.innerHTML = `
       <div class="crumb">${t.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(t.stage)}`} · ${esc(t.stage.title)}</div>
       <h1>${esc(t.title)}</h1>
-      <div class="panel tldr"><b>Nói trong 30 giây</b>${tagged(t.tldr)}${whyLine(W.tldr)}</div>
+      <div class="panel tldr"><b>Nói trong 30 giây</b>${tagged(txt(t.tldr))}${whyLine(t.tldr.why)}</div>
 
-      ${W.story ? `${h("Vì sao cần biết")}<div class="story">
-        <div class="panel"><b>Vấn đề</b>${inline(W.story.problem)}</div>
-        <div class="panel"><b>Ý tưởng</b>${inline(W.story.idea)}</div>
-        <div class="panel"><b>Đánh đổi</b>${inline(W.story.tradeoff)}</div></div>` : ""}
+      ${t.story ? `${h("Vì sao cần biết")}<div class="story">
+        <div class="panel"><b>Vấn đề</b>${inline(t.story.problem)}</div>
+        <div class="panel"><b>Ý tưởng</b>${inline(t.story.idea)}</div>
+        <div class="panel"><b>Đánh đổi</b>${inline(t.story.tradeoff)}</div></div>` : ""}
 
       ${sims.length ? `${h("Hình dung")}${sims.map(simBox).join("")}` : ""}
 
       ${h("Kiến thức cốt lõi")}
-      ${t.table ? `<div class="gap">${table(t.table, whyMap(W.table, "row"))}</div>` : ""}
-      ${t.points && t.points.length ? `<div class="gap">${points(t.points, whyMap(W.points))}</div>` : ""}
-      ${t.table2 ? `<h3>${esc(t.table2Title || "Chi tiết")}</h3>${table(t.table2, whyMap(W.table2, "row"))}` : ""}
-      ${(t.sections || []).map((s, si) => `<h3>${esc(s.title)}</h3>${s.points ? `<div class="gap">${points(s.points, whyMap(secW(si).points))}</div>` : ""}${s.table ? `<div class="gap">${table(s.table, whyMap(secW(si).table, "row"))}</div>` : ""}`).join("")}
+      ${t.table ? `<div class="gap">${table(t.table)}</div>` : ""}
+      ${t.points && t.points.length ? `<div class="gap">${points(t.points)}</div>` : ""}
+      ${t.table2 ? `<h3>${esc(t.table2Title || "Chi tiết")}</h3>${table(t.table2)}` : ""}
+      ${(t.sections || []).map((s) => `<h3>${esc(s.title)}</h3>${s.points ? `<div class="gap">${points(s.points)}</div>` : ""}${s.table ? `<div class="gap">${table(s.table)}</div>` : ""}`).join("")}
 
-      ${t.tips ? `${h("Mẹo khi phỏng vấn")}<div class="panel"><ul class="tips">${t.tips.map((x, i) => `<li>${inline(x)}${whyLine(whyMap(W.tips)[i])}</li>`).join("")}</ul></div>` : ""}
+      ${t.tips ? `${h("Mẹo khi phỏng vấn")}<div class="panel"><ul class="tips">${t.tips.map((x) => `<li>${inline(txt(x))}${whyLine(x.why)}</li>`).join("")}</ul></div>` : ""}
 
       ${t.cards && t.cards.length ? `${h("Tự kiểm tra")}<p class="muted small">Trả lời thành tiếng trước, rồi mới mở đáp án.</p>
         <div class="qa">${t.cards.map(([q, a]) => `<details class="panel"><summary>${inline(q)}</summary><div>${inline(a)}</div></details>`).join("")}</div>` : ""}
@@ -258,8 +293,6 @@
     setNav("problems", sideProblems(id));
     const i = PROBLEMS.indexOf(p), prev = PROBLEMS[i - 1], next = PROBLEMS[i + 1];
     const sims = (p.sims || []).map((sid) => simById[sid]).filter(Boolean);
-    const PW = PWHY[id] || {};
-    const nfrW = whyMap(PW.nfr);
     const lvl = (k, text, w) => `<div class="dd-col dd-${k}"><b>${{ bad: "Bad", good: "Good", great: "Great" }[k]}</b>${inline(text)}${w ? `<div class="why"><b>Vì sao</b>${inline(w)}</div>` : ""}</div>`;
     main.innerHTML = `
       <div class="crumb"><a href="#/problems">Luyện bài</a> · ${LEVELS[p.level]}</div>
@@ -275,7 +308,7 @@
       <h2><span class="h-n">1</span>Requirements</h2>
       <div class="req-grid">
         <div class="panel"><div class="req-h">Functional</div><ul class="tips">${p.fr.map((x) => `<li>${inline(x)}</li>`).join("")}</ul></div>
-        <div class="panel"><div class="req-h">Non-functional</div><ul class="tips">${p.nfr.map((x, k) => `<li>${inline(x)}${whyLine(nfrW[k])}</li>`).join("")}</ul></div>
+        <div class="panel"><div class="req-h">Non-functional</div><ul class="tips">${p.nfr.map((x) => `<li>${inline(txt(x))}${whyLine(x.why)}</li>`).join("")}</ul></div>
       </div>
       ${p.capacity ? `<div class="panel cap"><b>Ước lượng nhanh</b>${inline(p.capacity)}</div>` : ""}
 
@@ -286,13 +319,13 @@
       <pre class="api">${p.api.map(esc).join("\n")}</pre>
 
       <h2><span class="h-n">4</span>High-Level Design</h2>
-      ${PW.hld ? `<div class="panel why-hld"><b>Vì sao kiến trúc như vậy</b>${inline(PW.hld)}</div>` : ""}
+      ${p.hldWhy ? `<div class="panel why-hld"><b>Vì sao kiến trúc như vậy</b>${inline(p.hldWhy)}</div>` : ""}
       ${simBox(p.hld)}
 
       <h2><span class="h-n">5</span>Deep Dives</h2>
       <p class="muted small">Trả lời từng câu trước, rồi mới mở 3 mức đáp án.</p>
       ${p.deep.map((d, k) => `<details class="panel dd"><summary class="dd-q">${k + 1}. ${inline(d.q)}</summary>
-        <div class="dd-grid">${(() => { const w = (PW.deep || []).find((x) => x.i === k) || {}; return lvl("bad", d.bad, w.bad) + lvl("good", d.good, w.good) + lvl("great", d.great, w.great); })()}</div></details>`).join("")}
+        <div class="dd-grid">${(() => { const w = d.why || {}; return lvl("bad", d.bad, w.bad) + lvl("good", d.good, w.good) + lvl("great", d.great, w.great); })()}</div></details>`).join("")}
 
       ${sims.length ? `<h2><span class="h-n">+</span>Mô phỏng liên quan</h2>${sims.map(simBox).join("")}` : ""}
 
@@ -362,11 +395,11 @@
   function viewSearch(q) {
     setNav(null, sideKnowledge(null));
     const needle = q.toLowerCase();
-    const textOf = (t) => [t.title, t.tldr, ...(t.points || []), ...(t.tips || []),
-      ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flat()]),
-      ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || [])]), ...(t.cards || []).flat()];
+    const textOf = (t) => [t.title, txt(t.tldr), ...(t.points || []).map(txt), ...(t.tips || []).map(txt),
+      ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flatMap(cellsOf)]),
+      ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || []).map(txt)]), ...(t.cards || []).flat()];
     const hits = ORDER.map((t) => ({ href: `#/t/${t.id}`, title: t.title, where: t.stage.title, m: textOf(t).filter((s) => s.toLowerCase().includes(needle)) }))
-      .concat(PROBLEMS.map((p) => ({ href: `#/p/${p.id}`, title: p.title, where: "Bài luyện", m: [p.title, p.summary, ...p.fr, ...p.nfr, ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])].filter((s) => s.toLowerCase().includes(needle)) })))
+      .concat(PROBLEMS.map((p) => ({ href: `#/p/${p.id}`, title: p.title, where: "Bài luyện", m: [p.title, p.summary, ...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])].filter((s) => s.toLowerCase().includes(needle)) })))
       .filter((x) => x.m.length);
     // Bỏ tooltip trong kết quả tìm kiếm và chỉ tô sáng phần chữ, không đụng vào thẻ HTML
     const hl = (s) => plain(s.replace(/^[+!] /, "")).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1")
