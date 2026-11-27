@@ -96,6 +96,7 @@
     "content/topics/cs/conc-livelock-starvation.js",
     "content/topics/cs/conc-atomic-cas.js",
     "content/topics/cs/conc-memory-model.js",
+    "content/topics/cs/conc-classic-problems.js",
     "content/topics/cs/async-concurrency-models.js",
     "content/topics/cs/async-event-loop.js",
     "content/topics/cs/async-callback-promise-await.js",
