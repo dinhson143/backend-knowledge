@@ -20,8 +20,8 @@ BK.topic({
         why: "EKS dùng được mọi công cụ viết cho Kubernetes, vì nó chạy Kubernetes upstream được CNCF chứng nhận; ECS là API độc quyền của AWS nên chỉ dùng được công cụ hỗ trợ API của AWS.",
       },
       {
-        cells: ["Phí control plane", "0", "~$0.10/giờ mỗi cluster (~$73/tháng)"],
-        why: "EKS tính $0.10 × 730 giờ ≈ $73/tháng/cluster, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên.",
+        cells: ["Phí control plane", "Không tính", "Tính theo giờ cho mỗi cluster, cao hơn khi version Kubernetes đã sang extended support"],
+        why: "EKS tính phí control plane cho từng cluster chạy cả tháng dù không có workload, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên. Giá hiện hành: https://aws.amazon.com/eks/pricing/ và https://aws.amazon.com/ecs/pricing/",
       },
       {
         cells: ["Độ khó học", "Thấp: task, service, cluster", "Cao: pod, service, ingress, RBAC, Helm, CRD…"],

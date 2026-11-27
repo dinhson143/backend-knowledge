@@ -22,9 +22,9 @@ BK.topic({
             cells: [
               "Control plane",
               "AWS — API server, etcd, scheduler, controller, chạy đa AZ",
-              "Phí ~$0.10/giờ/cluster; extended support đắt hơn nhiều",
+              "Tính phí theo giờ mỗi cluster; extended support đắt hơn nhiều",
             ],
-            why: "AWS chạy nhiều bản etcd trên ít nhất 3 AZ để mất một AZ vẫn hoạt động, vì etcd cần quorum (đa số node sống) mới ghi được. Hết standard support mà chưa nâng version thì AWS tự chuyển sang extended support giá ~$0.60/giờ, gấp 6 lần.",
+            why: "AWS chạy nhiều bản etcd trên ít nhất 3 AZ để mất một AZ vẫn hoạt động, vì etcd cần quorum (đa số node sống) mới ghi được. Hết standard support mà chưa nâng version thì AWS tự chuyển sang extended support, phí control plane theo giờ cao hơn nhiều lần standard support. Nguồn: https://aws.amazon.com/eks/pricing/",
           },
           {
             cells: [
@@ -167,7 +167,7 @@ BK.topic({
         },
         {
           t: "**Chi phí** — phí control plane mỗi cluster + node; bin packing tốt và Spot qua Karpenter có thể rẻ hơn ECS ở quy mô lớn.",
-          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 70–90% so với on-demand. Ở quy mô hàng trăm node, khoản tiết kiệm này vượt phí control plane ~$73/tháng.",
+          why: "Karpenter chọn instance vừa khít và dùng Spot đa dạng loại → tỉ lệ sử dụng node cao, giá node giảm tới 70–90% so với on-demand. Ở quy mô hàng trăm node, khoản tiết kiệm này vượt xa phí control plane của cluster.",
         },
       ],
     },

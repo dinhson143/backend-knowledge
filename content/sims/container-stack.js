@@ -63,8 +63,8 @@ BK.sim({
   cost: {
     "ecs-ec2": "Không phí control plane · trả tiền EC2 (kể cả phần trống)",
     "ecs-fg": "Không phí control plane · trả theo vCPU/RAM của task",
-    "eks-mng": "~$0.10/giờ/cluster · trả tiền EC2",
-    "eks-fg": "~$0.10/giờ/cluster · trả theo vCPU/RAM của pod",
-    "eks-auto": "~$0.10/giờ/cluster · EC2 + phí quản lý Auto Mode",
+    "eks-mng": "Phí control plane theo giờ mỗi cluster · trả tiền EC2",
+    "eks-fg": "Phí control plane theo giờ mỗi cluster · trả theo vCPU/RAM của pod",
+    "eks-auto": "Phí control plane theo giờ mỗi cluster · EC2 + phí quản lý Auto Mode",
   },
 });

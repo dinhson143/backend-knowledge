@@ -39,7 +39,7 @@ BK.topic({
     },
     {
       t: "+ **Cost** — rẻ hơn DB nhiều lần mỗi GB; có storage class lạnh (Glacier) cho dữ liệu ít truy cập.",
-      why: "S3 Standard khoảng $0.023/GB-tháng, trong khi storage DB managed đắt hơn nhiều lần và còn nhân thêm bản replica, backup. Dữ liệu ít đọc chuyển sang Glacier còn rẻ hơn, đổi lại thời gian lấy ra từ phút đến giờ.",
+      why: "Object storage tính phí theo GB-tháng thấp hơn nhiều lần storage của DB managed, vì không phải gánh index, engine giao dịch và ổ đĩa gắn với máy chủ DB; dữ liệu trong DB còn bị nhân thêm theo số replica và backup. Giá hiện hành: https://aws.amazon.com/s3/pricing/ Dữ liệu ít đọc chuyển sang Glacier còn rẻ hơn, đổi lại thời gian lấy ra từ phút đến giờ.",
     },
   ],
   cards: [
