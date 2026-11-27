@@ -64,6 +64,10 @@
   const inline = (s) => esc(s).split(/(`[^`]+`)/).map((part) => (/^`[^`]+`$/.test(part) ? `<code>${part.slice(1, -1)}</code>` : glossify(part))).join("")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   window.glossInline = inline;
+  // Chữ trong thẻ <a> (thẻ sim/bài): không chèn <abbr tabindex> để tránh phần tử tương tác lồng trong link
+  const noTip = (s) => plain(s).replace(/<abbr[^>]*>([^<]*)<\/abbr>/g, "$1");
+  // Đánh dấu xong: render lại nhưng giữ vị trí đọc và focus của nút
+  const keepPlace = (render) => { const y = window.scrollY; render(); window.scrollTo(0, y); $("#doneBtn").focus(); };
   const tagged = (s) => {
     if (s.startsWith("+ ")) return `<span class="tag added">Bổ sung</span>${inline(s.slice(2))}`;
     if (s.startsWith("! ")) return `<span class="tag fix">Đính chính</span>${inline(s.slice(2))}`;
@@ -242,7 +246,7 @@
       </div>`;
     mountAll(sims);
     abbrBox(main.querySelector(".tldr"));
-    $("#doneBtn").onclick = () => { toggleDone(id); viewTopic(id); };
+    $("#doneBtn").onclick = () => { toggleDone(id); keepPlace(() => viewTopic(id)); };
   }
 
   // ── Bài luyện ──
@@ -256,7 +260,7 @@
         <div class="grid">${PROBLEMS.filter((p) => p.level === l).map((p) => `
           <a class="panel sim-card" href="#/p/${p.id}">
             <div class="t"><span class="sb-dot ${done.has(`p:${p.id}`) ? "done" : ""}" style="display:inline-block;margin-right:6px"></span>${esc(p.title)}</div>
-            <div class="s">${inline(p.summary)}</div>
+            <div class="s">${noTip(p.summary)}</div>
             <div class="tags">${p.topics.map((id) => `<span class="chip">${esc(byId[id].title)}</span>`).join("")}</div>
           </a>`).join("")}</div>`).join("")}`;
   }
@@ -311,7 +315,7 @@
       </div>`;
     mountAll([p.hld, ...sims]);
     abbrBox(main.querySelector(".prob-meta"));
-    $("#doneBtn").onclick = () => { toggleDone(key); viewProblem(id); };
+    $("#doneBtn").onclick = () => { toggleDone(key); keepPlace(() => viewProblem(id)); };
   }
 
   // ── Thư viện mô phỏng ──
@@ -326,7 +330,7 @@
         return `<h2>${stageNum(st)} · ${esc(st.title)}</h2><div class="grid">${list.map((s) => `
           <a class="panel sim-card" href="#/sim/${s.id}">
             <div class="t">${esc(s.title)}</div>
-            <div class="s">${inline(s.scenario)}</div>
+            <div class="s">${noTip(s.scenario)}</div>
             <div class="tags">${s.topics.filter((id) => byId[id]).map((id) => `<span class="chip">${esc(byId[id].title)}</span>`).join("")}</div>
           </a>`).join("")}</div>`;
       }).join("")}`;
@@ -338,6 +342,7 @@
     setNav("sims", sideKnowledge(sim.topics[0]));
     main.innerHTML = `
       <div class="crumb"><a href="#/sims">Mô phỏng</a> · ${esc(sim.title)}</div>
+      <h1 class="sr-only">${esc(sim.title)}</h1>
       ${simBox(sim)}
       <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>`;
     mountAll([sim]);
@@ -369,6 +374,7 @@
   // ── Tìm kiếm ──
   function viewSearch(q) {
     setNav(null, sideKnowledge(null));
+    if ($("#search").value.trim() !== q) $("#search").value = q; // mở thẳng #/search/x thì ô tìm vẫn hiện từ khoá
     const needle = q.toLowerCase();
     const textOf = (t) => [t.title, txt(t.tldr), ...(t.points || []).map(txt), ...(t.tips || []).map(txt),
       ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flatMap(cellsOf)]),
@@ -382,11 +388,16 @@
     main.innerHTML = `<h1>Kết quả cho “${esc(q)}”</h1><p class="lead">${hits.length} kết quả</p>
       ${hits.map((x) => `<a class="panel search-hit" href="${x.href}">
         <div class="t">${esc(x.title)} <span class="s">· ${esc(x.where)}</span></div>
-        <div class="s">${x.m.slice(0, 2).map(hl).join(" · ")}</div></a>`).join("") || `<div class="empty">Không tìm thấy.</div>`}`;
+        <div class="s">${x.m.slice(0, 2).map(hl).join(" · ")}</div></a>`).join("") || `<div class="empty">Không tìm thấy “${esc(q)}”.<br>Thử từ khoá ngắn hơn hoặc tên tiếng Anh (vd. <a href="#/search/cache">cache</a>, <a href="#/search/kafka">kafka</a>), hoặc tra từ viết tắt ở <a href="#/glossary">Thuật ngữ</a>.</div>`}`;
   }
 
   // ── Router ──
   function route() {
+    render();
+    const h1 = main.querySelector("h1");
+    document.title = h1 ? `${h1.textContent} · Backend Knowledge` : "Backend Knowledge";
+  }
+  function render() {
     const h = decodeURIComponent(location.hash.slice(1) || "/");
     if (h.startsWith("/t/")) return viewTopic(h.slice(3));
     if (h === "/learn") { location.hash = `#/t/${(ORDER.find((t) => !done.has(t.id)) || ORDER[0]).id}`; return; }
