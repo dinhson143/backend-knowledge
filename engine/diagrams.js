@@ -1,7 +1,8 @@
 /*
- * Mô phỏng tình huống chạy trực tiếp.
+ * Engine mô phỏng: window.mountSim(root, sim). Không chứa kịch bản — kịch bản ở content/sims/<id>.js
+ * và trong `hld` của content/problems/<id>.js.
  *
- * Kịch bản dạng flow: nodes + steps. Mỗi step:
+ * Kịch bản dạng flow: nodes + steps, `context` (bối cảnh, tuỳ chọn). Mỗi step:
  *   note   — lời dẫn của bước
  *   msgs   — danh sách message chạy lần lượt; phần tử {par:[...]} chạy song song
  *            message = [from, to, label, kind]  kind: req (mặc định) | ok | err | warn
@@ -9,7 +10,10 @@
  *   bad / good — tô đỏ / xanh node ở bước này
  *   cut / uncut — cắt / nối lại link giữa hai node
  *   lesson — bài học rút ra (hiện ở bước cuối)
+ *   detail — "chuyện gì xảy ra" ở bước này (tuỳ chọn)
  * Variant có thể khai báo `nodes` riêng.
+ * Trường `custom` (arch, code, stack, decide, kgroup, rplay, bucket, ring, vending, binary) chọn renderer riêng;
+ * dữ liệu renderer cần được ghi chú ở đầu từng hàm mount* (D7 trong docs/decisions.md).
  */
 (function () {
   const NS = "http://www.w3.org/2000/svg";
@@ -876,6 +880,3 @@
     return mountFlow(root, sim);
   };
 })();
-
-/* ════════════════════════ KỊCH BẢN ════════════════════════ */
-window.SIMS = [];

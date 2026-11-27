@@ -15,6 +15,7 @@
   BK.sim = reg(BK.sims, "sim");
 
   const FILES = [
+    "content/glossary.js",
     "content/tracks.js",
     "content/topics/sd/delivery.js",
     "content/topics/sd/networking.js",
@@ -103,6 +104,9 @@
     "content/sims/tdd-codewalk.js",
     "content/sims/token-bucket.js",
     "content/sims/binary-search.js",
+    "content/roadmap.js",
+    // engine + app luôn nạp cuối
+    "engine/diagrams.js",
     "app.js",
   ];
   // async = false giữ đúng thứ tự thực thi với script chèn động
