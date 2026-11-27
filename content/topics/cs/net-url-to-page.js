@@ -22,8 +22,8 @@ BK.topic({
         why: "HSTS (`Strict-Transport-Security`) cho trình duyệt nhớ domain chỉ dùng HTTPS; RFC 6797 §8.3 yêu cầu trình duyệt tự thay scheme thành `https` cho domain đó (https://www.rfc-editor.org/rfc/rfc6797#section-8.3), nên lần sau trình duyệt đổi sang `https` mà không cần một vòng redirect `301` từ server.",
       },
       {
-        cells: ["2 · DNS", "Hỏi lần lượt cache trình duyệt → OS → resolver; resolver hỏi root → TLD → authoritative nếu chưa có", "0 RTT nếu có cache; nhiều RTT nếu phải hỏi đủ chuỗi", "TTL của record, cache ở mọi tầng"],
-        why: "Mỗi hostname khác nhau trên trang cần một lần phân giải riêng; lần đầu có thể chậm, nhất là trên mạng di động, còn sau đó IP thường đã được cache (https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work). Bản ghi mang TTL (RFC 1035) quyết định cache được bao lâu: TTL dài thì nhanh nhưng đổi IP chậm có hiệu lực.",
+        cells: ["2 · DNS", "Hỏi cache trình duyệt → OS → resolver; resolver chưa có thì hỏi dần các name server, đi theo referral từ root xuống tới server giữ zone của domain", "0 RTT nếu có cache; nhiều RTT nếu phải hỏi đủ chuỗi", "TTL của record, cache ở mọi tầng"],
+        why: "Mỗi hostname khác nhau trên trang cần một lần phân giải riêng; lần đầu có thể chậm, nhất là trên mạng di động, còn sau đó IP thường đã được cache (https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work). Bản ghi mang TTL (RFC 1035) quyết định cache được bao lâu: TTL dài thì nhanh nhưng đổi IP chậm có hiệu lực. RFC 1034 mô tả hai chế độ: client hỏi resolver ở chế độ recursive và chỉ nhận đáp án hoặc lỗi; còn name server trả lời non-recursive bằng đáp án hoặc **referral** tới server \"gần đáp án hơn\", nên resolver phải đi qua nhiều server, mỗi bước một vòng mạng (https://www.rfc-editor.org/rfc/rfc1034).",
       },
       {
         cells: ["3 · TCP", "Bắt tay 3 bước SYN, SYN-ACK, ACK", "1 RTT", "Giữ kết nối (keep-alive), HTTP/2 dùng chung một kết nối"],
@@ -61,12 +61,12 @@ BK.topic({
       why: "Lần tải thứ hai thường nhanh hơn hẳn lần đầu chính vì các cache này. Khi phỏng vấn, phân biệt rõ \"lần đầu\" và \"lần sau\" cho thấy bạn hiểu mỗi cache bỏ qua bước nào.",
     },
     {
-      t: "**Phía server là phần backend sở hữu**: DNS có thể trả IP của CDN hoặc load balancer (DNS load balancing, anycast); LB kết thúc TLS và chuyển tới app; app đọc cache, DB, gọi service khác; response có thể được cache ở CDN cho lần sau.",
+      t: "**Phía server là phần backend sở hữu**: DNS có thể trả IP của CDN hoặc load balancer; LB kết thúc TLS và chuyển tới app; app đọc cache, DB, gọi service khác; response có thể được cache ở CDN cho lần sau.",
       why: "Interviewer backend thường hỏi tiếp \"request tới server rồi thì sao\" để chuyển sang System Design. Nối được câu chuyện này với LB, cache, DB, replica là cầu sang các topic Giai đoạn 1–2.",
     },
     {
-      t: "**HTTP/1.1, HTTP/2, HTTP/3** ảnh hưởng tới bước 3–7: HTTP/1.1 cần nhiều kết nối song song để tải nhiều file; HTTP/2 chạy nhiều request trên một kết nối TCP; HTTP/3 chạy trên QUIC (UDP) nên mất gói ở một stream không chặn stream khác.",
-      why: "Trang hiện đại tải hàng chục tới hàng trăm tài nguyên. Số kết nối và cách chúng chia sẻ một đường truyền quyết định các tài nguyên đó chờ nhau tới đâu.",
+      t: "**HTTP/1.1, HTTP/2, HTTP/3** ảnh hưởng tới bước 3–7: HTTP/1.1 vướng head-of-line blocking ở tầng ứng dụng nên client mở nhiều kết nối song song; HTTP/2 xen kẽ nhiều request trên một kết nối TCP nhưng **không** giải head-of-line blocking của TCP (https://www.rfc-editor.org/rfc/rfc9113); HTTP/3 chạy trên QUIC, có multiplexing và flow control theo từng stream, tin cậy theo stream (https://www.rfc-editor.org/rfc/rfc9114).",
+      why: "Trang hiện đại tải hàng chục tới hàng trăm tài nguyên. Số kết nối và cách chúng chia sẻ một đường truyền quyết định các tài nguyên đó chờ nhau tới đâu. RFC 9114 giải thích: trên TCP, một gói mất hoặc đến sai thứ tự làm **mọi** request đang chạy trên kết nối đều phải chờ, dù gói đó chỉ thuộc một request; QUIC khôi phục theo từng stream nên tránh được điều này.",
     },
   ],
   tips: [
