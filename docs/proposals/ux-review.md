@@ -43,6 +43,47 @@ Các ý về luồng/điều hướng, không tự sửa:
 - **Topbar mobile**: 5 tab + ô tìm chiếm nhiều chỗ; có thể gom Thuật ngữ/Mô phỏng vào sidebar hoặc menu — tuỳ cấu trúc điều hướng mới.
 - **Trang chủ trên mobile**: 3 KPI + 2 khối "Cách ôn" đẩy lộ trình xuống dưới ~1,5 màn hình.
 
+## Review đặc tả Product
+
+Đặc tả: `docs/proposals/product-learning-flow.md` trên nhánh `product/learning-flow`, §3.4 (UI flow) và §5 (lộ trình). Review từ góc UI/UX. Số liệu "hiện tại" đo trên `content/roadmap.js` ngày 2026-11-27: không bài nào có topic ngoài lộ trình chính. Theo topic muộn nhất, 4 bài rơi vào GĐ3 cũ (Bitly, Rate Limiter, Top K, Web Crawler) và 9 bài vào GĐ4 cũ (`patterns`).
+
+### Nhóm A
+
+| # | Ý kiến | Ghi chú / điều chỉnh |
+|---|---|---|
+| A1 | **Đồng ý** | Pager đi trong nhóm: lộ trình chính → `#/problems`, nhánh song song quay về `#/`. Nhãn cuối nhóm phải nói rõ đích đến ("Sang luyện đề →", "Về lộ trình →"), không để trống. |
+| A2 | **Đồng ý, thêm một chỗ** | `#/learn` hiện chuyển bằng `location.hash = …` nên tạo một mục lịch sử: bấm Back từ topic quay về `#/learn` rồi bị đẩy tới lại (kẹt Back). Đổi sang `location.replace`. Khi lộ trình chính xong hết mà chưa bài nào đủ nền, trỏ về `#/problems`. |
+| A3 | **Đồng ý, điều chỉnh** | (1) **Người mới (ip.done rỗng)**: không bài nào đủ nền, cũng không bài nào chỉ thiếu 1 chủ đề, nên thẻ trang chủ và bộ lọc "Đã đủ nền" sẽ trống với mọi người mới. Fallback: thẻ hiện "Gần đủ nền nhất" là bài thiếu ít chủ đề nhất (tối đa 2 bài, ghi "còn k chủ đề: …"). Bộ lọc trống thì hiện trạng thái rỗng có lời giải thích. (2) Nhãn "Cần k/n" dễ đọc thành "cần k trên n", nên dùng "Còn thiếu k". (3) ✓/○ không được là tín hiệu duy nhất: mỗi chip có chữ ẩn "đã nắm"/"chưa nắm" và khác viền, không chỉ khác màu. (4) Bộ lọc là nhóm nút có `aria-pressed`, trạng thái chỉ trong trang (đồng ý Q5). |
+| A4 | **Đồng ý, điều chỉnh** | Nút một chạm chỉ **thêm** vào `done`, không đảo trạng thái (nếu topic đã nắm thì nút chỉ chuyển trang). Nút đánh dấu riêng giữ nguyên hành vi đảo và giữ vị trí cuộn (đã sửa ở mục 9). Khối "Tiếp theo" thay cho `.topic-actions` cũ, không đặt hai nút đánh dấu ở hai chỗ. Ở 375px hai nút xếp dọc, rộng 100%. Phần "Đi tiếp" của mục "Gửi Product" (nút chỉ ở cuối trang) đã giải quyết một phần: nút vẫn ở cuối, nhưng giờ có lý do để ở đó. |
+| A5 | **Đồng ý, ghi chú** | Trên roadmap hiện tại, trang chủ hiện 9 bài ở "Kiểm tra chặng" của GĐ4 cũ, ngay trên GĐ5 liệt kê đủ 13 bài, nên bị trùng. Quy ước: giai đoạn `problems: true` không có hàng "Kiểm tra chặng" (nó chính là chỗ luyện). Sau bước 3, GĐ4 cũ gộp vào GĐ5 thì chỗ trùng tự hết. Chấp nhận trùng tạm thời. |
+| A6 | **Đồng ý** | Giải quyết mục "Trang chủ trên mobile": thẻ "Tiếp tục" lên đầu, "Cách ôn" và "Nguồn & phạm vi" gập lại. Mỗi giai đoạn là `<details>`; `<summary>` không chứa heading (trình đọc màn hình đọc summary là nút). Tiêu đề giai đoạn là chữ thường trong summary, còn số `d/n` là text thật, không chỉ là thanh. |
+| A7 | **Đồng ý** | Sidebar gập theo giai đoạn: mở GĐ chứa topic đang xem, nếu không có thì mở GĐ hiện tại. Mục "Sidebar trang Mô phỏng/Thuật ngữ" **chưa được giải quyết**: đề xuất giữ mục lục (để nhất quán) nhưng gập hết trừ GĐ hiện tại, đúng như A7 cho trường hợp không có topic đang xem. |
+| A8 | **Đồng ý, điều chỉnh** | Kết quả thuật ngữ hiện ngay định nghĩa trong kết quả (tên đầy đủ, nghĩa), có link "Mở trong Thuật ngữ" truyền từ khoá **trong bộ nhớ** sang ô lọc, **không thêm route** (đặc tả giữ router). Kèm sửa mục "Gửi Product" về Back: khi đang ở `#/search/…` thì gõ tiếp dùng `location.replace`, chỉ lần đầu vào trang tìm kiếm mới tạo mục lịch sử. |
+| A9 | **Đồng ý** | Không có ý kiến thêm. |
+
+### Nhóm B
+
+| # | Ý kiến | Ghi chú |
+|---|---|---|
+| B0 | **Đồng ý, ưu tiên cao nhất** | Code nhóm A viết lại `viewHome`, `sideKnowledge`, `viewSims` nhưng **không đổi** `stageKeys` và `check.mjs`. Code mới không giả định giai đoạn `problems` không có topic: lộ trình chính lấy `s.topics` của mọi giai đoạn không song song, kể cả giai đoạn có `problems`. |
+| B1 | **Đồng ý** | Crumb "GĐ › chặng · i/n" ở 375px phải cắt bằng `text-overflow: ellipsis` trên một dòng, giữ phần "· i/n". `.sb-section` đã có style. |
+| B2 | **Đồng ý** | "Làm được: …" đặt ngay dưới H1, cỡ chữ bằng `.lead`. |
+| B3 | **Đồng ý** | Dùng lại chip ✓/○ của A3 (cùng component, cùng chữ ẩn cho trình đọc màn hình). |
+| B4 | **Đồng ý** | Nhãn "Đào sâu" dạng `.tag` trung tính, không dùng màu cam/đỏ (đã gán nghĩa "Đính chính", "Nâng cao"). |
+| B5 | **Đồng ý** | Không cần code. |
+
+### Đối chiếu với mục "Gửi Product"
+
+| Mục đã gửi | Đặc tả | Đề xuất |
+|---|---|---|
+| Topbar mobile (không dính; 5 tab + ô tìm) | **Chưa giải quyết.** Wireframe 375px chỉ vẽ ☰, brand, ◐, nhưng không mục A/B nào dời tab và ô tìm. | **Câu hỏi cho Product:** trên mobile, dời 5 tab + ô tìm vào drawer ☰ (khi đó có thể cho topbar 1 hàng dính lại)? Chưa làm. |
+| Back khi tìm kiếm | Không nhắc | UI tự làm cùng A8 (xem trên). |
+| Tab "Kiến thức" chuyển hướng | A2 thu về lộ trình chính | Giữ chuyển hướng nhưng dùng `location.replace` để không kẹt Back. |
+| Sidebar trang Mô phỏng/Thuật ngữ | Không nhắc | Gập theo A7 (xem trên). |
+| Nút "Đánh dấu đã nắm" chỉ ở cuối | A4 | Đủ cho bước này. |
+| Trang chủ mobile | A6 | Đã giải quyết. |
+| Mỗi từ viết tắt là một điểm dừng Tab | Không nhắc | Vẫn mở. |
+
 ## Chưa kiểm tra được
 
 - Mở bằng `file://` (extension trình duyệt không mở được file://).
