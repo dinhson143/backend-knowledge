@@ -57,7 +57,7 @@
   <rect class="box" x="632" y="50" width="96" height="32" rx="8"/>
   <text class="c" x="680" y="71">Server</text>
   <g stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4">
-    <path d="M472,82 L472,340"/><path d="M680,82 L680,340"/>
+    <path d="M472,82 L472,300"/><path d="M680,82 L680,300"/>
   </g>
   <g stroke="#64748b" stroke-width="1.4" fill="none" marker-end="url(#a)">
     <path d="M472,108 L678,134"/>

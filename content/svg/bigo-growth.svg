@@ -35,8 +35,8 @@
   <path class="cv" stroke="#3b7ff5" d="M80,313 L460,180"/>
   <path class="cv" stroke="#14a37f" d="M80,320 L90,316 L100,313 L120,309 L140,306 L180,302 L220,299 L280,296 L340,293 L400,291 L460,290"/>
   <path class="cv" stroke="#64748b" d="M80,313 L460,313"/>
-  <text class="lb" x="192" y="50" fill="#c2410c">O(n²)</text>
-  <text class="lb" x="294" y="50" fill="#b45309">O(n log n)</text>
+  <text class="lb" x="192" y="60" fill="#c2410c">O(n²)</text>
+  <text class="lb" x="294" y="60" fill="#b45309">O(n log n)</text>
   <text class="lb" x="468" y="184" fill="#1d4ed8">O(n)</text>
   <text class="lb" x="468" y="294" fill="#0f7a5f">O(log n)</text>
   <text class="lb" x="468" y="317" fill="#475569">O(1)</text>
