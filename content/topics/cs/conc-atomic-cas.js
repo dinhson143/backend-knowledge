@@ -62,7 +62,7 @@ BK.topic({
     },
     {
       t: "**Atomic còn đảm bảo visibility** — ngoài không bị chen ngang, thao tác atomic còn bảo đảm thread khác **thấy** giá trị mới theo đúng thứ tự. Biến thường không có đảm bảo này dù phép ghi \"trông\" atomic.",
-      why: "Java: các phương thức của `AtomicInteger` có memory effects theo đặc tả `VarHandle`; Go: thao tác atomic A được B quan sát thì A \"synchronizes before\" B. Visibility, reordering, happens-before là bài `conc-memory-model` (sắp viết).",
+      why: "Java: các phương thức của `AtomicInteger` có memory effects theo đặc tả `VarHandle`; Go: thao tác atomic A được B quan sát thì A \"synchronizes before\" B. Visibility, reordering, happens-before là bài `conc-memory-model`.",
     },
   ],
   sections: [
