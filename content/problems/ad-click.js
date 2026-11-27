@@ -141,11 +141,11 @@ BK.problem({
       q: "Không mất và không đếm trùng?",
       bad: "Đếm trong RAM của app server.",
       good: "Kafka retention + Flink checkpoint (exactly-once trong pipeline).",
-      great: "Thêm dedupe theo impressionId đã ký + batch reconciliation từ raw S3.",
+      great: "Thêm dedupe theo impressionId đã ký ở Click Processor + batch reconciliation từ raw S3.",
       why: {
         bad: "App server restart hoặc crash là mất toàn bộ số đếm chưa flush, vì counter nằm trong RAM; nhiều server cũng không đếm nhất quán chung được.",
         good: "Kafka retention giữ event để replay; Flink checkpoint lưu state + offset nên crash xong khôi phục mà không mất hay đếm trùng trong pipeline. Exactly-once này chỉ phủ tới sink khi sink ghi idempotent hoặc theo transaction; sink ghi append thường sẽ nhận lại kết quả của các cửa sổ được tính lại sau restart. Nhưng click trùng từ nguồn (user bấm hai lần, bot, client retry) đã vào Kafka thành hai event riêng nên vẫn bị đếm.",
-        great: "Flink dedupe theo `impressionId` loại được click lặp và id giả mạo, vì server ký id đó lúc hiển thị ad. Batch reconciliation trên raw S3 tính lại độc lập, lệch với số streaming thì sửa — lớp kiểm tra thứ hai cho dữ liệu tiền.",
+        great: "Click Processor dedupe theo `impressionId` (`SET NX` có TTL, cùng chỗ với bước HLD) trước khi ghi Kafka, loại được click lặp và id giả mạo, vì server ký id đó lúc hiển thị ad; Flink chỉ đếm. Batch reconciliation trên raw S3 tính lại độc lập, lệch với số streaming thì sửa — lớp kiểm tra thứ hai cho dữ liệu tiền.",
       },
     },
     {
