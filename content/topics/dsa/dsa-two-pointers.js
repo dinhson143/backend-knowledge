@@ -94,7 +94,7 @@ BK.topic({
       table: {
         head: ["Dạng", "Thời gian", "Bộ nhớ thêm"],
         rows: [
-          ["Hai đầu trên mảng đã sắp", "O(n) (+ O(n log n) nếu phải sắp)", "O(1); sort của Python cần thêm bộ nhớ tạm"],
+          ["Hai đầu trên mảng đã sắp", "O(n) (+ O(n log n) nếu phải sắp)", "O(1) ngoài bộ nhớ của bước sort"],
           ["3-sum", "O(n²)", "O(1) ngoài kết quả và sort"],
           ["Nhanh–chậm", "O(n)", "O(1) — lý do chọn nó thay hash set lưu node đã thăm (O(n))"],
           ["Đọc–ghi tại chỗ", "O(n)", "O(1)"],

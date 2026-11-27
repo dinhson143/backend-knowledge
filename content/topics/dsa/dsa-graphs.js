@@ -7,7 +7,7 @@ BK.topic({
   needs: ["dsa-trees"],
   tldr: {
     t: "Bài **graph** trong phỏng vấn gần như luôn quy về năm khuôn: **BFS/DFS** đếm thành phần liên thông hoặc tìm đường ngắn nhất không trọng số (kể cả trên **grid**, mỗi ô là một đỉnh); **multi-source BFS** khi nhiều điểm lan cùng lúc; **topological sort** khi có quan hệ \"phải làm trước\"; **union-find** khi gộp nhóm dần và hỏi \"cùng nhóm chưa\"; **Dijkstra** cho đường ngắn nhất với trọng số không âm. Khác với cây: graph có thể có cycle, nên luôn cần tập `seen`.",
-    why: "Mỗi khuôn khai thác một tính chất: BFS thăm theo khoảng cách tăng dần nên lần đầu chạm đích là ngắn nhất; Kahn chỉ lấy đỉnh không còn tiền quyết nên lấy hết được nghĩa là không có cycle; Dijkstra chốt đỉnh gần nhất vì trọng số không âm thì đi vòng không thể ngắn hơn. BFS/DFS mỗi đỉnh và cạnh một lần: O(V + E).",
+    why: "Mỗi khuôn khai thác một tính chất: BFS thăm theo khoảng cách tăng dần nên lần đầu chạm đích là ngắn nhất; Kahn chỉ lấy đỉnh không còn tiên quyết nên lấy hết được nghĩa là không có cycle; Dijkstra chốt đỉnh gần nhất vì trọng số không âm thì đi vòng không thể ngắn hơn. BFS/DFS mỗi đỉnh và cạnh một lần: O(V + E).",
   },
   story: {
     problem: "Bài \"đếm số đảo\" làm bằng DFS đệ quy trên grid 300 × 300 toàn đất: đệ quy sâu tới 90.000 tầng và nổ `RecursionError` ở Python. Bài \"xếp lịch học\" thì ứng viên tự viết DFS tìm cycle, quên phân biệt đỉnh \"đang thăm\" với \"đã xong\", báo cycle sai.",
@@ -21,7 +21,7 @@ BK.topic({
       { cells: ["\"ít bước nhất\", mọi cạnh như nhau", "BFS từ nguồn", "O(V + E)"], why: "BFS thăm mọi đỉnh cách k cạnh trước đỉnh cách k + 1 cạnh. Có trọng số khác nhau thì BFS sai." },
       { cells: ["Nhiều điểm lan cùng lúc: \"cam thối\", \"khoảng cách tới cổng gần nhất\"", "Multi-source BFS: cho mọi nguồn vào queue từ đầu", "O(V + E)"], why: "Coi như một siêu-nguồn nối với mọi nguồn bằng cạnh 0; một lần BFS thay vì BFS từ từng nguồn." },
       { cells: ["\"môn A cần học trước môn B\", build order, có cycle không (có hướng)", "Topological sort (Kahn / DFS ba màu)", "O(V + E)"], why: "Thứ tự topo chỉ tồn tại khi graph có hướng không có cycle (DAG)." },
-      { cells: ["Cạnh đến dần, \"có cùng nhóm không\", cạnh thừa tạo cycle (vô hướng)", "Union-find (disjoint set)", "gần như O(1) amortized mỗi thao tác"], why: "Weighted quick-union + path compression có chi phí amortized bị chặn bởi hàm Ackermann ngược, nhỏ hơn 5 với mọi n thực tế (https://algs4.cs.princeton.edu/15uf/)." },
+      { cells: ["Cạnh đến dần, \"có cùng nhóm không\", cạnh thừa tạo cycle (vô hướng)", "Union-find (disjoint set)", "gần như O(1) amortized mỗi thao tác (khi có union by size + path compression)"], why: "Weighted quick-union (gộp cây nhỏ vào cây lớn) giữ chiều cao ≤ log n; thêm path compression thì chi phí amortized bị chặn bởi hàm Ackermann ngược, nhỏ hơn 5 với mọi n thực tế (https://algs4.cs.princeton.edu/15uf/). Template bên dưới chỉ có path halving cho gọn; bài lớn thì thêm mảng `size` và gộp theo kích thước." },
       { cells: ["Đường ngắn nhất có trọng số **không âm**", "Dijkstra với heap", "O(E log V)"], why: "Dijkstra cần trọng số không âm; có cạnh âm thì dùng Bellman-Ford O(E·V); DAG thì relax theo thứ tự topo O(E + V), được cả cạnh âm (https://algs4.cs.princeton.edu/44sp/)." },
     ],
   },
@@ -54,10 +54,10 @@ BK.topic({
         rows: [
           ["`from collections import deque, defaultdict`", ""],
           ["`def can_finish(n, prereqs):`", ""],
-          ["`\u00a0\u00a0\u00a0\u00a0graph, indeg = defaultdict(list), [0] * n`", "`indeg[v]` = số tiền quyết chưa xong của v."],
+          ["`\u00a0\u00a0\u00a0\u00a0graph, indeg = defaultdict(list), [0] * n`", "`indeg[v]` = số tiên quyết chưa xong của v."],
           ["`\u00a0\u00a0\u00a0\u00a0for course, pre in prereqs:`", ""],
           ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0graph[pre].append(course); indeg[course] += 1`", "Cạnh `pre → course`: chú ý chiều, đề thường cho ngược."],
-          ["`\u00a0\u00a0\u00a0\u00a0q = deque(i for i in range(n) if indeg[i] == 0)`", "Bắt đầu từ mọi đỉnh không có tiền quyết."],
+          ["`\u00a0\u00a0\u00a0\u00a0q = deque(i for i in range(n) if indeg[i] == 0)`", "Bắt đầu từ mọi đỉnh không có tiên quyết."],
           ["`\u00a0\u00a0\u00a0\u00a0done = 0`", ""],
           ["`\u00a0\u00a0\u00a0\u00a0while q:`", ""],
           ["`\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0u = q.popleft(); done += 1`", "Thứ tự lấy ra chính là một thứ tự topo."],
@@ -121,7 +121,7 @@ BK.topic({
         { t: "**DFS đệ quy trên grid lớn.**", why: "Grid toàn đất R × C cho đệ quy sâu tới R·C tầng, vượt giới hạn đệ quy của CPython (https://docs.python.org/3/library/sys.html#sys.getrecursionlimit; mặc định thường là 1000). Dùng BFS bằng `deque` hoặc stack tường minh." },
         { t: "**Dùng BFS cho graph có trọng số**, hoặc Dijkstra khi có cạnh âm.", why: "BFS chỉ đúng khi mọi cạnh bằng nhau. Dijkstra chốt đỉnh sớm nên cạnh âm phía sau có thể làm đường đã chốt không còn ngắn nhất; algs4 ghi bản chặn chèn lại vẫn chạy E log V nhưng có thể cho kết quả sai." },
         { t: "**Phát hiện cycle có hướng bằng `seen` hai trạng thái.**", why: "Gặp lại đỉnh \"đã xong\" ở nhánh khác không phải cycle (ví dụ hình kim cương A→B→D, A→C→D). Cần ba trạng thái (chưa thăm / đang trên stack / xong), hoặc dùng Kahn." },
-        { t: "**Đảo chiều cạnh trong bài tiền quyết** — `[a, b]` nghĩa là \"b trước a\".", why: "Chiều sai vẫn cho đúng câu trả lời có/không cycle, nhưng thứ tự topo in ra bị ngược; đọc kỹ đề và ghi chiều cạnh thành comment." },
+        { t: "**Đảo chiều cạnh trong bài tiên quyết** — `[a, b]` nghĩa là \"b trước a\".", why: "Chiều sai vẫn cho đúng câu trả lời có/không cycle, nhưng thứ tự topo in ra bị ngược; đọc kỹ đề và ghi chiều cạnh thành comment." },
         { t: "**Heap so sánh phần tử không so được** — `(dist, node)` với `node` là object, khi hai `dist` bằng nhau.", why: "Tài liệu `heapq` cảnh báo so sánh tuple hỏng khi ưu tiên bằng nhau và phần tử thứ hai không có thứ tự; thêm bộ đếm tăng dần làm phần tử giữa `(dist, count, node)`." },
       ],
     },
@@ -138,7 +138,7 @@ BK.topic({
   ],
   cards: [
     ["Vì sao BFS cho đường ngắn nhất trên graph không trọng số?", "BFS thăm hết đỉnh cách k cạnh trước đỉnh cách k + 1 cạnh, nên lần đầu chạm đích là ít cạnh nhất."],
-    ["Kahn biết có cycle thế nào?", "Số đỉnh lấy ra khỏi queue nhỏ hơn n: các đỉnh còn lại luôn còn tiền quyết chưa xong vì nằm trong cycle hoặc phía sau nó."],
+    ["Kahn biết có cycle thế nào?", "Số đỉnh lấy ra khỏi queue nhỏ hơn n: các đỉnh còn lại luôn còn tiên quyết chưa xong vì nằm trong cycle hoặc phía sau nó."],
     ["Union-find hợp với loại câu hỏi nào?", "Cạnh đến dần, hỏi \"hai đỉnh đã cùng nhóm chưa\" hoặc \"cạnh nào tạo cycle\" trên graph vô hướng."],
     ["Độ phức tạp Dijkstra với binary heap?", "O(E log V) (algs4); chỉ đúng khi mọi trọng số không âm."],
     ["Multi-source BFS là gì?", "Cho mọi nguồn vào queue từ đầu rồi BFS một lần; khoảng cách tới mỗi ô là tới nguồn gần nhất."],
