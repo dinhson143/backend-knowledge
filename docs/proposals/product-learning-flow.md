@@ -14,7 +14,7 @@
   3. Hai trường topic mới, đều tuỳ chọn: `goal` (học xong làm được gì) và `needs` (tiên quyết, chỉ gợi ý, không khoá).
   4. Quy ước tiêu đề nhất quán, kèm bảng tiêu đề mới cho cả 39 topic.
   5. Có quy tắc xếp chỗ cho chủ đề mới (Durable Execution, outbox/CDC, consensus, observability, auth…), không cần sửa code.
-  6. **Giai đoạn 2 (§7–8):** đã phân loại 15 chủ đề của SA, 134 đề mục của Research và chỗ cho mảng Container: 136 topic mới, 22 đề mục gộp, 3 nhánh mới. Viết theo 4 đợt; đợt 1 gồm 21 topic.
+  6. **Giai đoạn 2 (§7–8):** đã phân loại 20 chủ đề của SA (gồm 5 Container/Kubernetes) và 134 đề mục của Research: 132 topic mới, 22 đề mục gộp, 3 nhánh mới. Viết theo 4 đợt; đợt 1 gồm 21 topic.
   7. UI flow chia hai nhóm: **nhóm A chạy được với dữ liệu hiện có** (agent UI làm ngay, không đụng file nội dung dùng chung), **nhóm B cần trường mới**.
 
 ## 1. Hiện trạng
@@ -625,6 +625,8 @@ Bước 1 không đụng file nội dung dùng chung nên có thể làm ngay, s
 
 ## 6. Câu hỏi cần người dùng quyết
 
+> **Q1–Q7 đã duyệt theo mặc định** (ghi thành D20–D26, §8.4). **Q13 đã giải quyết:** SA chốt 5 id Container/Kubernetes (§7.1). Còn chờ: Q8–Q12, Q14.
+
 | # | Câu hỏi | Đề xuất mặc định |
 |---|---|---|
 | Q1 | `BK.section` trong `tracks.js` (mục lục Hello Interview) giữ hay bỏ? Bỏ thì phải sửa trường `section` ở 39 file. | **Giữ** làm siêu dữ liệu "nguồn Hello Interview" (không điều hướng), bỏ số thứ tự trong tiêu đề. Có thể hiện thành nhãn nhỏ trên trang topic sau. |
@@ -637,29 +639,30 @@ Bước 1 không đụng file nội dung dùng chung nên có thể làm ngay, s
 | Q8 | Dời `concurrency` (thư mục `lld`) từ nhánh LLD sang Nền tảng CS › Concurrency? Id không đổi, chỉ đổi chỗ trong `roadmap.js`. | **Có**: 10 topic concurrency mới xây quanh nó; LLD còn tham chiếu qua `needs` của `lld-problems-list`. |
 | Q9 | Lời giải chi tiết 9 bài LLD: mở rộng `lld-problems-list` hay thành trang riêng như bài System Design (loại nội dung mới, phải sửa `app.js`)? | **Mở rộng `lld-problems-list`** trước; tách trang riêng khi có ≥ 3 bài viết đủ sâu. |
 | Q10 | Kỹ năng viết code và Behavioral có thuộc phạm vi site "Backend Knowledge" không? | **Có**, là hai nhánh song song, không chen vào lộ trình chính. |
-| Q11 | Tách "Container & Kubernetes" (id giai đoạn `cloud`) và "Vận hành production" (id mới `ops`) thành hai nhánh, hay giữ một nhánh? | **Hai nhánh**: mảng container có 12 topic, observability/deploy là câu hỏi khác. |
+| Q11 | Tách "Container & Kubernetes" (id giai đoạn `cloud`) và "Vận hành production" (id mới `ops`) thành hai nhánh, hay giữ một nhánh? | **Hai nhánh**: mảng container có 8 topic, observability/deploy là câu hỏi khác. |
 | Q12 | Giữ tiền tố id của Research (`os-`, `thr-`, `io-`, `conc-`, `async-`, `net-`, `db-`, `code-`, `dsa-`, `beh-`, `ood-`, `mc-`)? Topic hiện có không dùng tiền tố. Id sẽ thành hợp đồng ngay khi phát hành, nên chỉ đổi được bây giờ. | **Giữ**: tiền tố giúp nhận ra nhánh trong URL, và các id đã được hai tài liệu tham chiếu chéo. |
-| Q13 | 9 id Container/Kubernetes là id tạm (SA chưa commit danh sách). Ai chốt? | **SA chốt** trước khi viết đợt 1; đổi id lúc này còn miễn phí. |
+| Q13 | 9 id Container/Kubernetes là id tạm (SA chưa commit danh sách). Ai chốt? | **Đã giải quyết:** SA chốt `container-basics`, `k8s-core`, `dockerfile`, `k8s-operations`, `image-delivery`. |
 | Q14 | Nền tảng CS có 60 topic: giữ một nhánh 6 chặng hay tách hai nhánh ("Hệ điều hành & I/O", "Concurrency & Async")? | **Một nhánh**: sidebar gập theo chặng (A7, B1) là đủ; tách khi chặng nào vượt ~15 topic. |
 
 ## 7. Phân loại chủ đề mới (giai đoạn 2)
 
 Nguồn:
 
-- Solution Architect: `docs/proposals/content-gaps.md` trên nhánh `sa/content-gaps` (đỉnh `fad486a`), Phần B, 15 chủ đề.
-- Research: `docs/proposals/interview-topic-catalog.md` trên nhánh `research/interview-catalog` (đỉnh `a2d8885`), 134 đề mục mới.
-- Mảng Container/Docker/Kubernetes mà Solution Architect đang nghiên cứu: nhánh `sa/content-gaps` **chưa có** commit nào về mảng này. Tôi dành sẵn chỗ và đặt **id tạm** (9 id). Solution Architect chốt id trước khi viết (Q13).
+- **Solution Architect:** `docs/proposals/content-gaps.md` trên nhánh `sa/content-gaps` (đỉnh `5cec411`), Phần B, 20 chủ đề:
+  - mục 1–15: System Design;
+  - mục 16–20: Container/Kubernetes.
+- **Research:** `docs/proposals/interview-topic-catalog.md` trên nhánh `research/interview-catalog` (đỉnh `a2d8885`), 134 đề mục mới.
 
-Mọi số liệu dưới đây sinh bằng một script đọc thẳng hai file nguồn và registry `BK`. Script kiểm:
+Mọi số liệu dưới đây do một script sinh ra. Script đọc thẳng hai file nguồn và registry `BK`, rồi kiểm:
 
-- Mọi id Research đều được xử lý, hoặc đặt vào cây hoặc gộp: 112 đặt + 22 gộp = 134.
-- Đủ 15 id SA.
-- Id mới không trùng id topic, problem, sim, track, section đang có.
+- Mọi id Research đều được xử lý (đặt vào cây hoặc gộp): 112 đặt + 22 gộp = 134.
+- Có đủ 20 id SA.
+- Không id mới nào trùng id topic, problem, sim, track hay section đang có.
 - Mọi topic có sẵn vẫn nằm trong cây.
 - Tiêu đề ≤ 40 ký tự, `goal` ≤ 90 ký tự, `needs` ≤ 3 mục và trỏ tới id có thật.
-- Trong cùng lộ trình chính hoặc cùng một nhánh, tiên quyết đứng trước.
+- Trong cùng lộ trình chính hoặc cùng một nhánh, tiên quyết đứng trước topic cần nó.
 
-Kết quả: **136 topic mới** (15 SA, 9 Container, 112 Research) và **22 đề mục gộp**. Cây có tổng cộng 175 topic.
+Kết quả: **132 topic mới** (20 SA, 112 Research) và **22 đề mục gộp**. Cây có tổng cộng 171 topic.
 
 ### 7.1 Gộp trùng
 
@@ -667,7 +670,7 @@ Luật áp dụng:
 
 - Trùng giữa hai danh sách thì giữ id của SA.
 - Trùng với topic có sẵn thì ghi "mở rộng topic X", không tạo id mới.
-- Trùng ở mức nhỏ (một mục trong bài khác) thì gộp vào bài lớn hơn.
+- Trùng ở mức nhỏ (chỉ là một mục trong bài khác) thì gộp vào bài lớn hơn.
 
 | Id Research | Gộp vào | Lý do |
 |---|---|---|
@@ -683,7 +686,7 @@ Luật áp dụng:
 | `sd-more-problems` | — | là bài luyện (`BK.problem`), không phải topic: vào GĐ5 › Luyện đề theo mức |
 | `db-storage-engines` | `storage-engines` | trùng SA |
 | `db-wal-recovery` | `storage-engines` | SA đã gồm WAL và crash recovery |
-| `os-containers-primitives` | `container-basics` | namespaces/cgroups là phần mở đầu của "container cơ bản" |
+| `os-containers-primitives` | `container-basics` | trùng SA (namespace, cgroup nằm trong `container-basics`) |
 | `conc-optimistic-pessimistic` | `db-locking` | mở rộng: optimistic (version/CAS) vs pessimistic (`FOR UPDATE`) là một mục của `db-locking` |
 | `db-schema-migration` | `deployment-safety` | mở rộng: expand/contract là trọng tâm của `deployment-safety` |
 | `code-logging` | `observability` | mở rộng: thêm mục "log ở mức code" vào `observability` |
@@ -694,19 +697,35 @@ Luật áp dụng:
 | `ood-concurrent-lld` | `conc-classic-problems` | mở rộng: bài LLD thread-safe là một nhóm trong `conc-classic-problems` |
 | `thr-virtual-threads-java` | `thr-green-threads` | mở rộng: pinning và giới hạn của virtual thread là một mục của `thr-green-threads` |
 
-Những chỗ **không** gộp dù gần nhau, vì khác tầng:
+**Id Container tạm đã bỏ.** Bản `431e065` của tài liệu này đặt 9 id Container tạm vì lúc đó SA chưa chốt. Nay SA đã chốt 5 id. Các id tạm chưa từng phát hành, nên bỏ đi không ảnh hưởng URL hay tiến độ.
+
+| Id tạm (đã bỏ) | Mở rộng vào id SA |
+|---|---|
+| `container-image` | `container-basics` (SA gồm cả image, layer, OCI) |
+| `container-build` | `dockerfile` (build cache) |
+| `container-pipeline` | `image-delivery` |
+| `k8s-workloads` | `k8s-core` (Pod, Deployment); StatefulSet và rolling update thuộc `k8s-operations` |
+| `k8s-networking` | `k8s-core` (Service, Ingress) |
+| `k8s-health-scaling` | `k8s-operations` (probe, resource, HPA) |
+| `k8s-rbac` | `k8s-core` (Namespace, RBAC) |
+
+`container-basics` và `dockerfile` trùng id SA nên giữ nguyên.
+
+Theo Q28 trong đề xuất của SA: khi có `k8s-core`, `eks` chỉ giữ phần riêng của AWS, và bảng "Object Kubernetes hay dùng" trong `eks` rút thành link sang `k8s-core`. Đây chỉ là sửa nội dung, id không đổi.
+
+Những cặp **không** gộp dù gần nhau, vì khác tầng:
 
 | Cặp | Vì sao để riêng |
 |---|---|
-| `async-backpressure` ↔ `resilience` | Một bên là giới hạn concurrency trong code, một bên là load shedding ở mức hệ thống. Hai bài link chéo nhau. |
-| `async-cancellation-timeout` ↔ `resilience` | Huỷ task và truyền deadline trong code, so với chọn timeout giữa các service |
-| `conc-atomic-cas` ↔ `redis-atomic`, `dist-lock` | Atomic trong một process, so với atomic giữa nhiều máy |
-| `conc-classic-problems` ↔ `rate-limiter` (problem) | Bài coding chạy trong một process, so với bài System Design |
-| `db-isolation-anomalies` ↔ `core-db`, sim `isolation` | `core-db` chỉ chọn SQL hay NoSQL. Isolation cần một bài riêng, dùng lại sim `isolation`. |
+| `async-backpressure` ↔ `resilience` | Một bài nói giới hạn concurrency trong code, bài kia nói load shedding ở mức hệ thống. Hai bài link chéo nhau. |
+| `async-cancellation-timeout` ↔ `resilience` | Huỷ task và truyền deadline trong code, khác với chọn timeout giữa các service |
+| `conc-atomic-cas` ↔ `redis-atomic`, `dist-lock` | Atomic trong một process, khác với atomic giữa nhiều máy |
+| `conc-classic-problems` ↔ `rate-limiter` (problem) | Bài coding trong một process, khác với bài System Design |
+| `db-isolation-anomalies` ↔ `core-db`, sim `isolation` | `core-db` chỉ bàn chọn SQL hay NoSQL. Isolation cần bài riêng, dùng lại sim `isolation`. |
 
 ### 7.2 Cây danh mục sau khi gộp
 
-`+` = topic mới; không có dấu = topic có sẵn (id giữ nguyên). Chặng có "(Đào sâu)" là `optional: true`.
+`+` = topic mới; không có dấu = topic có sẵn (id giữ nguyên). Chặng ghi "(Đào sâu)" là `optional: true`.
 
 ```text
 GĐ1 · Nền móng
@@ -747,9 +766,9 @@ GĐ5 · Ghép pattern & luyện đề
   Câu chuyện của bạn: +beh-star-stories, +beh-common-questions, +beh-project-deep-dive
   Quy trình & cấp độ: +beh-interview-process, +beh-self-intro, +beh-senior-signals
 ∥ Container & Kubernetes
-  Container cơ bản: +container-basics, +container-image, +dockerfile, +container-build
-  Từ build tới deploy: +container-pipeline
-  Kubernetes: +k8s-workloads, +k8s-networking, +k8s-health-scaling, +k8s-rbac
+  Container cơ bản: +container-basics, +dockerfile
+  Kubernetes: +k8s-core, +k8s-operations
+  Từ build tới deploy: +image-delivery
   Trên AWS: ecs, eks, ecs-vs-eks
 ∥ Vận hành production
   Quan sát hệ thống: +observability
@@ -769,34 +788,36 @@ GĐ5 · Ghép pattern & luyện đề
   Thuật toán: algo, +dsa-two-pointers, +dsa-sliding-window, +dsa-prefix-sum, +dsa-sorting, +dsa-binary-search-answer, +dsa-intervals, +dsa-greedy, +dsa-backtracking, +dsa-graphs, +dsa-matrix, +dsa-dp, +dsa-strings, +dsa-bit-manipulation
 ```
 
-Thay đổi so với cây ở §3.1 (§7 ghi đè §3.1 ở các điểm này):
+Thay đổi so với cây ở §3.1 (ở các điểm này §7 ghi đè §3.1):
 
 | Điểm | §3.1 | Sau khi có danh sách thật | Lý do |
 |---|---|---|---|
-| Transaction & isolation | chỗ chứa ở GĐ2 › Nhất quán & sao chép | GĐ1 › Lưu & truy vấn dữ liệu (`db-isolation-anomalies`) | Theo quy tắc xếp chỗ: chuyện của một database, không phải của nhiều máy (câu 4) |
-| Consensus | GĐ2 › Nhất quán & sao chép | GĐ3 › Tranh chấp tài nguyên, sau `dist-lock` | SA đặt `dist-lock` làm tiên quyết (lease, fencing); để ở GĐ2 thì tiên quyết đứng sau |
-| Chặng mới GĐ3 | — | "Gọi nhau an toàn khi có lỗi" (`resilience`, `idempotency`) | Hai bài P0, là nền cho outbox và durable execution |
-| `db-locking` | — | GĐ3 › Tranh chấp tài nguyên, trước `dist-lock` | Học lock một database trước lock nhiều máy |
-| Nhánh "Container trên AWS" / "Vận hành production" | một nhánh `cloud` | tách hai: **Container & Kubernetes** (id giai đoạn `cloud`, chứa `ecs`, `eks`, `ecs-vs-eks`) và **Vận hành production** (id giai đoạn mới `ops`) | Mảng container có 9 + 3 topic, đủ thành một nhánh riêng |
-| Nhánh mới | — | **Nền tảng CS** (6 chặng theo gợi ý của Research: Process → Thread → I/O → Concurrency → Async → Mạng), **Kỹ năng viết code**, **Behavioral** | Đều là vòng phỏng vấn riêng, không phải phần của bài System Design (quy tắc câu 2 và 9) |
-| `concurrency` (thư mục `lld`) | LLD › Concurrency | Nền tảng CS › Concurrency (**id giữ nguyên**, chỉ dời chỗ trong `roadmap.js`; file có thể ở nguyên `content/topics/lld/`) | 10 topic concurrency mới xây quanh nó. LLD vẫn tham chiếu chéo qua `needs` (Q8). |
-| `durable-execution` · `needs` | SA ghi `queue`, `patterns` | `queue`, `idempotency` | `patterns` ở GĐ5, đứng sau. Saga giải thích ngay trong bài và link sim `saga`. Khi tách `pattern-multi-step` (§3.2), durable execution là phần chính của pattern đó. |
+| Transaction & isolation | chỗ chứa ở GĐ2 › Nhất quán & sao chép | GĐ1 › Lưu & truy vấn dữ liệu (`db-isolation-anomalies`) | Theo quy tắc xếp chỗ (câu 4): đây là chuyện của một database, không phải của nhiều máy |
+| Consensus | GĐ2 › Nhất quán & sao chép | GĐ3 › Tranh chấp tài nguyên, sau `dist-lock` | SA lấy `dist-lock` làm tiên quyết (lease, fencing); để ở GĐ2 thì tiên quyết lại đứng sau |
+| Chặng mới ở GĐ3 | — | "Gọi nhau an toàn khi có lỗi" (`resilience`, `idempotency`) | Hai bài P0, là nền cho outbox và durable execution |
+| `db-locking` | — | GĐ3 › Tranh chấp tài nguyên, trước `dist-lock` | Học lock trong một database trước lock giữa nhiều máy |
+| Nhánh "Container trên AWS" / "Vận hành production" | một nhánh `cloud` | Tách hai: **Container & Kubernetes** (id giai đoạn `cloud`, thêm `ecs`, `eks`, `ecs-vs-eks`) và **Vận hành production** (id giai đoạn mới `ops`) | Mảng container có 5 topic mới + 3 topic có sẵn và thứ tự học riêng theo SA: `container-basics` → `dockerfile` → `k8s-core` → `k8s-operations` → `image-delivery` → `ecs`/`eks` |
+| Nhánh mới | — | **Nền tảng CS** (6 chặng theo gợi ý của Research: Process → Thread → I/O → Concurrency → Async → Mạng), **Kỹ năng viết code**, **Behavioral** | Đều là vòng phỏng vấn riêng, không phải một phần của bài System Design (quy tắc câu 2 và 9) |
+| `concurrency` (thư mục `lld`) | LLD › Concurrency | Nền tảng CS › Concurrency. **Id giữ nguyên**, chỉ đổi chỗ trong `roadmap.js`; file vẫn ở `content/topics/lld/` | 10 topic concurrency mới xây quanh topic này. LLD vẫn tham chiếu chéo qua `needs` (Q8). |
+| `needs` của `durable-execution` | SA ghi `queue`, `patterns` | `queue`, `idempotency` | `patterns` ở GĐ5, đứng sau. Saga được giải thích ngay trong bài và link sang sim `saga`. Khi tách `pattern-multi-step` (§3.2), durable execution là phần chính của pattern đó. |
 
-Thư mục cho file mới (track = thư mục, không phải điều hướng):
+Thư mục cho file mới (track = thư mục, không quyết định điều hướng):
 
 | Thư mục | Topic |
 |---|---|
-| `content/topics/sd/` | 15 topic của SA, `db-*` |
+| `content/topics/sd/` | 15 topic System Design của SA (kể cả `observability`, `deployment-safety`) và `db-*` |
 | `content/topics/cs/` (track mới) | `os-*`, `thr-*`, `io-*`, `conc-*`, `async-*`, `net-*`, `code-memory-gc` |
-| `content/topics/code/` (track mới) | `code-*` còn lại |
+| `content/topics/code/` (track mới) | Các `code-*` còn lại |
 | `content/topics/beh/` (track mới) | `beh-*` |
-| `content/topics/cloud/` | Container, Kubernetes |
+| `content/topics/cloud/` | `container-basics`, `dockerfile`, `k8s-*`, `image-delivery` |
 | `content/topics/lld/` | `ood-*`, `mc-*` |
 | `content/topics/dsa/` | `dsa-*` |
 
 ### 7.3 Tiêu đề, goal, needs từng topic mới
 
-Tiêu đề theo quy ước §3.3. Tiêu đề tạm của nguồn chỉ là gợi ý; khi viết dùng cột này. `needs` có tiên quyết **xuyên nhánh** (ví dụ `container-basics` cần `os-process-lifecycle`, `code-fp-vs-oop` cần `oop-pillars`) chỉ để hiển thị, không ràng buộc thứ tự. Cột "Đợt" xem §8.
+- Tiêu đề theo quy ước §3.3. Tiêu đề tạm trong tài liệu nguồn chỉ là gợi ý; khi viết dùng cột tiêu đề ở đây.
+- Tiên quyết **xuyên nhánh** chỉ để hiển thị, không ràng buộc thứ tự. Ví dụ: `container-basics` cần `networking`, `code-fp-vs-oop` cần `oop-pillars`.
+- Cột "Đợt" xem §8.
 
 #### GĐ1 · Nền móng
 
@@ -937,15 +958,11 @@ Tiêu đề theo quy ước §3.3. Tiêu đề tạm của nguồn chỉ là g�
 
 | Chặng | Id | Tiêu đề | `goal` | `needs` | Nguồn · ưu tiên | Đợt |
 |---|---|---|---|---|---|---|
-| Container cơ bản | `container-basics` | Container là gì? | Giải thích container khác VM nhờ namespaces và cgroups | `os-process-lifecycle` | SA (Container, id tạm) · P0 | 1 |
-| Container cơ bản | `container-image` | Image & layer | Giải thích image gồm các layer và registry lưu chúng thế nào | `container-basics` | SA (Container, id tạm) · P0 | 1 |
-| Container cơ bản | `dockerfile` | Dockerfile chuẩn | Viết Dockerfile nhỏ, an toàn, chạy non-root bằng multi-stage build | `container-image` | SA (Container, id tạm) · P0 | 1 |
-| Container cơ bản | `container-build` | Build cache | Sắp lệnh Dockerfile để build lại nhanh nhờ cache layer | `dockerfile` | SA (Container, id tạm) · P0 | 2 |
-| Từ build tới deploy | `container-pipeline` | Build, push, deploy | Dựng luồng build image → push registry → deploy có tag rõ ràng | `container-build` | SA (Container, id tạm) · P0 | 2 |
-| Kubernetes | `k8s-workloads` | Pod, Deployment, StatefulSet | Chọn loại workload và hiểu rolling update hoạt động thế nào | `container-image` | SA (Container, id tạm) · P0 | 2 |
-| Kubernetes | `k8s-networking` | Service & Ingress | Đưa traffic tới Pod bằng Service và Ingress | `k8s-workloads`, `lb-gateway-cdn` | SA (Container, id tạm) · P0 | 2 |
-| Kubernetes | `k8s-health-scaling` | Probe & HPA | Cấu hình probe đúng loại và tự scale bằng HPA | `k8s-workloads` | SA (Container, id tạm) · P0 | 2 |
-| Kubernetes | `k8s-rbac` | RBAC trong Kubernetes | Cấp quyền tối thiểu cho người và service account | `k8s-workloads` | SA (Container, id tạm) · P0 | 2 |
+| Container cơ bản | `container-basics` | Container là gì? | Giải thích container khác VM nhờ namespace, cgroup và image nhiều layer | `networking` | SA · P0 | 1 |
+| Container cơ bản | `dockerfile` | Dockerfile & build cache | Viết Dockerfile nhỏ, chạy non-root và build lại nhanh nhờ cache layer | `container-basics` | SA · P1 | 1 |
+| Kubernetes | `k8s-core` | Kubernetes cốt lõi | Giải thích reconcile loop và vai trò Pod, Deployment, Service, Ingress | `container-basics` | SA · P0 | 1 |
+| Kubernetes | `k8s-operations` | Chạy ổn định trên Kubernetes | Đặt probe, requests/limits, rollout, StatefulSet để pod không chết oan | `k8s-core` | SA · P1 | 2 |
+| Từ build tới deploy | `image-delivery` | Build, tag, push, deploy | Đưa image từ build tới cluster bằng digest, scan và SBOM | `dockerfile`, `system-architecture` | SA · P1 | 2 |
 
 #### ∥ Vận hành production
 
@@ -993,20 +1010,20 @@ Tiêu đề theo quy ước §3.3. Tiêu đề tạm của nguồn chỉ là g�
 
 Quy tắc chia đợt:
 
-- **Đợt 1** (21 topic) gồm:
+- **Đợt 1** (21 topic) gồm ba nhóm:
   - 6 chủ đề P0 của SA.
-  - Chặng đầu của mỗi nhánh mới, để nhánh nào cũng học được từ ngày đầu:
+  - Chặng đầu của mỗi nhánh mới, để nhánh nào cũng học được ngay:
     - Nền tảng CS › Process, thread & bộ nhớ: 5 P0.
     - Kỹ năng viết code › Vòng coding: 2 topic.
     - Behavioral › Câu chuyện của bạn: 3 P0.
-    - Container cơ bản: 3 topic.
-    - Vận hành production › Quan sát: chính là `observability`.
+    - Container & Kubernetes: `container-basics`, `dockerfile` (chặng Container cơ bản) và `k8s-core` (chặng Kubernetes).
+    - Vận hành production › Quan sát: chính là `observability`, đã nằm trong 6 chủ đề P0 của SA.
   - 2 P0 đứng độc lập và hay bị hỏi: `db-isolation-anomalies`, `net-url-to-page`.
-- **Đợt 2** (46): phần còn lại có P0 của Research, P1 của SA và các topic Container còn lại.
-- **Đợt 3** (50): P1 của Research.
-- **Đợt 4** (19): P2 của cả hai nguồn (3 của SA: `storage-engines`, `stream-processing`, `time-ordering`).
+- **Đợt 2** (42): các P0 còn lại của Research và các P1 của SA, kể cả `k8s-operations`, `image-delivery`.
+- **Đợt 3** (50): các P1 của Research.
+- **Đợt 4** (19): các P2 của cả hai nguồn, trong đó có 3 của SA: `storage-engines`, `stream-processing`, `time-ordering`.
 
-Một chặng chỉ được tạo trong `roadmap.js` cùng commit với topic đầu tiên của nó (§3.5), nên chặng còn thiếu bài vẫn chạy được.
+Một chặng chỉ được thêm vào `roadmap.js` trong cùng commit với topic đầu tiên của nó (§3.5). Nhờ vậy chặng còn thiếu bài vẫn chạy được.
 
 ### 8.1 Đợt 1: Solution Architect viết, Diagram vẽ
 
@@ -1029,25 +1046,26 @@ Một chặng chỉ được tạo trong `roadmap.js` cùng commit với topic �
 | 15 | `beh-star-stories` | Khung STAR | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
 | 16 | `beh-common-questions` | Câu hỏi behavioral hay gặp | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
 | 17 | `beh-project-deep-dive` | Kể sâu về dự án | ∥ Behavioral › Câu chuyện của bạn | Solution Architect (nguồn: Research) | — |
-| 18 | `container-basics` | Container là gì? | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | SVG container vs VM |
-| 19 | `container-image` | Image & layer | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | SVG layer chồng nhau + registry |
-| 20 | `dockerfile` | Dockerfile chuẩn | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | code-walk (custom `code` sim) Dockerfile xấu → tốt |
+| 18 | `container-basics` | Container là gì? | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | SVG container vs VM, image nhiều layer |
+| 19 | `dockerfile` | Dockerfile & build cache | ∥ Container & Kubernetes › Container cơ bản | Solution Architect | code-walk (custom `code` sim) Dockerfile xấu → tốt |
+| 20 | `k8s-core` | Kubernetes cốt lõi | ∥ Container & Kubernetes › Kubernetes | Solution Architect | SVG control plane + node; dùng lại sim `eks-flow` cho reconcile |
 | 21 | `observability` | Observability: log, metric, trace | ∥ Vận hành production › Quan sát hệ thống | Solution Architect | SVG trace waterfall 4 service (SA) |
 
 Thứ tự viết gợi ý trong đợt 1:
 
-1. `idempotency` và `resilience`: `outbox-cdc`, `durable-execution` đều dựa vào hai bài này.
+1. `idempotency` và `resilience` trước, vì `outbox-cdc` và `durable-execution` đều dựa vào hai bài này.
 2. `replication`.
 3. `outbox-cdc`, `durable-execution`.
 4. `observability`.
-5. Phần còn lại không phụ thuộc nhau nên viết song song được.
+5. `container-basics` → `dockerfile` → `k8s-core`.
+6. Các bài còn lại không phụ thuộc nhau, viết song song được.
 
-Mục "Hình" lấy từ đề xuất của SA khi có ghi "(SA)". Các mục khác là gợi ý của tôi, Diagram chốt.
+Cột hình ghi "(SA)" là lấy từ đề xuất của SA. Các ô khác là gợi ý của tôi; agent Diagram chốt.
 
-### 8.2 Đợt 2 (46 topic, theo thứ tự ưu tiên)
+### 8.2 Đợt 2 (42 topic, theo thứ tự ưu tiên)
 
-1. **System Design** (SA P1 và DB P0 của Research): `auth`, `id-generation`, `multi-region`, `db-locking`, `consensus`, `vector-search`, `deployment-safety`, `db-query-tuning`.
-2. **Container & Kubernetes:** `container-build`, `container-pipeline`, `k8s-workloads`, `k8s-networking`, `k8s-health-scaling`, `k8s-rbac`.
+1. **System Design** (P1 của SA và P0 về database của Research): `auth`, `id-generation`, `multi-region`, `db-locking`, `consensus`, `vector-search`, `deployment-safety`, `db-query-tuning`.
+2. **Container & Kubernetes:** `k8s-operations`, `image-delivery`.
 3. **Nền tảng CS (P0):**
    - Thread & I/O: `thr-io-vs-cpu-bound`, `thr-thread-pool`, `thr-gil`, `thr-green-threads`, `io-blocking-models`, `os-signals-shutdown`.
    - Concurrency: `conc-race-condition`, `conc-livelock-starvation`, `conc-atomic-cas`, `conc-memory-model`, `conc-classic-problems`.
@@ -1061,23 +1079,26 @@ Mục "Hình" lấy từ đề xuất của SA khi có ghi "(SA)". Các mục kh
 
 ### 8.3 Ảnh hưởng tới UI
 
-Không có màn hình mới. Khối lượng tăng từ 39 lên 175 topic nên hai mục UI ở §3.4 chuyển từ "nên có" thành **bắt buộc trước đợt 2**:
+Không cần màn hình mới. Số topic tăng từ 39 lên 171, nên hai mục UI ở §3.4 chuyển từ "nên có" thành **bắt buộc trước đợt 2**:
 
-- **A7:** sidebar gập theo giai đoạn/nhánh. Không gập thì sidebar dài 175 dòng.
+- **A7:** sidebar gập theo giai đoạn/nhánh. Không gập thì sidebar dài 171 dòng.
 - **B1:** hiển thị chặng.
 
-Trang chủ cũng cần gập "Nhánh song song" thành các ô (A6). Đã có trong wireframe; sẽ có 8 nhánh.
+Trang chủ cũng cần gập phần "Nhánh song song" thành các ô (A6, đã có trong wireframe), vì sẽ có 8 nhánh.
 
-### 8.4 Quyết định đề xuất (dải D20–D29)
+Thứ tự triển khai giữ nguyên §5: B0 và B1 (đọc `parts`) phải xong trước khi sửa `roadmap.js`.
 
-Chưa ghi vào `docs/decisions.md` (file dùng chung). Người dùng chốt §6 thì chép sang.
+### 8.4 Quyết định (dải D20–D29)
 
-| # | Quyết định |
-|---|---|
-| D20 | `ROADMAP` là cây học duy nhất: giai đoạn → chặng (`parts`, id `<giai đoạn>.<tên>`) → topic. Track chỉ là thư mục. |
-| D21 | Topic có thêm `goal` (≤ 90 ký tự, bắt đầu bằng động từ) và `needs` (≤ 3, chỉ gợi ý). Bài luyện "đủ nền" tính từ `problem.topics`. |
-| D22 | Quy ước tiêu đề §3.3. |
-| D23 | Quy tắc xếp chỗ 9 câu hỏi (§3.1) cho chủ đề mới. Chặng tạo cùng commit với topic đầu tiên, không có chặng rỗng. |
-| D24 | Gộp trùng theo §7.1: giữ id SA; trùng topic có sẵn thì mở rộng topic đó. |
-| D25 | Cây §7.2. Có 3 nhánh mới: Nền tảng CS, Kỹ năng viết code, Behavioral. Nhánh `cloud` thành Container & Kubernetes, thêm nhánh `ops`. `concurrency` dời sang Nền tảng CS, id không đổi. |
-| D26 | Chia đợt viết theo §8; đợt 1 gồm 21 topic. |
+D20–D26 là các câu Q1–Q7 người dùng đã duyệt theo mặc định, đã ghi vào `docs/decisions.md`. D27–D29 để dành cho Q8–Q14 và cây §7.2 khi được chốt.
+
+| # | Quyết định | Câu hỏi |
+|---|---|---|
+| D20 | Điều hướng chỉ theo `ROADMAP` (giai đoạn → chặng `parts` → topic). `BK.section` giữ làm siêu dữ liệu "nguồn Hello Interview" và bỏ số thứ tự trong tiêu đề. | Q1 |
+| D21 | Auth cơ bản nằm trong lộ trình chính (GĐ1 › Giao tiếp & cửa vào); phần vận hành nằm ở nhánh. | Q2 |
+| D22 | Tách `patterns` thành 8 topic pattern, nhưng làm sau bước 1–7. | Q3 |
+| D23 | Chưa thêm `ip.last` và chưa làm xuất/nhập tiến độ. | Q4 |
+| D24 | Bộ lọc trang Luyện bài không đưa vào URL. | Q5 |
+| D25 | Thuật ngữ ngành trong tiêu đề giữ tiếng Anh; giải nghĩa và `goal` viết tiếng Việt. | Q6 |
+| D26 | Tiến độ GĐ5 tính cả topic lẫn 13 bài luyện. | Q7 |
+| D27–D29 | Để dành | Q8–Q14 |
