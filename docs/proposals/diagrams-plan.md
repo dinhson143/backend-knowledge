@@ -17,6 +17,13 @@
 | 9 | `lb-gateway-cdn` | `lb-gateway-cdn-request-path.svg` | Đường đi: DNS → CDN edge (hit/miss → origin) cho static; API Gateway → LB → instance cho API | Ba thành phần hay bị nhầm vị trí; sim `lb` chỉ có LB | https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html |
 | 10 | `streams` | `streams-event-sourcing.svg` | Event store append-only, state = fold, snapshot, projection ra read model | Topic chưa có sim nào; fold + snapshot dễ hiểu bằng hình | https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing |
 | 11 | problem `uber` | `uber-geohash.svg` | Geohash: bit kinh/vĩ độ xen kẽ, prefix chung = ô lớn chung; GEOSEARCH quét 1+8 ô rồi lọc theo bán kính | HLD sim chỉ có hộp "Redis GEO"; cơ chế tìm gần chưa có hình | https://redis.io/docs/latest/commands/geoadd/ |
+| 12 | `core-db` | `core-db-btree-vs-lsm.svg` | B-Tree sửa page tại chỗ vs LSM-Tree: memtable + commit log → flush tuần tự ra SSTable → compaction; đường đọc qua Bloom filter | Bảng của topic chỉ có một câu về LSM; đánh đổi ghi/đọc thấy ngay trên hình | https://cassandra.apache.org/doc/latest/cassandra/architecture/storage-engine.html |
+| 13 | `bigdata-ds` | `bigdata-ds-count-min-sketch.svg` | 3 × 8 bộ đếm, ví dụ A/B/C và phần tử D chưa thấy bị đếm dư | "Chỉ đếm dư" cần thấy va chạm mới hiểu | https://redis.io/docs/latest/develop/data-types/probabilistic/count-min-sketch/ |
+| 14 | `data-modeling` | `data-modeling-denormalize.svg` | venues/events chuẩn hoá vs chép `venue_name`; đọc JOIN vs đổi tên sửa 1 + N dòng | Bước 5 của topic dùng đúng ví dụ `venue_name` | https://learn.microsoft.com/en-us/previous-versions/troubleshoot/microsoft-365/microsoft-365-apps/access/database-normalization-description (bài lưu trữ) |
+| 15 | `ds` | `ds-heap-array.svg` | Min-heap dạng cây ↔ mảng, con ở 2i+1/2i+2 | Bảng nói "cây nhị phân lưu trong mảng" mà chưa có hình | https://docs.python.org/3/library/heapq.html |
+| 16 | `eks` | `eks-control-data-plane.svg` | Control plane (≥2 API server, 3 etcd trên 3 AZ) vs data plane (node group, Karpenter/Auto Mode, Fargate) | `eks-flow` chỉ có một hộp "control plane" | https://docs.aws.amazon.com/eks/latest/userguide/eks-architecture.html |
+| — | problem `web-crawler` | dùng lại `bigdata-ds-bloom-filter.svg` | Bảng "URL đã thấy" | Deep dive của bài nói đúng cơ chế này | Redis Bloom filter docs |
+| — | problem `top-k` | dùng lại `bigdata-ds-count-min-sketch.svg` | CMS + heap khi chấp nhận sai số | Deep dive nêu đúng phương án này | Redis Count-min sketch docs |
 
 ## Đã xem, không vẽ (sim đã thể hiện)
 
@@ -24,7 +31,7 @@
 |---|---|
 | `code-architecture` (Layered/Hexagonal/Onion/Clean/Vertical Slice) | `arch-dependency` vẽ từng kiến trúc và hướng phụ thuộc |
 | `system-architecture` | `sys-arch-impact` |
-| `ecs`, `eks`, `ecs-vs-eks` | `container-stack` (ai quản lý lớp nào), `ecs-flow`, `eks-flow`, `container-decide` |
+| `ecs`, `ecs-vs-eks` (và `eks` ngoài sơ đồ #16) | `container-stack` (ai quản lý lớp nào), `ecs-flow`, `eks-flow`, `container-decide` |
 | `consistent-hashing` | `hash-ring` (tương tác) |
 | `kafka`, `redis` | đã có SVG + nhiều sim |
 | `queue`, `dist-lock`, `concurrency`, `core-db` (isolation), `api-design` (rate limit, N+1), `search` (inverted index), `blob` (presigned), `patterns` | `queue`, `redlock`, `deadlock`, `isolation`, `token-bucket`, `n-plus-one`, `inverted-index`, `presigned`, `saga`/`seat`/`long-task`/`realtime`/`replica-lag` |
@@ -42,14 +49,8 @@
 | `dist-cache` | Topic tự trỏ về `caching`; sơ đồ 4 tầng cache + `redis-cluster-slots` đã phủ |
 | `api-design`, `search` | `token-bucket`, `n-plus-one`, `inverted-index` đã phủ phần cơ chế |
 
-## Đề xuất, chưa vẽ
+## Không vẽ
 
-| Topic | Sơ đồ | Ghi chú |
-|---|---|---|
-| `numbers` | Thang latency (L1 → RAM → SSD → mạng cùng DC → xuyên lục địa) trên trục log | Cần nguồn chính thức cho từng con số; số liệu phổ biến không đến từ tài liệu vendor |
-| `core-db` | B-Tree ghi tại chỗ vs LSM-Tree (memtable → flush tuần tự ra SSTable → compaction) | Topic đã có một câu "vì sao" về LSM-Tree (Cassandra, RocksDB); ưu tiên cao nhất cho đợt sau. Nguồn: tài liệu RocksDB/Cassandra |
-| `ds` | Heap dạng cây ↔ mảng (`i → 2i+1, 2i+2`) | Hữu ích cho DSA, ưu tiên thấp |
-| `bigdata-ds` | Count-Min Sketch (d hàng × w cột, lấy min) | Dùng cho problem `top-k` |
-| `data-modeling` | Normalize vs denormalize một bảng đơn hàng (join khi đọc vs ghi nhiều chỗ) | Topic có bước "cân nhắc denormalize" theo tỉ lệ đọc/ghi; hình giúp thấy cái giá khi ghi |
-| `eks` | Control plane (AWS quản lý) vs data plane (node của bạn) | `eks-flow` + `container-stack` đã gần đủ |
-| problem `web-crawler` | Bloom filter "URL đã thấy" | Dùng lại hình Bloom filter bằng cách thêm vào `diagrams` của problem nếu cần |
+| Topic | Lý do |
+|---|---|
+| `numbers` (thang latency) | Không có nguồn chính thức hiện hành cho bộ số RAM/SSD/mạng: nguồn gốc là slide của Jeff Dean (2009), trước thời SSD phổ biến, và các bản "cập nhật" là blog cá nhân. Vẽ thang log từ số không có nguồn sẽ trái luật "facts từ tài liệu chính thức". Bảng của topic đã ghi bậc độ lớn. |
