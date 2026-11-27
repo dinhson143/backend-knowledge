@@ -130,6 +130,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Race Condition / Data Race | race condition, data race; check-then-act, read-modify-write, TOCTOU (glossary) | kết quả phụ thuộc thứ tự chạy / hai truy cập cùng ô nhớ không đồng bộ, ít nhất một ghi | "Điều kiện tranh chấp", "Tranh chấp dữ liệu" | `conc-race-condition` |
 | Livelock / Starvation | livelock, starvation, fairness, priority inversion | vẫn chạy mà không tiến / chờ mãi không tới lượt | "Khoá sống", "Chết đói", "Đảo ngược ưu tiên" | `conc-livelock-starvation` |
 | Atomic / CAS | atomic, compare-and-swap, CAS (glossary), lock-free; ABA | thao tác không bị chen ngang; chỉ ghi khi giá trị còn như lúc đọc | "So sánh và hoán đổi", "Không khoá" | `conc-atomic-cas` |
+| Flow Control / Congestion Control | flow control, congestion control; receive window, congestion window (cwnd), slow start; TIME_WAIT (gạch dưới, như trong `ss`/`netstat`) | bên nhận báo còn chứa được bao nhiêu / bên gửi tự giới hạn để không làm tắc mạng | "Điều khiển luồng", "Kiểm soát luồng", "Kiểm soát tắc nghẽn", "Điều khiển tắc nghẽn" | `net-tcp-deep` |
 | **LLD & kiến trúc** | | | | |
 | Design Principles | SOLID, KISS, DRY, YAGNI, SoC, LoD | nguyên tắc giữ code dễ đổi | "Nguyên tắc thiết kế", "Giữ thiết kế đơn giản" | `solid`, `principles-other` |
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
