@@ -157,8 +157,28 @@ const NO_DIACRITICS = /\b(khong|duoc|nguoi|nhieu|truoc|chung ta|tuong|thuc hien|
 const PRICE = /\$\s?\d[\d.,]*\s*(\/|mỗi|per\b)|≈\s*\$\d/i;
 // files/run = code; còn lại là id, toạ độ, đường dẫn
 const CODE_KEYS = new Set(["files", "run", "id", "x", "y", "w", "h", "src"]);
+// URL trong câu: app.js tách thành chú thích [n] (D92). Nạp đúng hàm splitCites của app.js để kiểm tra
+// URL đọc được, là https, và câu còn lại không sót "()" hay dấu câu treo sau khi tách.
+const citeSrc = read("app.js").match(/\/\/ ── cite:start[\s\S]*?\/\/ ── cite:end/);
+const splitCites = citeSrc ? vm.runInNewContext(`${citeSrc[0]}\nsplitCites`) : null;
+if (!splitCites) at("app.js", "", "không tìm thấy đoạn cite:start … cite:end (check.mjs dùng splitCites)");
+function checkCites(file, path, prose) {
+  if (!splitCites) return;
+  const { text, urls } = splitCites(prose);
+  urls.forEach((u) => {
+    let ok = false;
+    try { ok = new URL(u).protocol === "https:"; } catch {}
+    if (!ok) at(file, path, `URL nguồn hỏng hoặc không phải https: "${u}"`);
+  });
+  if (!urls.length) return;
+  const left = text.replace(/\u0001\d+\u0002/g, "[n]");
+  const bad = left.match(/\(\s*\)|\(\s*[,;:·—–]|[,;:—–]\s*\)/);
+  if (bad) at(file, path, `câu sau khi tách URL còn "${bad[0]}" — viết URL trong ngoặc "(https://…)" hoặc sau "—", xem content-system §6`);
+}
 function walk(file, v, path) {
   if (typeof v === "string") {
+    if (path.endsWith(".source") && /^https:\/\/\S+$/.test(v)) return; // source của sơ đồ: kiểm tra ở mục SVG
+    v.split(/`[^`]*`/).forEach((seg) => checkCites(file, path, seg)); // như app.js: tách từng đoạn ngoài `code`
     const ticks = (v.match(/`/g) || []).length;
     if (ticks % 2) return at(file, path, "backtick lẻ");
     const prose = v.replace(/`[^`]*`/g, "");
@@ -177,6 +197,30 @@ Object.values(topics).forEach((t) => pointLists(t).flat().forEach((p) => {
   const s = txt(p) || "";
   if (/^[+!](?! )/.test(s)) E(t.id, `${t.id}.points`, `tiền tố sai (chỉ "+ " hoặc "! "): "${s.slice(0, 30)}"`);
 }));
+
+// ── Thuật ngữ: nhãn điều hướng không dùng cách dịch đã loại (docs/terminology.md §3, D106) ──
+// Đọc cột 4 "Không dùng trong nhãn" của bảng giữa <!-- terminology:start/end -->; mỗi cụm trong "…".
+// So nguyên cụm từ, không phân biệt hoa/thường (\b không hiểu chữ có dấu nên dùng \p{L}).
+const TERMS = "docs/terminology.md";
+const termTable = (() => { try { return read(TERMS); } catch { return ""; } })().match(/<!-- terminology:start -->([\s\S]*?)<!-- terminology:end -->/)?.[1] || "";
+const norm = (s) => s.normalize("NFC").toLowerCase();
+const banned = termTable.split("\n").filter((l) => l.startsWith("|")).flatMap((l) => {
+  const c = l.split("|").slice(1, -1);
+  if (c.length < 5) return [];
+  const term = c[0].replace(/\*\*/g, "").trim();
+  return [...c[3].matchAll(/"([^"]+)"/g)].map(([, p]) => [new RegExp(`(?<![\\p{L}\\p{N}])${norm(p).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}\\p{N}])`, "u"), p, term]);
+});
+if (!banned.length) at(TERMS, "", "không đọc được cụm nào ở cột \"Không dùng trong nhãn\" giữa <!-- terminology:start --> và <!-- terminology:end -->");
+const label = (file, path, title) => {
+  if (typeof title !== "string") return;
+  for (const [re, p, term] of banned) if (re.test(norm(title))) at(file, path, `nhãn "${title}" dùng "${p}" — dùng key term "${term}" (docs/terminology.md)`);
+};
+W.ROADMAP.forEach((st) => { label(RM, `${st.id}.title`, st.title); (st.parts || []).forEach((p) => label(RM, `${p.id}.title`, p.title)); });
+BK.tracks.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.sections.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.topics.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+BK.problems.forEach((x) => label(fileIn(x), `${x.id}.title`, x.title));
+Object.values(sims).forEach((s) => label(whereOf[s.id], `${s.id}.title`, s.title));
 
 // ── Glossary: mỗi viết tắt một lần (mục sau ghi đè mục trước mà không báo) ──
 const glSeen = new Set();

@@ -39,7 +39,7 @@ BK.sim({
     {
       note: "Mỗi observer tự xử lý theo cách riêng.",
       set: { o1: "push notification", o2: "gửi email", o3: "vẽ lại chart" },
-      detail: "Mỗi observer phản ứng theo logic riêng với cùng dữ liệu: Mobile App đẩy push notification, Email Alert gửi email, Dashboard vẽ lại chart. Subject không biết và không quan tâm những việc này. Để observer chậm không chặn Subject, observer nên tự đẩy việc nặng (gửi email) sang hàng đợi hoặc thread khác.",
+      detail: "Mỗi observer phản ứng theo logic riêng với cùng dữ liệu: Mobile App đẩy push notification, Email Alert gửi email, Dashboard vẽ lại chart. Subject không biết và không quan tâm những việc này. Để observer chậm không chặn Subject, observer nên tự đẩy việc nặng (gửi email) sang queue hoặc thread khác.",
     },
     {
       note: "Email Alert **unsubscribe** — lần sau chỉ 2 observer nhận.",

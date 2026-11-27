@@ -2,7 +2,7 @@ BK.topic({
   id: "principles-other",
   track: "lld",
   section: "lld-principles",
-  title: "Giữ thiết kế đơn giản",
+  title: "KISS, DRY, YAGNI",
   goal: "Dùng KISS, DRY, YAGNI, SoC, LoD để tránh over-engineering",
   needs: ["solid"],
   tldr: {

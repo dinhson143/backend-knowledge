@@ -2,11 +2,11 @@ BK.topic({
   id: "cap",
   track: "sd",
   section: "sd-core",
-  title: "CAP & mô hình nhất quán",
-  goal: "Chọn nhất quán hay sẵn sàng cho từng phần dữ liệu khi mạng chia cắt",
+  title: "CAP & Consistency Models",
+  goal: "Chọn consistency hay availability cho từng phần dữ liệu khi có network partition",
   needs: ["sharding"],
   tldr: {
-    t: "Khi có network partition (luôn phải chấp nhận P), chọn Consistency hoặc Availability. Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",
+    t: "Khi có **network partition** (mạng giữa các node bị đứt; luôn phải chấp nhận P), chọn **Consistency** (mọi node trả cùng dữ liệu mới nhất) hoặc **Availability** (node nào còn sống cũng trả lời). Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",
     why: "P không phải lựa chọn: trong hệ nhiều máy, mạng đứt chắc chắn xảy ra, nên câu hỏi thật chỉ còn C hay A lúc đứt mạng. **Availability** là mặc định vì đa số dữ liệu (feed, like, profile) cũ vài giây không hại ai; còn đặt vé hay tồn kho mà đọc dữ liệu cũ là bán trùng, thiệt hại tiền thật → phải chấp nhận từ chối request.",
   },
   story: {
@@ -30,7 +30,7 @@ BK.topic({
         why: "Tránh được cảnh thấy câu trả lời trước câu hỏi mà vẫn rẻ hơn strong: hệ theo dõi quan hệ phụ thuộc (comment trả lời 「phụ thuộc」 comment gốc), replica chỉ hiện thao tác sau khi đã có đủ thao tác nó phụ thuộc; các thao tác không liên quan thì không cần chờ nhau.",
       },
       {
-        cells: ["Read-your-own-writes", "User luôn thấy dữ liệu chính mình vừa ghi", "Sửa profile xong thấy ngay"],
+        cells: ["Read-your-writes", "User luôn thấy dữ liệu chính mình vừa ghi", "Sửa profile xong thấy ngay"],
         why: "Người vừa sửa profile mà reload thấy dữ liệu cũ sẽ tưởng thao tác thất bại và sửa lại. Chỉ cần định tuyến đọc của chính user đó về primary (hoặc replica đã bắt kịp version vừa ghi) trong một khoảng ngắn; người khác vẫn đọc replica bình thường.",
       },
       {
@@ -66,7 +66,7 @@ BK.topic({
       "Network partition chắc chắn xảy ra trong hệ phân tán, nên P là bắt buộc; khi partition xảy ra phải chọn trả lỗi (C) hay trả dữ liệu có thể cũ (A).",
     ],
     [
-      "Read-your-own-writes là gì?",
+      "Read-your-writes là gì?",
       "User luôn đọc được thay đổi của chính mình (ví dụ đọc từ primary trong vài giây sau khi ghi), dù người khác có thể thấy trễ.",
     ],
   ],

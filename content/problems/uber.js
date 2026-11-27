@@ -202,7 +202,7 @@ BK.problem({
       why: {
         bad: "Matching quá tải thì request timeout và rơi mất, vì xử lý đồng bộ; crash giữa vòng ghép cũng mất luôn yêu cầu.",
         good: "Autoscale thêm năng lực khi tải tăng. Nhưng máy mới khởi động mất vài phút, trong khi peak (tan tầm, mưa) đến trong vài giây, và request đang xử lý vẫn mất khi instance chết.",
-        great: "Peak chỉ làm hàng đợi dài hơn, không mất request, vì Kafka lưu request bền vững trước khi xử lý. Partition theo khu vực giữ request cùng vùng một chỗ và scale độc lập; workflow bền vững (ví dụ Temporal) lưu trạng thái vòng ghép — worker chết thì worker khác làm tiếp.",
+        great: "Peak chỉ làm queue dài hơn, không mất request, vì Kafka lưu request bền vững trước khi xử lý. Partition theo khu vực giữ request cùng vùng một chỗ và scale độc lập; workflow bền vững (ví dụ Temporal) lưu trạng thái vòng ghép — worker chết thì worker khác làm tiếp.",
       },
     },
   ],

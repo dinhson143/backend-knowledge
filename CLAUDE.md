@@ -32,7 +32,8 @@ content/sims/<id>.js             simulation scenarios (shared by topics/problems
 content/svg/<name>.svg           static diagrams, referenced by `diagrams: [{ src, caption, source? }]`
 content/roadmap.js  ROADMAP (stage → `parts` → topic ids; the only navigation tree), MIRO_GAPS, HI_GAPS
 engine/diagrams.js  window.mountSim — simulation engine, no scenarios
-app.js              router + render, no content (loaded last by the manifest)
+app.js              router + render, no content (loaded last by the manifest); inline URLs render as `[n]` + "Nguồn tham khảo" (D92)
+fonts/              self-hosted Be Vietnam Pro + JetBrains Mono (OFL), D91
 scripts/check.mjs   content gate
 ```
 

@@ -122,6 +122,7 @@ Trước khi dời bất kỳ nội dung nào, viết `scripts/check.mjs`. Scrip
 | Manifest khớp với các file trong `content/` | Quên đăng ký file mới |
 | File nằm đúng `content/topics/<track>/<id>.js` (problem, sim tương tự); `section` thuộc đúng `track` | File đặt nhầm chỗ, id khác tên file |
 | `diagrams[].src` trỏ tới file có thật trong `content/svg/` (so cả hoa/thường); mọi SVG đều được tham chiếu; SVG có `xmlns`, `viewBox`, nền trắng | Ảnh vỡ trên GitHub Pages, SVG mồ côi, sơ đồ chìm trong theme tối |
+| `title` của giai đoạn, chặng, track, section, topic, problem, sim không chứa cụm nào ở cột "Không dùng trong nhãn" của `docs/terminology.md` | Nhãn điều hướng dùng bản dịch khó hiểu thay cho key term mà phỏng vấn dùng (D106) |
 
 Chạy `node scripts/check.mjs` sau **mọi** lần sửa nội dung, trước khi commit. Nên đặt nó thành pre-commit hook hoặc bước GitHub Actions trước khi deploy Pages. Script thoát với mã 1 khi có lỗi và in `file:đường-dẫn → lỗi`.
 
@@ -141,8 +142,12 @@ Kinh nghiệm: mỗi lần review phát hiện một loại lỗi mới, thêm m
 ## 6. Quy trình viết nội dung
 
 - **Bắt đầu từ mẫu**: copy `content/_TEMPLATE.js`. Mẫu ghi chú từng trường: trường nào bắt buộc, trường nào tuỳ chọn, giới hạn độ dài.
-- **Chi tiết đúng nằm ở nguồn chính thức** (tài liệu của Kafka, Redis, AWS…). Khi nêu một con số hay một hành vi, ghi URL nguồn ngay trong câu (trong `t`, `why`, `detail`…), vì app chưa có trường `src` riêng để hiển thị (D31). Sơ đồ SVG thì dùng `source` của `diagrams`. Không ghi giá tiền vì giá thay đổi.
-- **Một khái niệm, một thuật ngữ.** Chọn một cách gọi và dùng xuyên suốt. Thêm từ viết tắt vào `glossary.js`, không giải thích lại trong từng chủ đề.
+- **Chi tiết đúng nằm ở nguồn chính thức** (tài liệu của Kafka, Redis, AWS…). Khi nêu một con số hay một hành vi, tác giả vẫn ghi URL nguồn ngay trong câu (trong `t`, `why`, ô bảng, `tips`, `cards`, deep dive, `detail` của sim…); không có trường `src` riêng (D31). Sơ đồ SVG thì dùng `source` của `diagrams`. Không ghi giá tiền vì giá thay đổi.
+- **App hiển thị URL thành chú thích (D92).** Khi render trang topic, problem và sim, `app.js` (hàm `splitCites`) bỏ URL khỏi câu, đặt số mũ `[n]` (link thẳng tới nguồn, mở tab mới) vào chỗ đó và gom mọi nguồn vào mục **"Nguồn tham khảo"** cuối trang: đánh số theo thứ tự xuất hiện, khử trùng lặp, hiện domain + đường dẫn rút gọn. `source` của sơ đồ vào cùng danh sách. Ở chỗ không có danh sách (kết quả tìm kiếm, thẻ, tooltip) URL chỉ bị bỏ đi. Vì vậy viết URL sao cho câu còn đọc trôi khi URL biến mất:
+  - Tốt: `… mất dữ liệu (https://…).` → "… mất dữ liệu[1]." · `(JLS §4.2.2 — https://…)` → "(JLS §4.2.2)[1]" · `Nguồn: https://… · https://…` ở cuối câu → "[1][2]" · nhiều URL trong một ngoặc ngăn bằng `,` `;` `·` hoặc "và".
+  - Tránh: URL làm thành phần của câu ("xem https://… để biết") vì câu sẽ cụt; URL trong `` `code` `` (không được tách, hiện nguyên văn); `http://`.
+  - `check.mjs` nạp đúng `splitCites` của `app.js` và báo lỗi khi URL không đọc được hoặc không phải `https`, hoặc khi câu sau khi tách còn ngoặc rỗng / dấu câu treo trong ngoặc.
+- **Một khái niệm, một thuật ngữ.** Mỗi khái niệm có một key term ghi trong `docs/terminology.md` (cách viết, giải nghĩa tiếng Việt, các cách dịch không dùng). Nhãn điều hướng và `goal` dùng key term; tiếng Việt giải nghĩa nó một lần ở `tldr` hoặc lần đầu xuất hiện. Khái niệm chưa có trong bảng thì thêm dòng trước khi viết. Thêm từ viết tắt vào `glossary.js`, không giải thích lại trong từng chủ đề.
 - **"Vì sao" nói về cơ chế, không lặp lại ý.** Câu mẫu: "X xảy ra vì Y; nếu không có Y thì Z". Mỗi câu "vì sao" nên trả lời được câu hỏi "nếu bỏ đi thì hỏng gì?".
 - **Link, đừng viết lại.** Hai chủ đề cùng cần một ý thì một chủ đề giữ nội dung, chủ đề kia link sang bằng `related`.
 - **Thư mục mới = track mới.** Thêm `BK.track({ id, title })`, tạo `content/topics/<id>/`, thêm các giai đoạn vào `roadmap.js`, rồi chạy kiểm tra.

@@ -2,11 +2,11 @@ BK.topic({
   id: "resilience",
   track: "sd",
   section: "sd-core",
-  title: "Timeout, retry & circuit breaker",
+  title: "Timeout, Retry & Circuit Breaker",
   goal: "Đặt timeout, retry có jitter, circuit breaker để lỗi không lan dây chuyền",
   needs: ["api-design", "queue"],
   tldr: {
-    t: "Mọi lời gọi qua mạng cần **timeout**. Chỉ **retry** lỗi tạm thời của thao tác idempotent, có **exponential backoff + jitter**, giới hạn số lần và chỉ retry ở **một tầng**. Phụ thuộc đang chết thì **circuit breaker** ngắt nhanh. Quá tải thì **load shedding**: từ chối sớm thay vì xếp hàng tới chết.",
+    t: "**Resilience** (lỗi của một phụ thuộc không kéo cả hệ thống sập theo): mọi lời gọi qua mạng cần **timeout**. Chỉ **retry** lỗi tạm thời của thao tác idempotent, có **exponential backoff + jitter**, giới hạn số lần và chỉ retry ở **một tầng**. Phụ thuộc đang chết thì **circuit breaker** ngắt nhanh. Quá tải thì **load shedding**: từ chối sớm thay vì xếp hàng tới chết.",
     why: "Sự cố lan dây chuyền (cascading failure) là lỗi lớn dần nhờ vòng phản hồi dương: phụ thuộc chậm → thread chờ → pool cạn → service gọi nó cũng chậm → client retry → tải tăng thêm (https://sre.google/sre-book/addressing-cascading-failures/). Mỗi cơ chế ở đây cắt một mắt xích của vòng đó: timeout trả lại thread, giới hạn retry chặn nhân tải, breaker cho phụ thuộc thời gian hồi phục, shedding giữ phần việc đã nhận vẫn xong kịp.",
   },
   story: {
@@ -52,7 +52,7 @@ BK.topic({
   },
   points: [
     {
-      t: "**Retry nhân tải theo cấp số.** Mỗi tầng thử 3 lần, 5 tầng xếp chồng thì DB có thể nhận tải gấp 3⁵ = 243 lần (Builders' Library). Google SRE: 3 tầng, mỗi tầng 4 lần thử → một thao tác của user thành 64 lần gọi DB. Chỉ retry ở **một** tầng, thường là tầng gần user nhất hoặc tầng có thông tin tốt nhất.",
+      t: "**Retry storm: retry nhân tải theo cấp số.** Mỗi tầng thử 3 lần, 5 tầng xếp chồng thì DB có thể nhận tải gấp 3⁵ = 243 lần (Builders' Library). Google SRE: 3 tầng, mỗi tầng 4 lần thử → một thao tác của user thành 64 lần gọi DB. Chỉ retry ở **một** tầng, thường là tầng gần user nhất hoặc tầng có thông tin tốt nhất.",
       why: "Mỗi tầng không biết tầng trên cũng retry, nên số lần thử nhân với nhau chứ không cộng. Tải tăng đúng lúc phụ thuộc đang yếu, kéo dài sự cố thay vì giúp nó qua. Retry ở một tầng giữ hệ số nhân ở mức số lần thử của tầng đó.",
     },
     {

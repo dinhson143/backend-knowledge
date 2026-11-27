@@ -12,7 +12,7 @@ BK.topic({
   story: {
     problem: "Client gọi `POST /charges` 100.000đ, chờ 5 giây không thấy trả lời rồi bấm thử lại. Thực ra lần đầu đã trừ tiền xong, chỉ có response bị mất do mạng. Lần thứ hai trừ thêm 100.000đ. Queue, Kafka, cron retry đều có cùng bài toán: message được giao lại sau crash hay rebalance.",
     idea: "Client gắn một **key duy nhất** cho mỗi thao tác logic (không phải mỗi lần gửi). Server ghi key cùng kết quả **trong cùng transaction** với thay đổi nghiệp vụ. Lần sau gặp lại key thì trả kết quả đã lưu. Phía consumer làm tương tự bằng bảng message đã xử lý hoặc upsert theo khoá tự nhiên.",
-    tradeoff: "Thêm một bảng (hoặc một cột unique) phải ghi ở mọi thao tác có side effect, thêm chính sách hết hạn key, và phải xử lý hai request cùng key đến song song. Key chỉ có tác dụng trong phạm vi server lưu nó: gọi ra hệ thống bên thứ ba thì phải chuyển tiếp key sang đó.",
+    tradeoff: "Thêm một bảng (hoặc một cột unique) phải ghi ở mọi thao tác có side effect, thêm chính sách hết hạn key, và phải xử lý hai request cùng key đến đồng thời. Key chỉ có tác dụng trong phạm vi server lưu nó: gọi ra hệ thống bên thứ ba thì phải chuyển tiếp key sang đó.",
   },
   table: {
     head: ["Thao tác", "Tự nhiên idempotent?", "Gửi lại an toàn khi nào"],

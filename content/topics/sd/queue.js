@@ -6,13 +6,13 @@ BK.topic({
   goal: "Tách producer/consumer, xử lý retry, DLQ và backpressure",
   needs: ["api-design"],
   tldr: {
-    t: "Queue để tách producer/consumer: phân phối việc cho worker và hấp thụ traffic đột biến. Nắm 5 chủ đề: ordering, retry, DLQ, partition, backpressure.",
+    t: "Queue tách producer/consumer để xử lý **async** (bất đồng bộ: trả lời ngay, việc chạy sau): phân phối việc cho worker và hấp thụ traffic đột biến. Nắm 5 chủ đề: ordering, retry, DLQ, partition, backpressure.",
     why: "Producer không phải chờ consumer vì queue lưu message bền vững, và traffic đột biến chỉ làm queue dài ra thay vì làm sập worker. 5 chủ đề kia chính là những gì phát sinh khi tách rời: thứ tự, lỗi, message hỏng, song song hoá và consumer chạy chậm.",
   },
   story: {
     problem: "API gọi đồng bộ thẳng vào service xử lý chậm (gửi email, transcode video) thì một đợt spike 10x làm service đó quá tải, request timeout dây chuyền ngược lên user. Producer và consumer bị buộc phải sống, chết và scale cùng nhau.",
     idea: "Đặt một bộ đệm bền vững ở giữa: producer chỉ cần ghi message vào queue rồi trả lời ngay, consumer kéo việc ra theo tốc độ của chính nó → hai bên tách rời về thời gian, tốc độ và số lượng instance.",
-    tradeoff: "Xử lý thành bất đồng bộ nên user không nhận kết quả ngay, phải có cơ chế poll/notify. Hệ thống phải chịu message trùng (at-least-once), sai thứ tự giữa partition, và thêm một thành phần cần vận hành, giám sát lag.",
+    tradeoff: "Xử lý thành **async** (bất đồng bộ) nên user không nhận kết quả ngay, phải có cơ chế poll/notify. Hệ thống phải chịu message trùng (at-least-once), sai thứ tự giữa partition, và thêm một thành phần cần vận hành, giám sát lag.",
   },
   points: [
     {
@@ -51,7 +51,7 @@ BK.topic({
   cards: [
     [
       "Dead Letter Queue dùng để làm gì?",
-      "Chứa message xử lý lỗi quá số lần retry, tránh poison message chặn hàng đợi và cho phép điều tra/xử lý lại.",
+      "Chứa message xử lý lỗi quá số lần retry, tránh poison message chặn queue và cho phép điều tra/xử lý lại.",
     ],
     [
       "Queue đảm bảo thứ tự thế nào khi scale?",

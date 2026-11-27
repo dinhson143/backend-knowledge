@@ -42,7 +42,7 @@ BK.topic({
               "`ZADD` `ZINCRBY` `ZRANGE … REV` `ZRANGE … BYSCORE`",
               "Leaderboard, top K, sliding-window rate limit, waiting queue, lịch hẹn theo thời gian",
             ],
-            why: "Cập nhật score là O(log N), lấy top K hay khoảng score là O(log N + K), vì sorted set kết hợp skiplist (sắp theo score) và hash table (tra member). Score là timestamp thì cùng cấu trúc đó thành sliding window hay hàng đợi theo thời gian.",
+            why: "Cập nhật score là O(log N), lấy top K hay khoảng score là O(log N + K), vì sorted set kết hợp skiplist (sắp theo score) và hash table (tra member). Score là timestamp thì cùng cấu trúc đó thành sliding window hay queue theo thời gian.",
           },
           {
             cells: [
@@ -239,7 +239,7 @@ BK.topic({
         },
         {
           t: "**Hash tag** — trong Cluster, lệnh nhiều key chỉ chạy khi cùng slot: đặt tên `{user42}:cart`, `{user42}:profile`.",
-          why: "`MGET` hay Lua trên nhiều key không thể atomic trong Cluster, vì các key khác slot có thể nằm trên hai node khác nhau. Hash tag chỉ băm phần trong `{}` → `{user42}:cart` và `{user42}:profile` chắc chắn cùng slot, cùng node.",
+          why: "`MGET` hay Lua trên nhiều key không thể atomic trong Cluster, vì các key khác slot có thể nằm trên hai node khác nhau. Hash tag chỉ hash phần trong `{}` → `{user42}:cart` và `{user42}:profile` chắc chắn cùng slot, cùng node.",
         },
         {
           t: "**Failover có thể mất write đã ack** — vì replication bất đồng bộ. Nhớ điều này khi dùng Redis làm lock hoặc nơi lưu chính.",
@@ -288,7 +288,7 @@ BK.topic({
             why: "Redis có RDB/AOF để sống qua restart; Memcached thiết kế thuần cache nên restart là trống; Kafka ghi mọi message xuống đĩa và replicate sang broker khác, vì dữ liệu chính là sản phẩm của nó.",
           },
           {
-            cells: ["Scale", "Cluster theo slot", "Client-side sharding, đa luồng", "Partition"],
+            cells: ["Scale", "Cluster theo slot", "Client-side sharding, multi-thread", "Partition"],
             why: "Redis Cluster tự chia 16384 slot và chuyển slot giữa node; Memcached không có cluster — client tự hash key ra server — nhưng mỗi node dùng nhiều thread nên tận dụng nhiều core; Kafka scale bằng số partition rải trên broker.",
           },
           {

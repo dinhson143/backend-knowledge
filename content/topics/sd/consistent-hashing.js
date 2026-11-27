@@ -20,15 +20,15 @@ BK.topic({
       why: "Số key phải đổi chỗ khi scale chính là chi phí mỗi lần thêm/bớt máy, vì di chuyển dữ liệu tốn băng thông, còn với cache thì key chuyển chỗ = cache miss. Consistent hashing đưa chi phí đó từ gần 100% xuống ~1/N.",
     },
     {
-      t: "**Data imbalance → Virtual nodes** — mỗi server map thành nhiều virtual node; càng nhiều vnode càng đều (Cassandra hiện mặc định `num_tokens: 16`, dùng kèm thuật toán cấp token cân bằng — https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html). Lý do: băm trực tiếp server vật lý làm các khoảng trên ring không đều.",
-      why: "Vị trí mỗi server trên ring là ngẫu nhiên, nên với 3 server các khoảng có thể chênh nhau vài lần (một server ôm 50% ring). Băm mỗi server thành vài trăm điểm → mỗi server sở hữu nhiều đoạn nhỏ rải khắp ring, theo luật số lớn tổng các đoạn tiến về 1/N. Thêm nữa, khi một server chết, tải của nó rải ra nhiều server thay vì dồn hết vào một láng giềng.",
+      t: "**Data imbalance → Virtual nodes** — mỗi server map thành nhiều virtual node; càng nhiều vnode càng đều (Cassandra hiện mặc định `num_tokens: 16`, dùng kèm thuật toán cấp token cân bằng — https://cassandra.apache.org/doc/latest/cassandra/managing/configuration/cass_yaml_file.html). Lý do: hash trực tiếp server vật lý làm các khoảng trên ring không đều.",
+      why: "Vị trí mỗi server trên ring là ngẫu nhiên, nên với 3 server các khoảng có thể chênh nhau vài lần (một server ôm 50% ring). Hash mỗi server thành vài trăm điểm → mỗi server sở hữu nhiều đoạn nhỏ rải khắp ring, theo luật số lớn tổng các đoạn tiến về 1/N. Thêm nữa, khi một server chết, tải của nó rải ra nhiều server thay vì dồn hết vào một láng giềng.",
     },
     {
       t: "**Replication** — key nằm ở server đầu tiên và nhân bản sang RF−1 server **vật lý khác nhau** kế tiếp trên ring (bỏ qua vnode cùng máy) → high availability.",
       why: "Mọi node tự tính được bản sao nằm đâu mà không cần bảng tra cứu, vì key đã có server 「chủ」 xác định trên ring và quy tắc chỉ là đi tiếp theo chiều kim đồng hồ. Server chủ chết thì server kế tiếp vốn đã có bản sao, vừa là chủ mới vừa phục vụ được ngay (dùng vnode thì phải bỏ qua các vnode cùng máy vật lý để bản sao nằm trên máy khác).",
     },
     {
-      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database kiểu Dynamo (Cassandra, Riak — ring xuất phát từ paper Dynamo; dịch vụ DynamoDB không cho thấy ring): tiến trình nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
+      t: "**Data movement thực tế** — dữ liệu không “teleport”. Cache: server kế tiếp bị cache miss và phải warm up từ DB. Database kiểu Dynamo (Cassandra, Riak — ring xuất phát từ paper Dynamo; dịch vụ DynamoDB không cho thấy ring): process nền copy dữ liệu sang server mới mà không gián đoạn đọc/ghi.",
       why: "Consistent hashing chỉ trả lời 「key giờ thuộc ai」, dữ liệu vẫn phải chép qua mạng. Với cache, mất bản sao chỉ là miss → server mới cứ rỗng rồi đầy dần từ DB; với DB, dữ liệu là bản gốc → phải stream sang server mới trong nền, trong lúc đó server cũ vẫn phục vụ để không gián đoạn.",
     },
     {

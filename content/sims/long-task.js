@@ -1,6 +1,6 @@
 BK.sim({
   id: "long-task",
-  title: "Tác vụ chạy lâu: 202 + job queue",
+  title: "Long-running task: 202 + job queue",
   topics: ["patterns", "queue"],
   scenario: "User xuất báo cáo Excel 1 triệu dòng — mất vài phút.",
   context: "API không giữ HTTP request chờ: nó nhận yêu cầu, đẩy **job** vào **queue**, trả `202 Accepted` kèm `jobId`, còn **worker** chạy nền. Lý do: xuất báo cáo 1 triệu dòng mất vài phút, lâu hơn timeout của load balancer, gateway và browser (thường 30–60 giây). Theo dõi dòng chữ dưới API (trạng thái job: QUEUED → RUNNING → DONE), dưới Worker (tiến độ) và dưới S3 (file kết quả).",

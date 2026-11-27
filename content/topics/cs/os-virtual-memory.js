@@ -2,7 +2,7 @@ BK.topic({
   id: "os-virtual-memory",
   track: "cs",
   section: "cs-os",
-  title: "Virtual memory & paging",
+  title: "Virtual Memory & Paging",
   goal: "Giải thích page fault, TLB, swap và tác động lên latency",
   needs: ["os-memory-layout"],
   tldr: {
