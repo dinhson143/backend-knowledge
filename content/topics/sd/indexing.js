@@ -71,6 +71,18 @@ BK.topic({
       why: "B-Tree không trả lời được “điểm nào trong bán kính 2km” (cần 2 chiều) hay “văn bản nào chứa từ X” (từ nằm giữa chuỗi), vì nó chỉ sắp theo một chiều. Geohash/Quadtree chia không gian thành ô để điểm gần nhau có key gần nhau; inverted index map mỗi từ sang danh sách document chứa nó.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/indexing-btree.svg",
+      caption: "B-Tree index (kiểu non-clustered như PostgreSQL): đi từ root xuống đúng leaf một lần, rồi quét ngang các leaf đã sắp xếp cho tới khi vượt cận trên; mỗi entry trỏ tới một dòng trong bảng.",
+      source: "https://www.postgresql.org/docs/current/btree.html#BTREE-STRUCTURE",
+    },
+    {
+      src: "content/svg/indexing-composite-index.svg",
+      caption: "Composite index (Ho, Ten) sắp theo Ho rồi mới tới Ten, nên lọc theo Ho hoặc Ho + Ten chạm một khối liền nhau, còn chỉ lọc theo Ten thì các dòng khớp nằm rải khắp index (leftmost prefix).",
+      source: "https://dev.mysql.com/doc/refman/8.4/en/multiple-column-indexes.html",
+    },
+  ],
   cards: [
     [
       "Vì sao một bảng chỉ có 1 clustered index?",

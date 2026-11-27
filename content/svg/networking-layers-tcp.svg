@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 410" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Gói tin bọc header IP, TCP, HTTP; router, L4 LB và L7 LB đọc tới đâu; TCP bắt tay 3 bước</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .w { font-size: 12px; fill: #ffffff; font-weight: 600; text-anchor: middle; }
+      .c { font-size: 12px; fill: #1f2937; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="408" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Trái: 3 tầng -->
+  <text class="h" x="20" y="30">3 tầng cần nhớ</text>
+  <rect x="20" y="42" width="360" height="52" rx="10" fill="#fff3db" stroke="#e08a00" stroke-width="1.4"/>
+  <text class="h" x="34" y="64">L7 · Application</text>
+  <text class="t" x="180" y="64">HTTP, WebSocket, gRPC</text>
+  <text class="s" x="34" y="83">thấy URL, header, cookie, payload</text>
+  <rect x="20" y="102" width="360" height="52" rx="10" fill="#e4f5ef" stroke="#14a37f" stroke-width="1.4"/>
+  <text class="h" x="34" y="124">L4 · Transport</text>
+  <text class="t" x="180" y="124">TCP / UDP</text>
+  <text class="s" x="34" y="143">thấy port → giao cho đúng process (443, 5432)</text>
+  <rect x="20" y="162" width="360" height="52" rx="10" fill="#e8f0fe" stroke="#3b7ff5" stroke-width="1.4"/>
+  <text class="h" x="34" y="184">L3 · Network</text>
+  <text class="t" x="180" y="184">IP</text>
+  <text class="s" x="34" y="203">thấy IP nguồn / đích → chọn đường đi</text>
+
+  <!-- Gói tin -->
+  <text class="h" x="20" y="244">Một gói tin trên dây</text>
+  <rect x="20" y="254" width="86" height="30" fill="#3b7ff5"/>
+  <rect x="106" y="254" width="96" height="30" fill="#14a37f"/>
+  <rect x="202" y="254" width="178" height="30" fill="#e08a00"/>
+  <text class="w" x="63" y="274">IP header</text>
+  <text class="w" x="154" y="274">TCP header</text>
+  <text class="w" x="291" y="274">GET /orders · cookie</text>
+  <!-- Ai đọc tới đâu -->
+  <g stroke="#64748b" stroke-width="1.3" fill="none">
+    <path d="M20,296 L20,302 L106,302 L106,296"/>
+    <path d="M20,322 L20,328 L202,328 L202,322"/>
+    <path d="M20,348 L20,354 L380,354 L380,348"/>
+  </g>
+  <text class="s" x="114" y="306">router đọc tới đây</text>
+  <text class="s" x="210" y="332">L4 LB (NLB) đọc tới đây: IP + port</text>
+  <text class="s" x="20" y="372">L7 LB (ALB) đọc cả request → route theo path được</text>
+
+  <!-- Phải: TCP handshake -->
+  <rect class="grp" x="410" y="16" width="332" height="362" rx="12"/>
+  <text class="h" x="424" y="38">TCP bắt tay 3 bước</text>
+  <rect class="box" x="424" y="50" width="96" height="32" rx="8"/>
+  <text class="c" x="472" y="71">Client</text>
+  <rect class="box" x="632" y="50" width="96" height="32" rx="8"/>
+  <text class="c" x="680" y="71">Server</text>
+  <g stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4">
+    <path d="M472,82 L472,340"/><path d="M680,82 L680,340"/>
+  </g>
+  <g stroke="#64748b" stroke-width="1.4" fill="none" marker-end="url(#a)">
+    <path d="M472,108 L678,134"/>
+    <path d="M680,160 L474,186"/>
+    <path d="M472,212 L678,238"/>
+  </g>
+  <text class="c" x="576" y="111">SYN · seq=100</text>
+  <text class="c" x="576" y="163">SYN,ACK · seq=300 ack=101</text>
+  <text class="c" x="576" y="215">ACK · seq=101 ack=301</text>
+  <path d="M472,262 L678,288" stroke="#3b7ff5" stroke-width="1.6" fill="none" marker-end="url(#b)"/>
+  <text class="c" x="576" y="265" fill="#1d4ed8">dữ liệu: GET /orders</text>
+  <!-- 1 RTT -->
+  <path d="M458,108 L452,108 L452,186 L458,186" stroke="#e08a00" stroke-width="1.5" fill="none"/>
+  <text class="s" x="440" y="152" text-anchor="end" fill="#b45309">1 RTT</text>
+  <text class="s" x="424" y="320">Hai bên thống nhất số thứ tự ban đầu,</text>
+  <text class="s" x="424" y="336">rồi mới gửi dữ liệu (thêm 1 RTT; TLS thêm nữa).</text>
+  <text class="s" x="424" y="362">UDP: không bắt tay, không ACK, không gửi lại.</text>
+
+  <text class="t" x="20" y="398">Tầng càng cao càng biết nhiều về request, nhưng thiết bị phải mở gói sâu hơn nên tốn CPU hơn.</text>
+</svg>

@@ -77,6 +77,13 @@ BK.topic({
       why: "REST/JSON an toàn cho client bên ngoài, vì mọi trình duyệt, CDN, cache và công cụ debug đều hiểu. Giữa các service nội bộ bạn kiểm soát cả hai đầu → dùng được gRPC để lấy tốc độ và type safety; kết nối realtime tốn tài nguyên giữ state nên chỉ dùng khi yêu cầu thực cần push.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/networking-layers-tcp.svg",
+      caption: "Mỗi tầng bọc thêm một header: router chỉ đọc IP, L4 load balancer đọc tới port, L7 load balancer đọc cả request nên route theo path được. TCP bắt tay 3 bước (SYN, SYN-ACK, ACK) tốn 1 RTT trước khi gửi dữ liệu.",
+      source: "https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5",
+    },
+  ],
   cards: [
     [
       "TCP khác UDP thế nào? Khi nào chọn UDP?",
