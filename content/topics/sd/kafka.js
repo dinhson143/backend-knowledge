@@ -50,7 +50,7 @@ BK.topic({
             cells: [
               "Consumer group",
               "Nhóm consumer chia nhau partition",
-              "Mỗi partition chỉ 1 consumer trong group; group khác đọc độc lập",
+              "Mỗi partition chỉ 1 consumer trong group (consumer group cổ điển); group khác đọc độc lập",
             ],
             why: "Kafka gán partition độc quyền cho một consumer trong group, vì hai consumer cùng group đọc chung một partition sẽ giành nhau message và phá thứ tự. Group khác có offset riêng → analytics và notification đọc cùng topic mà không ảnh hưởng nhau.",
           },
@@ -123,8 +123,8 @@ BK.topic({
           why: "Consumer tự điều tốc theo sức xử lý thay vì bị broker đẩy ngập, vì nó là bên kéo (pull). Offset do consumer commit → thời điểm commit (trước hay sau khi xử lý) quyết định delivery semantics.",
         },
         {
-          t: "**Phân partition** — mỗi partition gán cho đúng 1 consumer trong group; consumer nhiều hơn partition thì dư consumer ngồi chơi.",
-          why: "Số consumer làm việc thực tế bị chặn trên bởi số partition, vì Kafka giữ thứ tự bằng cách cho mỗi partition đúng một người đọc trong group. Muốn scale consumer thì phải có đủ partition từ đầu.",
+          t: "**Phân partition** — mỗi partition gán cho đúng 1 consumer trong group (consumer group cổ điển); consumer nhiều hơn partition thì dư consumer ngồi chơi.",
+          why: "Số consumer làm việc thực tế bị chặn trên bởi số partition (consumer group cổ điển), vì Kafka giữ thứ tự bằng cách cho mỗi partition đúng một người đọc trong group. Muốn scale consumer thì phải có đủ partition từ đầu.",
         },
         {
           t: "**Rebalance** — khi consumer vào, ra hoặc chết (mất heartbeat), group chia lại partition; với protocol cũ (eager), xử lý tạm dừng trong lúc đó. Cooperative rebalancing và protocol mới KIP-848 (Kafka 4.0) chỉ dời những partition cần dời.",
@@ -227,7 +227,7 @@ BK.topic({
         },
         {
           t: "**Consumer chậm** — thêm partition + consumer, hoặc tách việc nặng sang worker pool.",
-          why: "Đã đủ consumer thì phải thêm partition mới scale được, vì số consumer bị giới hạn bởi số partition. Nếu nút cổ chai là xử lý nặng (gọi API, render), tách sang worker pool cho phép song song hơn số partition, đổi lại phải tự quản thứ tự và commit offset.",
+          why: "Đã đủ consumer thì phải thêm partition mới scale được, vì số consumer bị giới hạn bởi số partition (consumer group cổ điển). Nếu nút cổ chai là xử lý nặng (gọi API, render), tách sang worker pool cho phép song song hơn số partition, đổi lại phải tự quản thứ tự và commit offset.",
         },
       ],
     },
