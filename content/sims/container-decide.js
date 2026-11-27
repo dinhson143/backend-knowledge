@@ -37,10 +37,9 @@ BK.sim({
     },
     {
       id: "gpu",
-      q: "Cần GPU, DaemonSet hoặc tuỳ biến node sâu?",
-      eks: 1,
+      q: "Cần GPU, agent chạy trên mỗi máy hoặc tuỳ biến máy sâu?",
       ec2: true,
-      why: "Cần GPU / tuỳ biến node → không dùng được Fargate, phải có node EC2.",
+      why: "Cần GPU / agent mỗi máy / tuỳ biến máy → không dùng được Fargate, phải có máy EC2. Câu này chọn compute, không chọn orchestrator: ECS có daemon service, EKS có DaemonSet, cả hai đều chạy GPU trên EC2 (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service_definition_parameters.html).",
     },
     {
       id: "spiky",
