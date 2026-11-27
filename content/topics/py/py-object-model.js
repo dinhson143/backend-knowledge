@@ -51,7 +51,7 @@ BK.topic({
     },
     {
       t: "**`id()`** — trả số nguyên đại diện identity, duy nhất trong lúc object còn sống. Trong CPython `id(x)` là địa chỉ bộ nhớ, nên hai object **không sống cùng lúc** có thể có cùng `id`.",
-      why: "Data model: \"For CPython, `id(x)` is the memory address where `x` is stored\" (https://docs.python.org/3/reference/datamodel.html). Object bị giải phóng thì vùng nhớ được dùng lại, nên `id([]) == id([])` có thể ra `True`: list thứ nhất đã chết trước khi list thứ hai được tạo ở cùng chỗ. Đừng lưu `id()` làm khoá lâu dài.",
+      why: "Data model: \"For CPython, `id(x)` is the memory address where `x` is stored\" (https://docs.python.org/3/reference/datamodel.html). Object bị giải phóng thì vùng nhớ được dùng lại, nên `id([]) == id([])` có thể ra `True`: list thứ nhất đã chết trước khi list thứ hai được tạo ở cùng chỗ. Đừng lưu `id()` làm key lâu dài.",
     },
     {
       t: "**`x in container` dùng cả `is` lẫn `==`** — `nan = float(\"nan\"); print(nan == nan, nan in [nan])` → `False True`.",
@@ -62,11 +62,11 @@ BK.topic({
       why: "Module `copy`: \"Assignment statements in Python do not copy objects\"; shallow copy tạo container mới nhưng chèn **tham chiếu** tới các object con, deep copy chèn **bản sao** đệ quy (https://docs.python.org/3/library/copy.html). Vì vậy shallow copy chỉ an toàn khi phần tử là immutable; list lồng nhau thì các list con vẫn dùng chung.",
     },
     {
-      t: "+ **`deepcopy` xử lý vòng tham chiếu bằng memo** — `a = [1]; a.append(a); b = copy.deepcopy(a); print(b[1] is b)` → `True`. Class có thể tự định nghĩa `__copy__`/`__deepcopy__`; từ 3.13 có `copy.replace()` cho dataclass, namedtuple và class có `__replace__`.",
+      t: "**`deepcopy` xử lý vòng tham chiếu bằng memo** — `a = [1]; a.append(a); b = copy.deepcopy(a); print(b[1] is b)` → `True`. Class có thể tự định nghĩa `__copy__`/`__deepcopy__`; từ 3.13 có `copy.replace()` cho dataclass, namedtuple và class có `__replace__`.",
       why: "`deepcopy` giữ một dict `memo` các object đã copy trong lượt hiện tại, gặp lại thì dùng bản đã copy; không có memo thì cấu trúc vòng sẽ đệ quy vô hạn (https://docs.python.org/3/library/copy.html). Trang đó cũng cảnh báo deep copy \"may copy too much\": dữ liệu lẽ ra dùng chung (cache, connection) cũng bị nhân bản.",
     },
     {
-      t: "+ **Copy tuple trả lại chính nó** — `t = (1, 2); print(copy.copy(t) is t, t[:] is t)` → `True True`. Copy list, dict, set thì O(n).",
+      t: "**Copy tuple trả lại chính nó** — `t = (1, 2); print(copy.copy(t) is t, t[:] is t)` → `True True`. Copy list, dict, set thì O(n).",
       why: "Object immutable không cần copy vì không ai sửa được nó; trả lại chính object là O(1) và an toàn. Trang \"Time complexity of built-in types\" ghi copy tuple, frozenset là O(1), copy list/dict/set là O(n) (https://docs.python.org/3/builtins/time-complexity.html).",
     },
   ],
@@ -74,12 +74,12 @@ BK.topic({
     {
       title: "Bảng mutable / immutable hay gặp",
       table: {
-        head: ["Immutable (hashable nếu phần tử hashable)", "Mutable (không dùng làm key dict)"],
+        head: ["Immutable (hashable nếu mọi phần tử bên trong hashable)", "Mutable"],
         rows: [
           ["`int`, `float`, `bool`, `complex`, `str`, `bytes`, `tuple`, `frozenset`, `range`, `None`", "`list`, `dict`, `set`, `bytearray`, instance của class tự viết (mặc định), `collections.deque`"],
           {
             cells: ["Dataclass `frozen=True`, `typing.NamedTuple`", "Dataclass thường, module, function (có thể gán thuộc tính)"],
-            why: "Instance của class tự viết mặc định hashable theo identity (vì kế thừa `object.__hash__`) dù vẫn mutable; chỉ khi bạn định nghĩa `__eq__` mà không định nghĩa `__hash__` thì nó thành unhashable (https://docs.python.org/3/reference/datamodel.html). Chi tiết ở bài Data Model & Dunder Methods.",
+            why: "List, dict, set, bytearray, deque không hash được nên không làm key dict. Instance của class tự viết, module, function thì vẫn hashable theo identity (kế thừa `object.__hash__`) dù mutable; chỉ khi bạn định nghĩa `__eq__` mà không định nghĩa `__hash__` thì nó thành unhashable (https://docs.python.org/3/reference/datamodel.html). Chi tiết ở bài Data Model & Dunder Methods.",
           },
         ],
       },

@@ -9,7 +9,7 @@ BK.topic({
   needs: ["py-object-model"],
   tldr: {
     t: "Python tra tên theo thứ tự **LEGB**: Local → Enclosing (hàm bao ngoài) → Global (module) → Built-in. Tên nào **được gán ở bất kỳ đâu trong hàm** thì là biến local của cả hàm, kể cả dòng phía trên phép gán; muốn gán vào biến ngoài phải khai báo `global` hoặc `nonlocal`. **Closure** (hàm con nhớ biến của hàm ngoài) giữ **biến**, không giữ **giá trị** lúc tạo: giá trị được đọc lúc gọi. Đó là **late binding**.",
-    why: "Tutorial §9.2 liệt kê bốn lớp scope theo thứ tự tra, và \"assignments to names always go into the innermost scope\" nếu không có `global`/`nonlocal` (https://docs.python.org/3/tutorial/classes.html). Execution model: \"If a name binding operation occurs anywhere within a code block, all uses of the name within the block are treated as references to the current block\", và tên tự do (free variable) \"is resolved at runtime, not at compile time\" (https://docs.python.org/3/reference/executionmodel.html).",
+    why: "Tutorial §9.2 liệt kê bốn lớp scope theo thứ tự tra, và \"assignments to names always go into the innermost scope\" nếu không có `global`/`nonlocal` (https://docs.python.org/3/tutorial/classes.html). Execution model: \"If a name binding operation occurs anywhere within a code block, all uses of the name within the block are treated as references to the current block\", và \"Name resolution of free variables occurs at runtime, not at compile time\" (https://docs.python.org/3/reference/executionmodel.html).",
   },
   story: {
     problem: "Code đăng ký handler trong vòng lặp: `for event in events: bus.on(event, lambda: log(event))`. Phát event nào thì log cũng in tên event cuối cùng. Unit test chỉ có một event nên không bắt được.",
@@ -36,11 +36,11 @@ BK.topic({
         why: "Vì có `x = 1` trong thân hàm, compiler đánh dấu `x` là local cho **toàn bộ** hàm; `print(x)` đọc biến local chưa được gán (FAQ, \"Why am I getting an UnboundLocalError\" — https://docs.python.org/3/faq/programming.html). `UnboundLocalError` là subclass của `NameError` (https://docs.python.org/3/reference/executionmodel.html). `x += 1` cũng là một phép gán nên gây lỗi y hệt.",
       },
       {
-        cells: ["`nonlocal` cho closure có trạng thái", "`def counter(): n = 0; ...` với hàm con `def inc(): nonlocal n; n += 1; return n`", "Gọi ba lần → 1, 2, 3; `inc.__code__.co_freevars` → `('n',)`"],
+        cells: ["`nonlocal` cho closure có trạng thái", "Hàm `counter()` gán `n = 0`, bên trong định nghĩa `def inc(): nonlocal n; n += 1; return n` rồi `return inc`", "Gọi ba lần → 1, 2, 3; `inc.__code__.co_freevars` → `('n',)`"],
         why: "`nonlocal` làm tên trỏ tới binding ở scope hàm bao gần nhất; không có binding đó thì `SyntaxError` ngay lúc compile, kể cả khi hàm chưa được gọi (https://docs.python.org/3/reference/executionmodel.html). Thiếu `nonlocal` thì `n += 1` tạo local mới và gây `UnboundLocalError`.",
       },
       {
-        cells: ["Mutate thì không cần `nonlocal`", "`def outer(): items = []; ...` với hàm con `def add(x): items.append(x); return items`", "Gọi `add(1); add(2)` → `[1, 2]`"],
+        cells: ["Mutate thì không cần `nonlocal`", "Hàm `outer()` gán `items = []`, bên trong định nghĩa `def add(x): items.append(x); return items` rồi `return add`", "Gọi `add(1); add(2)` → `[1, 2]`"],
         why: "`items.append` chỉ **đọc** tên `items` rồi sửa object; không gán lại tên nên không làm `items` thành local. `nonlocal`/`global` chỉ cần khi **gán lại** tên.",
       },
     ],
@@ -48,7 +48,7 @@ BK.topic({
   points: [
     {
       t: "**Closure giữ biến, không giữ giá trị** — hàm `make()` gán `v = 1`, định nghĩa `def g(): return v`, rồi gán `v = 2` trước khi `return g`: `make()()` → `2`.",
-      why: "Biến được closure dùng nằm trong một **cell** chung giữa hàm ngoài và hàm con (thấy qua `g.__closure__[0].cell_contents`). Hàm con đọc cell lúc chạy, nên thấy giá trị cuối cùng. Execution model: tên tự do \"is resolved at runtime, not at compile time\" (https://docs.python.org/3/reference/executionmodel.html).",
+      why: "Biến được closure dùng nằm trong một **cell** chung giữa hàm ngoài và hàm con (thấy qua `g.__closure__[0].cell_contents`). Hàm con đọc cell lúc chạy, nên thấy giá trị cuối cùng. Execution model: \"Name resolution of free variables occurs at runtime, not at compile time\" (https://docs.python.org/3/reference/executionmodel.html).",
     },
     {
       t: "**Scope do vị trí trong code quyết định, việc tra cứu diễn ra lúc chạy** — hàm luôn tra global trong module nơi nó được **định nghĩa**, dù được gọi từ module khác.",
@@ -59,11 +59,11 @@ BK.topic({
       why: "`for` gán vào tên ở scope hiện tại. Comprehension có sub-scope riêng; từ 3.12 CPython inline comprehension vào hàm bao để chạy nhanh hơn nhưng vẫn giữ biến \"fully isolated\" (PEP 709 — https://peps.python.org/pep-0709/).",
     },
     {
-      t: "+ **`except E as err` xoá `err` khi ra khỏi khối** — sau khối `except ValueError as err: pass`, `print(err)` → `NameError: name 'err' is not defined`. Cần giữ lại thì gán sang tên khác trong khối.",
+      t: "**`except E as err` xoá `err` khi ra khỏi khối** — sau khối `except ValueError as err: pass`, `print(err)` → `NameError: name 'err' is not defined`. Cần giữ lại thì gán sang tên khác trong khối.",
       why: "Exception giữ traceback, traceback giữ frame, frame giữ biến local trong đó có `err`: một vòng tham chiếu làm frame sống lâu hơn cần thiết. Xoá tên khi ra khỏi khối cắt vòng đó (Compound statements, the try statement — https://docs.python.org/3/reference/compound_stmts.html).",
     },
     {
-      t: "+ **Scope của class không bao method và comprehension bên trong** — trong thân class có `cv = 42` thì `b = list(cv + k for k in range(3))` → `NameError: name 'cv' is not defined`.",
+      t: "**Scope của class không bao method và comprehension bên trong** — trong thân class có `cv = 42` thì `b = list(cv + k for k in range(3))` → `NameError: name 'cv' is not defined`.",
       why: "\"The scope of names defined in a class block is limited to the class block; it does not extend to the code blocks of methods. This includes comprehensions and generator expressions\" (https://docs.python.org/3/reference/executionmodel.html). Trong method phải viết `self.cv` hoặc `type(self).cv`.",
     },
     {

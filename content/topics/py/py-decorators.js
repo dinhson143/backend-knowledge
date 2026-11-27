@@ -17,32 +17,32 @@ BK.topic({
     tradeoff: "Decorator gom logic cắt ngang (log, đo thời gian, retry, auth, cache) vào một chỗ, nhưng che mất luồng chạy: đọc `def` không thấy hết hàm làm gì, stack trace dài thêm một tầng, và decorator chạy lúc import nên lỗi trong nó làm hỏng cả module.",
   },
   table: {
-    head: ["Dòng", "Code (decorator đo thời gian)", "Vì sao viết vậy"],
+    head: ["Dòng · nằm trong", "Code (decorator đo thời gian)", "Vì sao viết vậy"],
     rows: [
-      ["1", "`def timed(fn):`", "Nhận hàm gốc làm tham số"],
+      ["1 · module", "`def timed(fn):`", "Nhận hàm gốc làm tham số"],
       {
-        cells: ["2", "`    @functools.wraps(fn)`", "Chép metadata của `fn` sang wrapper"],
+        cells: ["2 · thân `timed`", "`@functools.wraps(fn)`", "Chép metadata của `fn` sang wrapper"],
         why: "`wraps` gán `__module__`, `__name__`, `__qualname__`, `__annotations__`, `__type_params__`, `__doc__`, cập nhật `__dict__` và thêm `__wrapped__` (https://docs.python.org/3/library/functools.html). Có nó: `add.__name__, add.__doc__` → `add cộng`; không có: → `wrapper None`.",
       },
       {
-        cells: ["3", "`    def wrapper(*args, **kwargs):`", "Nhận mọi kiểu tham số để bọc được hàm bất kỳ"],
+        cells: ["3 · thân `timed`", "`def wrapper(*args, **kwargs):`", "Nhận mọi kiểu tham số để bọc được hàm bất kỳ"],
         why: "Wrapper không biết chữ ký của hàm gốc, nên chuyển nguyên mọi tham số vị trí và tham số tên. Nhờ `__wrapped__`, `inspect.signature(add)` vẫn trả `(a, b)` của hàm gốc.",
       },
-      ["4", "`        t0 = time.perf_counter()`", "`perf_counter` là đồng hồ có độ phân giải cao nhất để đo khoảng thời gian ngắn; trên CPython nó là monotonic. `time.time()` có thể lùi khi đồng hồ hệ thống bị chỉnh (https://docs.python.org/3/library/time.html)"],
+      ["4 · thân `wrapper`", "`t0 = time.perf_counter()`", "`perf_counter` là đồng hồ có độ phân giải cao nhất để đo khoảng thời gian ngắn; trên CPython nó là monotonic. `time.time()` có thể lùi khi đồng hồ hệ thống bị chỉnh (https://docs.python.org/3/library/time.html)"],
       {
-        cells: ["5", "`        try: return fn(*args, **kwargs)`", "Gọi hàm gốc và trả kết quả của nó"],
+        cells: ["5 · thân `wrapper`", "`try: return fn(*args, **kwargs)`", "Gọi hàm gốc và trả kết quả của nó"],
         why: "Quên `return` là lỗi hay gặp nhất: hàm được bọc luôn trả `None`.",
       },
       {
-        cells: ["6", "`        finally: print(f\"{fn.__name__} {time.perf_counter() - t0:.4f}s\")`", "Đo cả khi hàm ném exception"],
+        cells: ["6 · thân `wrapper`, ngang `try`", "`finally: print(f\"{fn.__name__} {time.perf_counter() - t0:.4f}s\")`", "Đo cả khi hàm ném exception"],
         why: "`finally` chạy cả khi `fn` lỗi, nên các lần gọi lỗi (thường là lần chậm, như timeout) không biến mất khỏi số đo.",
       },
-      ["7", "`    return wrapper`", "Trả hàm thay thế; `@timed` trên `def add` nghĩa là `add = timed(add)`"],
+      ["7 · thân `timed`", "`return wrapper`", "Trả hàm thay thế; `@timed` trên `def add` nghĩa là `add = timed(add)`"],
     ],
   },
   points: [
     {
-      t: "**Decorator có tham số = ba lớp hàm** — `def retry(times): def deco(fn): @wraps(fn) def wrapper(*a, **k): ...; return wrapper; return deco` (viết nhiều dòng). `@retry(times=3)` gọi `retry(3)` trước, lấy về `deco`, rồi `deco(flaky)`. Hàm `flaky` lỗi hai lần đầu: gọi một lần → `ok`, chạy 3 lần.",
+      t: "**Decorator có tham số = ba lớp hàm** — `def retry(times):` bên trong định nghĩa `def deco(fn):`, trong `deco` lại định nghĩa `wrapper` (có `@wraps(fn)`, chạy `fn` tối đa `times` lần); `deco` trả `wrapper`, `retry` trả `deco`. `@retry(times=3)` gọi `retry(3)` trước, lấy về `deco`, rồi `deco(flaky)`. Hàm `flaky` lỗi hai lần đầu: gọi một lần → `ok`, chạy 3 lần.",
       why: "Biểu thức sau `@` được tính trước, kết quả của nó mới là decorator (https://docs.python.org/3/reference/compound_stmts.html). `times` sống trong closure của `deco` và `wrapper` (bài Scope, Closures & Late Binding). Từ 3.9 biểu thức sau `@` có thể là biểu thức bất kỳ (PEP 614), nhưng ba lớp hàm vẫn là dạng chuẩn.",
     },
     {
@@ -62,8 +62,8 @@ BK.topic({
       why: "Instance có `__call__` gọi được như hàm (bài Data Model & Dunder Methods), và giữ trạng thái bằng thuộc tính thay vì `nonlocal`. `update_wrapper` là dạng hàm của `wraps` (https://docs.python.org/3/library/functools.html). Lưu ý: class decorator kiểu này đặt trên method sẽ không nhận `self` vì class không phải descriptor như function.",
     },
     {
-      t: "+ **Class decorator** — decorator đặt trên `class` nhận class và trả class: `@dataclass`, `@functools.total_ordering` là ví dụ quen thuộc.",
-      why: "Cùng cơ chế `C = deco(C)`, có từ Python 2.6 (PEP 3129 — https://peps.python.org/pep-3129/). Thường dùng để thêm method hoặc đăng ký class, thay cho metaclass trong đa số trường hợp.",
+      t: "**Class decorator** — decorator đặt trên `class` nhận class và trả class: `@dataclass`, `@functools.total_ordering` là ví dụ quen thuộc.",
+      why: "Cùng cơ chế `C = deco(C)`, được thêm bởi PEP 3129 (https://peps.python.org/pep-3129/). Thường dùng để thêm method hoặc đăng ký class, thay cho metaclass trong đa số trường hợp.",
     },
   ],
   sections: [
@@ -112,7 +112,7 @@ BK.topic({
   ],
   cards: [
     ["`@deco` trên `def f` tương đương gì?", "`f = deco(f)`, chạy một lần khi `def` được thực thi (thường là lúc import)."],
-    ["Viết decorator đo thời gian chạy?", "`def timed(fn)`: bên trong `@wraps(fn) def wrapper(*args, **kwargs)`, lấy `perf_counter()` trước, `try: return fn(*args, **kwargs)`, `finally:` log thời gian; `return wrapper`."],
+    ["Viết decorator đo thời gian chạy?", "`def timed(fn)`: bên trong định nghĩa `wrapper(*args, **kwargs)` có `@wraps(fn)`; trong `wrapper` lấy `perf_counter()` trước, `try: return fn(*args, **kwargs)`, `finally:` log thời gian; `return wrapper`."],
     ["Decorator có tham số cần mấy lớp hàm?", "Ba: hàm nhận tham số → trả decorator → decorator trả wrapper. `@retry(3)` là `f = retry(3)(f)`."],
     ["Quên `functools.wraps` mất gì?", "`__name__`, `__qualname__`, `__doc__`, `__module__`, annotations của hàm gốc (wrapper hiện tên `wrapper`) và `__wrapped__` để truy về hàm gốc."],
     ["`lru_cache` trên method gây leak vì sao?", "`self` là một phần key; cache sống ở mức class nên giữ mọi instance tới khi age out hoặc `cache_clear()`. Dùng `cached_property` hoặc `maxsize` hữu hạn."],

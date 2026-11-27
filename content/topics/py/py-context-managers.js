@@ -17,20 +17,20 @@ BK.topic({
     tradeoff: "`with` chỉ bảo vệ trong phạm vi một khối lệnh. Resource cần sống lâu hơn một khối (connection dùng suốt đời app) phải quản lý bằng vòng đời app (lifespan của framework), và `__exit__` nuốt exception sai chỗ thì bug biến mất không dấu vết.",
   },
   table: {
-    head: ["Dòng", "Code (`@contextmanager` cho transaction)", "Vì sao viết vậy"],
+    head: ["Dòng · nằm trong", "Code (`@contextmanager` cho transaction)", "Vì sao viết vậy"],
     rows: [
-      ["1", "`@contextlib.contextmanager`", "Biến generator function thành context manager"],
-      ["2", "`def transaction(conn):`", "Nhận resource cần bọc"],
-      ["3", "`    conn.execute(\"BEGIN\")`", "Phần trước `yield` = `__enter__`"],
+      ["1 · module", "`@contextlib.contextmanager`", "Biến generator function thành context manager"],
+      ["2 · module", "`def transaction(conn):`", "Nhận resource cần bọc"],
+      ["3 · thân `transaction`", "`conn.execute(\"BEGIN\")`", "Phần trước `yield` = `__enter__`"],
       {
-        cells: ["4", "`    try: yield conn`", "Giá trị `yield` được gán vào biến sau `as`"],
+        cells: ["4 · thân `transaction`", "`try: yield conn`", "Giá trị `yield` được gán vào biến sau `as`"],
         why: "Generator phải yield **đúng một lần**. Exception xảy ra trong khối `with` được ném lại vào generator **ngay tại `yield`** (https://docs.python.org/3/library/contextlib.html). Không có `try` quanh `yield` thì phần dọn dẹp phía dưới không bao giờ chạy khi khối lỗi: generator chỉ có `log.append(\"open\"); yield; log.append(\"close\")` cho ra `['open']` sau một khối ném `ValueError`.",
       },
       {
-        cells: ["5", "`    except Exception: conn.execute(\"ROLLBACK\"); raise`", "Lỗi thì rollback rồi **ném lại**"],
+        cells: ["5 · thân `transaction`, ngang `try`", "`except Exception: conn.execute(\"ROLLBACK\"); raise`", "Lỗi thì rollback rồi **ném lại**"],
         why: "Docs: nếu bắt exception chỉ để log hay dọn dẹp, generator \"must reraise that exception\"; không thì `with` coi như đã xử lý xong và chạy tiếp lệnh sau khối (https://docs.python.org/3/library/contextlib.html). Quên `raise` ở đây là nuốt lỗi.",
       },
-      ["6", "`    else: conn.execute(\"COMMIT\")`", "Không lỗi thì commit. Thử với một list làm log: khối chạy bình thường → `['BEGIN', 'UPDATE', 'COMMIT']`; khối ném `KeyError` → `['BEGIN', 'ROLLBACK']` và `KeyError` vẫn ra ngoài"],
+      ["6 · thân `transaction`, ngang `try`", "`else: conn.execute(\"COMMIT\")`", "Không lỗi thì commit. Thử với một list làm log: khối chạy bình thường → `['BEGIN', 'UPDATE', 'COMMIT']`; khối ném `KeyError` → `['BEGIN', 'ROLLBACK']` và `KeyError` vẫn ra ngoài"],
     ],
   },
   points: [
@@ -55,21 +55,21 @@ BK.topic({
       why: "`ExitStack` được thiết kế để \"programmatically combine other context managers and cleanup functions, especially those that are optional or otherwise driven by input data\"; callback chạy theo thứ tự ngược khi stack đóng (https://docs.python.org/3/library/contextlib.html). Nếu mở tới file thứ 3 thì lỗi, hai file đầu vẫn được đóng. `pop_all()` chuyển các callback sang stack mới khi muốn giữ resource mở sau khi khối kết thúc thành công.",
     },
     {
-      t: "**`async with`** — dùng `__aenter__`/`__aexit__` (đều là coroutine) cho resource mà mở/đóng cần `await`: connection pool async, HTTP client session. Viết nhanh bằng `@contextlib.asynccontextmanager` trên `async def` có `yield`.",
+      t: "**`async with`** — dùng `__aenter__`/`__aexit__` (đều trả awaitable, thường viết bằng `async def`) cho resource mà mở/đóng cần `await`: connection pool async, HTTP client session. Viết nhanh bằng `@contextlib.asynccontextmanager` trên `async def` có `yield`.",
       why: "Mở/đóng connection async phải chờ I/O; `__enter__` thường không `await` được nên cần giao thức riêng (PEP 492 — https://peps.python.org/pep-0492/). `asynccontextmanager` có từ 3.7 (https://docs.python.org/3/library/contextlib.html).",
     },
     {
-      t: "+ **Context manager có sẵn hay gặp** — `open()` (đóng file), `threading.Lock` (`with lock:` tự release), `contextlib.closing(x)` (gọi `x.close()`), `contextlib.nullcontext(x)` (không làm gì, dùng khi context manager là tuỳ chọn), `unittest.mock.patch`, `decimal.localcontext`.",
+      t: "**Context manager có sẵn hay gặp** — `open()` (đóng file), `threading.Lock` (`with lock:` tự release), `contextlib.closing(x)` (gọi `x.close()`), `contextlib.nullcontext(x)` (không làm gì, dùng khi context manager là tuỳ chọn), `unittest.mock.patch`, `decimal.localcontext`.",
       why: "Lock dùng `with` thì không bao giờ quên release khi có exception, nguyên nhân deadlock phổ biến. `nullcontext` được thiết kế làm \"stand-in for an optional context manager\" (https://docs.python.org/3/library/contextlib.html), tránh phải viết hai nhánh `if` có và không có `with`.",
     },
     {
-      t: "+ **Phần lớn context manager chỉ dùng một lần** — object tạo bởi `@contextmanager` dùng lần hai trong `with` sẽ lỗi; tạo mới mỗi lần (gọi lại hàm).",
+      t: "**Phần lớn context manager chỉ dùng một lần** — object tạo bởi `@contextmanager` dùng lần hai trong `with` sẽ lỗi; tạo mới mỗi lần (gọi lại hàm).",
       why: "Docs chia ba loại: single use, reusable và reentrant (dùng lồng trong chính nó). Generator đã chạy hết thì không yield lại được, nên context manager từ generator là single use (https://docs.python.org/3/library/contextlib.html).",
     },
   ],
   tips: [
     {
-      t: "Câu \"viết context manager mở/đóng kết nối DB\": viết bản `@contextmanager` với `try: yield conn` / `except: rollback; raise` / `else: commit` / `finally: conn.close()`, rồi nói vì sao cần từng nhánh.",
+      t: "Câu \"viết context manager mở/đóng kết nối DB\": viết bản `@contextmanager`: `yield conn` nằm trong `try`; nhánh `except` rollback rồi `raise`; nhánh `else` commit; nhánh `finally` gọi `conn.close()`. Rồi nói vì sao cần từng nhánh.",
       why: "Interviewer kiểm tra ba điều: dọn dẹp chạy cả khi lỗi (`finally`), lỗi không bị nuốt (`raise`), commit chỉ khi thành công (`else`). Thiếu `raise` là lỗi phổ biến nhất.",
     },
     {

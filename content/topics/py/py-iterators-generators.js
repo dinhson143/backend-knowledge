@@ -46,7 +46,7 @@ BK.topic({
   },
   points: [
     {
-      t: "**Viết `__iter__` bằng generator để class duyệt được nhiều lần** — class `Countdown` có `def __iter__(self): n = self.n; while n > 0: yield n; n -= 1` (viết nhiều dòng). `list(c), list(c)` → `[3, 2, 1] [3, 2, 1]`.",
+      t: "**Viết `__iter__` bằng generator để class duyệt được nhiều lần** — class `Countdown` có `def __iter__(self): yield from range(self.n, 0, -1)`. Với `c = Countdown(3)`: `list(c), list(c)` → `[3, 2, 1] [3, 2, 1]`.",
       why: "Mỗi lần `for` gọi `__iter__`, và mỗi lần gọi hàm generator tạo một generator mới với trạng thái riêng. Class trở thành iterable (duyệt lại được), không phải iterator. Nếu class tự làm iterator (`__iter__` trả `self`, có `__next__`) thì lần duyệt thứ hai rỗng.",
     },
     {
@@ -58,11 +58,11 @@ BK.topic({
       why: "Trước đây `StopIteration` lọt ra từ một `next()` gọi bên trong generator sẽ âm thầm kết thúc vòng lặp bên ngoài, che mất bug. PEP 479 đổi nó thành `RuntimeError`, bật cho mọi code từ Python 3.7 (https://peps.python.org/pep-0479/).",
     },
     {
-      t: "**Dọn dẹp trong generator** — `try: yield ... finally: cleanup()` chạy `finally` khi generator chạy hết, khi bị `close()`, hoặc khi bị garbage collect. `g = gen2(); next(g); g.close()` in `cleanup`.",
+      t: "**Dọn dẹp trong generator** — khối `try` bọc `yield`, có `finally` dọn dẹp: `finally` chạy khi generator chạy hết, khi bị `close()`, hoặc khi bị garbage collect. `g = gen2(); next(g); g.close()` in `cleanup`.",
       why: "`close()` ném `GeneratorExit` vào điểm đang dừng để `finally` chạy (PEP 342 — https://peps.python.org/pep-0342/). Nhưng nếu không ai gọi `close()` thì thời điểm dọn phụ thuộc lúc object bị thu hồi; resource quan trọng (file, connection) nên quản lý bằng `with` (bài Context Managers & with).",
     },
     {
-      t: "+ **`send()`: generator nhận giá trị** — `x = yield total` cho phép caller đẩy giá trị vào; phải `next()` một lần để chạy tới `yield` đầu tiên. Generator `acc()` cộng dồn: `a = acc(); next(a); a.send(5), a.send(3)` → `5 8`.",
+      t: "**`send()`: generator nhận giá trị** — `x = yield total` cho phép caller đẩy giá trị vào; phải `next()` một lần để chạy tới `yield` đầu tiên. Generator `acc()` cộng dồn: `a = acc(); next(a); a.send(5), a.send(3)` → `5 8`.",
       why: "PEP 342 biến generator thành coroutine đơn giản bằng `send`, `throw`, `close` (https://peps.python.org/pep-0342/). Đây là nền lịch sử của `asyncio`, dù code mới dùng `async def`/`await` (PEP 492) thay vì generator-coroutine.",
     },
   ],
@@ -95,7 +95,7 @@ BK.topic({
   ],
   tips: [
     {
-      t: "Câu \"đọc file 50 GB\": `with open(path) as f: for line in f: ...` (file object duyệt theo dòng), rồi nối generator cho từng bước (parse → lọc → gom lô bằng `batched`) và ghi kết quả theo lô. Nói rõ bộ nhớ là O(kích thước lô), không phụ thuộc kích thước file.",
+      t: "Câu \"đọc file 50 GB\": mở bằng `with open(path) as f:`, bên trong `for line in f:` (file object duyệt theo dòng), rồi nối generator cho từng bước (parse → lọc → gom lô bằng `batched`) và ghi kết quả theo lô. Nói rõ bộ nhớ là O(kích thước lô), không phụ thuộc kích thước file.",
       why: "Interviewer muốn nghe ba ý: không `read()`/`readlines()` cả file, pipeline lazy, và đầu ra cũng phải theo lô (nếu gom tất cả vào list kết quả thì lại OOM).",
     },
     {
@@ -107,7 +107,7 @@ BK.topic({
     ["Generator khác list comprehension về bộ nhớ thế nào?", "List comprehension tạo mọi phần tử ngay (O(n) bộ nhớ). Generator expression chỉ giữ trạng thái vòng lặp và sinh từng phần tử khi được hỏi (O(1))."],
     ["Duyệt một iterator hai lần thì sao?", "Lần thứ hai rỗng, không lỗi: iterator đã cạn và `__iter__` trả lại chính nó. List thì mỗi lần `for` tạo iterator mới."],
     ["`yield from` làm gì?", "Ủy quyền cho iterable/generator con: chuyển mọi phần tử (và `send`/`throw`) xuống nó, và nhận giá trị `return` của generator con làm giá trị biểu thức (PEP 380)."],
-    ["Đọc file 50 GB từng dòng thế nào?", "`with open(p) as f: for line in f:`; mỗi bước xử lý viết thành generator, ghi kết quả theo lô. Không dùng `read()`/`readlines()`."],
+    ["Đọc file 50 GB từng dòng thế nào?", "Mở bằng `with open(p) as f:`, bên trong `for line in f:`; mỗi bước xử lý viết thành generator, ghi kết quả theo lô. Không dùng `read()`/`readlines()`."],
     ["Iterable khác iterator?", "Iterable có `__iter__` trả iterator mới (list, dict). Iterator có `__next__` và `__iter__` trả chính nó; dùng một lần."],
     ["`raise StopIteration` trong generator thì sao (3.7+)?", "Thành `RuntimeError` (PEP 479). Kết thúc generator bằng `return`."],
     ["Gọi một hàm generator có chạy thân hàm không?", "Không. Chỉ tạo generator object; thân hàm chạy tới `yield` đầu tiên khi có `next()` đầu tiên."],

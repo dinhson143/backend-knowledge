@@ -8,7 +8,7 @@ BK.topic({
   needs: ["py-object-model", "bigo"],
   tldr: {
     t: "`list` là **mảng động chứa con trỏ**: index và `append` O(1), chèn/xoá ở đầu O(n), `x in list` O(n). `dict` và `set` là **hash table**: `in`, lấy, thêm, xoá O(1) trung bình, O(n) khi mọi key đụng hash. `dict` giữ thứ tự chèn (bảo đảm từ 3.7), `set` không có thứ tự. Cần thêm/bớt ở hai đầu thì dùng `collections.deque`.",
-    why: "Bảng độ phức tạp chính thức của CPython: \"Time complexity of operations on built-in types\" (https://docs.python.org/3/builtins/time-complexity.html; trước đây là wiki TimeComplexity). Trang đó nói rõ các số liệu là của CPython, giả định đúng kiểu built-in (subclass có thể khác), và O(1) của dict/set là trung bình, giả định hash function phân bố tốt.",
+    why: "Bảng độ phức tạp chính thức của CPython: \"Time complexity of operations on built-in types\" (https://docs.python.org/3/builtins/time-complexity.html). Trang này thay cho trang wiki TimeComplexity cũ, nay chuyển hướng về đây; nó nói rõ các số liệu là của CPython, giả định đúng kiểu built-in (subclass có thể khác), và O(1) của dict/set là trung bình, giả định hash function phân bố tốt.",
   },
   story: {
     problem: "Job dedup đọc 1 triệu event, kiểm `if event_id not in seen:` với `seen` là list. Chạy thử với 1.000 event thì nhanh; lên production thì job chạy hàng giờ. Mỗi lần `in` quét cả list, tổng cộng O(n²).",
@@ -66,7 +66,7 @@ BK.topic({
       why: "\"In the worst case, when every key hashes to the same value, each of the O(1) operations below instead takes O(n) time\" (https://docs.python.org/3/builtins/time-complexity.html). Đây là lý do CPython thêm salt ngẫu nhiên vào hash của str/bytes: để client không tạo được hàng loạt key đụng hash có chủ đích, kiểu tấn công DoS lên dict chứa tham số request (https://docs.python.org/3/reference/datamodel.html).",
     },
     {
-      t: "+ **Bảng hash không co lại khi xoá** — xoá gần hết phần tử của một dict/set lớn thì duyệt nó vẫn tốn thời gian theo kích thước cũ, tới khi có lần chèn làm resize.",
+      t: "**Bảng hash không co lại khi xoá** — xoá gần hết phần tử của một dict/set lớn thì duyệt nó vẫn tốn thời gian theo kích thước cũ, tới khi có lần chèn làm resize.",
       why: "Trang time complexity: các thao tác quét bảng hash bên trong, \"which is not shrunk when elements are removed\" (https://docs.python.org/3/builtins/time-complexity.html). Cache dài hạn xoá nhiều thì tạo dict mới (`d = dict(d)`) để lấy lại bộ nhớ và tốc độ duyệt.",
     },
     {

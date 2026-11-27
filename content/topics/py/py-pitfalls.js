@@ -24,7 +24,7 @@ BK.topic({
         why: "\"The default value is evaluated only once. This makes a difference when the default is a mutable object\" (Tutorial — https://docs.python.org/3/tutorial/controlflow.html). List mặc định là thuộc tính của function object (`__defaults__`) nên sống suốt đời hàm. Cùng cơ chế: `def stamp(t=time.time())` trả cùng một thời điểm mãi mãi.",
       },
       {
-        cells: ["**Sửa list khi đang duyệt**", "`L = [1, 2, 2, 3]` rồi `for x in L: if x == 2: L.remove(x)` → `[1, 2, 3]` (còn sót một số 2)", "Tạo list mới: `L = [x for x in L if x != 2]`, hoặc duyệt bản copy `for x in L[:]`"],
+        cells: ["**Sửa list khi đang duyệt**", "`L = [1, 2, 2, 3]` rồi `for x in L:` với thân `if x == 2: L.remove(x)` → `[1, 2, 3]` (còn sót một số 2)", "Tạo list mới: `L = [x for x in L if x != 2]`, hoặc duyệt bản copy `for x in L[:]`"],
         why: "Iterator của list đi theo index. Xoá phần tử ở index 1 làm mọi phần tử sau dịch lên một ô, nên phần tử kế tiếp bị nhảy qua. Tutorial khuyên \"loop over a copy of the collection or to create a new collection\" (https://docs.python.org/3/tutorial/controlflow.html). Với dict thì không sót mà ném `RuntimeError` (bài list, dict, set: Internals & Big-O).",
       },
       {
@@ -83,7 +83,7 @@ BK.topic({
       why: "Chuỗi chỉ falsy khi rỗng; object rỗng hoặc bằng 0 là falsy (`__bool__`/`__len__`, bài Data Model & Dunder Methods). Kiểm `None` thì viết `if x is None`, kiểm cấu hình thì parse chuỗi tường minh.",
     },
     {
-      t: "+ **`bool` là subclass của `int`** — `True + True` → `2`, `isinstance(True, int)` → `True`. Validate input bằng `isinstance(x, int)` sẽ nhận cả `True`.",
+      t: "**`bool` là subclass của `int`** — `True + True` → `2`, `isinstance(True, int)` → `True`. Validate input bằng `isinstance(x, int)` sẽ nhận cả `True`.",
       why: "`bool` kế thừa `int`, `True`/`False` hoạt động như 1/0 trong phép toán (https://docs.python.org/3/library/stdtypes.html). Cần loại bool thì kiểm `type(x) is int` hoặc kiểm `bool` trước.",
     },
   ],

@@ -73,7 +73,7 @@ BK.topic({
       why: "Ghi chú CPython implementation detail ở `__len__` (https://docs.python.org/3/reference/datamodel.html). Hiếm gặp, nhưng là lý do object \"vô hạn\" (như một dải số rất lớn) nên định nghĩa `__bool__` riêng.",
     },
     {
-      t: "+ **Đặt dunder method bằng `None` để tắt một giao thức** — `__iter__ = None` làm class không duyệt được, kể cả khi có `__getitem__`; `__hash__ = None` làm class unhashable có chủ đích.",
+      t: "**Đặt dunder method bằng `None` để tắt một giao thức** — `__iter__ = None` làm class không duyệt được, kể cả khi có `__getitem__`; `__hash__ = None` làm class unhashable có chủ đích.",
       why: "Docs: đặt special method thành `None` nghĩa là thao tác tương ứng không có; `iter()` sẽ ném `TypeError` \"without falling back to `__getitem__()`\" (https://docs.python.org/3/reference/datamodel.html).",
     },
   ],
