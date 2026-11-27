@@ -47,3 +47,5 @@ BK.track({ id: "py", title: "Python", subtitle: "Ngôn ngữ cốt lõi · CPyth
 BK.section({ id: "py-core", track: "py", title: "Ngôn ngữ cốt lõi" });
 BK.section({ id: "py-runtime", track: "py", title: "Bên trong CPython" });
 BK.section({ id: "py-concurrency", track: "py", title: "Concurrency trong Python" });
+BK.section({ id: "py-tooling", track: "py", title: "Đóng gói & kiểm thử" });
+BK.section({ id: "py-backend", track: "py", title: "Python cho backend" });

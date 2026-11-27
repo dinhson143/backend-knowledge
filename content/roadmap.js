@@ -69,6 +69,8 @@ window.ROADMAP = [
       { id: "py.core", title: "Ngôn ngữ cốt lõi", topics: ["py-object-model", "py-builtin-types-complexity", "py-data-model", "py-scope-closures", "py-iterators-generators", "py-decorators", "py-context-managers", "py-pitfalls"] },
       { id: "py.runtime", title: "Bên trong CPython", topics: ["py-memory-gc"] },
       { id: "py.concurrency", title: "Concurrency trong Python", topics: ["thr-gil", "py-threading-multiprocessing", "py-asyncio"] },
+      { id: "py.tooling", title: "Đóng gói & kiểm thử", topics: ["py-pytest"] },
+      { id: "py.backend", title: "Python cho backend", topics: ["py-wsgi-asgi", "py-fastapi"] },
     ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [

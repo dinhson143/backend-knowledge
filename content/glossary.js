@@ -68,6 +68,8 @@ window.GLOSSARY = [
     ["gRPC", "gRPC Remote Procedure Calls", "Framework RPC chạy trên HTTP/2, dữ liệu nhị phân Protocol Buffers."],
     ["SSE", "Server-Sent Events", "Server giữ HTTP response mở để đẩy event một chiều xuống client."],
     ["WS", "WebSocket", "Kết nối hai chiều giữ mở lâu dài giữa client và server."],
+    ["WSGI", "Web Server Gateway Interface", "Giao diện chuẩn (PEP 3333) giữa web server và app Python: app là callable `app(environ, start_response)`, mỗi request giữ một thread tới khi trả xong."],
+    ["ASGI", "Asynchronous Server Gateway Interface", "Giao diện kế tiếp WSGI cho app Python async: app là coroutine `app(scope, receive, send)`; hỗ trợ WebSocket và sự kiện lifespan."],
     ["JSON", "JavaScript Object Notation", "Định dạng dữ liệu dạng văn bản phổ biến cho API."],
     ["GPS", "Global Positioning System", "Hệ thống định vị toàn cầu — nguồn toạ độ của điện thoại."],
   ] },
