@@ -91,7 +91,7 @@ BK.topic({
           },
           {
             cells: ["HPA", "Tự tăng giảm số pod theo CPU hoặc metric tuỳ chỉnh (KEDA theo độ dài queue)"],
-            why: "Tải tăng là số pod tăng tỉ lệ, vì HPA định kỳ (mặc định 15 giây) lấy metric rồi tính `desired = current × metric / target`. HPA thường không scale về 0, nên KEDA lo trường hợp theo queue và scale-to-zero.",
+            why: "Tải tăng là số pod tăng tỉ lệ, vì HPA định kỳ (mặc định 15 giây) lấy metric rồi tính `desired = ceil(current × metric / target)` (https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/). HPA thường không scale về 0, nên KEDA lo trường hợp theo queue và scale-to-zero.",
           },
           {
             cells: ["Namespace + RBAC", "Chia cluster cho nhiều team, phân quyền trong cluster"],

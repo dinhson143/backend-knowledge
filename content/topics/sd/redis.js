@@ -37,7 +37,7 @@ BK.topic({
           {
             cells: [
               "Sorted Set",
-              "`ZADD` `ZINCRBY` `ZREVRANGE` `ZRANGEBYSCORE`",
+              "`ZADD` `ZINCRBY` `ZRANGE … REV` `ZRANGE … BYSCORE`",
               "Leaderboard, top K, sliding-window rate limit, waiting queue, lịch hẹn theo thời gian",
             ],
             why: "Cập nhật score là O(log N), lấy top K hay khoảng score là O(log N + K), vì sorted set kết hợp skiplist (sắp theo score) và hash table (tra member). Score là timestamp thì cùng cấu trúc đó thành sliding window hay hàng đợi theo thời gian.",
@@ -126,7 +126,7 @@ BK.topic({
           {
             cells: [
               "Leaderboard",
-              "`ZINCRBY board 10 user`; `ZREVRANGE board 0 9 WITHSCORES`",
+              "`ZINCRBY board 10 user`; `ZRANGE board 0 9 REV WITHSCORES`",
               "O(log N) mỗi lần cập nhật",
             ],
             why: "`ZINCRBY` chỉ chèn lại một node O(log N) và top 10 là đọc 10 node đầu, vì sorted set giữ member sắp theo score bằng skiplist. So với `ORDER BY score LIMIT 10` trên DB cập nhật liên tục, Redis không phải sort lại mỗi lần đọc.",
@@ -335,7 +335,7 @@ BK.topic({
     ],
     [
       "Leaderboard top 10 bằng Redis?",
-      "Sorted set: ZINCRBY board điểm user để cập nhật, ZREVRANGE board 0 9 WITHSCORES để lấy top 10; O(log N).",
+      "Sorted set: ZINCRBY board điểm user để cập nhật, ZRANGE board 0 9 REV WITHSCORES để lấy top 10 (`ZREVRANGE` đã deprecated từ Redis 6.2 — https://redis.io/docs/latest/commands/zrevrange/); O(log N).",
     ],
     [
       "Redis Cluster định tuyến key thế nào?",

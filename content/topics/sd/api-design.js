@@ -67,7 +67,7 @@ BK.topic({
       why: "Offset càng về sau càng chậm, vì `OFFSET 10000` buộc DB đọc rồi bỏ 10000 dòng trước khi trả 10 dòng; có item mới chèn vào đầu thì mọi item bị đẩy xuống một vị trí và trang sau lặp lại item cũ. Cursor dùng `WHERE id < :cursor LIMIT 10` nên đi thẳng vào index, và vị trí neo theo item chứ không theo số thứ tự → dữ liệu mới không làm lệch.",
     },
     {
-      t: "**Versioning** — URL versioning `/v1/events` (phổ biến, dễ thấy) hoặc Header `Accept-Version: v2`.",
+      t: "**Versioning** — URL versioning `/v1/events` (phổ biến, dễ thấy) hoặc header tự đặt (ví dụ `X-API-Version: 2`) hay media type (`Accept: application/vnd.example.v2+json`) — không có header chuẩn riêng cho version.",
       why: "Thay đổi phá vỡ phải ra version mới để hai bản chạy song song, vì client cũ (app mobile chưa update) vẫn gọi API cũ. Version trên URL hiện rõ trong log và dễ route ở gateway; version trong header giữ URL sạch nhưng khó thấy, khó test bằng trình duyệt.",
     },
     {
