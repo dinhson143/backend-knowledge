@@ -180,6 +180,19 @@
   const table = (t) => !t ? "" : `<div class="table-wrap"><table><thead><tr>${t.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
     <tbody>${t.rows.map((r) => `<tr class="${r.why ? "has-why" : ""}">${cellsOf(r).map((c) => `<td>${tagged(c)}</td>`).join("")}</tr>` +
       (r.why ? `<tr class="why-row"><td colspan="${cellsOf(r).length}">${whyLine(r.why)}</td></tr>` : "")).join("")}</tbody></table></div>`;
+  // Khối code nhiều dòng (D13): lines = chuỗi, hoặc [dòng code, chú thích]. Số chú thích vẽ bằng ::after (data-n)
+  // nên bôi đen hay nút Copy đều chỉ lấy code; chú thích hiện thành danh sách đánh số bên dưới
+  const codeBlock = (c) => {
+    const notes = [];
+    const body = c.lines.map((l) => {
+      const [src, note] = Array.isArray(l) ? l : [l];
+      if (!note) return esc(src);
+      notes.push(note);
+      return `${esc(src)}<span class="cn" data-n="${notes.length}" aria-hidden="true"></span>`;
+    }).join("\n");
+    return `<div class="panel code-block"><div class="code-head"><span>${esc(c.lang || "code")}</span><button type="button" class="copy-btn">Copy</button></div>
+      <pre><code>${body}</code></pre>${notes.length ? `<ol class="code-notes">${notes.map((n) => `<li>${inline(n)}</li>`).join("")}</ol>` : ""}</div>`;
+  };
   const points = (ps) => !ps || !ps.length ? "" : `<div class="panel"><ul class="points">${ps.map((p) => `<li>${tagged(txt(p))}${whyLine(p.why)}</li>`).join("")}</ul></div>`;
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
   // Sơ đồ SVG tĩnh (content/svg/): <img> chạy được qua file://, nền sáng nằm sẵn trong file SVG (D11)
@@ -450,7 +463,7 @@
       ${t.table ? `<div class="gap">${table(t.table)}</div>` : ""}
       ${t.points && t.points.length ? `<div class="gap">${points(t.points)}</div>` : ""}
       ${t.table2 ? `<h3>${esc(t.table2Title || "Chi tiết")}</h3>${table(t.table2)}` : ""}
-      ${(t.sections || []).map((s) => `<h3>${esc(s.title)}</h3>${s.points ? `<div class="gap">${points(s.points)}</div>` : ""}${s.table ? `<div class="gap">${table(s.table)}</div>` : ""}`).join("")}
+      ${(t.sections || []).map((s) => `<h3>${esc(s.title)}</h3>${s.points ? `<div class="gap">${points(s.points)}</div>` : ""}${s.table ? `<div class="gap">${table(s.table)}</div>` : ""}${s.code ? `<div class="gap">${codeBlock(s.code)}</div>` : ""}`).join("")}
 
       ${t.tips ? `${h("Mẹo khi phỏng vấn")}<div class="panel"><ul class="tips">${t.tips.map((x) => `<li>${inline(txt(x))}${whyLine(x.why)}</li>`).join("")}</ul></div>` : ""}
 
@@ -672,7 +685,7 @@
     const needle = q.toLowerCase();
     const textOf = (t) => [t.title, txt(t.tldr), ...(t.points || []).map(txt), ...(t.tips || []).map(txt),
       ...[t.table, t.table2, ...(t.sections || []).map((s) => s.table)].filter(Boolean).flatMap((x) => [...x.head, ...x.rows.flatMap(cellsOf)]),
-      ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || []).map(txt)]), ...(t.cards || []).flat()];
+      ...(t.sections || []).flatMap((s) => [s.title, ...(s.points || []).map(txt), ...(s.code ? s.code.lines.flat() : [])]), ...(t.cards || []).flat()];
     // A8: chủ đề, bài, mô phỏng, thuật ngữ. Xếp hạng: khớp tiêu đề (0) > khớp tóm tắt (1) > khớp thân (2); cùng hạng giữ thứ tự gốc
     const has = (s) => !!s && s.toLowerCase().includes(needle);
     const hit = (type, href, title, where, head, lead, body, gl) => {
@@ -697,6 +710,14 @@
 
   let glPrefill = "";
   main.addEventListener("click", (e) => { const a = e.target.closest("[data-gl]"); if (a) glPrefill = a.dataset.gl; });
+  // Copy khối code: textContent của <code> không gồm số chú thích (::after)
+  main.addEventListener("click", (e) => {
+    const b = e.target.closest(".copy-btn");
+    if (!b) return;
+    const code = b.closest(".code-block").querySelector("code").textContent;
+    const ok = () => { b.textContent = "Đã copy"; setTimeout(() => (b.textContent = "Copy"), 1500); };
+    if (navigator.clipboard) navigator.clipboard.writeText(code).then(ok, () => (b.textContent = "Không copy được"));
+  });
 
   // ── Router ──
   function route() {

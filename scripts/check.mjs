@@ -188,7 +188,25 @@ function walk(file, v, path) {
     return;
   }
   if (Array.isArray(v)) return v.forEach((x, i) => walk(file, x, `${path}[${i}]`));
-  if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) if (!CODE_KEYS.has(k)) walk(file, x, path ? `${path}.${k}` : k);
+  if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) {
+    if (CODE_KEYS.has(k)) continue;
+    const sub = path ? `${path}.${k}` : k;
+    if (k === "code" && x && !Array.isArray(x) && typeof x === "object") checkCode(file, sub, x);
+    else walk(file, x, sub);
+  }
+}
+// Khối code (D13): { lang?, lines: [chuỗi | [code, chú thích]] }. Code giữ nguyên (không kiểm markup);
+// thụt lề bằng dấu cách thật, không NBSP/tab; chú thích là văn bản thường nên đi qua walk.
+function checkCode(file, path, c) {
+  if (!Array.isArray(c.lines) || !c.lines.length) return at(file, path, "code.lines phải là mảng không rỗng");
+  if (c.lang != null && typeof c.lang !== "string") at(file, `${path}.lang`, "lang phải là chuỗi");
+  c.lines.forEach((l, i) => {
+    const [src, note, ...rest] = Array.isArray(l) ? l : [l];
+    if (typeof src !== "string" || rest.length || (Array.isArray(l) && typeof note !== "string")) return at(file, `${path}.lines[${i}]`, "dòng phải là chuỗi hoặc [code, chú thích]");
+    if (/[\u00a0\t]/.test(src)) at(file, `${path}.lines[${i}]`, "thụt lề bằng dấu cách, không dùng NBSP hay tab");
+    if (/\n/.test(src)) at(file, `${path}.lines[${i}]`, "mỗi phần tử là một dòng code");
+    if (note != null) walk(file, note, `${path}.lines[${i}][1]`);
+  });
 }
 for (const g of Object.keys(fileOf)) if (g !== "BK") walk(fileOf[g], W[g], g);
 for (const [x, f] of bkFile) walk(f, x, x.id);
