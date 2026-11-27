@@ -73,11 +73,11 @@ BK.sim({
           detail: "1,000 request cùng miss, nhưng nhờ **single flight** chỉ một request đi rebuild: request đầu tiên cho key `feed:hot` đăng ký làm **leader** (ví dụ giữ một promise/future trong map theo key, như `singleflight` của Go). 999 request sau thấy đã có leader đang rebuild thì **không query DB**, chỉ chờ kết quả của leader. Lưu ý: map này nằm trong từng process — nhiều app server thì mỗi server có một leader, hoặc phải dùng lock phân tán (`SET lock:feed:hot NX EX 5` trên Redis) để còn đúng một leader toàn cluster.",
         },
         {
-          note: "Chỉ **1 query** xuống DB.",
+          note: "Chỉ **1 query mỗi app server** xuống DB (đúng 1 nếu dùng lock phân tán).",
           msgs: [["app", "db", "SELECT (×1)"], ["db", "app", "rows", "ok"]],
           set: { db: "CPU 22% ✓" },
           good: ["db"],
-          detail: "Chỉ một `SELECT` xuống DB, DB trả rows và CPU chỉ nhích lên 22%. Cái giá: 999 request chờ thêm đúng bằng thời gian một query (ví dụ 50–200ms) thay vì được trả từ cache ngay. Cần đặt timeout cho việc chờ, để leader treo thì follower không bị kẹt mãi.",
+          detail: "Mỗi app server chỉ gửi một `SELECT` xuống DB (single flight chạy trong từng process; muốn đúng một query cho cả cụm thì cần lock phân tán), DB trả rows và CPU chỉ nhích lên 22%. Cái giá: 999 request chờ thêm đúng bằng thời gian một query (ví dụ 50–200ms) thay vì được trả từ cache ngay. Cần đặt timeout cho việc chờ, để leader treo thì follower không bị kẹt mãi.",
         },
         {
           note: "Leader ghi lại cache với TTL có **jitter** rồi trả kết quả cho cả 1,000 request.",
