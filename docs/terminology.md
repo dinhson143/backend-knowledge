@@ -144,6 +144,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Decorator | decorator (Python, PEP 318) | hàm nhận một hàm và trả hàm thay thế, viết bằng `@` | "Hàm trang trí", "Bộ trang trí" | `py-decorators` |
 | Context Manager | context manager, `with`; `__enter__`/`__exit__` | object lo việc mở/đóng resource quanh một khối code | "Trình quản lý ngữ cảnh", "Quản lý ngữ cảnh" | `py-context-managers` |
 | Reference Counting | reference counting, refcount; cyclic GC, weak reference (`weakref`) | mỗi object đếm số tham chiếu tới nó, về 0 thì được giải phóng; GC riêng dọn vòng tham chiếu | "Đếm tham chiếu", "Tham chiếu yếu" | `py-memory-gc` |
+| GIL / Free-threading | GIL (glossary), free-threading, free-threaded build; `PYTHON_GIL` | khoá của CPython cho một thread chạy bytecode tại một thời điểm; bản build tắt khoá đó | "Khoá thông dịch toàn cục", "Phân luồng tự do" | `thr-gil` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật
