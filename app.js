@@ -40,8 +40,11 @@
     document.documentElement.dataset.theme = next;
     store.set("ip.theme", next);
   };
-  $("#menuBtn").onclick = () => sidebar.classList.toggle("open");
-  main.addEventListener("click", () => sidebar.classList.remove("open"));
+  const menuBtn = $("#menuBtn");
+  const setMenu = (open) => { sidebar.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open); };
+  menuBtn.onclick = () => setMenu(!sidebar.classList.contains("open"));
+  // Bấm ra ngoài sidebar (kể cả nền mờ) thì đóng
+  document.addEventListener("click", (e) => { if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) setMenu(false); });
 
   // ── Helpers ──
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -114,6 +117,12 @@
   document.addEventListener("focusin", (e) => { const a = e.target.closest("abbr.g"); if (a) showTip(a); });
   document.addEventListener("focusout", hideTip);
   window.addEventListener("scroll", hideTip, { passive: true });
+  // Esc: ẩn tooltip (WCAG 1.4.13), đóng sidebar mobile và trả focus về nút ☰
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    hideTip();
+    if (sidebar.classList.contains("open")) { setMenu(false); menuBtn.focus(); }
+  });
 
   // ── Sidebar theo ngữ cảnh ──
   function sideKnowledge(active) {
@@ -134,7 +143,7 @@
     glSeen = mode === "glossary" ? null : new Set();
     document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
     sidebar.innerHTML = side;
-    sidebar.classList.remove("open");
+    setMenu(false);
     window.scrollTo(0, 0);
   }
 

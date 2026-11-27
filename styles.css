@@ -40,6 +40,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--accent); text-decoration: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 code { font-family: var(--mono); font-size: .86em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
 
 /* ── Top bar ── */
@@ -140,8 +141,9 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   .menu-btn { display: inline-block; }
   .brand span { display: none; }
   .layout { grid-template-columns: minmax(0, 1fr); }
-  .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: 280px; z-index: 30; transform: translateX(-100%); transition: transform .2s; box-shadow: var(--shadow); }
-  .sidebar.open { transform: none; }
+  .sidebar { position: fixed; left: 0; top: 0; height: 100vh; width: 280px; z-index: 30; transform: translateX(-100%); visibility: hidden; transition: transform .2s, visibility .2s; }
+  /* đóng: visibility ẩn khỏi thứ tự Tab; mở: bóng phủ làm nền mờ */
+  .sidebar.open { transform: none; visibility: visible; box-shadow: 0 0 0 100vmax rgba(0,0,0,.45); }
   main { padding: 20px 16px 60px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }
   .topbar { gap: 8px; padding: 10px 16px; flex-wrap: wrap; }
@@ -423,8 +425,8 @@ tr.why-row td { padding-top: 0; font-weight: 400 !important; }
 
 /* ── Thuật ngữ ── */
 abbr.g { text-decoration: underline dotted; text-decoration-color: var(--accent); text-underline-offset: 3px; cursor: help; border-radius: 3px; }
-abbr.g:hover, abbr.g:focus { background: var(--accent-soft); outline: none; }
-#gtip { position: fixed; z-index: 100; max-width: 300px; padding: 8px 12px; border-radius: 8px; background: #111318; color: #eceef2; font-size: 13px; line-height: 1.5; box-shadow: 0 6px 24px rgba(0,0,0,.25); pointer-events: none; opacity: 0; transition: opacity .12s; }
+abbr.g:hover, abbr.g:focus { background: var(--accent-soft); }
+#gtip { position: fixed; z-index: 100; max-width: 300px; padding: 8px 12px; border-radius: 8px; border: 1px solid #3a3f4a; background: #111318; color: #eceef2; font-size: 13px; line-height: 1.5; box-shadow: 0 6px 24px rgba(0,0,0,.25); pointer-events: none; opacity: 0; transition: opacity .12s; }
 #gtip.on { opacity: 1; }
 #gtip b { color: #8fb4ff; }
 #gtip .ex { margin-top: 4px; color: #aab0bb; font-size: 12px; }
