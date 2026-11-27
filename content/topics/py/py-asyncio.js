@@ -76,7 +76,7 @@ BK.topic({
       why: "Docs: delay 0 \"provides an optimized path to allow other tasks to run\" và \"can be used by long-running functions to avoid blocking the event loop\" (https://docs.python.org/3/library/asyncio-task.html). Loop chỉ đổi task tại điểm `await` (bài Event Loop), nên vòng lặp không có `await` giữ loop tới khi xong.",
     },
     {
-      t: "**Ctrl-C và shutdown** — từ 3.11, `asyncio.run`/`Runner` cài handler SIGINT: lần Ctrl-C đầu huỷ task chính (code dọn dẹp trong `finally` chạy được), rồi `run()` ném `KeyboardInterrupt`; lần thứ hai ngắt ngay. Trong container, SIGTERM không được xử lý như vậy; tự đăng ký bằng `loop.add_signal_handler` (Unix) để huỷ task chính và drain.",
+      t: "**Ctrl-C và shutdown** — từ 3.11, `asyncio.run`/`Runner` cài handler SIGINT: lần Ctrl-C đầu huỷ task chính (code dọn dẹp trong `finally` chạy được), rồi `run()` ném `KeyboardInterrupt`; lần thứ hai ngắt ngay. Trong container, SIGTERM không được xử lý như vậy; trên Unix tự đăng ký bằng `loop.add_signal_handler(signal.SIGTERM, …)` để huỷ task chính và drain (https://docs.python.org/3/library/asyncio-eventloop.html).",
       why: "Mục \"Handling Keyboard Interruption\" của docs runner mô tả đúng trình tự này (https://docs.python.org/3/library/asyncio-runner.html). Graceful shutdown nói chung ở bài Signal & Graceful Shutdown.",
     },
     {

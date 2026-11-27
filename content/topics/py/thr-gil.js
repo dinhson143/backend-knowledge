@@ -61,7 +61,7 @@ BK.topic({
     },
     {
       t: "**Kiểm tra đang chạy bản nào** — `sysconfig.get_config_var(\"Py_GIL_DISABLED\")` → `1` nếu build hỗ trợ free-threading; `sys._is_gil_enabled()` (3.13+) cho biết GIL **lúc này** có bật không; `python -VV` có chữ \"free-threading build\". Trên bản free-threaded, ép bật/tắt GIL bằng biến môi trường `PYTHON_GIL` hoặc `-X gil`.",
-      why: "HOWTO khuyên dùng `Py_GIL_DISABLED` cho quyết định theo build, và `_is_gil_enabled()` cho trạng thái thật trong process, vì hai cái có thể khác nhau khi một extension làm GIL bật lại (https://docs.python.org/3/howto/free-threading-python.html). Trên máy chạy thử (bản mặc định): `0` và `True`.",
+      why: "HOWTO khuyên dùng `Py_GIL_DISABLED` cho quyết định theo build, và `_is_gil_enabled()` cho trạng thái thật trong process, vì hai cái có thể khác nhau khi một extension làm GIL bật lại (https://docs.python.org/3/howto/free-threading-python.html). `-X gil=0|1` và `PYTHON_GIL=0|1` có từ 3.13; giá trị `0` chỉ dùng được trên bản build `--disable-gil`, và `-X gil` thắng biến môi trường (https://docs.python.org/3/using/cmdline.html). Trên máy chạy thử (bản mặc định): `0` và `True`.",
     },
     {
       t: "**Free-threaded không làm code tự an toàn** — dùng chung một iterator giữa nhiều thread có thể bỏ sót hoặc lặp phần tử; đọc `frame.f_locals` của frame đang chạy ở thread khác có thể làm crash. Code từng \"chạy đúng nhờ GIL\" (ví dụ dựa vào việc một lệnh bytecode không bị chen) cần lock tường minh trước khi chuyển sang free-threaded.",
@@ -126,7 +126,7 @@ BK.topic({
     ["Thread có giúp code Python thuần CPU-bound không?", "Không trên bản mặc định: các thread lần lượt giữ GIL. Dùng process, thư viện C nhả GIL, hoặc bản free-threaded."],
     ["Free-threaded Python có từ bản nào, đã mặc định chưa?", "Thử nghiệm từ 3.13, hỗ trợ chính thức từ 3.14 (PEP 779), vẫn là bản build tuỳ chọn, chưa mặc định."],
     ["Kiểm tra GIL đang bật thế nào?", "`sys._is_gil_enabled()`; build có hỗ trợ free-threading thì `sysconfig.get_config_var(\"Py_GIL_DISABLED\") == 1`."],
-    ["Vì sao bản free-threaded vẫn có thể chạy với GIL?", "Import một extension C chưa khai báo hỗ trợ free-threading làm GIL tự bật lại (có cảnh báo), hoặc ép bằng `PYTHON_GIL=1` / `-X gil=1`."],
+    ["Vì sao bản free-threaded vẫn có thể chạy với GIL?", "Import một extension C chưa khai báo hỗ trợ free-threading làm GIL tự bật lại (có cảnh báo), hoặc ép bằng `PYTHON_GIL=1` / `-X gil=1` (3.13+)."],
     ["Subinterpreter khác thread ở đâu?", "Mỗi interpreter có GIL riêng (PEP 684) và object riêng, nên chạy song song được; đổi lại phải chia sẻ dữ liệu qua kênh/serialize như process."],
   ],
   related: ["ctx-switch"],

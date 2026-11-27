@@ -15,7 +15,7 @@ BK.topic({
   },
   story: {
     problem: "Một job resize 10.000 ảnh chạy bằng `ThreadPoolExecutor` không nhanh hơn chạy tuần tự. Đổi sang `ProcessPoolExecutor` thì nhanh hơn trên laptop dev (macOS), nhưng khi deploy lên Linux với Python cũ hơn, worker thỉnh thoảng treo vĩnh viễn ngay lúc khởi động. Thêm một bản sửa nhanh truyền `lambda` vào pool thì gặp `PicklingError`.",
-    idea: "Resize bằng Pillow là CPU-bound nên cần process. Treo trên Linux là do start method `fork` (mặc định trên Linux trước 3.14) sao chép process cha đang có thread giữ lock; chọn `spawn` hoặc `forkserver` tường minh bằng `get_context()`. Hàm gửi sang process phải định nghĩa ở mức module để pickle được; gửi đường dẫn file thay vì bytes ảnh.",
+    idea: "Phần resize là CPU-bound và chạy trong code giữ GIL, nên cần process. Treo trên Linux là do start method `fork` (mặc định trên Linux trước 3.14) sao chép process cha đang có thread giữ lock; chọn `spawn` hoặc `forkserver` tường minh bằng `get_context()`. Hàm gửi sang process phải định nghĩa ở mức module để pickle được; gửi đường dẫn file thay vì bytes ảnh.",
     tradeoff: "Process cô lập lỗi và dùng được mọi core, nhưng khởi động chậm (nhất là `spawn`), mỗi process giữ một bản bộ nhớ riêng, và mọi dữ liệu qua lại tốn chi phí pickle. Thread rẻ và chung bộ nhớ, nhưng không tăng tốc code Python thuần CPU-bound trên bản có GIL và phải tự lo race condition.",
   },
   table: {
@@ -57,7 +57,7 @@ BK.topic({
       },
       {
         cells: ["`fork`", "`os.fork()` sao chép process cha, con có sẵn mọi thứ cha đang có", "Linux và POSIX khác **tới 3.13**; từ 3.14 không còn là mặc định ở đâu", "Không an toàn khi process cha có nhiều thread: từ 3.12 `os.fork()` cảnh báo `DeprecationWarning` khi phát hiện điều đó"],
-        why: "Docs: \"safely forking a multithreaded process is problematic\" (https://docs.python.org/3/library/multiprocessing.html). Cơ chế: `fork` chỉ chép thread gọi nó; lock mà thread khác đang giữ lúc fork nằm trong con ở trạng thái đã khoá và không ai mở (bài Process: fork, exec, zombie). Muốn dùng `fork` từ 3.14 phải chọn tường minh qua `get_context(\"fork\")`.",
+        why: "Docs: \"safely forking a multithreaded process is problematic\" (https://docs.python.org/3/library/multiprocessing.html). Cơ chế: POSIX tạo process con \"with a single thread\", bản sao của thread gọi `fork`, và con chỉ được làm thao tác async-signal-safe cho tới `exec` (https://pubs.opengroup.org/onlinepubs/9799919799/functions/fork.html); lock mà thread khác đang giữ (kể cả lock của `malloc`) nằm trong con ở trạng thái đã khoá và không ai mở. Docs `os.fork`: \"it has never been safe to mix threading with `os.fork()` on POSIX platforms\" (https://docs.python.org/3/library/os.html). Xem thêm bài Process: fork, exec, zombie. Muốn dùng `fork` từ 3.14 phải chọn tường minh qua `get_context(\"fork\")`.",
       },
       {
         cells: ["`forkserver`", "Một server process đơn thread được dựng trước; mỗi lần cần process mới thì server fork ra", "POSIX hỗ trợ truyền fd qua Unix pipe (Linux…) **từ 3.14**", "Như `spawn`: cần pickle và guard `__main__`; từ 3.15.1 tự lùi về `spawn` khi không có thư mục tạm ghi được"],

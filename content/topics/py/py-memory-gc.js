@@ -39,7 +39,7 @@ BK.topic({
   },
   points: [
     {
-      t: "**`sys.getrefcount(x)` luôn lớn hơn 1** so với số tên bạn đếm được, vì chính lời gọi giữ thêm một tham chiếu tạm. `x = []` rồi `sys.getrefcount(x)` → `2`; thêm `y = x` → `3`. Từ 3.12, object **immortal** như `None`, `True`, số nguyên nhỏ có refcount rất lớn không đổi: `sys.getrefcount(None)` → `3221225472` trên 3.14.6.",
+      t: "**`sys.getrefcount(x)` luôn lớn hơn 1** so với số tên bạn đếm được, vì chính lời gọi giữ thêm một tham chiếu tạm. `x = []` rồi `sys.getrefcount(x)` → `2`; thêm `y = x` → `3`. Từ 3.12, object **immortal** như `None`, `True` có refcount rất lớn không đổi (trên 3.14.6 số nguyên nhỏ cũng vậy: `sys._is_immortal(1)` → `True`, `sys._is_immortal(10**6)` → `False`): `sys.getrefcount(None)` → `3221225472` trên 3.14.6.",
       why: "Docs `sys`: số trả về \"generally one higher than you might expect\", và vì object immortal, đừng tin giá trị này \"other than a value of 0 or 1\" (https://docs.python.org/3/library/sys.html). Immortal object (PEP 683, 3.12) không bao giờ bị sửa refcount, nên nhiều thread đọc `None` không phải ghi chung một ô nhớ (https://docs.python.org/3/glossary.html).",
     },
     {
