@@ -30,7 +30,7 @@ window.ROADMAP = [
     parts: [
       { id: "s2.cache", title: "Caching", topics: ["caching", "dist-cache"] },
       { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing", "id-generation"] },
-      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication"] },
+      { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication", "multi-region"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
   { id: "s3", title: "Async & Coordination", goal: "Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và xử lý contention giữa nhiều máy.",
