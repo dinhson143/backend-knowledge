@@ -178,6 +178,13 @@ Object.values(topics).forEach((t) => pointLists(t).flat().forEach((p) => {
   if (/^[+!](?! )/.test(s)) E(t.id, `${t.id}.points`, `tiền tố sai (chỉ "+ " hoặc "! "): "${s.slice(0, 30)}"`);
 }));
 
+// ── Glossary: mỗi viết tắt một lần (mục sau ghi đè mục trước mà không báo) ──
+const glSeen = new Set();
+(W.GLOSSARY || []).forEach((g) => g.items.forEach(([k]) => {
+  if (glSeen.has(k)) at(fileOf.GLOSSARY || "content/glossary.js", k, `viết tắt "${k}" khai báo hai lần`);
+  glSeen.add(k);
+}));
+
 // ── content/: manifest khớp thư mục, kích thước file ──
 const MAX = 40 * 1024;
 const NOT_LOADED = new Set(["content/manifest.js", "content/_TEMPLATE.js"]);
