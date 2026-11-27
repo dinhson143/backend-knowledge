@@ -117,6 +117,7 @@
     "content/topics/py/py-pitfalls.js",
     "content/topics/py/py-memory-gc.js",
     "content/topics/py/thr-gil.js",
+    "content/topics/py/py-threading-multiprocessing.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
