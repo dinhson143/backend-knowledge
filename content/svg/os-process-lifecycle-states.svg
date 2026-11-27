@@ -4,6 +4,7 @@
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
     <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#14a37f"/></marker>
     <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
     <style>
       .st { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.4; }
@@ -60,7 +61,7 @@
 
   <path d="M502,97 L588,97" stroke="#e08a00" stroke-width="1.6" fill="none" marker-end="url(#o)"/>
   <text class="code" x="545" y="89" text-anchor="middle">exit()</text>
-  <path d="M665,120 L665,194" stroke="#14a37f" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <path d="M665,120 L665,194" stroke="#14a37f" stroke-width="1.6" fill="none" marker-end="url(#g)"/>
   <text class="lb" x="657" y="152" text-anchor="end">cha gọi</text>
   <text class="code" x="657" y="168" text-anchor="end">wait()</text>
 
