@@ -7,11 +7,17 @@
   const BK = window.BK;
   const ALL = BK.topics;
   const byId = Object.fromEntries(ALL.map((t) => [t.id, t]));
-  const STAGES = window.ROADMAP.map((s) => ({ ...s, topics: (s.topics || []).filter((id) => byId[id]) }));
+  // Giai đoạn có `parts` (chặng) thì `topics` suy từ các chặng; không có thì dùng `topics` như cũ (B1). Mọi trường mới đều tuỳ chọn
+  const STAGES = window.ROADMAP.map((s) => {
+    if (!s.parts) return { ...s, topics: (s.topics || []).filter((id) => byId[id]) };
+    const parts = s.parts.map((p) => ({ ...p, topics: (p.topics || []).filter((id) => byId[id]) })).filter((p) => p.topics.length);
+    return { ...s, parts, topics: parts.flatMap((p) => p.topics) };
+  });
   const listed = new Set(STAGES.flatMap((s) => s.topics));
   const orphans = ALL.filter((t) => !listed.has(t.id)).map((t) => t.id);
   if (orphans.length) STAGES.push({ id: "other", title: "Khác", goal: "", topics: orphans, parallel: true });
   STAGES.forEach((s) => s.topics.forEach((id) => (byId[id].stage = s)));
+  STAGES.forEach((s) => (s.parts || []).forEach((p) => p.topics.forEach((id) => (byId[id].part = p))));
   // Thứ tự đọc: giai đoạn chính trước, nhánh song song sau
   const ORDER = [...STAGES.filter((s) => !s.parallel), ...STAGES.filter((s) => s.parallel)].flatMap((s) => s.topics.map((id) => byId[id]));
   // Lộ trình chính = topic của mọi giai đoạn không song song (kể cả giai đoạn có bài luyện, B0).
@@ -53,7 +59,7 @@
   }
   // "Học tiếp" (A2): topic chưa nắm đầu tiên của lộ trình chính; xong hết thì bài đủ nền chưa luyện đầu tiên
   function nextStep() {
-    const t = MAIN.find((x) => !done.has(x.id));
+    const t = MAIN.find((x) => !done.has(x.id) && !(x.part && x.part.optional)); // bỏ qua chặng "Đào sâu" (B4)
     if (t) return { href: `#/t/${t.id}`, title: t.title, topic: t };
     const p = PROBLEMS.find((x) => !done.has(`p:${x.id}`) && isReady(x));
     return p ? { href: `#/p/${p.id}`, title: p.title, problem: p } : { href: "#/problems", title: "Ôn lại bài luyện" };
@@ -122,7 +128,13 @@
   const readyBadge = (p) => { const m = missing(p).length; return m ? `<span class="ready miss">Còn thiếu ${m}</span>` : `<span class="ready ok">✓ Đủ nền</span>`; };
   const practiceBox = () => { const h = practiceHint(); return !h ? "" : `<div class="panel practice-box"><div class="l">${h.title}</div>
     ${h.list.map((p) => `<div class="pb-item"><a href="#/p/${p.id}">${esc(p.title)}</a> ${levelBadge(p.level)}${h.showMissing ? `<div class="muted small">Còn thiếu: ${missing(p).map((id) => esc(byId[id].title)).join(", ")}</div>` : ""}</div>`).join("")}</div>`; };
-  const stageKeys = (s) => (s.problems ? PROBLEMS.map((p) => `p:${p.id}`) : s.topics);
+  // Tiến độ giai đoạn: topic + bài (giai đoạn có `problems`) — B0, Q7
+  const stageKeys = (s) => (s.problems ? [...s.topics, ...PROBLEMS.map((p) => `p:${p.id}`)] : s.topics);
+  const deepTag = (p) => (p && p.optional && p.title !== "Đào sâu" ? `<span class="tag deep">Đào sâu</span>` : ""); // chặng tên "Đào sâu" thì không lặp nhãn
+  // Vị trí topic: "Giai đoạn N · tên" (+ " › chặng") — dùng cho crumb, thẻ Tiếp tục, tìm kiếm
+  const stageText = (s) => `${s.parallel ? "Song song" : `Giai đoạn ${stageNum(s)}`} · ${s.title}`;
+  const placeText = (t) => stageText(t.stage) + (t.part ? ` › ${t.part.title}` : "");
+  const goalLine = (t) => (t.goal ? `<p class="goal"><b>Làm được:</b> ${inline(t.goal)}</p>` : "");
   const stageNum = (s) => (s.parallel ? "∥" : STAGES.filter((x) => !x.parallel).indexOf(s) + 1);
 
   // Hộp "Viết tắt trong bài này" chèn sau phần mở đầu của trang
@@ -172,8 +184,9 @@
     const block = (s) => `
       <details class="sb-track" ${s === open ? "open" : ""}>
         <summary class="sb-track-title"><span>${stageNum(s)} · ${esc(s.title)}</span><span class="sb-count">${s.topics.filter((id) => done.has(id)).length}/${s.topics.length}</span></summary>
-        ${s.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}"${id === active ? ' aria-current="page"' : ""}>
-          <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")}
+        ${(s.parts || [{ topics: s.topics }]).map((p) => (p.title ? `<div class="sb-section">${esc(p.title)}${deepTag(p)}</div>` : "") +
+          p.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}"${id === active ? ' aria-current="page"' : ""}>
+          <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")).join("")}
       </details>`;
     const withTopics = STAGES.filter((s) => s.topics.length);
     return `<div class="sb-group">Lộ trình chính</div>${withTopics.filter((s) => !s.parallel).map(block).join("")}
@@ -202,20 +215,23 @@
     // Mỗi giai đoạn là <details> (A6); chỉ mở sẵn giai đoạn đang học. Summary không chứa heading (trình đọc màn hình đọc summary là nút)
     const stage = (s) => {
       const keys = stageKeys(s), d = keys.filter((k) => done.has(k)).length;
-      const items = s.problems
-        ? PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")
-        : s.topics.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
+      const tChips = (ids) => ids.map((id) => `<a class="rm-chip ${done.has(id) ? "done" : ""}" href="#/t/${id}">${esc(byId[id].title)}</a>`).join("");
+      const pChips = PROBLEMS.map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("");
+      // Có chặng: mỗi chặng một hàng có nhãn; giai đoạn có cả topic lẫn bài: thêm hàng "Luyện đề" (B0, B1)
+      const rows = [...(s.parts || (s.topics.length ? [{ topics: s.topics }] : [])).map((p) => [p.title ? esc(p.title) + deepTag(p) : "", tChips(p.topics)]),
+        ...(s.problems ? [[s.topics.length ? "Luyện đề" : "", pChips]] : [])];
+      const items = rows.map(([label, chips]) => (label ? `<div class="rm-part"><div class="rm-part-t">${label}</div><div class="rm-chips">${chips}</div></div>` : `<div class="rm-chips">${chips}</div>`)).join("");
       return `<div class="rm-stage ${s.parallel ? "parallel" : ""} ${d === keys.length ? "complete" : ""}">
         <div class="rm-num" aria-hidden="true">${stageNum(s)}</div>
         <details class="rm-body" ${s === cur ? "open" : ""}>
           <summary class="rm-head"><span class="rm-title"><span class="sr-only">${s.parallel ? "Nhánh song song" : `Giai đoạn ${stageNum(s)}`}: </span>${esc(s.title)}</span><span class="muted">${d}/${keys.length}</span></summary>
           <p class="muted">${esc(s.goal)}</p>
-          <div class="rm-chips">${items}</div>
+          ${items}
           ${checkpoint(s).length ? `<div class="rm-check"><span class="muted">✔ Kiểm tra chặng:</span> ${checkpoint(s).map((p) => `<a class="rm-chip ${done.has(`p:${p.id}`) ? "done" : ""}" href="#/p/${p.id}">${esc(p.title.split(" (")[0])}</a>`).join("")}</div>` : ""}
         </details>
       </div>`;
     };
-    const where = step.topic ? `${step.topic.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(step.topic.stage)}`} · ${esc(step.topic.stage.title)}`
+    const where = step.topic ? esc(placeText(step.topic))
       : step.problem ? `Luyện đề · ${LEVELS[step.problem.level]}` : "Đã xong lộ trình chính và các bài đủ nền";
     main.innerHTML = `
       <h1>Lộ trình ôn System Design & Backend</h1>
@@ -226,6 +242,7 @@
           <div class="l">Tiếp tục</div>
           <div class="crumb">${where}</div>
           <div class="c-title">${esc(step.title)}</div>
+          ${step.topic && step.topic.goal ? `<div class="c-goal">Làm được: ${noTip(step.topic.goal)}</div>` : ""}
           <span class="btn primary">${step.topic ? "Học tiếp" : step.problem ? "Luyện tiếp" : "Xem bài luyện"} →</span>
         </a>
         ${practiceBox()}
@@ -274,8 +291,11 @@
     let n = 0;
     const h = (title) => `<h2><span class="h-n">${++n}</span>${esc(title)}</h2>`;
     main.innerHTML = `
-      <div class="crumb">${t.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(t.stage)}`} · ${esc(t.stage.title)}</div>
+      <div class="crumb t-crumb ${t.part ? "has-part" : ""}"><span class="cr-long">${esc(stageText(t.stage))}</span><span class="cr-short">${t.stage.parallel ? "∥" : `GĐ${stageNum(t.stage)}`}</span>${t.part
+        ? ` › <span class="cr-part">${esc(t.part.title)}</span><span class="cr-n">&nbsp;· ${t.part.topics.indexOf(id) + 1}/${t.part.topics.length}</span>` : ""}</div>
       <h1>${esc(t.title)}</h1>
+      ${goalLine(t)}
+      ${(t.needs || []).filter((x) => byId[x]).length ? `<div class="needs"><span class="muted">Cần trước:</span> ${t.needs.filter((x) => byId[x]).map((x) => needChip(x)).join("")}</div>` : ""}
       <div class="panel tldr"><b>Nói trong 30 giây</b>${tagged(txt(t.tldr))}${whyLine(t.tldr.why)}</div>
 
       ${t.story ? `${h("Vì sao cần biết")}<div class="story">
@@ -330,7 +350,8 @@
         <a class="btn primary" id="goNext" href="${next ? `#/t/${next.id}` : end.href}">${esc(label)}</a>
         <button class="btn ${isDone ? "done" : ""}" id="doneBtn" aria-pressed="${isDone}">${isDone ? "✓ Đã nắm" : "Chỉ đánh dấu đã nắm"}</button>
       </div>
-      ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}</div>` : ""}
+      ${next && !lastOfStage ? `<div class="small"><span class="muted">Tiếp:</span> ${esc(next.title)}${next.goal ? ` — ${inline(next.goal)}` : ""}</div>` : ""}
+      ${(() => { const opens = ALL.filter((x) => (x.needs || []).includes(id)); return opens.length ? `<div class="small"><span class="muted">Bài này mở đường cho:</span> ${opens.map((x) => `<a href="#/t/${x.id}">${esc(x.title)}</a>`).join(", ")}</div>` : ""; })()}
       ${soon.length ? `<div class="small"><span class="muted">Sắp mở:</span> ${soon.map((p) => { const rest = missing(p).filter((x) => x !== id);
         return `<a href="#/p/${p.id}">${esc(p.title)}</a> · ${LEVELS[p.level]} ${rest.length ? `(còn ${esc(byId[rest[0]].title)})` : isDone ? "(đã đủ nền)" : "(đủ nền sau bài này)"}`; }).join("; ")}</div>` : ""}
     </section>`;
@@ -430,7 +451,8 @@
 
   // ── Thư viện mô phỏng ──
   // A9: sim thuộc giai đoạn của topic đứng sớm nhất trong ORDER (không theo topics[0])
-  const simStage = (s) => { const ts = s.topics.map((id) => byId[id]).filter(Boolean).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)); return ts[0] && ts[0].stage; };
+  const simTopic = (s) => s.topics.map((id) => byId[id]).filter(Boolean).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b))[0];
+  const simStage = (s) => { const t = simTopic(s); return t && t.stage; };
   function viewSims() {
     setNav("sims", sideKnowledge(null));
     main.innerHTML = `
@@ -439,12 +461,15 @@
       ${STAGES.filter((s) => s.topics.length).map((st) => {
         const list = SIMS.filter((s) => simStage(s) === st);
         if (!list.length) return "";
-        return `<h2>${stageNum(st)} · ${esc(st.title)}</h2><div class="grid">${list.map((s) => `
+        const card = (s) => `
           <a class="panel sim-card" href="#/sim/${s.id}">
             <div class="t">${esc(s.title)}</div>
             <div class="s">${noTip(s.scenario)}</div>
             <div class="tags">${s.topics.filter((id) => byId[id]).map((id) => `<span class="chip">${esc(byId[id].title)}</span>`).join("")}</div>
-          </a>`).join("")}</div>`;
+          </a>`;
+        // Có chặng: nhóm con theo chặng của topic đứng sớm nhất (B1)
+        const groups = st.parts ? st.parts.map((p) => [p, list.filter((s) => simTopic(s).part === p)]).filter(([, l]) => l.length) : [[null, list]];
+        return `<h2>${stageNum(st)} · ${esc(st.title)}</h2>${groups.map(([p, l]) => `${p ? `<h3>${esc(p.title)}</h3>` : ""}<div class="grid">${l.map(card).join("")}</div>`).join("")}`;
       }).join("")}`;
   }
 
@@ -503,9 +528,8 @@
       // Chỉ khớp tiêu đề thì hiện tóm tắt (với thuật ngữ: nghĩa) làm đoạn trích
       return (m.length || has(head)) && { type, href, title, where, m: m.length ? m : [lead].filter(Boolean), gl, rank: has(head) ? 0 : has(lead) ? 1 : 2 };
     };
-    const stageLabel = (s) => `${s.parallel ? "Song song" : `Giai đoạn ${stageNum(s)}`} · ${s.title}`;
     const hits = [
-      ...ORDER.map((t) => hit("Chủ đề", `#/t/${t.id}`, t.title, stageLabel(t.stage), t.title, txt(t.tldr), textOf(t))),
+      ...ORDER.map((t) => hit("Chủ đề", `#/t/${t.id}`, t.title, placeText(t), t.title, t.goal || txt(t.tldr), [txt(t.tldr), ...textOf(t)])),
       ...PROBLEMS.map((p) => hit("Bài", `#/p/${p.id}`, p.title, LEVELS[p.level], p.title, p.summary, [...p.fr, ...p.nfr.map(txt), ...p.entities, ...p.api, ...p.deep.flatMap((d) => [d.q, d.bad, d.good, d.great])])),
       ...SIMS.map((s) => hit("Mô phỏng", `#/sim/${s.id}`, s.title, byId[s.topics[0]] ? byId[s.topics[0]].title : "", s.title, s.scenario, [s.context])),
       ...Object.values(GL).map((g) => hit("Thuật ngữ", "#/glossary", `${g.k} · ${g.full}`, g.group, `${g.k} ${g.full}`, g.vi, [g.ex], g.k)),

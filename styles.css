@@ -171,6 +171,8 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
   #search { order: 5; flex: 1 1 100%; margin-left: 0; }
   .face { padding: 28px 20px; }
   .nc-btns .btn { flex: 1 1 100%; }
+  .rm-part { grid-template-columns: 1fr; gap: 4px; }
+  .t-crumb.has-part .cr-long { display: none; } .t-crumb.has-part .cr-short { display: inline; }
   .pager { flex-direction: column; }
   .pager a { max-width: none; }
   .face .q { font-size: 18px; }
@@ -398,6 +400,18 @@ a.need-chip:hover { border-color: var(--accent); }
 .practice-box .l { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
 .pb-item { padding: 4px 0; }
 .pb-item > a { font-weight: 600; }
+/* Chặng, goal, Đào sâu (B1–B4) */
+.goal { margin: 0 0 6px; color: var(--muted); max-width: 70ch; }
+.goal b { color: var(--text); font-weight: 600; }
+.c-goal { font-size: 14px; color: var(--muted); margin: -8px 0 14px; }
+.tag.deep { background: var(--surface-2); color: var(--muted); margin-left: 6px; }
+.rm-part { display: grid; grid-template-columns: 180px 1fr; gap: 10px; align-items: start; padding: 4px 0; }
+.rm-part-t { font-size: 13px; color: var(--muted); padding-top: 4px; }
+.sb-section { font-size: 12px; }
+.t-crumb { display: flex; align-items: baseline; min-width: 0; white-space: pre; }
+.t-crumb > span { white-space: nowrap; }
+.cr-part { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cr-short { display: none; }
 .practice-hint { margin: 10px 0 0; font-size: 14px; border-left: 3px solid var(--fix); }
 
 /* Kafka consumer group */
