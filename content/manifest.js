@@ -80,6 +80,7 @@
     "content/topics/py/py-object-model.js",
     "content/topics/py/py-builtin-types-complexity.js",
     "content/topics/py/py-data-model.js",
+    "content/topics/py/py-scope-closures.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
