@@ -29,7 +29,7 @@ window.ROADMAP = [
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ consistency model.",
     parts: [
       { id: "s2.cache", title: "Caching", topics: ["caching", "dist-cache"] },
-      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing"] },
+      { id: "s2.split", title: "Sharding", topics: ["sharding", "consistent-hashing", "id-generation"] },
       { id: "s2.consistency", title: "Consistency & Replication", topics: ["cap", "replication"] },
       { id: "s2.tech", title: "Công nghệ trọng tâm", topics: ["redis"] },
     ] },
