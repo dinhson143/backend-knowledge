@@ -2,7 +2,9 @@ BK.topic({
   id: "ecs",
   track: "cloud",
   section: "cloud-containers",
-  title: "ECS chi tiết",
+  title: "ECS chuyên sâu",
+  goal: "Triển khai, scale và tự phục hồi service trên ECS",
+  needs: ["lb-gateway-cdn"],
   tldr: {
     t: "ECS là orchestrator container **riêng của AWS**: khai báo Task Definition (image, CPU/RAM, IAM role) và Service (chạy N bản, gắn load balancer); AWS lo control plane và **không tính phí** phần đó. Chạy trên **Fargate** (không quản máy), **EC2** (tự quản máy) hoặc **ECS Managed Instances** (EC2 do AWS chọn, vá và thay định kỳ). Đơn giản, tích hợp sâu với AWS, nhưng chỉ chạy trên AWS.",
     why: "Bạn chỉ trả cho compute, vì ECS là dịch vụ đa tenant do AWS vận hành, không có control plane riêng để tính tiền theo cluster. Tích hợp sâu (IAM role cho task, ALB, CloudWatch) có sẵn vì cùng nhà cung cấp — nhưng chính điều đó khoá bạn vào AWS.",

@@ -2,7 +2,9 @@ BK.topic({
   id: "search",
   track: "sd",
   section: "sd-tech",
-  title: "Search Optimized Database",
+  title: "Full-text Search",
+  goal: "Thêm tìm kiếm full-text bằng inverted index thay cho `LIKE '%x%'`",
+  needs: ["indexing"],
   tldr: {
     t: "Elasticsearch / OpenSearch dùng inverted index + tokenization + stemming để full-text search; không dùng `LIKE '%x%'` trên DB chính.",
     why: "Inverted index tìm document chứa một từ bằng một lần tra cứu thay vì quét mọi dòng; tokenization và stemming quyết định 'từ' vào index ở dạng nào để query khớp được. `LIKE '%x%'` không dùng được B-Tree index nên thường full scan trên DB chính; index trigram (`pg_trgm` của PostgreSQL) tăng tốc được kiểu tìm này nhưng vẫn không có stemming hay xếp hạng độ liên quan (https://www.postgresql.org/docs/current/pgtrgm.html).",

@@ -2,7 +2,9 @@ BK.topic({
   id: "eks",
   track: "cloud",
   section: "cloud-containers",
-  title: "EKS chi tiết",
+  title: "EKS chuyên sâu",
+  goal: "Hiểu EKS quản lý gì, bạn quản lý gì và scale 3 lớp",
+  needs: ["ecs"],
   tldr: {
     t: "EKS là **Kubernetes do AWS quản lý**: AWS chạy control plane (API server, etcd) trên nhiều AZ và tính phí theo giờ mỗi cluster; bạn chạy workload bằng Pod/Deployment chuẩn Kubernetes trên node EC2, Fargate hoặc Auto Mode. Mạnh ở hệ sinh thái (Helm, operator, GitOps, service mesh) và chạy được ngoài AWS, đổi lại vận hành phức tạp hơn ECS.",
     why: "EKS tính phí control plane theo giờ, vì control plane Kubernetes (API server, etcd) là thành phần riêng của mỗi cluster mà AWS phải chạy dành riêng cho bạn trên nhiều AZ. API là Kubernetes chuẩn → manifest và Helm chart mang sang GKE/AKS được, nhưng cũng kéo theo toàn bộ độ phức tạp của Kubernetes.",

@@ -2,7 +2,9 @@ BK.topic({
   id: "patterns-gof",
   track: "lld",
   section: "lld-patterns",
-  title: "Creational · Structural · Behavioral",
+  title: "Design Patterns (GoF)",
+  goal: "Chọn pattern tạo, ghép và phối hợp object cho tình huống cụ thể",
+  needs: ["solid"],
   tldr: {
     t: "Creational kiểm soát cách tạo object; Structural lo cách object nối với nhau; Behavioral lo cách object giao tiếp và chia trách nhiệm.",
     why: "Ba nhóm khớp với ba nguồn thay đổi chính: cách tạo object (constructor phức tạp, chọn class), cách ghép object (bọc, che, nối), và cách object phối hợp (ai quyết định, ai được báo). Biết vấn đề thuộc nhóm nào là thu hẹp được pattern cần chọn.",

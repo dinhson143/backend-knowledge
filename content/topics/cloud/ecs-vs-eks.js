@@ -3,6 +3,8 @@ BK.topic({
   track: "cloud",
   section: "cloud-containers",
   title: "ECS hay EKS?",
+  goal: "Chọn ECS hay EKS theo team, hệ sinh thái và chi phí vận hành",
+  needs: ["eks"],
   tldr: {
     t: "Mặc định chọn **ECS + Fargate** khi team nhỏ, chỉ chạy trên AWS và muốn ít vận hành. Chọn **EKS** khi team đã quen Kubernetes, cần hệ sinh thái K8s (Helm, operator, GitOps, service mesh), phải chạy ngoài AWS, hoặc có platform team phục vụ nhiều team. Fargate hay EC2 là **quyết định thứ hai**, áp dụng cho cả hai.",
     why: "ECS có chi phí vận hành thấp nhất khi team nhỏ và chỉ dùng AWS, vì không có control plane tính phí và không có version cluster phải nâng. EKS chỉ đáng khi dùng tới thứ chỉ Kubernetes có; Fargate/EC2 là lớp compute dùng chung cho cả hai nên quyết định tách riêng.",

@@ -2,7 +2,9 @@ BK.topic({
   id: "kafka",
   track: "sd",
   section: "sd-deep",
-  title: "Kafka chi tiết",
+  title: "Kafka chuyên sâu",
+  goal: "Thiết kế topic, partition, consumer group và chọn delivery semantics",
+  needs: ["streams", "sharding"],
   tldr: {
     t: "Kafka là **distributed commit log**: producer append vào cuối partition, consumer tự đọc theo offset. Dữ liệu bền, đọc lại được, scale bằng partition. Kafka chỉ đảm bảo thứ tự **trong một partition**.",
     why: "Dữ liệu ở lại đủ lâu để đọc lại và mỗi consumer group đọc độc lập, vì producer chỉ **append** vào cuối file, consumer chỉ giữ một con số offset → broker không phải xoá hay đánh dấu từng message. Thứ tự chỉ định nghĩa được **bên trong** một partition, vì mỗi partition là một log riêng có offset tăng dần; hai partition trên hai broker khác nhau không có đồng hồ chung nào để so thứ tự.",

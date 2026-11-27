@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-tech",
   title: "Message Queue",
+  goal: "Tách producer/consumer, xử lý retry, DLQ và backpressure",
+  needs: ["api-design"],
   tldr: {
     t: "Queue để tách producer/consumer: phân phối việc cho worker và hấp thụ traffic đột biến. Nắm 5 chủ đề: ordering, retry, DLQ, partition, backpressure.",
     why: "Producer không phải chờ consumer vì queue lưu message bền vững, và traffic đột biến chỉ làm queue dài ra thay vì làm sập worker. 5 chủ đề kia chính là những gì phát sinh khi tách rời: thứ tự, lỗi, message hỏng, song song hoá và consumer chạy chậm.",

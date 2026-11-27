@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-tech",
   title: "Blob Storage",
+  goal: "Lưu file lớn ngoài database và cho client tải trực tiếp",
+  needs: ["api-design", "core-db"],
   tldr: {
     t: "S3 / GCS cho file lớn: rẻ, durable, scale gần như vô hạn. DB chỉ lưu metadata + URL. Client upload/download trực tiếp qua presigned URL.",
     why: "Provider chia được dữ liệu ra hàng nghìn máy, dùng erasure coding và đĩa rẻ, vì object storage chỉ cần get/put theo key, không có index hay transaction phức tạp. DB giữ metadata vì cần query/transaction; presigned URL cho client đi thẳng tới S3 nên backend không phải chuyển byte.",

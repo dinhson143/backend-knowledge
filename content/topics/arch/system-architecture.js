@@ -2,7 +2,9 @@ BK.topic({
   id: "system-architecture",
   track: "arch",
   section: "arch-main",
-  title: "Kiến trúc hệ thống: Monolith, Microservices, Event-driven, Serverless",
+  title: "Monolith hay Microservices?",
+  goal: "Biết khi nào giữ modular monolith, khi nào tách service",
+  needs: ["code-architecture", "queue"],
   tldr: {
     t: "Bắt đầu bằng **Modular Monolith** — một deployable, ranh giới module rõ ràng — rồi chỉ tách **Microservice** khi có lý do cụ thể: scale riêng, team deploy độc lập, công nghệ khác hẳn. Đây là chuyện **triển khai và ranh giới runtime**, khác với cách tổ chức code bên trong. Event-driven và Serverless là cách các phần giao tiếp và chạy, dùng kết hợp được.",
     why: "Tách service phải có lý do cụ thể mới đáng: nó cho deploy và scale độc lập nhưng biến mọi tương tác thành gọi qua mạng. Modular monolith cho phần lớn lợi ích về ranh giới mà chưa phải trả chi phí phân tán.",

@@ -30,7 +30,7 @@ content/topics/<track>/<id>.js   one topic per file: text + "vì sao" + diagrams
 content/problems/<id>.js         one problem per file, incl. its inline `hld` sim
 content/sims/<id>.js             simulation scenarios (shared by topics/problems)
 content/svg/<name>.svg           static diagrams, referenced by `diagrams: [{ src, caption, source? }]`
-content/roadmap.js  ROADMAP (stages → topic ids), MIRO_GAPS, HI_GAPS
+content/roadmap.js  ROADMAP (stage → `parts` → topic ids; the only navigation tree), MIRO_GAPS, HI_GAPS
 engine/diagrams.js  window.mountSim — simulation engine, no scenarios
 app.js              router + render, no content (loaded last by the manifest)
 scripts/check.mjs   content gate
@@ -41,6 +41,7 @@ Adding a file = create it + add one line to `FILES` in `content/manifest.js` (ch
 ## Data shape
 
 - A point (`tldr`, `points`, `tips`, problem `nfr`) is a string, or `{ t, why }` when it has a "Vì sao". A table row is an array of cells, or `{ cells, why }`. Topic `story` = `{ problem, idea, tradeoff }`. Problem: `hldWhy`, `deep[k].why = { bad, good, great }`.
+- Roadmap: stage `{ id, title, goal, parallel?, problems?, parts }`, part `{ id: "<stage>.<name>", title, optional?, topics }`. Add a part only together with its first topic. Topic `title` ≤ 40 chars, optional `goal` (≤ 90, starts with a verb) and `needs` (≤ 3 topic ids, no cycles). Placement rules and the full planned tree: `docs/proposals/product-learning-flow.md` §3.1, §7.2.
 - Inline markup: `**bold**` and `` `code` `` only (rendered by `inline()` in `app.js`).
 - `points` prefixes: `"+ "` = added (badge "Bổ sung"), `"! "` = correction (badge "Đính chính"); plain = from the original Miro board.
 - Problem deep dives: bad / good / great = junior / mid / senior.

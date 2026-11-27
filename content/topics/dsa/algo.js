@@ -2,7 +2,9 @@ BK.topic({
   id: "algo",
   track: "dsa",
   section: "dsa-algo",
-  title: "Thuật toán & pattern",
+  title: "Pattern thuật toán",
+  goal: "Nhận dạng pattern thuật toán từ đề bài",
+  needs: ["ds"],
   tldr: {
     t: "Nhận dạng pattern từ đề bài: sorted → binary search / two pointers; đường đi ngắn nhất không trọng số → BFS; liệt kê mọi tổ hợp → backtracking; tối ưu có subproblem chồng nhau → DP.",
     why: "Mỗi dấu hiệu tương ứng một tính chất: sorted cho phép loại nửa không gian tìm kiếm; BFS lan theo tầng nên lần đầu chạm đích là ngắn nhất; liệt kê mọi tổ hợp thì output đã là mũ; subproblem chồng nhau thì nhớ kết quả để không tính lại.",

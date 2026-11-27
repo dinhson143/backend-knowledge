@@ -3,6 +3,8 @@ BK.topic({
   track: "lld",
   section: "lld-concurrency",
   title: "Concurrency & Deadlock",
+  goal: "Dùng lock, semaphore, condition variable và tránh deadlock",
+  needs: ["oop-pillars"],
   tldr: {
     t: "Concurrency là xử lý nhiều tác vụ xen kẽ (không nhất thiết song song vật lý). Một process: lock, semaphore, condition variable. Nhiều server: distributed lock, queue, transaction, idempotency.",
     why: "Một CPU core vẫn có race condition, vì concurrency chỉ cần các tác vụ đan xen trên timeline và OS có thể chuyển thread giữa hai lệnh bất kỳ. Lock trong một process không có tác dụng với process khác → nhiều server phải dùng cơ chế chung như DB transaction hay distributed lock.",

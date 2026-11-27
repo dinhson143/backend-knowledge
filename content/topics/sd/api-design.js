@@ -3,6 +3,8 @@ BK.topic({
   track: "sd",
   section: "sd-core",
   title: "API Design",
+  goal: "Chọn REST, GraphQL hay gRPC và thiết kế endpoint, phân trang",
+  needs: ["networking"],
   tldr: {
     t: "REST là mặc định. GraphQL khi nhiều loại client cần dữ liệu khác nhau. RPC (gRPC) cho service-to-service cần hiệu năng, type safety, streaming.",
     why: "REST là mặc định an toàn, vì nó tận dụng HTTP nên CDN, browser, cache đều hiểu sẵn. GraphQL đáng giá khi mỗi client cần shape dữ liệu khác nhau, vì client tự chọn field trong một request; gRPC đáng giá khi bạn kiểm soát cả hai đầu và cần tốc độ, type safety, streaming.",

@@ -2,7 +2,9 @@ BK.topic({
   id: "bigdata-ds",
   track: "sd",
   section: "sd-deep",
-  title: "Data Structures for Big Data",
+  title: "Cấu trúc dữ liệu xác suất",
+  goal: "Đếm, lọc trùng ở quy mô lớn với bộ nhớ nhỏ, chấp nhận sai số",
+  needs: ["numbers"],
   tldr: {
     t: "+ Cấu trúc xác suất: đổi một chút sai số lấy bộ nhớ cực nhỏ. Hay xuất hiện ở Web Crawler, Top K, Ad Click, Metrics.",
     why: "Bộ nhớ không tăng theo số phần tử mà chỉ theo sai số chấp nhận được, vì hash phân tán phần tử đều trên một mảng cố định. Crawler, top K, ad click có hàng tỷ phần tử nhưng chấp nhận sai 1% — đúng chỗ cấu trúc xác suất toả sáng.",

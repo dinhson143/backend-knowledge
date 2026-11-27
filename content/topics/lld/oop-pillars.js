@@ -2,7 +2,9 @@ BK.topic({
   id: "oop-pillars",
   track: "lld",
   section: "lld-oop",
-  title: "4 tính chất cốt lõi",
+  title: "4 tính chất của OOP",
+  goal: "Giải thích và chọn interface hay abstract class đúng chỗ",
+  needs: ["lld-delivery"],
   tldr: {
     t: "Encapsulation, Abstraction, Inheritance, Polymorphism. Hiểu Interface (CAN-DO) vs Abstract Class (IS-A).",
     why: "Bốn tính chất giải bốn vấn đề khác nhau: kiểm soát trạng thái, giấu chi tiết, tái dùng code, thay thế hành vi. Interface và abstract class là hai công cụ hiện thực Abstraction — chọn sai sẽ khoá thiết kế vào đơn kế thừa hoặc mất khả năng chia sẻ state.",

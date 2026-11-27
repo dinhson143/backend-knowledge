@@ -3,6 +3,7 @@ BK.topic({
   track: "lld",
   section: "lld-framework",
   title: "Khung trả lời LLD",
+  goal: "Trình bày một bài LLD từ requirements tới class design",
   tldr: {
     t: "+ Requirements → Entities & relationships → Class design → Implementation → Extensibility. Nhánh này không có trên Miro.",
     why: "Thứ tự này đi từ thứ rẻ nhất để đổi (câu hỏi, danh sách entity) tới thứ đắt nhất (code). Các bước trước phải tạo ra cấu trúc mà yêu cầu mới chỉ cần thêm class, vì **Extensibility** là bước interviewer kiểm tra thiết kế.",

@@ -2,7 +2,9 @@ BK.topic({
   id: "cap",
   track: "sd",
   section: "sd-core",
-  title: "CAP Theorem & Consistency Models",
+  title: "CAP & mô hình nhất quán",
+  goal: "Chọn nhất quán hay sẵn sàng cho từng phần dữ liệu khi mạng chia cắt",
+  needs: ["sharding"],
   tldr: {
     t: "Khi có network partition (luôn phải chấp nhận P), chọn Consistency hoặc Availability. Mặc định chọn Availability; chọn Consistency cho chỗ sai dữ liệu là mất tiền (đặt vé, tồn kho, thanh toán).",
     why: "P không phải lựa chọn: trong hệ nhiều máy, mạng đứt chắc chắn xảy ra, nên câu hỏi thật chỉ còn C hay A lúc đứt mạng. **Availability** là mặc định vì đa số dữ liệu (feed, like, profile) cũ vài giây không hại ai; còn đặt vé hay tồn kho mà đọc dữ liệu cũ là bán trùng, thiệt hại tiền thật → phải chấp nhận từ chối request.",
