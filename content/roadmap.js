@@ -54,7 +54,7 @@ window.ROADMAP = [
       { id: "cs.process", title: "Process, Thread & Memory", topics: ["os-process-lifecycle", "thr-thread-vs-process", "os-context-switch", "os-memory-layout", "os-virtual-memory"] },
       { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound", "thr-thread-pool", "thr-green-threads"] },
       { id: "cs.io", title: "I/O & hệ điều hành", topics: ["io-blocking-models", "os-signals-shutdown"] },
-      { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas"] },
+      { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas", "conc-memory-model"] },
       { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },
