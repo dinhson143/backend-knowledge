@@ -56,7 +56,7 @@
     const t = MAIN.find((x) => !done.has(x.id));
     if (t) return { href: `#/t/${t.id}`, title: t.title, topic: t };
     const p = PROBLEMS.find((x) => !done.has(`p:${x.id}`) && isReady(x));
-    return p ? { href: `#/p/${p.id}`, title: p.title, problem: p } : { href: "#/problems", title: "Luyện bài" };
+    return p ? { href: `#/p/${p.id}`, title: p.title, problem: p } : { href: "#/problems", title: "Ôn lại bài luyện" };
   }
 
   // ── Theme & mobile menu ──
@@ -216,7 +216,7 @@
       </div>`;
     };
     const where = step.topic ? `${step.topic.stage.parallel ? "Song song" : `Giai đoạn ${stageNum(step.topic.stage)}`} · ${esc(step.topic.stage.title)}`
-      : step.problem ? `Luyện đề · ${LEVELS[step.problem.level]}` : "Luyện đề";
+      : step.problem ? `Luyện đề · ${LEVELS[step.problem.level]}` : "Đã xong lộ trình chính và các bài đủ nền";
     main.innerHTML = `
       <h1>Lộ trình ôn System Design & Backend</h1>
       <p class="lead">Học theo giai đoạn 1 → 5; Low-Level Design và DSA học song song. Mọi chủ đề dùng chung một khung nên ôn lại nhanh.</p>
@@ -226,7 +226,7 @@
           <div class="l">Tiếp tục</div>
           <div class="crumb">${where}</div>
           <div class="c-title">${esc(step.title)}</div>
-          <span class="btn primary">${step.topic ? "Học tiếp" : "Luyện tiếp"} →</span>
+          <span class="btn primary">${step.topic ? "Học tiếp" : step.problem ? "Luyện tiếp" : "Xem bài luyện"} →</span>
         </a>
         ${practiceBox()}
       </div>
