@@ -80,6 +80,7 @@
     "content/topics/code/code-clean-naming.js",
     "content/topics/code/code-error-handling.js",
     "content/topics/code/code-testing-fundamentals.js",
+    "content/topics/code/code-debugging.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
