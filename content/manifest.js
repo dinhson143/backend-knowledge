@@ -78,6 +78,7 @@
     "content/topics/code/code-interview-communication.js",
     "content/topics/code/code-language-choice.js",
     "content/topics/py/py-object-model.js",
+    "content/topics/py/py-builtin-types-complexity.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
