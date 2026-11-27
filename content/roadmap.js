@@ -51,6 +51,7 @@ window.ROADMAP = [
   { id: "cs", title: "Nền tảng CS", goal: "Học xong bạn giải thích được process, thread, I/O và viết code chạy đồng thời không race, không deadlock.", parallel: true,
     parts: [
       { id: "cs.concurrency", title: "Concurrency", topics: ["concurrency"] },
+      { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page"] },
     ] },
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn chọn được nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
