@@ -47,6 +47,12 @@ BK.topic({
       why: "Pivot luôn là phần tử nhỏ nhất hoặc lớn nhất (ví dụ chọn phần tử đầu trên mảng đã sắp xếp) → mỗi lần chia chỉ bớt 1 phần tử, cần n tầng, mỗi tầng O(n). Chọn pivot ngẫu nhiên hoặc median-of-three thì worst case gần như không xảy ra.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/bigo-growth.svg",
+      caption: "Hình dạng tăng trưởng của các độ phức tạp hay gặp, và số phép tính khi n = 10⁵: O(n log n) còn trong ngân sách ~10⁸ phép tính/giây, O(n²) vượt khoảng 100 lần.",
+    },
+  ],
   cards: [
     [
       "Độ phức tạp của Quick sort: trung bình và tệ nhất?",

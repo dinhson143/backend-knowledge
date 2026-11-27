@@ -46,6 +46,13 @@ BK.topic({
       why: "PostgreSQL phủ phần lớn bài toán, vì có ACID, JOIN, index đa dạng, JSONB cho dữ liệu bán cấu trúc và một node chịu được tải khá lớn. Chọn NoSQL không lý do là nhận về hạn chế (không JOIN, consistency yếu) mà không được lợi gì; interviewer muốn nghe bạn nêu được con số hoặc pattern buộc phải đổi.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/data-modeling-denormalize.svg",
+      caption: "Chuẩn hoá giữ tên venue ở một chỗ nên đổi tên chỉ sửa một dòng nhưng đọc phải JOIN; denormalize chép venue_name vào events để đọc một bảng, đổi lại mỗi lần đổi tên phải sửa mọi bản sao.",
+      source: "https://learn.microsoft.com/en-us/previous-versions/troubleshoot/microsoft-365/microsoft-365-apps/access/database-normalization-description",
+    },
+  ],
   cards: [
     [
       "6 bước Data Modeling?",

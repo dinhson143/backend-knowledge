@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Đường đi của request: DNS, CDN edge cho nội dung tĩnh, API Gateway rồi Load Balancer tới các instance cho API</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lo { font-size: 12px; font-weight: 600; fill: #b45309; }
+      .lb { font-size: 12px; font-weight: 600; fill: #1d4ed8; }
+      .lg { font-size: 12px; font-weight: 600; fill: #475569; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="388" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Client -->
+  <rect class="box" x="20" y="150" width="110" height="56" rx="10"/>
+  <text class="hc" x="75" y="174">Client</text>
+  <text class="sc" x="75" y="193">browser / app</text>
+
+  <!-- DNS -->
+  <rect class="box" x="200" y="20" width="170" height="50" rx="10"/>
+  <text class="hc" x="285" y="41">DNS</text>
+  <text class="sc" x="285" y="59">tên miền → IP gần user</text>
+  <path d="M70,150 C80,80 140,46 198,45" stroke="#64748b" stroke-width="1.3" stroke-dasharray="5 4" fill="none" marker-end="url(#a)"/>
+  <text class="lg" x="104" y="106">① tra tên</text>
+
+  <!-- CDN + origin -->
+  <rect class="box" x="200" y="100" width="170" height="68" rx="10" style="stroke:#e08a00;stroke-width:1.8"/>
+  <text class="hc" x="285" y="122">CDN edge (POP)</text>
+  <text class="sc" x="285" y="140">ảnh, JS/CSS, video</text>
+  <text class="sc" x="285" y="157">hit → trả ngay tại edge</text>
+  <path d="M130,165 L198,140" stroke="#e08a00" stroke-width="1.5" fill="none" marker-end="url(#o)"/>
+  <text class="lo" x="136" y="136">② static</text>
+  <rect class="box" x="440" y="100" width="130" height="68" rx="10"/>
+  <text class="hc" x="505" y="126">Origin</text>
+  <text class="sc" x="505" y="146">S3 / web server</text>
+  <path d="M370,134 L438,134" stroke="#e08a00" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#o)"/>
+  <text class="lo" x="388" y="126">miss</text>
+  <text class="s" x="584" y="126">miss: CDN lấy từ origin,</text>
+  <text class="s" x="584" y="142">trả cho user và giữ lại</text>
+  <text class="s" x="584" y="158">cho lần sau</text>
+
+  <!-- API -->
+  <rect class="box" x="200" y="216" width="170" height="76" rx="10" style="stroke:#3b7ff5;stroke-width:1.8"/>
+  <text class="hc" x="285" y="240">API Gateway</text>
+  <text class="sc" x="285" y="260">auth · rate limit</text>
+  <text class="sc" x="285" y="277">routing · validation · log</text>
+  <path d="M130,192 L198,240" stroke="#3b7ff5" stroke-width="1.5" fill="none" marker-end="url(#b)"/>
+  <text class="lb" x="112" y="238">② /api/*</text>
+  <rect class="box" x="410" y="216" width="150" height="76" rx="10"/>
+  <text class="hc" x="485" y="240">Load Balancer</text>
+  <text class="sc" x="485" y="260">L7 (ALB) / L4 (NLB)</text>
+  <text class="sc" x="485" y="277">chia tải giữa instance</text>
+  <path d="M370,254 L408,254" stroke="#3b7ff5" stroke-width="1.5" fill="none" marker-end="url(#b)"/>
+  <rect class="box" x="600" y="200" width="140" height="28" rx="7"/><text class="c" x="670" y="219">Order service #1</text>
+  <rect class="box" x="600" y="240" width="140" height="28" rx="7"/><text class="c" x="670" y="259">Order service #2</text>
+  <rect class="box" x="600" y="280" width="140" height="28" rx="7"/><text class="c" x="670" y="299">Order service #3</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M560,244 L598,214"/><path d="M560,254 L598,254"/><path d="M560,264 L598,294"/>
+  </g>
+
+  <text class="t" x="20" y="332">CDN chặn request tĩnh ở edge, origin không phải phục vụ. API Gateway lo việc chung cho mọi API;</text>
+  <text class="t" x="20" y="352">Load Balancer chỉ chia tải giữa các instance của một service.</text>
+  <text class="s" x="20" y="374">Gọi nội bộ service → service: client-side LB lấy danh sách instance từ service discovery rồi tự chọn.</text>
+</svg>

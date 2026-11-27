@@ -31,13 +31,13 @@
   <path d="M186,142 L224,142" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
 
   <!-- Master -->
-  <rect class="box" x="226" y="96" width="144" height="56" rx="10" stroke="#3b7ff5" stroke-width="2"/>
+  <rect class="box" x="226" y="96" width="144" height="56" rx="10" style="stroke:#3b7ff5;stroke-width:2"/>
   <text class="h" x="298" y="120" text-anchor="middle">Master A</text>
   <text class="s" x="298" y="140" text-anchor="middle">slot 0 – 5460</text>
-  <rect class="box" x="402" y="96" width="144" height="56" rx="10" stroke="#14a37f" stroke-width="2"/>
+  <rect class="box" x="402" y="96" width="144" height="56" rx="10" style="stroke:#14a37f;stroke-width:2"/>
   <text class="h" x="474" y="120" text-anchor="middle">Master B</text>
   <text class="s" x="474" y="140" text-anchor="middle">slot 5461 – 10922</text>
-  <rect class="box" x="578" y="96" width="144" height="56" rx="10" stroke="#e08a00" stroke-width="2"/>
+  <rect class="box" x="578" y="96" width="144" height="56" rx="10" style="stroke:#e08a00;stroke-width:2"/>
   <text class="h" x="650" y="120" text-anchor="middle">Master C</text>
   <text class="s" x="650" y="140" text-anchor="middle">slot 10923 – 16383</text>
 

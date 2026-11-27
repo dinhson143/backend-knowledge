@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">B-Tree sửa page tại chỗ, LSM-Tree gom ghi vào memtable rồi flush tuần tự thành SSTable và compaction ở nền</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .log { fill: #eef2f7; stroke: #94a3b8; }
+      .ram { fill: #e8f0fe; stroke: #3b7ff5; stroke-width: 1.4; }
+      .sst { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.2; }
+      .hot { fill: #fff3db; stroke: #e08a00; stroke-width: 1.6; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lo { font-size: 11.5px; fill: #b45309; }
+      .ok { font-size: 12.5px; fill: #0f7a5f; }
+      .no { font-size: 12.5px; fill: #c2410c; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="398" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- B-Tree -->
+  <rect class="grp" x="20" y="16" width="290" height="306" rx="12"/>
+  <text class="h" x="34" y="40">B-Tree · sửa page tại chỗ</text>
+  <rect class="box" x="36" y="54" width="110" height="28" rx="7"/><text class="code" x="91" y="73">ghi k=42</text>
+  <rect class="log" x="36" y="104" width="258" height="24" rx="5"/><text class="c" x="165" y="121">WAL · append tuần tự</text>
+  <rect class="box" x="130" y="150" width="70" height="26" rx="5"/><text class="sc" x="165" y="168">root</text>
+  <rect class="box" x="40" y="206" width="76" height="26" rx="5"/><text class="sc" x="78" y="224">page 3</text>
+  <rect class="hot" x="127" y="206" width="76" height="26" rx="5"/><text class="c" x="165" y="224">page 7</text>
+  <rect class="box" x="214" y="206" width="76" height="26" rx="5"/><text class="sc" x="252" y="224">page 9</text>
+  <g stroke="#94a3b8" stroke-width="1.2" fill="none">
+    <path d="M150,176 L80,206"/><path d="M165,176 L165,206"/><path d="M180,176 L250,206"/>
+  </g>
+  <path d="M91,82 L91,102" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <path d="M146,70 C268,70 280,140 214,210" stroke="#e08a00" stroke-width="1.6" fill="none" marker-end="url(#o)"/>
+  <text class="lo" x="165" y="250" text-anchor="middle">page nằm đâu ghi đó → ghi ngẫu nhiên</text>
+  <text class="ok" x="34" y="280">✓ đọc: một đường root → leaf</text>
+  <text class="no" x="34" y="302">✗ mỗi update ghi ngẫu nhiên lên đĩa</text>
+
+  <!-- LSM -->
+  <rect class="grp" x="326" y="16" width="414" height="306" rx="12"/>
+  <text class="h" x="340" y="40">LSM-Tree · gom ghi trong RAM, ghi đĩa tuần tự</text>
+  <rect class="box" x="342" y="54" width="110" height="28" rx="7"/><text class="code" x="397" y="73">ghi k=42</text>
+  <rect class="ram" x="342" y="102" width="176" height="46" rx="8"/>
+  <text class="c" x="430" y="121">memtable (RAM)</text>
+  <text class="sc" x="430" y="139">sắp xếp theo key</text>
+  <rect class="log" x="532" y="102" width="192" height="46" rx="8"/>
+  <text class="c" x="628" y="121">commit log (đĩa)</text>
+  <text class="sc" x="628" y="139">append, để phục hồi khi sập</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M397,82 L397,100"/><path d="M452,68 C560,68 600,80 610,100"/>
+  </g>
+  <path d="M430,148 L430,180" stroke="#3b7ff5" stroke-width="1.5" marker-end="url(#a)"/>
+  <text class="s" x="438" y="169">đầy → flush tuần tự</text>
+  <rect class="sst" x="342" y="182" width="70" height="30" rx="5"/><text class="c" x="377" y="202">SST 3</text>
+  <rect class="sst" x="418" y="182" width="70" height="30" rx="5"/><text class="c" x="453" y="202">SST 2</text>
+  <rect class="sst" x="494" y="182" width="70" height="30" rx="5"/><text class="c" x="529" y="202">SST 1</text>
+  <text class="s" x="574" y="194">L0 · file bất biến,</text>
+  <text class="s" x="574" y="210">mới → cũ từ trái</text>
+  <path d="M453,212 L453,240" stroke="#14a37f" stroke-width="1.5" marker-end="url(#a)"/>
+  <text class="s" x="461" y="232">compaction ở nền: gộp, bỏ bản cũ và key đã xoá</text>
+  <rect class="sst" x="342" y="242" width="250" height="28" rx="5"/><text class="c" x="467" y="261">L1 · SSTable lớn hơn, đã gộp</text>
+  <text class="ok" x="340" y="292">✓ ghi: RAM + append tuần tự → rất nhanh</text>
+  <text class="no" x="340" y="312">✗ đọc có thể phải xem nhiều file; compaction tốn I/O nền</text>
+
+  <text class="t" x="20" y="348">Đọc k ở LSM: xem memtable trước, rồi SSTable từ mới tới cũ; Bloom filter của mỗi file</text>
+  <text class="t" x="20" y="368">giúp bỏ qua file chắc chắn không có k. Ví dụ LSM: Cassandra, RocksDB; B-Tree: PostgreSQL, InnoDB.</text>
+  <text class="s" x="20" y="390">Số file và số tầng ở đây là minh hoạ; mỗi engine có chiến lược compaction riêng.</text>
+</svg>

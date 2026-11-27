@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 370" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">B-Tree index: đi từ root xuống leaf một lần rồi quét ngang các leaf để trả lời range query</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <style>
+      .pg { fill: #f8fafc; stroke: #94a3b8; stroke-width: 1.2; }
+      .k { fill: #ffffff; stroke: #94a3b8; }
+      .hit { fill: #fff3db; stroke: #e08a00; stroke-width: 1.6; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .o { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="368" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="code" x="20" y="30">WHERE id BETWEEN 50 AND 85</text>
+
+  <!-- Root -->
+  <text class="s" x="476" y="54">root page</text>
+  <rect class="pg" x="300" y="40" width="160" height="36" rx="6"/>
+  <rect class="k" x="322" y="46" width="46" height="24"/><text class="o" x="345" y="63">40</text>
+  <rect class="k" x="392" y="46" width="46" height="24"/><text class="o" x="415" y="63">80</text>
+  <circle cx="311" cy="58" r="3" fill="#64748b"/><circle cx="380" cy="58" r="3" fill="#e08a00"/><circle cx="449" cy="58" r="3" fill="#64748b"/>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M311,76 L140,148"/>
+    <path d="M449,76 L620,148"/>
+  </g>
+  <path d="M380,76 L380,148" stroke="#e08a00" stroke-width="2" fill="none" marker-end="url(#o)"/>
+  <text class="s" x="168" y="104">id &lt; 40</text>
+  <text class="s" x="390" y="118" style="fill:#b45309">① 40 ≤ 50 &lt; 80</text>
+  <text class="s" x="560" y="104">id ≥ 80</text>
+
+  <!-- Leaves -->
+  <rect class="pg" x="40" y="150" width="190" height="36" rx="6"/>
+  <rect class="k" x="50" y="156" width="46" height="24"/><text class="o" x="73" y="173">10</text>
+  <rect class="k" x="100" y="156" width="46" height="24"/><text class="o" x="123" y="173">20</text>
+  <rect class="k" x="150" y="156" width="46" height="24"/><text class="o" x="173" y="173">30</text>
+  <rect class="pg" x="285" y="150" width="190" height="36" rx="6"/>
+  <rect class="k" x="295" y="156" width="46" height="24"/><text class="o" x="318" y="173">40</text>
+  <rect class="hit" x="345" y="156" width="46" height="24"/><text class="o" x="368" y="173">55</text>
+  <rect class="hit" x="395" y="156" width="46" height="24"/><text class="o" x="418" y="173">70</text>
+  <rect class="pg" x="530" y="150" width="190" height="36" rx="6"/>
+  <rect class="hit" x="540" y="156" width="46" height="24"/><text class="o" x="563" y="173">80</text>
+  <rect class="k" x="590" y="156" width="46" height="24"/><text class="o" x="613" y="173">90</text>
+  <rect class="k" x="640" y="156" width="46" height="24"/><text class="o" x="663" y="173">95</text>
+  <text class="s" x="40" y="208">leaf page: key đã sắp xếp</text>
+
+  <!-- Sibling links -->
+  <path d="M232,168 L283,168" stroke="#64748b" stroke-width="1.3" fill="none" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path d="M477,168 L528,168" stroke="#e08a00" stroke-width="2" fill="none" marker-end="url(#o)"/>
+  <text class="s" x="440" y="208" style="fill:#b45309">② quét ngang sang</text>
+  <text class="s" x="440" y="224" style="fill:#b45309">leaf kế, dừng ở 90</text>
+
+  <!-- Heap -->
+  <text class="s" x="40" y="298">↑ bảng (heap): dòng nằm theo thứ tự ghi, không theo id</text>
+  <g>
+    <rect class="k" x="40" y="252" width="75" height="30"/><text class="o" x="77" y="272">id 70</text>
+    <rect class="k" x="115" y="252" width="75" height="30"/><text class="o" x="152" y="272">id 10</text>
+    <rect class="k" x="190" y="252" width="75" height="30"/><text class="o" x="227" y="272">id 95</text>
+    <rect class="k" x="265" y="252" width="75" height="30"/><text class="o" x="302" y="272">id 40</text>
+    <rect class="k" x="340" y="252" width="75" height="30"/><text class="o" x="377" y="272">id 55</text>
+    <rect class="k" x="415" y="252" width="75" height="30"/><text class="o" x="452" y="272">id 20</text>
+    <rect class="k" x="490" y="252" width="75" height="30"/><text class="o" x="527" y="272">id 90</text>
+    <rect class="k" x="565" y="252" width="75" height="30"/><text class="o" x="602" y="272">id 80</text>
+    <rect class="k" x="640" y="252" width="75" height="30"/><text class="o" x="677" y="272">id 30</text>
+  </g>
+  <rect x="40" y="252" width="75" height="30" fill="none" stroke="#e08a00" stroke-width="1.6"/>
+  <rect x="340" y="252" width="75" height="30" fill="none" stroke="#e08a00" stroke-width="1.6"/>
+  <rect x="565" y="252" width="75" height="30" fill="none" stroke="#e08a00" stroke-width="1.6"/>
+  <g stroke="#e08a00" stroke-width="1.2" stroke-dasharray="4 3" fill="none" marker-end="url(#o)">
+    <path d="M368,180 L376,250"/>
+    <path d="M418,180 C400,220 120,220 80,250"/>
+    <path d="M563,180 L600,250"/>
+  </g>
+
+  <text class="t" x="20" y="322">Leaf giữ key theo thứ tự và nối với leaf kề → range, ORDER BY chỉ là quét ngang;</text>
+  <text class="t" x="20" y="341">mỗi entry trỏ tới một dòng trong bảng. Tree thấp (vài tầng) nên đi xuống chỉ tốn vài lần đọc page.</text>
+  <text class="s" x="20" y="360">Hash index không giữ thứ tự → chỉ tra được =, không quét range. Thêm/xoá dòng là phải sửa cả index → ghi chậm hơn.</text>
+</svg>

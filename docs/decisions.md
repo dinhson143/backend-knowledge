@@ -22,3 +22,4 @@ Quyết định sau ghi đè quyết định trước. Khi code hoặc nội dun
 | D24 | Bộ lọc trang Luyện bài không đưa vào URL (Q5). | Không cần chia sẻ/bookmark trạng thái lọc. | 2026-11-27 |
 | D25 | Tiêu đề giữ thuật ngữ ngành bằng tiếng Anh; giải nghĩa và `goal` bằng tiếng Việt (Q6). | Phỏng vấn dùng nguyên văn thuật ngữ. | 2026-11-27 |
 | D26 | Tiến độ GĐ5 tính cả topic và 13 bài luyện (Q7). | Giữ cách đếm của giai đoạn luyện bài cũ. | 2026-11-27 |
+| D50 | Trong SVG, màu riêng của một phần tử (fill, stroke, stroke-width) đặt bằng `style="…"` khi class của nó đã đặt thuộc tính đó trong `<style>`. `check.mjs` báo lỗi khi gặp thuộc tính trùng với CSS của class. | CSS trong `<style>` thắng presentation attribute, nên viền/chữ màu bị class ghi đè mà không báo gì (đã gặp ở `redis-cluster-slots.svg` và các sơ đồ mới). | 2026-11-27 |

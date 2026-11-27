@@ -126,6 +126,13 @@ BK.problem({
       },
     ],
   },
+  diagrams: [
+    {
+      src: "content/svg/bigdata-ds-count-min-sketch.svg",
+      caption: "Khi chấp nhận sai số, Count-Min Sketch thay bảng đếm từng video bằng d × w bộ đếm cố định: lấy min của các hàng nên chỉ đếm dư, không đếm thiếu — hợp để tìm video lượt xem cao rồi đưa vào heap K.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/count-min-sketch/",
+    },
+  ],
   deep: [
     {
       q: "Đếm ~800k view/giây?",

@@ -54,6 +54,18 @@ BK.topic({
     ],
   },
   points: [],
+  diagrams: [
+    {
+      src: "content/svg/bigdata-ds-bloom-filter.svg",
+      caption: "Bloom filter bật k bit cho mỗi phần tử; chỉ cần một bit bằng 0 là chắc chắn chưa có, còn đủ k bit bằng 1 có thể do phần tử khác bật nên chỉ là “có thể có”.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/",
+    },
+    {
+      src: "content/svg/bigdata-ds-count-min-sketch.svg",
+      caption: "Count-Min Sketch cộng mỗi phần tử vào một ô ở mỗi hàng; va chạm chỉ cộng thêm, nên lấy min của các hàng ra ước lượng chỉ có thể dư, không thiếu — phần tử chưa từng thấy vẫn có thể nhận số dương.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/count-min-sketch/",
+    },
+  ],
   cards: [
     [
       "Bloom filter có false negative không?",

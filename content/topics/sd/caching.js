@@ -84,6 +84,13 @@ BK.topic({
       why: "Bốn câu này quyết định hệ cache đúng hay sai: key sai thì hit rate thấp hoặc trả nhầm dữ liệu giữa user, TTL quyết định độ stale tối đa, invalidation quyết định dữ liệu đổi bao lâu mới được thấy. Nghe đủ bốn câu trả lời, interviewer biết bạn hiểu cache chứ không chỉ nói 「thêm Redis」.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/caching-tiers.svg",
+      caption: "Bốn chỗ đặt cache trên đường đi của request: client, CDN, in-process (mỗi instance một bản riêng) và external cache như Redis (mọi instance dùng chung). Càng gần user càng ít chặng mạng nhưng càng khó chủ động xoá khi dữ liệu đổi.",
+      source: "https://aws.amazon.com/caching/",
+    },
+  ],
   cards: [
     [
       "So sánh Write-Through, Write-Around, Write-Back.",

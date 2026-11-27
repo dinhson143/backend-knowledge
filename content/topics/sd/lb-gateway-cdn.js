@@ -38,6 +38,13 @@ BK.topic({
       why: "Edge ở Singapore chỉ vài chục ms, trong khi request Việt Nam → Mỹ tốn ~150–250ms RTT, vì ánh sáng trong cáp quang đi ~200km/ms. Nội dung tĩnh ít đổi nên cache lâu ở edge được → phần lớn request không tới origin, giảm tải và băng thông origin.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/lb-gateway-cdn-request-path.svg",
+      caption: "DNS đưa user tới CDN edge gần nhất: nội dung tĩnh hit thì trả ngay, miss mới về origin. Request API đi qua API Gateway (auth, rate limit, routing) rồi Load Balancer chia tải giữa các instance của service.",
+      source: "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html",
+    },
+  ],
   cards: [
     [
       "Client-side load balancing là gì?",
