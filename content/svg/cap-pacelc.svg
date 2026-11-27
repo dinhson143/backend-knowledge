@@ -34,19 +34,19 @@
     <path d="M500,142 L480,164"/><path d="M620,142 L640,164"/>
   </g>
 
-  <rect class="box" x="40" y="166" width="154" height="68" rx="10" stroke="#e08a00" stroke-width="1.8"/>
+  <rect class="box" x="40" y="166" width="154" height="68" rx="10" style="stroke:#e08a00;stroke-width:1.8"/>
   <text class="hc" x="117" y="188">PA</text>
   <text class="sc" x="117" y="206">vẫn trả lời,</text>
   <text class="sc" x="117" y="222">có thể là dữ liệu cũ</text>
-  <rect class="box" x="206" y="166" width="154" height="68" rx="10" stroke="#3b7ff5" stroke-width="1.8"/>
+  <rect class="box" x="206" y="166" width="154" height="68" rx="10" style="stroke:#3b7ff5;stroke-width:1.8"/>
   <text class="hc" x="283" y="188">PC</text>
   <text class="sc" x="283" y="206">từ chối hoặc chờ,</text>
   <text class="sc" x="283" y="222">không trả sai</text>
-  <rect class="box" x="400" y="166" width="154" height="68" rx="10" stroke="#e08a00" stroke-width="1.8"/>
+  <rect class="box" x="400" y="166" width="154" height="68" rx="10" style="stroke:#e08a00;stroke-width:1.8"/>
   <text class="hc" x="477" y="188">EL</text>
   <text class="sc" x="477" y="206">đọc replica gần, trả</text>
   <text class="sc" x="477" y="222">nhanh, có thể hơi cũ</text>
-  <rect class="box" x="566" y="166" width="154" height="68" rx="10" stroke="#3b7ff5" stroke-width="1.8"/>
+  <rect class="box" x="566" y="166" width="154" height="68" rx="10" style="stroke:#3b7ff5;stroke-width:1.8"/>
   <text class="hc" x="643" y="188">EC</text>
   <text class="sc" x="643" y="206">chờ replica đồng bộ,</text>
   <text class="sc" x="643" y="222">luôn mới, chậm hơn</text>

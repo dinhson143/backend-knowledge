@@ -35,7 +35,7 @@
   </g>
   <rect class="box" x="40" y="108" width="96" height="40" rx="8"/><text class="c" x="88" y="133">Shard A</text>
   <rect class="box" x="144" y="108" width="96" height="40" rx="8"/><text class="c" x="192" y="133">Shard B</text>
-  <rect class="box" x="252" y="108" width="96" height="40" rx="8" stroke="#e0562b" stroke-width="2.2"/><text class="c" x="300" y="133">Shard C</text>
+  <rect class="box" x="252" y="108" width="96" height="40" rx="8" style="stroke:#e0562b;stroke-width:2.2"/><text class="c" x="300" y="133">Shard C</text>
   <!-- query khoảng -->
   <rect class="q" x="36" y="196" width="168" height="28" rx="6"/>
   <text class="code" x="46" y="214">id 1200 → 1300</text>
