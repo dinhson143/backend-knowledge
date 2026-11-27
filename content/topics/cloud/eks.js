@@ -87,7 +87,7 @@ BK.topic({
           },
           {
             cells: ["ConfigMap / Secret", "Cấu hình và bí mật gắn vào pod"],
-            why: "Tách cấu hình khỏi image → cùng image chạy được ở dev và prod. Secret mặc định chỉ base64 trong etcd, nên cần bật KMS envelope encryption hoặc dùng Secrets Manager qua CSI driver.",
+            why: "Tách cấu hình khỏi image → cùng image chạy được ở dev và prod. Kubernetes gốc chỉ lưu Secret dạng base64 trong etcd; EKS từ Kubernetes 1.28 mặc định envelope-encrypt mọi dữ liệu API bằng KMS (có thể dùng key của mình). Secrets Manager qua CSI driver vẫn hữu ích khi cần xoay vòng và quản lý secret tập trung. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/envelope-encryption.html",
           },
           {
             cells: ["HPA", "Tự tăng giảm số pod theo CPU hoặc metric tuỳ chỉnh (KEDA theo độ dài queue)"],

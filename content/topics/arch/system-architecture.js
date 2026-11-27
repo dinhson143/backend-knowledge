@@ -63,7 +63,7 @@ BK.topic({
           "Cold start; giới hạn thời gian chạy; vendor lock-in; khó test cục bộ; đắt khi tải cao liên tục",
           "Tải lẻ tẻ, theo sự kiện, glue code, MVP",
         ],
-        why: "Tải thấp thì gần như miễn phí, vì nền tảng khởi động môi trường cho từng lần gọi và tính tiền theo lần chạy. Khởi động môi trường mới gây cold start, và tải cao liên tục thì trả theo lần chạy đắt hơn máy chạy sẵn.",
+        why: "Tải thấp thì gần như miễn phí, vì nền tảng chỉ tạo môi trường chạy khi có request và tính tiền theo số lần gọi cùng thời gian chạy × bộ nhớ. Môi trường được giữ lại và tái dùng cho các lần gọi sau; cold start chỉ xảy ra khi phải tạo môi trường mới (lần gọi đầu, khi scale ra, sau một thời gian rảnh). Tải cao liên tục thì trả theo lần chạy đắt hơn máy chạy sẵn. Nguồn: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html",
       },
     ],
   },

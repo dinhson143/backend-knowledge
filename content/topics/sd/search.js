@@ -5,7 +5,7 @@ BK.topic({
   title: "Search Optimized Database",
   tldr: {
     t: "Elasticsearch / OpenSearch dùng inverted index + tokenization + stemming để full-text search; không dùng `LIKE '%x%'` trên DB chính.",
-    why: "Inverted index tìm document chứa một từ bằng một lần tra cứu thay vì quét mọi dòng; tokenization và stemming quyết định 'từ' vào index ở dạng nào để query khớp được. `LIKE '%x%'` không có index nào hỗ trợ nên luôn full scan trên DB chính.",
+    why: "Inverted index tìm document chứa một từ bằng một lần tra cứu thay vì quét mọi dòng; tokenization và stemming quyết định 'từ' vào index ở dạng nào để query khớp được. `LIKE '%x%'` không dùng được B-Tree index nên thường full scan trên DB chính; index trigram (`pg_trgm` của PostgreSQL) tăng tốc được kiểu tìm này nhưng vẫn không có stemming hay xếp hạng độ liên quan (https://www.postgresql.org/docs/current/pgtrgm.html).",
   },
   story: {
     problem: "`LIKE '%phone%'` buộc DB scan toàn bảng vì wildcard đầu khiến B-Tree index không dùng được: 100 triệu dòng là vài giây đến vài chục giây, và chạy trên DB chính làm chậm mọi query khác. Nó cũng không biết 'phones' khớp 'phone', không xếp hạng kết quả theo độ liên quan.",
