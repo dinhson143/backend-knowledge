@@ -59,6 +59,7 @@
     "content/topics/cs/os-process-lifecycle.js",
     "content/topics/cs/thr-thread-vs-process.js",
     "content/topics/cs/os-context-switch.js",
+    "content/topics/cs/os-memory-layout.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",
