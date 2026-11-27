@@ -58,6 +58,7 @@ window.ROADMAP = [
       { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure", "async-blocking-in-loop"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page", "net-tcp-deep", "net-http-versions", "net-tls"] },
       { id: "cs.arch", title: "Kiến trúc máy tính", topics: ["hw-numbers-float"] },
+      { id: "cs.security", title: "Bảo mật & mật mã", topics: ["sec-crypto-primitives"] },
     ] },
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [

@@ -106,6 +106,7 @@
     "content/topics/cs/net-http-versions.js",
     "content/topics/cs/net-tls.js",
     "content/topics/cs/hw-numbers-float.js",
+    "content/topics/cs/sec-crypto-primitives.js",
     "content/topics/code/code-interview-communication.js",
     "content/topics/code/code-language-choice.js",
     "content/topics/code/code-clean-naming.js",
