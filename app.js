@@ -429,13 +429,15 @@
   }
 
   // ── Thư viện mô phỏng ──
+  // A9: sim thuộc giai đoạn của topic đứng sớm nhất trong ORDER (không theo topics[0])
+  const simStage = (s) => { const ts = s.topics.map((id) => byId[id]).filter(Boolean).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)); return ts[0] && ts[0].stage; };
   function viewSims() {
     setNav("sims", sideKnowledge(null));
     main.innerHTML = `
       <h1>Thư viện mô phỏng</h1>
       <p class="lead">${SIMS.length} mô phỏng chạy trực tiếp, xếp theo giai đoạn lộ trình. Mỗi mô phỏng cũng có trong trang chủ đề tương ứng.</p>
-      ${STAGES.filter((s) => !s.problems).map((st) => {
-        const list = SIMS.filter((s) => byId[s.topics[0]] && byId[s.topics[0]].stage === st);
+      ${STAGES.filter((s) => s.topics.length).map((st) => {
+        const list = SIMS.filter((s) => simStage(s) === st);
         if (!list.length) return "";
         return `<h2>${stageNum(st)} · ${esc(st.title)}</h2><div class="grid">${list.map((s) => `
           <a class="panel sim-card" href="#/sim/${s.id}">
@@ -454,7 +456,8 @@
       <div class="crumb"><a href="#/sims">Mô phỏng</a> · ${esc(sim.title)}</div>
       <h1 class="sr-only">${esc(sim.title)}</h1>
       ${simBox(sim)}
-      <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>`;
+      <div class="topic-actions">${sim.topics.filter((tid) => byId[tid]).map((tid) => `<a class="btn" href="#/t/${tid}">Ôn chủ đề: ${esc(byId[tid].title)}</a>`).join("")}</div>
+      ${(() => { const uses = PROBLEMS.filter((p) => (p.sims || []).includes(id)); return uses.length ? `<div class="apply sim-uses"><span class="muted">Dùng trong bài:</span> ${uses.map((p) => `<a class="chip" href="#/p/${p.id}">${esc(p.title)}</a>`).join("")}</div>` : ""; })()}`;
     mountAll([sim]);
   }
 
