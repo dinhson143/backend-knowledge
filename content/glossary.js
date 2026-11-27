@@ -17,6 +17,7 @@ window.GLOSSARY = [
     ["LSP", "Liskov Substitution Principle", "Class con thay được class cha ở mọi chỗ mà không làm sai hành vi."],
     ["ISP", "Interface Segregation Principle", "Client không bị buộc phụ thuộc vào method nó không dùng; vì vậy tách interface theo nhu cầu của từng loại client."],
     ["DIP", "Dependency Inversion Principle", "Phụ thuộc vào abstraction (interface), không phụ thuộc class cụ thể."],
+    ["STAR", "Situation · Task · Action · Result", "Khung kể câu chuyện behavioral: bối cảnh, việc của bạn, bạn làm gì, kết quả."],
     ["DI", "Dependency Injection", "Truyền dependency từ ngoài vào thay vì tự `new` bên trong — cách hiện thực DIP."],
     ["YAGNI", "You Aren't Gonna Need It", "Đừng xây tính năng khi chưa thật sự cần."],
     ["KISS", "Keep It Simple, Stupid", "Giữ thiết kế đơn giản nhất có thể."],

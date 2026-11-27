@@ -47,6 +47,7 @@
     "content/topics/lld/patterns-gof.js",
     "content/topics/lld/concurrency.js",
     "content/topics/lld/lld-problems-list.js",
+    "content/topics/beh/beh-star-stories.js",
     "content/topics/cloud/container-basics.js",
     "content/topics/cloud/dockerfile.js",
     "content/topics/cloud/k8s-core.js",
