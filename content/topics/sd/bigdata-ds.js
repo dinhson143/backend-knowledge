@@ -54,6 +54,13 @@ BK.topic({
     ],
   },
   points: [],
+  diagrams: [
+    {
+      src: "content/svg/bigdata-ds-bloom-filter.svg",
+      caption: "Bloom filter bật k bit cho mỗi phần tử; chỉ cần một bit bằng 0 là chắc chắn chưa có, còn đủ k bit bằng 1 có thể do phần tử khác bật nên chỉ là “có thể có”.",
+      source: "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/",
+    },
+  ],
   cards: [
     [
       "Bloom filter có false negative không?",

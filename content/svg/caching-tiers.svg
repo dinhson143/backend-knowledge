@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">4 chỗ đặt cache trên đường đi của request: client, CDN, in-process trong app, external cache dùng chung, rồi mới tới DB</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#fff3db"/><stop offset="1" stop-color="#e8f0fe"/>
+    </linearGradient>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .cache { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.4; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .n { font-size: 12px; font-weight: 700; fill: #0f7a5f; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="358" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="s" x="20" y="30">Request đi từ trái sang phải; hit ở tầng nào thì trả lời ngay tại đó, miss mới đi tiếp vào trong.</text>
+
+  <!-- Client -->
+  <rect class="cache" x="20" y="62" width="124" height="76" rx="10"/>
+  <text class="hc" x="82" y="86">Client</text>
+  <text class="c" x="82" y="106"><tspan class="n">①</tspan> browser cache</text>
+  <text class="sc" x="82" y="124">LocalStorage, Cache API</text>
+
+  <!-- CDN -->
+  <rect class="cache" x="166" y="62" width="124" height="76" rx="10"/>
+  <text class="hc" x="228" y="86">CDN edge</text>
+  <text class="c" x="228" y="106"><tspan class="n">②</tspan> cache ở edge</text>
+  <text class="sc" x="228" y="124">giữa user và origin</text>
+
+  <!-- App -->
+  <rect class="grp" x="312" y="44" width="176" height="122" rx="12"/>
+  <text class="h" x="324" y="64">App instances</text>
+  <rect class="box" x="324" y="74" width="152" height="38" rx="8"/>
+  <text class="c" x="400" y="90">App #1</text>
+  <text class="sc" x="400" y="105"><tspan class="n">③</tspan> in-process cache</text>
+  <rect class="box" x="324" y="118" width="152" height="38" rx="8"/>
+  <text class="c" x="400" y="134">App #2</text>
+  <text class="sc" x="400" y="149"><tspan class="n">③</tspan> in-process cache</text>
+
+  <!-- Redis -->
+  <rect class="cache" x="510" y="62" width="124" height="76" rx="10"/>
+  <text class="hc" x="572" y="86">Redis</text>
+  <text class="c" x="572" y="106"><tspan class="n">④</tspan> external cache</text>
+  <text class="sc" x="572" y="124">mọi app dùng chung</text>
+
+  <!-- DB -->
+  <rect class="box" x="656" y="62" width="84" height="76" rx="10"/>
+  <text class="hc" x="698" y="96">DB</text>
+  <text class="sc" x="698" y="116">nguồn sự thật</text>
+
+  <g stroke="#64748b" stroke-width="1.4" fill="none" marker-end="url(#a)">
+    <path d="M144,100 L164,100"/>
+    <path d="M290,100 L310,100"/>
+    <path d="M476,93 C495,93 495,98 508,98"/>
+    <path d="M476,137 C495,137 495,104 508,104"/>
+    <path d="M634,100 L654,100"/>
+  </g>
+
+  <!-- Dải đánh đổi -->
+  <rect x="20" y="182" width="720" height="28" rx="6" fill="url(#g)" stroke="#cbd5e1"/>
+  <text class="t" x="32" y="201">← gần user: ít chặng mạng hơn, nhanh hơn</text>
+  <text class="t" x="728" y="201" text-anchor="end">gần DB: dễ chủ động xoá hơn →</text>
+
+  <!-- Ghi chú từng tầng -->
+  <text class="s" x="20" y="234">không tốn</text>
+  <text class="s" x="20" y="250">round-trip nào</text>
+  <text class="s" x="166" y="234">cắt đường xa</text>
+  <text class="s" x="166" y="250">tới origin</text>
+  <text class="s" x="312" y="234">không qua mạng, nhưng mỗi</text>
+  <text class="s" x="312" y="250">instance giữ một bản riêng</text>
+  <text class="s" x="510" y="234">mọi instance thấy</text>
+  <text class="s" x="510" y="250">cùng một bản</text>
+  <text class="s" x="656" y="234">đọc disk,</text>
+  <text class="s" x="656" y="250">chạy query</text>
+
+  <text class="t" x="20" y="290">Càng gần user càng rẻ, nhưng càng khó xoá khi dữ liệu đổi → mỗi tầng cần TTL làm lưới an toàn.</text>
+  <text class="s" x="20" y="314">Cache ở ③ lệch nhau giữa các instance; cần mọi instance thấy cùng giá trị thì đặt ở ④.</text>
+  <text class="s" x="20" y="336">Ví dụ: ảnh, JS/CSS ở ②; config ít đổi ở ③; session, profile, kết quả query nóng ở ④.</text>
+</svg>
