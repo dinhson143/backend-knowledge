@@ -4,7 +4,7 @@ BK.topic({
   section: "cloud-containers",
   title: "EKS chuyên sâu",
   goal: "Hiểu EKS quản lý gì, bạn quản lý gì và scale 3 lớp",
-  needs: ["ecs"],
+  needs: ["ecs", "k8s-core"],
   tldr: {
     t: "EKS là **Kubernetes do AWS quản lý**: AWS chạy control plane (API server, etcd) trên nhiều AZ và tính phí theo giờ mỗi cluster; bạn chạy workload bằng Pod/Deployment chuẩn Kubernetes trên node EC2, Fargate hoặc Auto Mode. Mạnh ở hệ sinh thái (Helm, operator, GitOps, service mesh) và chạy được ngoài AWS, đổi lại vận hành phức tạp hơn ECS.",
     why: "EKS tính phí control plane theo giờ, vì control plane Kubernetes (API server, etcd) là thành phần riêng của mỗi cluster mà AWS phải chạy dành riêng cho bạn trên nhiều AZ. API là Kubernetes chuẩn → manifest và Helm chart mang sang GKE/AKS được, nhưng cũng kéo theo toàn bộ độ phức tạp của Kubernetes.",
@@ -64,52 +64,36 @@ BK.topic({
       },
     },
     {
-      title: "Object Kubernetes hay dùng",
+      title: "Object Kubernetes: phần riêng trên AWS",
+      points: [
+        "Pod, Deployment/ReplicaSet, Service, Ingress/Gateway, ConfigMap/Secret, Namespace/RBAC, DaemonSet, StatefulSet, Job hoạt động như mọi cluster Kubernetes: xem topic **Kubernetes cốt lõi** (`k8s-core`). Bảng dưới chỉ giữ chỗ EKS khác hoặc thêm.",
+      ],
       table: {
-        head: ["Object", "Vai trò"],
+        head: ["Object", "Trên EKS"],
         rows: [
           {
-            cells: ["Pod", "Đơn vị chạy nhỏ nhất (1+ container cùng network)"],
-            why: "Các container trong pod chia sẻ network namespace → gọi nhau qua `localhost` và dùng chung một IP. Pod là đơn vị scheduler đặt lên node, nên mọi container trong pod luôn ở cùng node.",
+            cells: ["Service `type: LoadBalancer`", "Tạo NLB qua AWS Load Balancer Controller"],
+            why: "Kubernetes chỉ khai báo \"cần một load balancer\"; trên EKS, AWS Load Balancer Controller đọc Service và tạo NLB, đăng ký IP pod làm target (target type `ip`).",
           },
           {
-            cells: ["Deployment / ReplicaSet", "Giữ N pod, rolling update theo `maxSurge` / `maxUnavailable`"],
-            why: "Rolling update và rollback chỉ là đổi số replica giữa hai ReplicaSet, vì Deployment tạo ReplicaSet mới cho mỗi version và giảm dần ReplicaSet cũ. `maxSurge` cho chạy dư bao nhiêu pod, `maxUnavailable` cho thiếu bao nhiêu.",
-          },
-          {
-            cells: [
-              "Service",
-              "Địa chỉ ổn định cho nhóm pod: ClusterIP (nội bộ), LoadBalancer (NLB qua AWS LB Controller)",
-            ],
-            why: "Service cấp một IP/DNS ổn định và tự cập nhật danh sách endpoint theo label selector, vì IP pod đổi mỗi lần pod tạo lại. `LoadBalancer` type tạo NLB khi có AWS Load Balancer Controller.",
-          },
-          {
-            cells: ["Ingress", "HTTP routing → ALB qua AWS Load Balancer Controller"],
+            cells: ["Ingress / Gateway", "Tạo ALB qua AWS Load Balancer Controller"],
             why: "Ingress cần controller biến nó thành load balancer thật, vì bản thân nó chỉ khai báo luật HTTP (host, path). AWS Load Balancer Controller đọc Ingress và tạo ALB với listener rule tương ứng.",
           },
           {
-            cells: ["ConfigMap / Secret", "Cấu hình và bí mật gắn vào pod"],
-            why: "Tách cấu hình khỏi image → cùng image chạy được ở dev và prod. Kubernetes gốc chỉ lưu Secret dạng base64 trong etcd; EKS từ Kubernetes 1.28 mặc định envelope-encrypt mọi dữ liệu API bằng KMS (có thể dùng key của mình). Secrets Manager qua CSI driver vẫn hữu ích khi cần xoay vòng và quản lý secret tập trung. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/envelope-encryption.html",
+            cells: ["Secret", "Từ Kubernetes 1.28, EKS envelope-encrypt mọi dữ liệu API bằng KMS"],
+            why: "Kubernetes gốc chỉ lưu Secret dạng base64 trong etcd; EKS từ Kubernetes 1.28 mặc định envelope-encrypt mọi dữ liệu API bằng KMS (có thể dùng key của mình). Secrets Manager qua CSI driver vẫn hữu ích khi cần xoay vòng và quản lý secret tập trung. Nguồn: https://docs.aws.amazon.com/eks/latest/userguide/envelope-encryption.html",
           },
           {
             cells: ["HPA", "Tự tăng giảm số pod theo CPU hoặc metric tuỳ chỉnh (KEDA theo độ dài queue)"],
             why: "Tải tăng là số pod tăng tỉ lệ, vì HPA định kỳ (mặc định 15 giây) lấy metric rồi tính `desired = ceil(current × metric / target)` (https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/). HPA thường không scale về 0, nên KEDA lo trường hợp theo queue và scale-to-zero.",
           },
           {
-            cells: ["Namespace + RBAC", "Chia cluster cho nhiều team, phân quyền trong cluster"],
-            why: "Role/RoleBinding giới hạn team A chỉ thao tác trong namespace của A, vì namespace là ranh giới đặt tên và gắn quyền. Đây là cách ly logic, không phải cách ly bảo mật tuyệt đối.",
+            cells: ["DaemonSet", "Không chạy trên Fargate"],
+            why: "DaemonSet đảm bảo mỗi node có đúng một pod. Fargate cho mỗi pod một micro-VM riêng, không có node dùng chung, nên DaemonSet không có chỗ để chạy.",
           },
           {
-            cells: ["DaemonSet", "Một pod trên mỗi node (agent log, monitoring)"],
-            why: "DaemonSet đảm bảo mỗi node có đúng một pod, node mới tự có pod — cần cho agent log và monitoring đọc dữ liệu từ từng máy. Vì vậy Fargate (không có node chung) không hỗ trợ.",
-          },
-          {
-            cells: ["StatefulSet + PVC", "Workload có trạng thái, volume EBS qua CSI driver (EBS gắn với 1 AZ)"],
+            cells: ["StatefulSet + PVC", "Volume EBS qua CSI driver, EBS gắn với 1 AZ"],
             why: "Pod tạo lại vẫn gắn đúng volume, vì StatefulSet cho mỗi pod tên cố định (`db-0`) và PVC riêng đi theo pod. EBS là block device nằm trong một AZ, nên pod chỉ lên lại được node cùng AZ.",
-          },
-          {
-            cells: ["Job / CronJob", "Tác vụ chạy một lần hoặc theo lịch"],
-            why: "Job hợp tác vụ batch, vì nó chạy pod tới khi thành công rồi dừng (thay vì luôn giữ N pod như Deployment). CronJob tạo Job theo lịch cron.",
           },
         ],
       },
