@@ -23,7 +23,7 @@ window.ROADMAP = [
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
       { id: "s1.io", title: "Giao tiếp & cửa vào", topics: ["networking", "api-design", "lb-gateway-cdn"] },
-      { id: "s1.data", title: "Lưu & truy vấn dữ liệu", topics: ["data-modeling", "core-db", "indexing"] },
+      { id: "s1.data", title: "Lưu & truy vấn dữ liệu", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
     ] },
   { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ mức nhất quán.",
     parts: [

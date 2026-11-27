@@ -46,6 +46,7 @@
     "content/topics/sd/outbox-cdc.js",
     "content/topics/sd/durable-execution.js",
     "content/topics/sd/observability.js",
+    "content/topics/sd/db-isolation-anomalies.js",
     "content/topics/lld/lld-delivery.js",
     "content/topics/lld/oop-pillars.js",
     "content/topics/lld/solid.js",
