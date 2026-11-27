@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Trace waterfall của một request qua gateway, order, payment và inventory; span cha con và header traceparent trên từng chặng</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <style>
+      .bar { fill: #dbe7fd; stroke: #3b7ff5; stroke-width: 1.2; }
+      .slow { fill: #fff3db; stroke: #e08a00; stroke-width: 1.4; }
+      .db { fill: #eef2f7; stroke: #94a3b8; stroke-width: 1.2; }
+      .row { fill: #f8fafc; stroke: none; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .e { font-size: 12.5px; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .d { font-size: 11.5px; fill: #1f2937; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="448" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="h" x="20" y="30">Trace</text>
+  <text class="code" x="66" y="30" style="fill:#1d4ed8">0af7651916cd43dd8448eb211c80319c</text>
+  <text class="s" x="20" y="48">Mọi span mang cùng trace-id; thanh ngang = từ lúc span bắt đầu tới lúc kết thúc.</text>
+
+  <!-- trục thời gian: 0..220 ms → x 300..740 -->
+  <path d="M300,72 L740,72" stroke="#94a3b8" stroke-width="1"/>
+  <g stroke="#94a3b8" stroke-width="1">
+    <path d="M300,72 L300,77"/><path d="M400,72 L400,77"/><path d="M500,72 L500,77"/><path d="M600,72 L600,77"/><path d="M700,72 L700,77"/>
+  </g>
+  <text class="sc" x="300" y="66">0</text><text class="sc" x="400" y="66">50</text><text class="sc" x="500" y="66">100</text><text class="sc" x="600" y="66">150</text><text class="sc" x="700" y="66">200 ms</text>
+
+  <!-- A -->
+  <rect class="row" x="16" y="82" width="728" height="32" rx="4"/>
+  <text class="e" x="20" y="96">A · GET /checkout</text>
+  <text class="s" x="20" y="110">gateway · root span, không có cha</text>
+  <rect class="bar" x="300" y="88" width="440" height="20" rx="4"/><text class="d" x="308" y="102">220 ms</text>
+  <!-- B -->
+  <text class="e" x="34" y="130">B · POST /orders</text>
+  <text class="s" x="34" y="144">order-service · cha: A</text>
+  <rect class="bar" x="316" y="122" width="408" height="20" rx="4"/><text class="d" x="324" y="136">204 ms</text>
+  <!-- C -->
+  <rect class="row" x="16" y="150" width="728" height="32" rx="4"/>
+  <text class="e" x="48" y="164">C · POST /charge</text>
+  <text class="s" x="48" y="178">payment-service · cha: B</text>
+  <rect class="slow" x="336" y="156" width="204" height="20" rx="4"/><text class="d" x="344" y="170" style="fill:#b45309">102 ms · chậm nhất</text>
+  <!-- D -->
+  <text class="e" x="48" y="198">D · POST /reserve</text>
+  <text class="s" x="48" y="212">inventory-service · cha: B</text>
+  <rect class="bar" x="552" y="190" width="156" height="20" rx="4"/><text class="d" x="560" y="204">78 ms</text>
+  <!-- E -->
+  <rect class="row" x="16" y="218" width="728" height="32" rx="4"/>
+  <text class="e" x="62" y="232">E · UPDATE stock</text>
+  <text class="s" x="62" y="246">client span gọi DB · cha: D</text>
+  <rect class="db" x="572" y="224" width="120" height="20" rx="4"/><text class="d" x="580" y="238">60 ms</text>
+
+  <text class="s" x="20" y="272">C xong rồi mới tới D (gọi tuần tự), B chờ cả hai; C chiếm một nửa thời gian của B nên sửa C được lợi nhiều nhất.</text>
+
+  <!-- traceparent -->
+  <text class="h" x="20" y="304">traceparent trên từng chặng</text>
+  <text class="code" x="226" y="304"><tspan style="fill:#64748b">version</tspan>-<tspan style="fill:#1d4ed8">trace-id</tspan>-<tspan style="fill:#b45309">parent-id</tspan>-<tspan style="fill:#0f7a5f">flags</tspan></text>
+
+  <text class="s" x="20" y="332">gateway → order</text>
+  <text class="code" x="150" y="332"><tspan style="fill:#64748b">00</tspan>-<tspan style="fill:#1d4ed8">0af7651916cd43dd8448eb211c80319c</tspan>-<tspan style="fill:#b45309">b7ad6b7169203331</tspan>-<tspan style="fill:#0f7a5f">01</tspan></text>
+  <text class="s" x="560" y="332">parent-id = span A</text>
+  <text class="s" x="20" y="356">order → payment</text>
+  <text class="code" x="150" y="356"><tspan style="fill:#64748b">00</tspan>-<tspan style="fill:#1d4ed8">0af7651916cd43dd8448eb211c80319c</tspan>-<tspan style="fill:#b45309">00f067aa0ba902b7</tspan>-<tspan style="fill:#0f7a5f">01</tspan></text>
+  <text class="s" x="560" y="356">parent-id = span B</text>
+  <text class="s" x="20" y="380">order → inventory</text>
+  <text class="code" x="150" y="380"><tspan style="fill:#64748b">00</tspan>-<tspan style="fill:#1d4ed8">0af7651916cd43dd8448eb211c80319c</tspan>-<tspan style="fill:#b45309">00f067aa0ba902b7</tspan>-<tspan style="fill:#0f7a5f">01</tspan></text>
+  <text class="s" x="560" y="380">parent-id = span B</text>
+
+  <text class="t" x="20" y="410">trace-id (16 byte) giữ nguyên suốt trace; parent-id (8 byte) là span của bên gọi, đổi ở mỗi chặng.</text>
+  <text class="s" x="20" y="430">flags 01 = sampled. Service nhận header tạo span con với cha = parent-id; quên truyền header thì trace đứt đôi tại đó.</text>
+</svg>
