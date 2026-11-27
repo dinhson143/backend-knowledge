@@ -4,7 +4,7 @@ BK.topic({
   section: "cs-async",
   title: "Thread, Event Loop, Coroutine, Actor",
   goal: "So sánh 4 mô hình concurrency cho server nhiều kết nối",
-  needs: ["thr-thread-vs-process"],
+  needs: ["thr-thread-vs-process", "io-blocking-models"],
   tldr: {
     t: "Server phục vụ 10.000 kết nối phần lớn thời gian chỉ **chờ** (chờ DB, chờ client gửi tiếp). Bốn mô hình khác nhau ở chỗ **ai giữ trạng thái của việc đang chờ**: **thread-per-request** để một OS thread đứng chờ; **event loop** để một thread nhận tin \"socket sẵn sàng\" rồi gọi callback; **coroutine** (async/await, goroutine, virtual thread) để runtime cất trạng thái hàm và đổi sang hàm khác trong user space; **actor** để mỗi actor xử lý tin nhắn trong hàng đợi riêng, không chia sẻ bộ nhớ. **Async Programming** (lập trình bất đồng bộ) là viết code theo hai mô hình giữa: không chặn thread khi chờ I/O.",
     why: "OS thread đắt vì mỗi cái có stack riêng và mỗi lần chờ là một context switch của kernel; khi việc chủ yếu là chờ I/O thì phần lớn thread chỉ nằm ngủ. Ba mô hình còn lại tách \"việc đang chờ\" khỏi \"OS thread\" để một số ít thread phục vụ rất nhiều việc. Java nói thẳng virtual thread \"không chạy code nhanh hơn\", chúng cho **scale** (throughput cao hơn) chứ không cho **speed** (latency thấp hơn) (https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html).",
