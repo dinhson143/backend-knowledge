@@ -23,7 +23,7 @@ BK.topic({
       },
       {
         cells: ["Phí control plane", "Không tính", "Tính theo giờ cho mỗi cluster, cao hơn khi version Kubernetes đã sang extended support"],
-        why: "EKS tính phí control plane cho từng cluster chạy cả tháng dù không có workload, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên. Giá hiện hành: https://aws.amazon.com/eks/pricing/ và https://aws.amazon.com/ecs/pricing/",
+        why: "EKS tính phí control plane cho từng cluster chạy cả tháng dù không có workload, vì nó dựng API server và etcd riêng cho mỗi cluster, còn control plane ECS là dịch vụ dùng chung. Nhiều cluster (dev, staging, prod) thì nhân lên. Bảng giá chính thức (https://aws.amazon.com/eks/pricing/, https://aws.amazon.com/ecs/pricing/).",
       },
       {
         cells: ["Độ khó học", "Thấp: task, service, cluster", "Cao: pod, service, ingress, RBAC, Helm, CRD…"],
