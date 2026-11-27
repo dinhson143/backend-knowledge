@@ -14,6 +14,13 @@ BK.topic({
     idea: "Kể theo **dòng thời gian** của một request, mỗi bước nói nó làm gì, tốn bao nhiêu vòng mạng, và cache nào giúp bỏ qua nó. Sau đó hỏi interviewer muốn đào sâu phía mạng, phía server hay phía trình duyệt.",
     tradeoff: "Không thể kể sâu mọi tầng trong 5 phút. Chọn độ sâu theo vị trí phỏng vấn: backend đào sâu đoạn từ load balancer tới DB; frontend đào sâu critical rendering path; SRE/network đào sâu DNS, TCP, TLS.",
   },
+  diagrams: [
+    {
+      src: "content/svg/net-url-to-page-rtt.svg",
+      caption: "Kết nối HTTPS mới cần 3 RTT tới byte HTML đầu tiên với TCP + TLS 1.3, 4 RTT với TLS 1.2, 2 RTT với QUIC (gộp bắt tay transport và TLS 1.3), 1 RTT với QUIC 0-RTT khi đã từng kết nối. Sau đó trình duyệt dựng DOM và CSSOM, render tree, layout, paint, composite.",
+      source: "https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work",
+    },
+  ],
   table: {
     head: ["Bước", "Chuyện gì xảy ra", "Tốn gì", "Bỏ qua/giảm nhờ"],
     rows: [

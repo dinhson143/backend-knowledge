@@ -14,6 +14,13 @@ BK.topic({
     idea: "Một node (leader) nhận ghi và gửi **log thay đổi** (WAL, binlog) sang các follower, follower áp lại theo đúng thứ tự. Leader chết thì đưa một follower lên thay (failover). Muốn nhiều nơi cùng nhận ghi thì dùng multi-leader hoặc leaderless với quorum, đổi lại phải xử lý xung đột.",
     tradeoff: "Bản sao bất đồng bộ luôn trễ (replication lag), gây ra các bất thường khi đọc. Failover tự động có thể chọn nhầm lúc và sinh ra **hai leader** (split brain). Nhiều nơi cùng ghi thì phải chọn cách giải xung đột, và last-writer-wins sẽ âm thầm mất bớt ghi.",
   },
+  diagrams: [
+    {
+      src: "content/svg/replication-three-models.svg",
+      caption: "Single-leader: một leader nhận mọi ghi và gửi WAL bất đồng bộ cho standby, nên standby có thể trễ. Multi-leader: hai region cùng nhận ghi một key trước khi thấy nhau, sinh xung đột phải giải. Leaderless N = 3, W = 2, R = 2: tập ghi và tập đọc luôn giao nhau ít nhất một node.",
+      source: "https://www.allthingsdistributed.com/2007/10/amazons_dynamo.html",
+    },
+  ],
   table: {
     head: ["Mô hình", "Ai nhận ghi", "Hợp khi", "Cái giá"],
     rows: [

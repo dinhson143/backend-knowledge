@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Số RTT trước byte HTML đầu tiên với TCP cộng TLS 1.3, TLS 1.2, QUIC và QUIC 0-RTT, rồi các bước trình duyệt dựng trang: DOM, CSSOM, render tree, layout, paint, composite</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .tcp { fill: #eef2f7; stroke: #94a3b8; stroke-width: 1.2; }
+      .tls { fill: #dbe7fd; stroke: #3b7ff5; stroke-width: 1.2; }
+      .http { fill: #fff3db; stroke: #e08a00; stroke-width: 1.2; }
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .e { font-size: 12.5px; fill: #1f2937; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .t { font-size: 13px; font-weight: 650; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .lr { font-size: 11.5px; fill: #b42318; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="438" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="h" x="20" y="30">Kết nối HTTPS mới: bao nhiêu vòng mạng (RTT) trước byte HTML đầu tiên</text>
+  <text class="s" x="20" y="48">Chưa tính DNS (0 RTT nếu đã cache) và thời gian server xử lý. 1 RTT = một lượt đi và về tới server.</text>
+
+  <!-- trục: 0..4 RTT → x 230..670 -->
+  <path d="M230,72 L670,72" stroke="#94a3b8" stroke-width="1"/>
+  <g stroke="#94a3b8" stroke-width="1">
+    <path d="M230,72 L230,77"/><path d="M340,72 L340,77"/><path d="M450,72 L450,77"/><path d="M560,72 L560,77"/><path d="M670,72 L670,77"/>
+  </g>
+  <text class="sc" x="230" y="66">0</text><text class="sc" x="340" y="66">1</text><text class="sc" x="450" y="66">2</text><text class="sc" x="560" y="66">3</text><text class="sc" x="670" y="66">4 RTT</text>
+
+  <!-- TCP + TLS 1.3 -->
+  <text class="e" x="20" y="96">TCP + TLS 1.3</text>
+  <text class="s" x="20" y="111">HTTP/1.1, HTTP/2</text>
+  <rect class="tcp" x="230" y="86" width="110" height="28" rx="4"/><text class="c" x="285" y="104">TCP</text>
+  <rect class="tls" x="340" y="86" width="110" height="28" rx="4"/><text class="c" x="395" y="104">TLS 1.3</text>
+  <rect class="http" x="450" y="86" width="110" height="28" rx="4"/><text class="c" x="505" y="104">GET → byte đầu</text>
+  <text class="t" x="572" y="105">3 RTT</text>
+
+  <!-- TCP + TLS 1.2 -->
+  <text class="e" x="20" y="140">TCP + TLS 1.2</text>
+  <text class="s" x="20" y="155">bắt tay TLS 2 RTT</text>
+  <rect class="tcp" x="230" y="130" width="110" height="28" rx="4"/><text class="c" x="285" y="148">TCP</text>
+  <rect class="tls" x="340" y="130" width="220" height="28" rx="4"/><text class="c" x="450" y="148">TLS 1.2</text>
+  <rect class="http" x="560" y="130" width="110" height="28" rx="4"/><text class="c" x="615" y="148">GET → byte đầu</text>
+  <text class="t" x="682" y="149">4 RTT</text>
+
+  <!-- QUIC -->
+  <text class="e" x="20" y="184">QUIC (HTTP/3)</text>
+  <text class="s" x="20" y="199">transport + TLS 1.3 gộp</text>
+  <rect class="tls" x="230" y="174" width="110" height="28" rx="4"/><text class="c" x="285" y="192">QUIC + TLS</text>
+  <rect class="http" x="340" y="174" width="110" height="28" rx="4"/><text class="c" x="395" y="192">GET → byte đầu</text>
+  <text class="t" x="462" y="193">2 RTT</text>
+
+  <!-- QUIC 0-RTT -->
+  <text class="e" x="20" y="228">QUIC 0-RTT</text>
+  <text class="s" x="20" y="243">đã từng kết nối tới server</text>
+  <rect class="http" x="230" y="218" width="110" height="28" rx="4"/><text class="c" x="285" y="236">GET gửi ngay</text>
+  <text class="t" x="352" y="237">1 RTT</text>
+  <text class="lr" x="400" y="237">dữ liệu 0-RTT có thể bị replay</text>
+
+  <!-- Trình duyệt -->
+  <text class="h" x="20" y="284">Sau byte đầu tiên: trình duyệt dựng trang</text>
+  <rect class="box" x="20" y="298" width="130" height="32" rx="7"/><text class="c" x="85" y="319">HTML → DOM</text>
+  <rect class="box" x="20" y="338" width="130" height="32" rx="7"/><text class="c" x="85" y="359">CSS → CSSOM</text>
+  <g stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#a)">
+    <path d="M150,314 C162,314 160,334 172,334"/>
+    <path d="M150,354 C162,354 160,334 172,334"/>
+    <path d="M286,334 L304,334"/>
+    <path d="M412,334 L430,334"/>
+    <path d="M538,334 L556,334"/>
+  </g>
+  <rect class="box" x="174" y="314" width="112" height="40" rx="7"/><text class="c" x="230" y="331">Render tree</text><text class="sc" x="230" y="346">node hiển thị</text>
+  <rect class="box" x="306" y="314" width="106" height="40" rx="7"/><text class="c" x="359" y="331">Layout</text><text class="sc" x="359" y="346">vị trí, kích thước</text>
+  <rect class="box" x="432" y="314" width="106" height="40" rx="7"/><text class="c" x="485" y="331">Paint</text><text class="sc" x="485" y="346">ra pixel</text>
+  <rect class="box" x="558" y="314" width="112" height="40" rx="7"/><text class="c" x="614" y="331">Composite</text><text class="sc" x="614" y="346">ghép layer</text>
+
+  <text class="s" x="20" y="392">&lt;script&gt; không async/defer dừng parse HTML; CSS chặn render và chặn chạy JS. Vòng đầu chỉ gửi được khoảng 14KB</text>
+  <text class="s" x="20" y="410">(TCP slow start), nên đặt phần cần để render sớm vào đó. Style, layout, paint trên main thread nên xong trong</text>
+  <text class="s" x="20" y="428">khoảng 16.67ms mỗi khung hình để cuộn mượt.</text>
+</svg>

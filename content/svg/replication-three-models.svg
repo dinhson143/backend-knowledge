@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 410" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Ba mô hình replication: single-leader, multi-leader và leaderless quorum với R + W lớn hơn N</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#14a37f"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .lead { fill: #eef4ff; stroke: #3b7ff5; stroke-width: 1.6; }
+      .ok { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.4; }
+      .old { fill: #fff3db; stroke: #e08a00; stroke-width: 1.4; }
+      .bad { fill: #fdecea; stroke: #d64545; stroke-dasharray: 5 3; }
+      .hc { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lr { font-size: 11.5px; fill: #b42318; }
+      .lg { font-size: 11.5px; fill: #0f7a5f; }
+      .codec { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; fill: #1f2937; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="408" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Single-leader -->
+  <rect class="grp" x="16" y="16" width="232" height="340" rx="12"/>
+  <text class="hc" x="132" y="40">Single-leader</text>
+  <text class="sc" x="132" y="57">PostgreSQL streaming replication</text>
+  <rect class="box" x="58" y="70" width="148" height="28" rx="7"/>
+  <text class="codec" x="132" y="89">ghi x = 2</text>
+  <path d="M132,98 L132,118" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="lead" x="58" y="120" width="148" height="42" rx="9"/>
+  <text class="c" x="132" y="138">Leader (primary)</text>
+  <text class="sc" x="132" y="154">nhận mọi ghi</text>
+  <g stroke="#3b7ff5" stroke-width="1.4" marker-end="url(#b)">
+    <path d="M104,162 L76,218"/>
+    <path d="M160,162 L188,218"/>
+  </g>
+  <text class="sc" x="132" y="196">WAL, async</text>
+  <rect class="ok" x="28" y="220" width="98" height="42" rx="8"/>
+  <text class="c" x="77" y="238">Standby 1</text>
+  <text class="sc" x="77" y="254">x = 2</text>
+  <rect class="old" x="138" y="220" width="98" height="42" rx="8"/>
+  <text class="c" x="187" y="238">Standby 2</text>
+  <text class="sc" x="187" y="254" style="fill:#b45309">x = 1 (trễ)</text>
+  <text class="s" x="28" y="282">Standby nhận query đọc (hot standby).</text>
+  <text class="lg" x="28" y="300">Một thứ tự ghi → không xung đột.</text>
+  <text class="lr" x="28" y="318">Primary chết khi standby còn trễ:</text>
+  <text class="lr" x="28" y="334">commit chưa sang sẽ mất khi failover.</text>
+
+  <!-- Multi-leader -->
+  <rect class="grp" x="264" y="16" width="232" height="340" rx="12"/>
+  <text class="hc" x="380" y="40">Multi-leader</text>
+  <text class="sc" x="380" y="57">thường mỗi region một leader</text>
+  <rect class="box" x="276" y="70" width="98" height="28" rx="7"/>
+  <text class="codec" x="325" y="89">ghi x = 1</text>
+  <rect class="box" x="386" y="70" width="98" height="28" rx="7"/>
+  <text class="codec" x="435" y="89">ghi x = 2</text>
+  <path d="M325,98 L325,118" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <path d="M435,98 L435,118" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+  <rect class="lead" x="276" y="120" width="98" height="42" rx="9"/>
+  <text class="c" x="325" y="138">Leader A</text>
+  <text class="sc" x="325" y="154">region 1</text>
+  <rect class="lead" x="386" y="120" width="98" height="42" rx="9"/>
+  <text class="c" x="435" y="138">Leader B</text>
+  <text class="sc" x="435" y="154">region 2</text>
+  <g stroke="#3b7ff5" stroke-width="1.4" fill="none" marker-end="url(#b)">
+    <path d="M318,162 C318,196 442,196 442,166"/>
+    <path d="M428,162 C428,182 332,182 332,166"/>
+  </g>
+  <text class="sc" x="380" y="216">đồng bộ chéo, async</text>
+  <rect class="bad" x="276" y="226" width="208" height="36" rx="8"/>
+  <text class="c" x="380" y="249" style="fill:#b42318">x = 1 hay x = 2? xung đột</text>
+  <text class="s" x="276" y="282">Ghi ở region gần user, latency thấp.</text>
+  <text class="s" x="276" y="300">Hai leader nhận hai thay đổi trái nhau</text>
+  <text class="s" x="276" y="316">trước khi thấy nhau → phải giải:</text>
+  <text class="lr" x="276" y="334">LWW (mất một ghi), vector clock, CRDT.</text>
+
+  <!-- Leaderless -->
+  <rect class="grp" x="512" y="16" width="232" height="340" rx="12"/>
+  <text class="hc" x="628" y="40">Leaderless (Dynamo)</text>
+  <text class="sc" x="628" y="57">N = 3, W = 2, R = 2</text>
+  <rect class="box" x="554" y="70" width="148" height="28" rx="7"/>
+  <text class="codec" x="628" y="89">ghi x = 2</text>
+  <g stroke="#64748b" stroke-width="1.3" marker-end="url(#a)">
+    <path d="M590,98 L557,134"/>
+    <path d="M628,98 L628,134"/>
+    <path d="M666,98 L699,134"/>
+  </g>
+  <rect class="ok" x="524" y="136" width="66" height="42" rx="8"/>
+  <text class="c" x="557" y="154">A ✓</text>
+  <text class="sc" x="557" y="170">x = 2</text>
+  <rect class="ok" x="595" y="136" width="66" height="42" rx="8" style="stroke-width:2.4"/>
+  <text class="c" x="628" y="154">B ✓</text>
+  <text class="sc" x="628" y="170">x = 2</text>
+  <rect class="old" x="666" y="136" width="66" height="42" rx="8"/>
+  <text class="c" x="699" y="154">C</text>
+  <text class="sc" x="699" y="170" style="fill:#b45309">x = 1</text>
+  <g stroke="#14a37f" stroke-width="1.4" marker-end="url(#g)">
+    <path d="M614,204 L622,180"/>
+    <path d="M660,204 L690,180"/>
+  </g>
+  <rect class="box" x="554" y="206" width="148" height="28" rx="7" style="stroke:#14a37f"/>
+  <text class="c" x="628" y="225">đọc hỏi R = 2: B, C</text>
+  <text class="s" x="524" y="258">Ghi gửi tới cả 3 node, chờ W = 2 ack.</text>
+  <text class="lg" x="524" y="282">B có trong cả tập ghi lẫn tập đọc</text>
+  <text class="lg" x="524" y="298">→ đọc thấy x = 2 (bản mới hơn).</text>
+  <text class="s" x="524" y="320">R + W &gt; N: hai tập luôn giao nhau.</text>
+  <text class="s" x="524" y="338">(3, 2, 2) là cấu hình hay dùng.</text>
+
+  <text class="s" x="20" y="380">Single-leader là mặc định của PostgreSQL, MySQL. Dynamo dùng sloppy quorum + hinted handoff để luôn ghi được,</text>
+  <text class="s" x="20" y="398">nên đọc vẫn có thể thấy bản cũ cho tới khi handoff xong. Cassandra chọn consistency level (ONE, QUORUM, ALL) cho từng thao tác.</text>
+</svg>
