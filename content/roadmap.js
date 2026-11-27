@@ -22,7 +22,7 @@ window.ROADMAP = [
   { id: "s1", title: "Nền móng", goal: "Học xong bạn trình bày được một bài theo khung 6 bước và chọn giao thức, API, database cho bài đơn giản.",
     parts: [
       { id: "s1.frame", title: "Khung trả lời", topics: ["delivery", "numbers"] },
-      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth"] },
+      { id: "s1.io", title: "Networking & API", topics: ["networking", "api-design", "lb-gateway-cdn", "auth", "rate-limiting"] },
       { id: "s1.data", title: "Database", topics: ["data-modeling", "core-db", "indexing", "db-isolation-anomalies"] },
       { id: "s1.db-deep", title: "Đào sâu: Database Internals", optional: true, topics: ["db-query-tuning"] },
     ] },
