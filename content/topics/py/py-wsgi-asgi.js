@@ -6,7 +6,7 @@ BK.topic({
   section: "py-backend",
   title: "WSGI, ASGI & Worker Models",
   goal: "Chọn WSGI hay ASGI và tính số process, thread, event loop cho app server Python",
-  needs: ["async-event-loop", "thr-io-vs-cpu-bound"],
+  needs: ["py-asyncio", "py-threading-multiprocessing"],
   tldr: {
     t: "**WSGI** (PEP 3333) là giao diện giữa web server và app Python: app là callable `app(environ, start_response)` trả về iterable chứa bytes. Server gọi app **một lần cho mỗi request**, và thread đang gọi bị giữ tới khi trả xong, nên số request chạy cùng lúc = số process × số thread. **ASGI** đổi app thành coroutine `app(scope, receive, send)` trao đổi các event dạng `dict`; một **event loop** trong mỗi process giữ được hàng nghìn kết nối đang chờ I/O, và phục vụ được kết nối sống lâu như WebSocket. App server: **Gunicorn** (WSGI, một arbiter quản lý nhiều worker process), **Uvicorn** (ASGI).",
     why: "PEP 3333 định nghĩa app là callable nhận `environ`, `start_response` và trả iterable các bytestring (https://peps.python.org/pep-3333/). ASGI spec ghi lý do ra đời: WSGI gắn chặt với chu trình request/response kiểu HTTP, còn WebSocket và các giao thức khác không theo mẫu đó; ASGI cho phép gửi và nhận dữ liệu bất cứ lúc nào (https://asgi.readthedocs.io/en/latest/specs/main.html).",
