@@ -28,7 +28,7 @@ Còn lại, nếu nhãn tiếng Việt là **bản dịch** của một thuật 
 
 ### Cách viết
 
-- **Hoa/thường trong nhãn**: viết hoa chữ đầu mỗi từ của key term, như Hello Interview và tài liệu chính thức ("Consistent Hashing", "Circuit Breaker", "Isolation Level"). Phần sau dấu `:` là danh sách ví dụ, giữ chữ thường như trong câu ("Process: fork, exec, zombie", "Observability: log, metric, trace"). Từ viết tắt viết hoa (CAP, SQL, DLQ). Tên sản phẩm viết như hãng viết (Kafka, PostgreSQL, gRPC, etcd).
+- **Hoa/thường trong nhãn**: tiêu đề giai đoạn, chặng, topic viết hoa chữ đầu mỗi từ của key term, như Hello Interview và tài liệu chính thức ("Consistent Hashing", "Circuit Breaker", "Isolation Level"). Tiêu đề sim và tên variant là câu mô tả kịch bản: chỉ viết hoa chữ đầu câu, key term bên trong viết như trong câu ("Retry storm và circuit breaker"). Phần sau dấu `:` là danh sách ví dụ, giữ chữ thường như trong câu ("Process: fork, exec, zombie", "Observability: log, metric, trace"). Từ viết tắt viết hoa (CAP, SQL, DLQ). Tên sản phẩm viết như hãng viết (Kafka, PostgreSQL, gRPC, etcd).
 - **Trong câu**: chữ thường, trừ viết tắt và tên sản phẩm ("replication lag", "circuit breaker", "Kafka").
 - **Gạch nối**: theo cột "Cách viết chuẩn". Tính từ ghép trong tài liệu gốc có gạch nối thì giữ (at-least-once, write-through, cache-aside, read-your-writes, fan-out, multi-leader, full-text, thread-safe). Từ đã thành một từ thì viết liền (backpressure, realtime, failover, timeout).
 - **Không dịch trong `code`**: tên lệnh, tham số, header giữ nguyên văn.
@@ -94,7 +94,7 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Contention | contention | nhiều bên cùng tranh một tài nguyên | "Tranh chấp tài nguyên", "Tranh chấp" | `dist-lock` |
 | Distributed Lock | distributed lock; TTL, lease, fencing token, Redlock | khoá tài nguyên xuyên nhiều máy | "Khoá phân tán", "Khóa phân tán" | `dist-lock` |
 | Consensus / Leader Election | consensus, leader election; Raft, quorum | các node thống nhất một giá trị hoặc một leader | "Đồng thuận", "Bầu leader", "Bầu chọn leader" | `consensus` (sắp viết) |
-| Multi-step Workflow | workflow; saga, orchestration, choreography, compensation | quy trình nhiều bước qua nhiều service | "Quy trình nhiều bước", "Điều phối dịch vụ" | `durable-execution` |
+| Multi-step Processes | workflow; saga, orchestration, choreography, compensation | quy trình nhiều bước qua nhiều service | "Quy trình nhiều bước", "Điều phối dịch vụ" | `durable-execution` |
 | Transactional Outbox / CDC | outbox, CDC (glossary); dual write | ghi DB và phát event trong cùng một transaction | "Hộp thư đi" | `outbox-cdc` |
 | Durable Execution | Durable Execution; event history, replay | quy trình nhiều bước sống qua crash nhờ ghi lại lịch sử | "Thực thi bền" | `durable-execution` |
 | **Lưu trữ chuyên dụng** | | | | |
@@ -141,7 +141,7 @@ Những từ dưới đây có hai nghĩa trở lên. Dùng chúng cho khái ni�
 | giao dịch | giao dịch tiền ("lịch sử từng giao dịch" trong `payment`) | transaction của database |
 | đồng thuận | (không dùng) | consensus |
 | hàng đợi | phép so sánh đời thường ("như hàng đợi") | queue khi nói về thành phần hệ thống |
-| khoá | lock khi đã rõ ngữ cảnh ("giữ khoá", "khoá dòng") | key ("khoá chính" vẫn được vì là tên chuẩn của primary key) |
+| khoá | lock khi đã rõ ngữ cảnh ("giữ khoá", "khoá dòng"); "khoá chính", "khoá ngoại" (tên chuẩn của PK, FK) | key của cache/Redis/partition → viết "key". *Chưa rà hết khoảng 100 chỗ "khoá" hiện có; sửa dần khi đụng tới topic.* |
 | chịu lỗi | chịu lỗi chính tả trong fuzzy search | fault tolerance: lần đầu viết "chịu lỗi (fault tolerance)" |
 | phân trang | (không dùng trong nhãn) | pagination (API) hoặc paging (bộ nhớ) |
 

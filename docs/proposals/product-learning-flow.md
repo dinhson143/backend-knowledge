@@ -747,7 +747,7 @@ GĐ3 · Async & Coordination
   Message Queue & Streaming: queue, streams, kafka
   Resilience & Idempotency: +resilience, +idempotency
   Contention & Locking: +db-locking, dist-lock, +consensus
-  Multi-step Workflow: +outbox-cdc, +durable-execution
+  Multi-step Processes: +outbox-cdc, +durable-execution
   Đào sâu: Stream Processing (Đào sâu): +stream-processing
 GĐ4 · Lưu trữ chuyên dụng
   Kho chuyên dụng: blob, search, +vector-search, bigdata-ds
@@ -831,8 +831,8 @@ Thư mục cho file mới (track = thư mục, không quyết định điều h�
 | Database | `db-isolation-anomalies` | Transaction & Isolation Level | Nhận ra lost update, write skew và chọn isolation level chặn được nó | `core-db` | Research · P0 | 1 |
 | Đào sâu: Database Internals *(Đào sâu)* | `db-query-tuning` | EXPLAIN & Query Tuning | Đọc query plan và sửa truy vấn không dùng được index | `indexing` | Research · P0 | 2 |
 | Đào sâu: Database Internals *(Đào sâu)* | `db-sql-handwriting` | Viết SQL tay | Viết join, group by, window function cho câu hỏi phỏng vấn | `core-db` | Research · P1 | 3 |
-| Đào sâu: Database Internals *(Đào sâu)* | `storage-engines` | Storage engine: B-Tree, LSM, WAL | Giải thích vì sao DB này ghi nhanh, DB kia đọc nhanh và commit bền nhờ WAL | `indexing`, `core-db` | SA · P2 | 4 |
-| Đào sâu: Database Internals *(Đào sâu)* | `db-mvcc` | MVCC & snapshot | Giải thích đọc không chặn ghi và vì sao transaction dài làm phình bảng | `db-isolation-anomalies`, `storage-engines` | Research · P1 | 3 |
+| Đào sâu: Database Internals *(Đào sâu)* | `storage-engines` | Storage Engine: B-Tree, LSM, WAL | Giải thích vì sao DB này ghi nhanh, DB kia đọc nhanh và commit bền nhờ WAL | `indexing`, `core-db` | SA · P2 | 4 |
+| Đào sâu: Database Internals *(Đào sâu)* | `db-mvcc` | MVCC & Snapshot | Giải thích đọc không chặn ghi và vì sao transaction dài làm phình bảng | `db-isolation-anomalies`, `storage-engines` | Research · P1 | 3 |
 
 #### GĐ2 · Scale dữ liệu
 
@@ -851,8 +851,8 @@ Thư mục cho file mới (track = thư mục, không quyết định điều h�
 | Resilience & Idempotency | `idempotency` | Idempotency | Cho phép gửi lại request/message mà không xử lý hai lần | `api-design`, `queue` | SA · P0 | 1 |
 | Contention & Locking | `db-locking` | Database Locking | Chọn optimistic hay pessimistic lock và tránh deadlock trong DB | `db-isolation-anomalies` | Research · P0 | 2 |
 | Contention & Locking | `consensus` | Consensus & Leader Election | Giải thích Raft, lease, fencing và vì sao cluster cần đa số | `replication`, `dist-lock` | SA · P1 | 2 |
-| Multi-step Workflow | `outbox-cdc` | Outbox & CDC | Ghi DB và phát event mà không mất hay lệch nhau | `core-db`, `kafka` | SA · P0 | 1 |
-| Multi-step Workflow | `durable-execution` | Durable Execution | Chạy quy trình nhiều bước sống qua crash, deploy và chờ nhiều ngày | `queue`, `idempotency` | SA · P0 | 1 |
+| Multi-step Processes | `outbox-cdc` | Outbox & CDC | Ghi DB và phát event mà không mất hay lệch nhau | `core-db`, `kafka` | SA · P0 | 1 |
+| Multi-step Processes | `durable-execution` | Durable Execution | Chạy quy trình nhiều bước sống qua crash, deploy và chờ nhiều ngày | `queue`, `idempotency` | SA · P0 | 1 |
 | Đào sâu: Stream Processing *(Đào sâu)* | `stream-processing` | Stream Processing | Tính toán theo window, watermark và giữ state khi xử lý luồng | `streams`, `kafka` | SA · P2 | 4 |
 
 #### GĐ4 · Lưu trữ chuyên dụng
@@ -877,35 +877,35 @@ Thư mục cho file mới (track = thư mục, không quyết định điều h�
 | Thread trong thực tế | `thr-io-vs-cpu-bound` | I/O-bound hay CPU-bound? | Chọn thread, process hay async theo loại tải | `thr-thread-vs-process` | Research · P0 | 2 |
 | Thread trong thực tế | `thr-thread-pool` | Thread Pool | Chọn kích thước pool, hàng đợi và cách từ chối khi đầy | `thr-io-vs-cpu-bound` | Research · P0 | 2 |
 | Thread trong thực tế | `io-connection-pool` | Connection Pool | Chọn số connection tới DB và nhận ra connection leak | `thr-thread-pool` | Research · P1 | 3 |
-| Thread trong thực tế | `thr-gil` | GIL & free-threading | Biết khi nào multithreading Python có ích và khi nào không | `thr-io-vs-cpu-bound` | Research · P0 | 2 |
+| Thread trong thực tế | `thr-gil` | GIL & Free-threading | Biết khi nào multithreading Python có ích và khi nào không | `thr-io-vs-cpu-bound` | Research · P0 | 2 |
 | Thread trong thực tế | `thr-green-threads` | Goroutine & Virtual Thread | Giải thích M:N scheduling và vì sao goroutine rẻ hơn OS thread | `thr-thread-vs-process`, `os-context-switch` | Research · P0 | 2 |
 | Thread trong thực tế | `thr-goroutine-channel` | Goroutine & channel | Dựng pipeline, fan-out/fan-in bằng channel và tránh goroutine leak | `thr-green-threads` | Research · P1 | 3 |
 | Thread trong thực tế | `thr-thread-local-context` | Thread-local & truyền context | Truyền request id, trace qua thread pool và task an toàn | `thr-thread-pool` | Research · P2 | 4 |
-| I/O & hệ điều hành | `os-file-descriptors` | File descriptor & ulimit | Sửa lỗi "too many open files" và hiểu socket cũng là fd | `os-process-lifecycle` | Research · P1 | 3 |
-| I/O & hệ điều hành | `io-blocking-models` | Blocking, non-blocking, async I/O | Phân biệt 4 mô hình I/O và vì sao event loop cần multiplexing | `os-file-descriptors` | Research · P0 | 2 |
+| I/O & hệ điều hành | `os-file-descriptors` | File Descriptor & ulimit | Sửa lỗi "too many open files" và hiểu socket cũng là fd | `os-process-lifecycle` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-blocking-models` | Blocking, Non-blocking, Async I/O | Phân biệt 4 mô hình I/O và vì sao event loop cần multiplexing | `os-file-descriptors` | Research · P0 | 2 |
 | I/O & hệ điều hành | `io-epoll-kqueue` | epoll & kqueue | Giải thích vì sao epoll scale hơn select, level vs edge triggered | `io-blocking-models` | Research · P1 | 3 |
-| I/O & hệ điều hành | `io-reactor-proactor` | Reactor & proactor | Nhận ra mô hình I/O của Nginx, Netty, libuv | `io-epoll-kqueue` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-reactor-proactor` | Reactor & Proactor | Nhận ra mô hình I/O của Nginx, Netty, libuv | `io-epoll-kqueue` | Research · P1 | 3 |
 | I/O & hệ điều hành | `io-uring` | io_uring | Giải thích io_uring giảm syscall bằng hàng đợi completion | `io-reactor-proactor` | Research · P2 | 4 |
-| I/O & hệ điều hành | `io-buffering-fsync` | Buffer, flush & fsync | Biết dữ liệu "đã ghi" thật sự nằm ở đâu và fsync tốn gì | `os-file-descriptors` | Research · P1 | 3 |
+| I/O & hệ điều hành | `io-buffering-fsync` | Buffer, Flush & fsync | Biết dữ liệu "đã ghi" thật sự nằm ở đâu và fsync tốn gì | `os-file-descriptors` | Research · P1 | 3 |
 | I/O & hệ điều hành | `os-filesystem` | File System & Journaling | Giải thích inode, journaling và page cache | `io-buffering-fsync` | Research · P2 | 4 |
 | I/O & hệ điều hành | `io-zero-copy` | Zero-copy & Page Cache | Giải thích sendfile, mmap và vì sao Kafka đọc đĩa nhanh | `os-virtual-memory`, `io-buffering-fsync` | Research · P2 | 4 |
 | I/O & hệ điều hành | `os-ipc` | IPC: pipe, socket, shared memory | Chọn pipe, Unix socket hay shared memory cho hai process | `thr-thread-vs-process` | Research · P1 | 3 |
 | I/O & hệ điều hành | `os-signals-shutdown` | Signal & Graceful Shutdown | Dừng app không rớt request: SIGTERM, drain, PID 1 trong container | `os-process-lifecycle` | Research · P0 | 2 |
 | I/O & hệ điều hành | `os-linux-diagnostics` | Chẩn đoán trên Linux | Dùng top, strace, lsof, /proc để tìm nguyên nhân server chậm | `os-file-descriptors` | Research · P2 | 4 |
-| Concurrency | `conc-race-condition` | Race condition | Nhận ra check-then-act và phân biệt race condition với data race | `thr-thread-vs-process` | Research · P0 | 2 |
-| Concurrency | `conc-monitor-rwlock` | Monitor, RW lock, spinlock | Chọn loại lock và độ mịn lock theo mức tranh chấp | `concurrency` | Research · P1 | 3 |
-| Concurrency | `conc-livelock-starvation` | Livelock, starvation, fairness | Nhận ra livelock, thread bị đói và priority inversion | `concurrency` | Research · P0 | 2 |
-| Concurrency | `conc-atomic-cas` | Atomic, CAS & lock-free | Dùng CAS đúng chỗ và biết bài toán ABA | `conc-race-condition` | Research · P0 | 2 |
+| Concurrency | `conc-race-condition` | Race Condition | Nhận ra check-then-act và phân biệt race condition với data race | `thr-thread-vs-process` | Research · P0 | 2 |
+| Concurrency | `conc-monitor-rwlock` | Monitor, RW Lock, Spinlock | Chọn loại lock và độ mịn lock theo mức tranh chấp | `concurrency` | Research · P1 | 3 |
+| Concurrency | `conc-livelock-starvation` | Livelock, Starvation, Fairness | Nhận ra livelock, thread bị đói và priority inversion | `concurrency` | Research · P0 | 2 |
+| Concurrency | `conc-atomic-cas` | Atomic, CAS & Lock-free | Dùng CAS đúng chỗ và biết bài toán ABA | `conc-race-condition` | Research · P0 | 2 |
 | Concurrency | `conc-memory-model` | Memory Model & Happens-before | Giải thích visibility, reordering và volatile đảm bảo gì | `conc-atomic-cas` | Research · P0 | 2 |
 | Concurrency | `conc-thread-safe-collections` | Thread-safe Collections | Chọn concurrent map, copy-on-write hay dữ liệu immutable | `conc-atomic-cas` | Research · P1 | 3 |
-| Concurrency | `conc-producer-consumer` | Producer–consumer | Cài bounded blocking queue bằng lock và condition variable | `concurrency` | Research · P1 | 3 |
+| Concurrency | `conc-producer-consumer` | Producer–Consumer | Cài bounded blocking queue bằng lock và condition variable | `concurrency` | Research · P1 | 3 |
 | Concurrency | `conc-parallelism-amdahl` | Concurrency, Parallelism & Amdahl | Ước lượng tăng tốc khi thêm core bằng định luật Amdahl | `thr-io-vs-cpu-bound` | Research · P1 | 3 |
 | Concurrency | `conc-classic-problems` | Bài coding concurrency kinh điển | Giải bài in theo thứ tự, readers–writers, rate limiter thread-safe | `concurrency`, `conc-producer-consumer` | Research · P0 | 2 |
 | Concurrency | `conc-testing-debugging` | Test & debug concurrency | Bắt race bằng race detector, stress test và đọc thread dump | `conc-race-condition` | Research · P1 | 3 |
-| Async | `async-concurrency-models` | Thread, event loop, coroutine, actor | So sánh 4 mô hình concurrency cho server nhiều kết nối | `thr-thread-vs-process`, `io-blocking-models` | Research · P0 | 2 |
+| Async | `async-concurrency-models` | Thread, Event Loop, Coroutine, Actor | So sánh 4 mô hình concurrency cho server nhiều kết nối | `thr-thread-vs-process`, `io-blocking-models` | Research · P0 | 2 |
 | Async | `async-event-loop` | Event Loop | Giải thích một thread phục vụ nhiều request nhờ event loop | `async-concurrency-models` | Research · P0 | 2 |
 | Async | `async-callback-promise-await` | Callback, Promise, async/await | Viết code async không callback hell và chạy song song đúng cách | `async-event-loop` | Research · P0 | 2 |
-| Async | `async-microtask-queue` | Microtask & macrotask | Đoán đúng thứ tự chạy khi trộn Promise và setTimeout | `async-event-loop` | Research · P1 | 3 |
+| Async | `async-microtask-queue` | Microtask & Macrotask | Đoán đúng thứ tự chạy khi trộn Promise và setTimeout | `async-event-loop` | Research · P1 | 3 |
 | Async | `async-coroutine` | Coroutine | Giải thích suspend/resume và coroutine khác thread ở đâu | `async-callback-promise-await` | Research · P0 | 2 |
 | Async | `async-future-combinators` | Future Combinators | Gọi nhiều việc song song và xử lý lỗi lan truyền | `async-callback-promise-await` | Research · P1 | 3 |
 | Async | `async-error-handling` | Async Error Handling | Không để exception bị nuốt hay unhandled rejection làm chết process | `async-callback-promise-await` | Research · P1 | 3 |
@@ -934,7 +934,7 @@ Thư mục cho file mới (track = thư mục, không quyết định điều h�
 | Clean Code | `code-clean-naming` | Đặt tên & hàm nhỏ | Đặt tên rõ nghĩa và tách hàm theo một mức trừu tượng | — | Research · P0 | 2 |
 | Clean Code | `code-error-handling` | Error Handling | Chọn exception hay error value, không nuốt lỗi và thêm ngữ cảnh | — | Research · P0 | 2 |
 | Clean Code | `code-defensive-validation` | Validate ở biên & invariant | Validate dữ liệu ở biên và giữ invariant bằng kiểu dữ liệu | `code-error-handling` | Research · P1 | 3 |
-| Clean Code | `code-immutability` | Immutability & value object | Dùng dữ liệu bất biến để giảm lỗi và an toàn khi chạy song song | `code-clean-naming` | Research · P1 | 3 |
+| Clean Code | `code-immutability` | Immutability & Value Object | Dùng dữ liệu bất biến để giảm lỗi và an toàn khi chạy song song | `code-clean-naming` | Research · P1 | 3 |
 | Clean Code | `code-fp-vs-oop` | Functional hay OOP? | Chọn composition, pure function hay kế thừa cho từng tình huống | `oop-pillars` | Research · P1 | 3 |
 | Clean Code | `code-api-design-code` | Thiết kế API ở mức code | Thiết kế chữ ký hàm, interface nhỏ và giữ tương thích ngược | `code-clean-naming` | Research · P1 | 3 |
 | Clean Code | `code-generics-types` | Generics & Type System | Giải thích variance, type erasure và khi nào cần generic | — | Research · P2 | 4 |
@@ -991,7 +991,7 @@ Thư mục cho file mới (track = thư mục, không quyết định điều h�
 | Cấu trúc dữ liệu | `dsa-arrays-hashing` | Array & Hashing | Giải bài đếm tần suất, two-sum, nhóm theo key trong O(n) | `bigo` | Research · P1 | 3 |
 | Cấu trúc dữ liệu | `dsa-linked-list` | Linked List | Đảo, ghép linked list bằng dummy node và con trỏ | `ds` | Research · P1 | 3 |
 | Cấu trúc dữ liệu | `dsa-stack-monotonic` | Stack & Monotonic Stack | Giải next greater element và max trong sliding window | `ds` | Research · P1 | 3 |
-| Cấu trúc dữ liệu | `dsa-heap-topk` | Heap & top-K | Giải top-K, K-way merge và median của luồng số | `ds` | Research · P1 | 3 |
+| Cấu trúc dữ liệu | `dsa-heap-topk` | Heap & Top-K | Giải top-K, K-way merge và median của luồng số | `ds` | Research · P1 | 3 |
 | Cấu trúc dữ liệu | `dsa-trees` | Tree & BST | Duyệt cây DFS/BFS, kiểm tra BST và tìm LCA | `dsa-recursion` | Research · P0 | 2 |
 | Cấu trúc dữ liệu | `dsa-trie` | Trie | Cài trie cho tìm theo tiền tố và autocomplete | `dsa-trees` | Research · P1 | 3 |
 | Cấu trúc dữ liệu | `dsa-design-ds` | Thiết kế cấu trúc dữ liệu | Cài LRU cache O(1), min stack, hit counter | `dsa-linked-list`, `dsa-arrays-hashing` | Research · P0 | 2 |
