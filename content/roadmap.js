@@ -52,7 +52,7 @@ window.ROADMAP = [
     ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [
-      { id: "beh.stories", title: "Câu chuyện của bạn", topics: ["beh-star-stories", "beh-common-questions"] },
+      { id: "beh.stories", title: "Câu chuyện của bạn", topics: ["beh-star-stories", "beh-common-questions", "beh-project-deep-dive"] },
     ] },
   { id: "cloud", title: "Container & Kubernetes", goal: "Học xong bạn giải thích được container, Kubernetes và chọn nền chạy container cho một hệ thống trên AWS.", parallel: true,
     parts: [
