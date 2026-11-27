@@ -27,7 +27,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 3,
-      "key": "Trả về client. Request đầu mất ~",
+      "key": "Trả về client: request đầu mất ~",
       "detail": "Request đầu mất ~25ms: app trả `200` sau một round-trip Redis (miss) + query DB + `SET` Redis + xử lý, phần lớn thời gian nằm ở DB. Đây là cái giá của request đầu tiên; mọi request sau trong 300 giây không phải trả nữa."
      },
      {
@@ -58,12 +58,12 @@ window.SIM_DETAIL = {
      },
      {
       "i": 1,
-      "key": "Ghi vào cache, cache ghi **đồng ",
+      "key": "App ghi vào cache, cache ghi **đ",
       "detail": "Sau bước này cả hai node đều `price=99`: với write-through, app ghi vào cache và lớp cache **ghi đồng bộ** tiếp xuống DB trong cùng một thao tác. Một số hệ như DynamoDB DAX hoặc cache trong ORM làm vậy; với Redis thường thì chính app ghi cả hai liên tiếp. Request của admin vẫn đang treo, chưa được trả lời."
      },
      {
       "i": 2,
-      "key": "Chỉ khi DB xác nhận mới trả lời ",
+      "key": "Nhất quán vì chỉ trả lời khi DB",
       "detail": "Khi admin nhận `200`, **cả cache và DB đều đã có 99**, nên mọi lần đọc ngay sau đều thấy giá mới. Đổi lại, app chỉ trả `200` sau ~30ms — DB commit, ack cho cache, cache ack cho app — bằng tổng thời gian ghi cache + ghi DB. Nếu ghi DB lỗi, request phải báo lỗi (và gỡ giá trị khỏi cache) chứ không được ack, nếu không cache sẽ giữ giá mà DB không có. Nhược điểm khác: dữ liệu ít ai đọc cũng bị nhét vào cache, tốn RAM."
      }
     ]
@@ -89,7 +89,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 3,
-      "key": "Lần đọc tới bị MISS và nạp giá 9",
+      "key": "Lần đọc tới MISS và nạp giá 99 t",
       "detail": "Lần đọc đầu sau mỗi lần ghi luôn chậm — đó là cái giá của write-around. Request đọc kế tiếp `GET` vào cache, nhận **MISS** (mũi tên đỏ), app tự `SELECT` DB lấy 99 rồi `SET 99` vào cache — đúng luồng cache-aside, tốn một round-trip DB. Write-around hợp với dữ liệu ghi nhiều mà ít khi đọc lại ngay (log, bản ghi lịch sử), vì không tốn RAM cache cho thứ không ai đọc."
      }
     ]
@@ -167,7 +167,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "1,000 request MISS, nhưng **sing",
+      "key": "**Single flight**: 1,000 request",
       "detail": "1,000 request cùng miss, nhưng nhờ **single flight** chỉ một request đi rebuild: request đầu tiên cho key `feed:hot` đăng ký làm **leader** (ví dụ giữ một promise/future trong map theo key, như `singleflight` của Go). 999 request sau thấy đã có leader đang rebuild thì **không query DB**, chỉ chờ kết quả của leader. Lưu ý: map này nằm trong từng process — nhiều app server thì mỗi server có một leader, hoặc phải dùng lock phân tán (`SET lock:feed:hot NX EX 5` trên Redis) để còn đúng một leader toàn cluster."
      },
      {
@@ -265,7 +265,7 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "User đổi tên thành **Son**. Ghi ",
+      "key": "User đổi tên thành **Son**. App",
       "detail": "Lệnh ghi vào primary thành công nhanh: app gửi `UPDATE` đổi tên thành **Son** tới primary (mọi lệnh ghi phải vào primary), primary commit, trả `ok`, app trả `200`. Primary giờ `name=Son`. Ghi nhanh vì với replication bất đồng bộ, primary **không chờ** replica nhận thay đổi trước khi ack."
      },
      {
@@ -286,7 +286,7 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "User đổi tên thành **Son**. Ghi ",
+      "key": "User đổi tên thành **Son**. App",
       "detail": "Giống variant trước: `UPDATE` vào primary, primary `name=Son`, app trả `200`."
      },
      {
@@ -296,7 +296,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "Trong 5s sau khi ghi, đọc của **",
+      "key": "Trong 5s sau khi ghi, app route",
       "detail": "User reload và thấy đúng `name=Son`: app thấy `now - last_write_at < 5s` nên route `SELECT` của **chính user này** sang primary. Cái giá: một phần đọc dồn về primary, tải primary tăng theo tỉ lệ người vừa ghi. Rủi ro còn lại: lag vượt 5s (replica quá tải) thì lỗi quay lại — cách chặt hơn là lưu LSN/GTID của lần ghi và chỉ đọc replica khi replica đã áp tới vị trí đó. Nếu `last_write_at` nằm trong cookie, user mở app trên thiết bị khác vẫn có thể thấy tên cũ."
      },
      {
@@ -426,7 +426,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 3,
-      "key": "Chỉ 1 query `IN (...)`.",
+      "key": "Chỉ còn 1 query `IN (...)`.",
       "detail": "Tổng cộng **2 query** dù có 100 hay 10.000 event — số query giờ bằng độ sâu của query, không theo số dòng. Hết tick, DataLoader gọi **batch function** một lần với toàn bộ key: `SELECT * FROM venues WHERE id IN (1..100)`. Batch function phải trả mảng kết quả **đúng thứ tự và đúng số lượng** như mảng key, để DataLoader resolve từng Promise cho đúng event. Cái giá: thêm một tầng code, cache chỉ sống trong một request (không dùng chung giữa user), và danh sách `IN` quá dài cần chia batch (`maxBatchSize`)."
      }
     ]
@@ -614,7 +614,7 @@ window.SIM_DETAIL = {
   "variants": [
    {
     "v": 0,
-    "name": "Chỉ dùng Redlock",
+    "name": "Chỉ dùng lock có TTL",
     "steps": [
      {
       "i": 0,
@@ -814,7 +814,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "Có bàn thắng, nhưng phải chờ tới",
+      "key": "Có bàn thắng, nhưng client chỉ b",
       "detail": "Browser chỉ biết bàn thắng ở lần hỏi kế tiếp (`200 1-0`), dù nó xảy ra ngay sau lần hỏi trước. Độ trễ tệ nhất bằng **một chu kỳ poll** (2 giây), trung bình nửa chu kỳ. Giảm chu kỳ xuống 0.5s cho nhanh thì số request gấp 4 lần — trade-off cố hữu giữa độ tươi và tải. Polling vẫn hợp khi dữ liệu đổi chậm hoặc ít client, vì đơn giản và đi qua mọi proxy, cache."
      }
     ]
@@ -954,7 +954,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "Đủ ISR mới ack.",
+      "key": "Leader chỉ ack khi đủ ISR.",
       "detail": "Leader trả ack khi đủ số replica in-sync đã có message; lời hứa với producer giờ dựa trên **3 bản sao trên 3 máy**, không còn là một bản. Cái giá: latency ghi tăng thêm một vòng replication (thường vài ms trong cùng region) — throughput vẫn cao vì producer gửi theo batch và có nhiều request bay song song."
      },
      {
@@ -964,7 +964,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 4,
-      "key": "Nếu chỉ còn 1 replica in-sync, p",
+      "key": "Chỉ còn 1 replica in-sync → brok",
       "detail": "Leader **từ chối** `order#43` bằng lỗi `NotEnoughReplicas` thay vì nhận ghi chỉ với một bản: Broker 3 cũng chết, ISR chỉ còn Broker 2 (1 < `min.insync.replicas`=2). Producer retry hoặc báo lỗi cho user. Đây là chọn **consistency hơn availability** (CP trong CAP): thà không nhận ghi còn hơn hứa rồi làm mất. Đọc dữ liệu đã có vẫn hoạt động bình thường."
      }
     ]
@@ -1281,12 +1281,12 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "IP của task (awsvpc) được đăng k",
+      "key": "ECS đăng ký IP của task (awsvpc)",
       "detail": "ALB đăng ký thẳng **IP của task** vào target group (target type `ip`) nhờ `awsvpc`, không qua port động của host. ALB gọi `GET /health`; target chỉ thành healthy và nhận request thật khi pass đủ `HealthyThresholdCount` lần liên tiếp. Trong `healthCheckGracePeriodSeconds`, ECS bỏ qua kết quả health check để app kịp khởi động (warm cache, mở connection pool). `targets: 3` cho thấy giai đoạn ngắn có 3 task cùng phục vụ — v1 và v2 chạy song song, nên API và schema DB phải tương thích ngược giữa hai version."
      },
      {
       "i": 3,
-      "key": "Drain và dừng task cũ, lặp lại t",
+      "key": "ECS drain và dừng task cũ, lặp l",
       "detail": "Có task v2 healthy, ECS mới rút task v1. Đầu tiên ECS **deregister** task khỏi target group: ALB ngừng gửi request mới nhưng giữ các request đang chạy trong `deregistration_delay` (mặc định 300 giây, thường chỉnh xuống 30–60 giây). Sau đó ECS gửi `SIGTERM`, chờ `stopTimeout` (mặc định 30 giây) rồi `SIGKILL` — app phải bắt `SIGTERM` để đóng gọn. Vòng này lặp tới khi mọi task chạy revision 8. Nếu task v2 cứ fail health check, **deployment circuit breaker** (bật `rollback=true`) đếm số lần fail, đánh dấu deployment `FAILED` và tự quay về revision 7 thay vì kẹt mãi ở trạng thái nửa vời."
      }
     ]
@@ -1437,7 +1437,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "Mã hoá **base62** → `15FTIf`. 7 ",
+      "key": "Mã hoá **base62** → `15FTIf` (6",
       "detail": "Số 1000000123 đổi sang hệ 62 (0–9, a–z, A–Z) ra **`15FTIf`** — 6 ký tự, vì 62^6 ≈ 56.8 tỷ vẫn chứa đủ số này. Counter vượt 56.8 tỷ thì mã mới dài 7 ký tự, tối đa 62^7 ≈ **3.5 nghìn tỷ** mã. Base62 không dùng `+` hay `/` như base64 nên an toàn trong URL. Nhược điểm: mã liên tiếp đoán được (`15FTIf`, `15FTIg`...), kẻ xấu có thể quét hết link; muốn chống thì xáo trộn số bằng một hoán vị song ánh (ví dụ Feistel) trước khi encode."
      },
      {
@@ -1567,17 +1567,17 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "10 triệu người vào cùng lúc. Cli",
+      "key": "10 triệu người vào cùng lúc. Hệ",
       "detail": "10 triệu người vào lúc mở bán được đưa vào **virtual waiting room** thay vì đập thẳng vào backend — nếu không, Booking, Redis và Postgres đều quá tải, mọi người cùng nhận lỗi và retry làm tải tệ hơn. Mỗi người được thêm vào Redis **sorted set** với score là thời điểm vào hàng; `ZRANK` cho biết vị trí `#52,341`. Waiting room chỉ phục vụ trang tĩnh và số thứ tự, rất rẻ để scale, nên đứng được trước đám đông khổng lồ."
      },
      {
       "i": 1,
-      "key": "Mỗi đợt admit vài nghìn người th",
+      "key": "Mỗi đợt admit vài nghìn người, v",
       "detail": "Waiting room admit theo đợt, ví dụ **5k người/phút** — con số đặt theo năng lực thật của Booking và lượng ghế còn lại. Người tới lượt nhận thông báo qua **SSE/WebSocket** kèm admit token có hạn dùng (ký số để không làm giả được), thay vì client poll liên tục làm tăng tải. Score theo thời điểm vào nên thứ tự là **FIFO**, công bằng hơn cảnh ai bấm F5 nhanh hơn thì thắng."
      },
      {
       "i": 2,
-      "key": "Người được admit mới vào luồng g",
+      "key": "Chỉ người đã được admit mới vào",
       "detail": "Gateway chỉ cho vào Booking các `POST /reserve` mang admit token hợp lệ; request không có token bị chặn ngay ở cửa. Từ đây luồng giữ ghế y hệt bình thường, nhưng số người cùng lúc trong backend luôn nằm trong mức hệ thống chịu được. Waiting room là **backpressure ở tầng sản phẩm**: thay vì để hệ thống sập rồi từ chối ngẫu nhiên, ta chủ động cho người dùng chờ có thứ tự."
      }
     ]
@@ -1707,7 +1707,7 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "Mỗi tài xế gửi GPS **mỗi 5 giây*",
+      "key": "Tài xế gửi GPS **mỗi 5 giây** →",
       "detail": "Location Service nhận khoảng **400k update/giây**: app tài xế gửi `POST /drivers/location` với GPS **mỗi 5 giây**, khoảng 2 triệu tài xế online → 2M / 5 ≈ 400k. Gateway chuyển tới Location Service — stateless, scale ngang. Thực tế tài xế thường gửi qua kết nối lâu dài (WebSocket/gRPC stream) để khỏi tốn TLS handshake mỗi lần. Đây là luồng ghi lớn nhất hệ thống, nhưng mỗi bản ghi rất nhỏ và chỉ có giá trị vài giây."
      },
      {
@@ -1759,7 +1759,7 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "Offer gửi cho d42, lock giữ 10s.",
+      "key": "Matching gửi offer cho d42, lock",
       "detail": "Lock `d42 → ride#7` giữ 10 giây sau khi Matching gửi offer cho d42: trong thời gian này không chuyến nào khác gửi offer cho d42, còn rider phải chờ. Đây là đánh đổi: TTL dài cho tài xế thời gian suy nghĩ nhưng bắt rider chờ lâu hơn nếu tài xế bỏ qua."
      },
      {
@@ -2015,7 +2015,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 2,
-      "key": "Cập nhật heap; video tụt hạng bị",
+      "key": "Cập nhật heap; video tụt hạng rơ",
       "detail": "Worker tính lại top cục bộ vì sau khi trừ, count của nhiều video **giảm**: video tụt hạng bị đẩy ra, video khác vượt lên thay chỗ. Min-heap thuần chỉ xử lý được count tăng; khi count giảm, worker cần cấu trúc cho phép cập nhật (heap có index, hoặc chọn lại top-K từ bảng count đầy đủ của partition). Worker gửi local top-100 mới, Merger gộp và `ZADD top:1h` ghi đè kết quả cũ."
      }
     ]
@@ -2026,7 +2026,7 @@ window.SIM_DETAIL = {
     "steps": [
      {
       "i": 0,
-      "key": "Kết quả đã **precompute** sẵn tr",
+      "key": "Cache giữ sẵn kết quả đã **preco",
       "detail": "Query API trả top 100 video trong khoảng **5ms**: client gọi `GET /views/top?window=1h`, Query API chạy `ZREVRANGE top:1h 0 99` trên Redis, lấy 100 video theo score giảm dần. Lúc query không tính toán gì — worker và Merger đã tính trước. Đổi lại kết quả cũ vài giây (độ trễ một vòng gộp), hoàn toàn chấp nhận được với bảng xếp hạng."
      }
     ]
@@ -2193,7 +2193,7 @@ window.SIM_DETAIL = {
      },
      {
       "i": 3,
-      "key": "Op của Bob dựa trên v5 nên được ",
+      "key": "Op của Bob dựa trên v5 nên serve",
       "detail": "Server **transform** op của Bob từ `delete(2)` thành `delete(3)`, doc thành `\"XAB\"` · **v7**, op đã transform được ghi vào log. Op của Bob dựa trên v5 trong khi doc đã ở v6; áp nguyên `delete(2)` lên `\"XABC\"` sẽ xoá `B` — sai ý Bob. Alice chèn 1 ký tự ở vị trí 0 ≤ 2, nên mọi vị trí từ 2 trở đi bị đẩy lên 1 → `delete(3)` xoá đúng `C`."
      },
      {
