@@ -84,7 +84,7 @@ BK.topic({
     ],
     [
       "L4 Load Balancer (NLB) khác L7 (ALB) ra sao?",
-      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu kết nối. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
+      "NLB chỉ đọc IP + port, không mở gói tin → cực nhanh, hàng triệu request/giây. ALB đọc HTTP (URL, header, cookie) → định tuyến thông minh theo path/host, tốn CPU hơn.",
     ],
     [
       "DNS dùng gì trong system design ngoài phân giải tên?",

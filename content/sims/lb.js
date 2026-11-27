@@ -48,7 +48,7 @@ BK.sim({
         {
           note: "NLB chỉ thấy **IP + port**, payload vẫn mã hoá → không biết path.",
           set: { lb: "NLB · chỉ thấy IP:443" },
-          detail: "NLB **không thể biết** request muốn gì, vì path `/images/cat.png` nằm trong payload đã mã hoá. NLB làm việc ở tầng transport: chỉ đọc header IP/TCP (source IP, dest IP, port) và chuyển tiếp luồng byte nguyên vẹn, không giải mã. Đổi lại, NLB cực nhanh, giữ được hàng triệu kết nối, latency rất thấp, có IP tĩnh và giữ nguyên IP client.",
+          detail: "NLB **không thể biết** request muốn gì, vì path `/images/cat.png` nằm trong payload đã mã hoá. NLB làm việc ở tầng transport: chỉ đọc header IP/TCP (source IP, dest IP, port) và chuyển tiếp luồng byte nguyên vẹn, không giải mã. Đổi lại, NLB cực nhanh, xử lý hàng triệu request/giây, latency rất thấp, có IP tĩnh và giữ nguyên IP client.",
         },
         {
           note: "Chọn backend theo hash/round-robin → có thể rơi vào service không phục vụ path này.",
