@@ -115,6 +115,7 @@
     "content/topics/py/py-decorators.js",
     "content/topics/py/py-context-managers.js",
     "content/topics/py/py-pitfalls.js",
+    "content/topics/py/py-pytest.js",
     "content/problems/bitly.js",
     "content/problems/ticketmaster.js",
     "content/problems/dropbox.js",

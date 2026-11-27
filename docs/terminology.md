@@ -143,6 +143,8 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Iterator / Generator | iterator, iterable, generator, `yield`, generator expression | đối tượng trả từng phần tử khi được hỏi; hàm có `yield` tạm dừng và chạy tiếp | "Bộ lặp", "Hàm sinh", "Trình sinh" | `py-iterators-generators` |
 | Decorator | decorator (Python, PEP 318) | hàm nhận một hàm và trả hàm thay thế, viết bằng `@` | "Hàm trang trí", "Bộ trang trí" | `py-decorators` |
 | Context Manager | context manager, `with`; `__enter__`/`__exit__` | object lo việc mở/đóng resource quanh một khối code | "Trình quản lý ngữ cảnh", "Quản lý ngữ cảnh" | `py-context-managers` |
+| Fixture | fixture (pytest); scope, `conftest.py`, yield fixture | hàm chuẩn bị và dọn dẹp dữ liệu/resource cho test, được tiêm vào test theo tên tham số | "Đồ gá kiểm thử", "Dữ liệu cố định" | `py-pytest` |
+| Mock / Patch | mock, `patch`, autospec, `monkeypatch` | object giả ghi lại lời gọi; thay tạm một tên bằng object giả trong lúc test | "Đối tượng giả", "Vá tạm thời" | `py-pytest` |
 <!-- terminology:end -->
 
 ## 4. Từ tiếng Việt nhiều nghĩa: không dùng cho khái niệm kỹ thuật
