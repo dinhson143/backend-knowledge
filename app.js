@@ -75,7 +75,7 @@
     store.set("ip.theme", next);
   };
   const menuBtn = $("#menuBtn");
-  const setMenu = (open) => { sidebar.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open); };
+  const setMenu = (open) => { sidebar.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", open); if (open) showActive(); };
   menuBtn.onclick = () => setMenu(!sidebar.classList.contains("open"));
   // Bấm ra ngoài sidebar (kể cả nền mờ) thì đóng
   document.addEventListener("click", (e) => { if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) setMenu(false); });
@@ -174,35 +174,106 @@
     if (sidebar.classList.contains("open")) { setMenu(false); menuBtn.focus(); }
   });
 
-  // ── Sidebar theo ngữ cảnh ──
+  // ── Sidebar theo ngữ cảnh (D90: cây giai đoạn → chặng → topic, ô lọc, giữ trạng thái khi đổi trang) ──
   // Giai đoạn "đang học": chứa bước Học tiếp; xong lộ trình chính thì là giai đoạn luyện bài
   const currentStage = () => { const st = nextStep(); return st.topic ? st.topic.stage : STAGES.find((s) => s.problems); };
-  // Sidebar (A7): mỗi giai đoạn là <details>, chỉ mở giai đoạn chứa topic đang xem (không có thì giai đoạn đang học).
+  // Trạng thái sống qua các lần render lại sidebar: giai đoạn người dùng tự mở, chữ đang lọc, vị trí cuộn
+  const sb = { open: new Set(), filter: "", scroll: 0 };
+  // Bỏ dấu để lọc: "bo nho" khớp "Bộ nhớ"
+  const fold = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[đĐ]/g, "d").toLowerCase();
+  const sbCount = (d, n) => `<span class="sb-n"><span aria-hidden="true">${d}/${n}</span><span class="sr-only">, đã nắm ${d} trên ${n}</span></span>`;
+  // Trạng thái không chỉ bằng màu: ✓ trong vòng tròn + chữ ẩn "đã nắm"
+  const sbLink = (href, title, ok, active) => `<a class="sb-topic${active ? " active" : ""}" href="${href}"${active ? ' aria-current="page"' : ""}>` +
+    `${ok === null ? "" : `<span class="sb-ic${ok ? " done" : ""}" aria-hidden="true">${ok ? "✓" : ""}</span>`}<span>${esc(title)}${ok ? '<span class="sr-only"> (đã nắm)</span>' : ""}</span></a>`;
+  // Mỗi giai đoạn là <details>: mở giai đoạn chứa topic đang xem (không có thì giai đoạn đang học) + những giai đoạn người dùng đã tự mở (A7).
   // Lọc theo "có topic" chứ không theo `problems`, để giai đoạn vừa có topic vừa có bài vẫn hiện (B0)
   function sideKnowledge(active) {
-    const open = active && byId[active] ? byId[active].stage : currentStage();
-    const block = (s) => `
-      <details class="sb-track" ${s === open ? "open" : ""}>
-        <summary class="sb-track-title"><span>${stageNum(s)} · ${esc(s.title)}</span><span class="sb-count">${s.topics.filter((id) => done.has(id)).length}/${s.topics.length}</span></summary>
-        ${(s.parts || [{ topics: s.topics }]).map((p) => (p.title ? `<div class="sb-section">${esc(p.title)}${deepTag(p)}</div>` : "") +
-          p.topics.map((id) => `<a class="sb-topic ${id === active ? "active" : ""}" href="#/t/${id}"${id === active ? ' aria-current="page"' : ""}>
-          <span class="sb-dot ${done.has(id) ? "done" : ""}"></span>${esc(byId[id].title)}</a>`).join("")).join("")}
-      </details>`;
+    const cur = active && byId[active] ? byId[active].stage : currentStage();
+    const block = (s) => {
+      const d = s.topics.filter((id) => done.has(id)).length, n = s.topics.length;
+      const parts = (s.parts || [{ topics: s.topics }]).map((p) => `<div class="sb-part">
+        ${p.title ? `<div class="sb-part-t" data-q="${esc(fold(p.title))}"><span>${esc(p.title)}${deepTag(p)}</span>${sbCount(p.topics.filter((id) => done.has(id)).length, p.topics.length)}</div>` : ""}
+        <ul class="sb-list">${p.topics.map((id) => `<li data-q="${esc(fold(`${byId[id].title} ${id}`))}">${sbLink(`#/t/${id}`, byId[id].title, done.has(id), id === active)}</li>`).join("")}</ul></div>`).join("");
+      return `<details class="sb-stage${s.parallel ? " parallel" : ""}${d === n ? " complete" : ""}" data-id="${s.id}"${s === cur || sb.open.has(s.id) ? " open" : ""}>
+        <summary><span class="sb-num" aria-hidden="true">${stageNum(s)}</span>
+          <span class="sb-st"><span class="sb-st-t"><span class="sr-only">${s.parallel ? "Nhánh" : `Giai đoạn ${stageNum(s)}`}: </span>${esc(s.title)}</span>
+            <span class="sb-prog" aria-hidden="true"><i style="width:${pct(d, n)}%"></i></span></span>${sbCount(d, n)}</summary>
+        ${parts}</details>`;
+    };
     const withTopics = STAGES.filter((s) => s.topics.length);
-    return `<div class="sb-group">Lộ trình chính</div>${withTopics.filter((s) => !s.parallel).map(block).join("")}
-      <div class="sb-group">Nhánh song song</div>${withTopics.filter((s) => s.parallel).map(block).join("")}`;
+    return `<div class="sb-filter" role="search"><input id="sbFilter" type="search" placeholder="Lọc chủ đề…" aria-label="Lọc chủ đề trong mục lục" aria-describedby="sbFilterN" autocomplete="off" spellcheck="false" value="${esc(sb.filter)}">
+        <span id="sbFilterN" class="sr-only" aria-live="polite"></span></div>
+      <nav class="sb-nav" aria-label="Mục lục chủ đề">
+        <h2 class="sb-group">Lộ trình chính</h2>${withTopics.filter((s) => !s.parallel).map(block).join("")}
+        <h2 class="sb-group">Nhánh song song</h2>${withTopics.filter((s) => s.parallel).map(block).join("")}
+        <p class="sb-empty" hidden></p>
+      </nav>`;
   }
   function sideProblems(active) {
-    return `<div class="sb-track"><a class="sb-topic ${active === "all" ? "active" : ""}" href="#/problems"><span class="sb-dot"></span>Tất cả bài & cách luyện</a></div>` +
-      [1, 2, 3].map((l) => `<div class="sb-track"><div class="sb-track-title">${LEVELS[l]}</div>
-        ${PROBLEMS.filter((p) => p.level === l).map((p) => `<a class="sb-topic ${active === p.id ? "active" : ""}" href="#/p/${p.id}">
-          <span class="sb-dot ${done.has(`p:${p.id}`) ? "done" : ""}"></span>${esc(p.title)}</a>`).join("")}</div>`).join("");
+    return `<nav class="sb-nav" aria-label="Danh sách bài luyện"><ul class="sb-list sb-top"><li>${sbLink("#/problems", "Tất cả bài & cách luyện", null, active === "all")}</li></ul>` +
+      [1, 2, 3].map((l) => { const ps = PROBLEMS.filter((p) => p.level === l), d = ps.filter((p) => done.has(`p:${p.id}`)).length;
+        return `<section class="sb-level"><h2 class="sb-level-t"><span>${LEVELS[l]}</span>${sbCount(d, ps.length).replace("đã nắm", "đã luyện")}</h2>
+          <ul class="sb-list">${ps.map((p) => `<li>${sbLink(`#/p/${p.id}`, p.title, done.has(`p:${p.id}`), active === p.id).replace("(đã nắm)", "(đã luyện)")}</li>`).join("")}</ul></section>`; }).join("") + "</nav>";
   }
+  // Lọc trong sidebar: ẩn topic không khớp (chặng khớp tên thì giữ cả chặng), mở mọi giai đoạn có kết quả
+  function applyFilter() {
+    const box = sidebar.querySelector("#sbFilter");
+    if (!box) return;
+    const q = fold(sb.filter.trim());
+    let hits = 0;
+    sidebar.querySelectorAll(".sb-stage").forEach((st) => {
+      let any = 0;
+      st.querySelectorAll(".sb-part").forEach((p) => {
+        const whole = !!q && !!p.querySelector(`.sb-part-t[data-q*="${CSS.escape(q)}"]`);
+        let n = 0;
+        p.querySelectorAll("li").forEach((li) => { const ok = !q || whole || li.dataset.q.includes(q); li.hidden = !ok; n += ok; });
+        p.hidden = !n; any += n;
+      });
+      st.hidden = !any;
+      if (q) { st.open = !!any; hits += any; }
+    });
+    sidebar.querySelectorAll(".sb-group").forEach((g) => { let el = g.nextElementSibling, vis = false; while (el && el.matches(".sb-stage")) { vis ||= !el.hidden; el = el.nextElementSibling; } g.hidden = !vis; });
+    const empty = sidebar.querySelector(".sb-empty");
+    empty.hidden = !q || hits > 0;
+    if (q && !hits) empty.innerHTML = `Không có chủ đề khớp “${esc(sb.filter.trim())}”. <a href="#/search/${encodeURIComponent(sb.filter.trim())}">Tìm trong toàn bộ nội dung →</a>`;
+    $("#sbFilterN").textContent = q ? (hits ? `${hits} chủ đề khớp` : "Không có chủ đề khớp") : "";
+  }
+  // Bỏ lọc: trả các giai đoạn về trạng thái mở/gập trước khi lọc
+  function clearFilter() {
+    sb.filter = "";
+    sidebar.querySelectorAll(".sb-stage").forEach((st) => (st.open = sb.open.has(st.dataset.id) || !!st.querySelector("[aria-current]") || st.dataset.cur === "1"));
+    applyFilter();
+  }
+  // Đưa mục đang xem vào giữa khung sidebar nếu nó đang khuất (chỉ cuộn sidebar, không cuộn trang)
+  function showActive() {
+    const a = sidebar.querySelector(".sb-topic[aria-current]");
+    if (!a) return;
+    const top = a.getBoundingClientRect().top - sidebar.getBoundingClientRect().top + sidebar.scrollTop;
+    if (top < sidebar.scrollTop + 60 || top > sidebar.scrollTop + sidebar.clientHeight - 60) sidebar.scrollTop = top - sidebar.clientHeight / 2;
+  }
+  // Ghi nhớ khi người dùng bấm (chuột hoặc Enter/Space trên summary), không ghi khi code mở/gập
+  sidebar.addEventListener("click", (e) => {
+    const s = e.target.closest(".sb-stage > summary");
+    if (!s || sb.filter.trim()) return;
+    const st = s.parentElement;
+    !st.open ? sb.open.add(st.dataset.id) : sb.open.delete(st.dataset.id); // click chạy trước khi details đổi trạng thái
+  });
+  sidebar.addEventListener("input", (e) => { if (e.target.id !== "sbFilter") return; sb.filter = e.target.value; sb.filter.trim() ? applyFilter() : clearFilter(); });
+  sidebar.addEventListener("keydown", (e) => {
+    if (e.target.id !== "sbFilter" || e.key !== "Escape" || !e.target.value) return;
+    e.preventDefault(); e.stopPropagation(); // Esc lần đầu: xoá lọc; lần sau: đóng drawer (handler chung)
+    e.target.value = ""; clearFilter();
+  });
+  sidebar.addEventListener("scroll", () => (sb.scroll = sidebar.scrollTop), { passive: true });
   function setNav(mode, side) {
     glSeen = mode === "glossary" ? null : new Set();
     document.querySelectorAll(".modes a").forEach((a) => { const on = a.dataset.mode === mode; a.classList.toggle("active", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
     // Màn hẹp: 5 tab nằm đầu drawer ☰ (bản sao của .modes, CSS chỉ hiện một trong hai) — D28
     sidebar.innerHTML = `<nav class="sb-modes" aria-label="Chế độ học">${$(".modes").innerHTML}</nav>${side}`;
+    sidebar.querySelectorAll(".sb-stage[open]").forEach((st) => { if (!sb.open.has(st.dataset.id)) st.dataset.cur = "1"; });
+    if (sb.filter.trim()) applyFilter();
+    sidebar.scrollTop = sb.scroll;
+    showActive();
     setMenu(false);
     window.scrollTo(0, 0);
   }
