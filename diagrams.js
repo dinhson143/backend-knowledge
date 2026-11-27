@@ -355,12 +355,8 @@
 
   /* ───────────── Custom: Vending machine (State pattern) ───────────── */
   function mountVending(root, sim) {
-    const S = { Idle: [150, 80], HasCoin: [520, 80], Dispensing: [520, 235], SoldOut: [150, 235] };
-    const E = [
-      ["Idle", "HasCoin", "insertCoin", -22], ["HasCoin", "Idle", "refund", -22], ["HasCoin", "Dispensing", "select", 0],
-      ["Dispensing", "Idle", "take (còn hàng)", 0], ["Dispensing", "SoldOut", "take (hết hàng)", 0], ["SoldOut", "Idle", "restock", 0],
-    ];
-    const ACTIONS = [["insertCoin", "Bỏ xu"], ["select", "Chọn món"], ["refund", "Hoàn xu"], ["take", "Lấy hàng"], ["restock", "Nạp hàng"]];
+    // states: { tên: [x, y] } · actions: [[action, nhãn nút]] · transitions: [{ from, to, on, label, bend, stock? (cộng), restock?, when?: "stock" | "empty" }]
+    const { states: S, actions: ACTIONS, transitions: T } = sim;
     let cur, stock, log, fired, flash;
     root.classList.add("sim");
     root.innerHTML = `
@@ -371,14 +367,11 @@
       <div class="sim-ctrl">${ACTIONS.map(([a, l]) => `<button class="btn" data-a="${a}">${l}</button>`).join("")}<button class="btn" data-a="reset">⟲</button></div>
       <ol class="sim-log"></ol>`;
     const stage = root.querySelector(".sim-stage"), note = root.querySelector(".sim-note"), logEl = root.querySelector(".sim-log");
-    function reset() { cur = "Idle"; stock = 2; log = []; fired = null; flash = null; render(); }
+    function reset() { cur = sim.initial; stock = sim.stock; log = []; fired = null; flash = null; render(); }
     function act(a) {
       let to = null, why = "";
-      if (cur === "Idle" && a === "insertCoin") to = "HasCoin";
-      else if (cur === "HasCoin" && a === "refund") to = "Idle";
-      else if (cur === "HasCoin" && a === "select") { to = "Dispensing"; stock--; }
-      else if (cur === "Dispensing" && a === "take") to = stock > 0 ? "Idle" : "SoldOut";
-      else if (cur === "SoldOut" && a === "restock") { to = "Idle"; stock = 3; }
+      const t = T.find((x) => x.from === cur && x.on === a && (!x.when || (x.when === "stock") === stock > 0));
+      if (t) { to = t.to; if (t.stock) stock += t.stock; if (t.restock != null) stock = t.restock; }
       else why = cur === "SoldOut" && a === "insertCoin" ? "máy hết hàng — xu bị trả lại" : `trạng thái **${cur}** không có hành động này`;
       const label = ACTIONS.find((x) => x[0] === a)[1];
       if (to) { fired = [cur, to]; log.unshift(`✓ ${label}: ${cur} → ${to}`); cur = to; flash = null; }
@@ -389,7 +382,7 @@
       stage.innerHTML = "";
       const svg = el("svg", { viewBox: "0 0 800 300", class: "sim-svg" }, stage);
       const uid = defs(svg);
-      E.forEach(([a, b, l, bend]) => {
+      T.forEach(({ from: a, to: b, label: l, bend }) => {
         const A = { x: S[a][0], y: S[a][1], w: 150 }, B = { x: S[b][0], y: S[b][1], w: 150 };
         const len = Math.hypot(B.x - A.x, B.y - A.y), nx = -(B.y - A.y) / len, ny = (B.x - A.x) / len;
         const p = edgePoint(A, B.x, B.y, 6), q = edgePoint(B, A.x, A.y, 6);
@@ -420,7 +413,8 @@
 
   /* ───────────── Custom: Binary search ───────────── */
   function mountBinary(root, sim) {
-    const ARR = [3, 7, 12, 18, 21, 29, 34, 40, 46, 53, 58, 64, 71, 77, 85, 92];
+    // array: mảng đã sắp xếp · missing: giá trị không có trong mảng (20% lần chọn)
+    const ARR = sim.array;
     let target, lo, hi, mid, found, log, done, cmp;
     root.classList.add("sim");
     root.innerHTML = `
@@ -432,7 +426,7 @@
       <div class="sim-ctrl"><button class="btn primary" data-a="step">Bước tiếp</button><button class="btn" data-a="all">Chạy hết</button><button class="btn" data-a="new">Target mới</button></div>
       <ol class="sim-log"></ol>`;
     function fresh() {
-      target = Math.random() < 0.8 ? ARR[Math.floor(Math.random() * ARR.length)] : 50;
+      target = Math.random() < 0.8 ? ARR[Math.floor(Math.random() * ARR.length)] : sim.missing;
       lo = 0; hi = ARR.length - 1; mid = null; found = -1; log = []; done = false; cmp = 0;
       render();
     }
@@ -456,7 +450,7 @@
       }).join("");
       const lin = ARR.indexOf(target);
       root.querySelector(".sim-note").innerHTML = done
-        ? `Binary search: <b>${cmp}</b> lần so sánh (tối đa ⌈log₂16⌉ + 1 = 5). Linear search: <b>${lin >= 0 ? lin + 1 : ARR.length}</b> lần.`
+        ? `Binary search: <b>${cmp}</b> lần so sánh (tối đa ⌈log₂${ARR.length}⌉ + 1 = ${Math.ceil(Math.log2(ARR.length)) + 1}). Linear search: <b>${lin >= 0 ? lin + 1 : ARR.length}</b> lần.`
         : `Mỗi bước loại bỏ một nửa khoảng [lo, hi] → O(log n).`;
       root.querySelector(".sim-log").innerHTML = log.map((l) => `<li>${esc(l)}</li>`).join("");
       root.querySelector('[data-a="step"]').disabled = done;
@@ -678,27 +672,10 @@
 
   /* ───────────── Custom: ai quản lý lớp nào (ECS/EKS × compute) ───────────── */
   function mountStack(root, sim) {
-    const OPTS = [
-      { id: "ecs-ec2", label: "ECS + EC2", fit: "Tải lớn ổn định cần tối ưu chi phí, GPU hoặc host đặc thù — chấp nhận tự quản máy." },
-      { id: "ecs-fg", label: "ECS + Fargate", fit: "Mặc định cho team nhỏ/vừa chỉ chạy trên AWS: ít việc vận hành nhất trong nhóm container." },
-      { id: "eks-mng", label: "EKS + Node group", fit: "Cần đầy đủ Kubernetes (DaemonSet, GPU, tuỳ biến node) và có người vận hành cluster." },
-      { id: "eks-fg", label: "EKS + Fargate", fit: "Muốn API Kubernetes nhưng không quản node; chấp nhận không DaemonSet, không GPU." },
-      { id: "eks-auto", label: "EKS Auto Mode", fit: "Muốn Kubernetes với ít vận hành nhất: AWS lo node, vá, scale, add-on lõi." },
-    ];
-    // y = bạn, a = AWS, s = chia sẻ
-    const LAYERS = [
-      ["Code & container image", { "ecs-ec2": "y", "ecs-fg": "y", "eks-mng": "y", "eks-fg": "y", "eks-auto": "y" }],
-      ["Task def / manifest, quy tắc scale", { "ecs-ec2": "y", "ecs-fg": "y", "eks-mng": "y", "eks-fg": "y", "eks-auto": "y" }],
-      ["Add-on (CNI, ingress, DNS, autoscaler)", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "y", "eks-fg": "s", "eks-auto": "a" }],
-      ["Nâng version orchestrator", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "y", "eks-fg": "y", "eks-auto": "s" }],
-      ["Thêm/bớt máy chủ", { "ecs-ec2": "s", "ecs-fg": "a", "eks-mng": "s", "eks-fg": "a", "eks-auto": "a" }],
-      ["Vá OS, AMI của node", { "ecs-ec2": "y", "ecs-fg": "a", "eks-mng": "s", "eks-fg": "a", "eks-auto": "a" }],
-      ["Control plane (API, scheduler, state)", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "a", "eks-fg": "a", "eks-auto": "a" }],
-      ["Hạ tầng vật lý, hypervisor", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "a", "eks-fg": "a", "eks-auto": "a" }],
-    ];
     const NAME = { y: "Bạn", a: "AWS", s: "Chia sẻ" };
-    const COST = { "ecs-ec2": "Không phí control plane · trả tiền EC2 (kể cả phần trống)", "ecs-fg": "Không phí control plane · trả theo vCPU/RAM của task", "eks-mng": "~$0.10/giờ/cluster · trả tiền EC2", "eks-fg": "~$0.10/giờ/cluster · trả theo vCPU/RAM của pod", "eks-auto": "~$0.10/giờ/cluster · EC2 + phí quản lý Auto Mode" };
-    let cur = "ecs-fg";
+    // options: [{ id, label, fit }] · layers: [tên lớp, { optionId: "y" bạn | "a" AWS | "s" chia sẻ }] · cost: { optionId: chuỗi }
+    const { options: OPTS, layers: LAYERS, cost: COST } = sim;
+    let cur = sim.initial;
     root.classList.add("sim");
     root.innerHTML = `
       <div class="sim-title">${esc(sim.title)}</div>
@@ -726,15 +703,8 @@
 
   /* ───────────── Custom: trả lời câu hỏi → ECS hay EKS ───────────── */
   function mountDecide(root, sim) {
-    const Q = [
-      { id: "k8s", q: "Team đã vận hành Kubernetes thành thạo?", eks: 2, why: "Team đã quen Kubernetes → chi phí học EKS gần như bằng 0." },
-      { id: "multi", q: "Phải chạy cả ngoài AWS (on-prem, cloud khác)?", eks: 3, why: "Cần chạy nhiều nơi → Kubernetes cho cùng manifest và công cụ ở mọi môi trường." },
-      { id: "eco", q: "Cần công cụ chỉ Kubernetes có (Helm chart sẵn, operator, ArgoCD, KEDA, Istio)?", eks: 2, why: "Cần hệ sinh thái Kubernetes mà ECS không có tương đương." },
-      { id: "platform", q: "Có platform team riêng phục vụ nhiều team dev?", eks: 1, why: "Có platform team → đủ người nâng version, quản add-on, RBAC đa team." },
-      { id: "small", q: "Team nhỏ, ưu tiên ship nhanh, không ai chuyên lo hạ tầng?", ecs: 3, why: "Team nhỏ → ECS bỏ hết khâu nâng version và lắp ghép add-on." },
-      { id: "gpu", q: "Cần GPU, DaemonSet hoặc tuỳ biến node sâu?", eks: 1, ec2: true, why: "Cần GPU / tuỳ biến node → không dùng được Fargate, phải có node EC2." },
-      { id: "spiky", q: "Traffic lẻ tẻ, mỗi lần xử lý ngắn, không cần chạy thường trực?", lambda: true, why: "Tải lẻ tẻ, ngắn → cân nhắc Lambda trước khi nghĩ tới container." },
-    ];
+    // questions: [{ id, q, why, eks?, ecs? (điểm cộng), ec2?, lambda? (cờ) }]
+    const Q = sim.questions;
     const ans = {};
     root.classList.add("sim");
     root.innerHTML = `
@@ -1350,6 +1320,18 @@ window.SIMS = [
   {
     id: "vending", custom: "vending", title: "State pattern: máy bán hàng", topics: ["patterns-gof"],
     scenario: "Bấm các nút để chuyển trạng thái. Máy từ chối hành động không hợp lệ ở trạng thái hiện tại.",
+    initial: "Idle",
+    stock: 2,
+    states: { Idle: [150, 80], HasCoin: [520, 80], Dispensing: [520, 235], SoldOut: [150, 235] },
+    actions: [["insertCoin", "Bỏ xu"], ["select", "Chọn món"], ["refund", "Hoàn xu"], ["take", "Lấy hàng"], ["restock", "Nạp hàng"]],
+    transitions: [
+      { from: "Idle", to: "HasCoin", on: "insertCoin", label: "insertCoin", bend: -22 },
+      { from: "HasCoin", to: "Idle", on: "refund", label: "refund", bend: -22 },
+      { from: "HasCoin", to: "Dispensing", on: "select", label: "select", bend: 0, stock: -1 },
+      { from: "Dispensing", to: "Idle", on: "take", label: "take (còn hàng)", bend: 0, when: "stock" },
+      { from: "Dispensing", to: "SoldOut", on: "take", label: "take (hết hàng)", bend: 0, when: "empty" },
+      { from: "SoldOut", to: "Idle", on: "restock", label: "restock", bend: 0, restock: 3 },
+    ],
   },
   {
     id: "observer", title: "Observer: 1 subject, nhiều observer", topics: ["patterns-gof"],
@@ -1501,10 +1483,38 @@ window.SIMS = [
   {
     id: "container-stack", custom: "stack", title: "Ai quản lý lớp nào: ECS, EKS × Fargate, EC2", topics: ["ecs-vs-eks", "ecs", "eks"],
     scenario: "Chọn từng phương án để thấy lớp nào bạn phải tự lo, lớp nào AWS lo. Càng nhiều lớp đỏ → càng nhiều việc vận hành.",
+    initial: "ecs-fg",
+    options: [
+      { id: "ecs-ec2", label: "ECS + EC2", fit: "Tải lớn ổn định cần tối ưu chi phí, GPU hoặc host đặc thù — chấp nhận tự quản máy." },
+      { id: "ecs-fg", label: "ECS + Fargate", fit: "Mặc định cho team nhỏ/vừa chỉ chạy trên AWS: ít việc vận hành nhất trong nhóm container." },
+      { id: "eks-mng", label: "EKS + Node group", fit: "Cần đầy đủ Kubernetes (DaemonSet, GPU, tuỳ biến node) và có người vận hành cluster." },
+      { id: "eks-fg", label: "EKS + Fargate", fit: "Muốn API Kubernetes nhưng không quản node; chấp nhận không DaemonSet, không GPU." },
+      { id: "eks-auto", label: "EKS Auto Mode", fit: "Muốn Kubernetes với ít vận hành nhất: AWS lo node, vá, scale, add-on lõi." },
+    ],
+    layers: [
+      ["Code & container image", { "ecs-ec2": "y", "ecs-fg": "y", "eks-mng": "y", "eks-fg": "y", "eks-auto": "y" }],
+      ["Task def / manifest, quy tắc scale", { "ecs-ec2": "y", "ecs-fg": "y", "eks-mng": "y", "eks-fg": "y", "eks-auto": "y" }],
+      ["Add-on (CNI, ingress, DNS, autoscaler)", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "y", "eks-fg": "s", "eks-auto": "a" }],
+      ["Nâng version orchestrator", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "y", "eks-fg": "y", "eks-auto": "s" }],
+      ["Thêm/bớt máy chủ", { "ecs-ec2": "s", "ecs-fg": "a", "eks-mng": "s", "eks-fg": "a", "eks-auto": "a" }],
+      ["Vá OS, AMI của node", { "ecs-ec2": "y", "ecs-fg": "a", "eks-mng": "s", "eks-fg": "a", "eks-auto": "a" }],
+      ["Control plane (API, scheduler, state)", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "a", "eks-fg": "a", "eks-auto": "a" }],
+      ["Hạ tầng vật lý, hypervisor", { "ecs-ec2": "a", "ecs-fg": "a", "eks-mng": "a", "eks-fg": "a", "eks-auto": "a" }],
+    ],
+    cost: { "ecs-ec2": "Không phí control plane · trả tiền EC2 (kể cả phần trống)", "ecs-fg": "Không phí control plane · trả theo vCPU/RAM của task", "eks-mng": "~$0.10/giờ/cluster · trả tiền EC2", "eks-fg": "~$0.10/giờ/cluster · trả theo vCPU/RAM của pod", "eks-auto": "~$0.10/giờ/cluster · EC2 + phí quản lý Auto Mode" },
   },
   {
     id: "container-decide", custom: "decide", title: "Trả lời 7 câu → ECS hay EKS", topics: ["ecs-vs-eks"],
     scenario: "Bấm Có/Không theo tình huống của bạn (hoặc của đề bài) để xem gợi ý orchestrator, kiểu compute và lý do.",
+    questions: [
+      { id: "k8s", q: "Team đã vận hành Kubernetes thành thạo?", eks: 2, why: "Team đã quen Kubernetes → chi phí học EKS gần như bằng 0." },
+      { id: "multi", q: "Phải chạy cả ngoài AWS (on-prem, cloud khác)?", eks: 3, why: "Cần chạy nhiều nơi → Kubernetes cho cùng manifest và công cụ ở mọi môi trường." },
+      { id: "eco", q: "Cần công cụ chỉ Kubernetes có (Helm chart sẵn, operator, ArgoCD, KEDA, Istio)?", eks: 2, why: "Cần hệ sinh thái Kubernetes mà ECS không có tương đương." },
+      { id: "platform", q: "Có platform team riêng phục vụ nhiều team dev?", eks: 1, why: "Có platform team → đủ người nâng version, quản add-on, RBAC đa team." },
+      { id: "small", q: "Team nhỏ, ưu tiên ship nhanh, không ai chuyên lo hạ tầng?", ecs: 3, why: "Team nhỏ → ECS bỏ hết khâu nâng version và lắp ghép add-on." },
+      { id: "gpu", q: "Cần GPU, DaemonSet hoặc tuỳ biến node sâu?", eks: 1, ec2: true, why: "Cần GPU / tuỳ biến node → không dùng được Fargate, phải có node EC2." },
+      { id: "spiky", q: "Traffic lẻ tẻ, mỗi lần xử lý ngắn, không cần chạy thường trực?", lambda: true, why: "Tải lẻ tẻ, ngắn → cân nhắc Lambda trước khi nghĩ tới container." },
+    ],
   },
   {
     id: "ecs-flow", title: "ECS: deploy, scale và tự phục hồi", topics: ["ecs"],
@@ -1890,5 +1900,7 @@ window.SIMS = [
   {
     id: "binary-search", custom: "binary", title: "Binary search từng bước", topics: ["algo", "bigo"],
     scenario: "Mỗi bước so sánh phần tử giữa rồi loại bỏ một nửa khoảng tìm kiếm.",
+    array: [3, 7, 12, 18, 21, 29, 34, 40, 46, 53, 58, 64, 71, 77, 85, 92],
+    missing: 50,
   },
 ];
