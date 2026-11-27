@@ -14,6 +14,13 @@ BK.topic({
     idea: "Chia theo ranh giới tin cậy: phần cần cô lập (code không tin được, plugin, worker có thể crash) chạy ở process riêng; bên trong mỗi process dùng nhiều thread hoặc event loop để chia sẻ dữ liệu rẻ. Nginx, PostgreSQL, Chrome đều theo kiểu này ở các mức khác nhau.",
     tradeoff: "Process: an toàn nhưng tốn bộ nhớ, giao tiếp chậm (pipe, socket, shared memory). Thread: rẻ nhưng phải tự đồng bộ (lock, race condition) và lỗi một chỗ là lỗi toàn bộ.",
   },
+  diagrams: [
+    {
+      src: "content/svg/thr-thread-vs-process-memory.svg",
+      caption: "Hai process mỗi bên một bộ nhớ, trao đổi qua IPC. Các thread trong một process chung code, global, heap, fd, PID; riêng stack, thanh ghi, thread ID, `errno`, signal mask (pthreads(7); OSTEP Threads — https://pages.cs.wisc.edu/~remzi/OSTEP/threads-intro.pdf).",
+      source: "https://man7.org/linux/man-pages/man7/pthreads.7.html",
+    },
+  ],
   table: {
     head: ["Tiêu chí", "Process", "Thread (cùng process)"],
     rows: [

@@ -13,6 +13,13 @@ BK.topic({
     idea: "Hiểu vòng đời: mỗi process con khi kết thúc để lại một bản ghi nhỏ (PID, exit status, thống kê tài nguyên) chờ cha đọc bằng `wait()`. Cha phải `wait()` mọi con nó sinh ra, hoặc nhờ một init process biết dọn (subreaper, `tini`) làm thay.",
     tradeoff: "`fork()` rẻ nhờ copy-on-write nhưng vẫn phải chép page table, và trong chương trình nhiều thread thì nguy hiểm (chỉ thread gọi `fork` được chép, lock có thể đang bị giữ). Vì vậy nhiều runtime chuyển sang spawn hoặc forkserver thay vì fork thẳng.",
   },
+  diagrams: [
+    {
+      src: "content/svg/os-process-lifecycle-states.svg",
+      caption: "Ready ⇄ Running do scheduler quyết; chờ I/O thì Blocked, xong I/O quay về Ready. Sau `exit()` process là zombie tới khi cha gọi `wait()`. Cha chết trước thì con được subreaper gần nhất hoặc init nhận, và init tự `wait()` để dọn zombie (OSTEP cpu-intro — https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-intro.pdf; PR_SET_CHILD_SUBREAPER(2const) — https://man7.org/linux/man-pages/man2/PR_SET_CHILD_SUBREAPER.2const.html).",
+      source: "https://man7.org/linux/man-pages/man2/wait.2.html",
+    },
+  ],
   table: {
     head: ["Lời gọi", "Làm gì", "Trả về"],
     rows: [

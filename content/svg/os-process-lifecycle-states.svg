@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Vòng đời process: new, ready và running đổi qua lại, blocked khi chờ I/O, exit thành zombie, cha gọi wait() thì được dọn; cha chết trước thì con được subreaper hoặc init nhận</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b7ff5"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e08a00"/></marker>
+    <style>
+      .st { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.4; }
+      .run { fill: #e8f0fe; stroke: #3b7ff5; stroke-width: 1.8; }
+      .zom { fill: #fff3db; stroke: #e08a00; stroke-width: 1.6; }
+      .ok { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.4; }
+      .grp { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .n { font-size: 14px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .c { font-size: 12.5px; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #64748b; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lb { font-size: 12px; fill: #475569; }
+      .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; fill: #1f2937; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="418" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="h" x="20" y="30">Trạng thái của một process</text>
+
+  <!-- Trạng thái -->
+  <rect class="st" x="20" y="74" width="92" height="46" rx="10"/>
+  <text class="n" x="66" y="94">New</text><text class="sc" x="66" y="111">đang tạo</text>
+
+  <rect class="st" x="180" y="74" width="116" height="46" rx="10"/>
+  <text class="n" x="238" y="94">Ready</text><text class="sc" x="238" y="111">chờ tới lượt CPU</text>
+
+  <rect class="run" x="386" y="74" width="116" height="46" rx="10"/>
+  <text class="n" x="444" y="94">Running</text><text class="sc" x="444" y="111">đang chạy trên CPU</text>
+
+  <rect class="st" x="276" y="196" width="128" height="46" rx="10"/>
+  <text class="n" x="340" y="216">Blocked</text><text class="sc" x="340" y="233">chờ I/O, sự kiện</text>
+
+  <rect class="zom" x="590" y="74" width="150" height="46" rx="10"/>
+  <text class="n" x="665" y="94">Zombie</text><text class="sc" x="665" y="111">đã exit, chờ cha đọc</text>
+
+  <rect class="ok" x="590" y="196" width="150" height="46" rx="10"/>
+  <text class="n" x="665" y="216">Đã dọn (reaped)</text><text class="sc" x="665" y="233">bản ghi bị xoá</text>
+
+  <!-- Chuyển trạng thái -->
+  <g stroke="#64748b" stroke-width="1.4" fill="none" marker-end="url(#a)">
+    <path d="M112,97 L178,97"/>
+    <path d="M296,88 L384,88"/>
+    <path d="M386,108 L298,108"/>
+    <path d="M430,120 L384,194"/>
+    <path d="M296,196 L250,122"/>
+  </g>
+  <text class="lb" x="145" y="89" text-anchor="middle">tạo xong</text>
+  <text class="lb" x="340" y="80" text-anchor="middle">scheduled</text>
+  <text class="lb" x="342" y="128" text-anchor="middle">descheduled</text>
+  <text class="lb" x="416" y="166">I/O: bắt đầu</text>
+  <text class="lb" x="262" y="166" text-anchor="end">I/O: xong</text>
+
+  <path d="M502,97 L588,97" stroke="#e08a00" stroke-width="1.6" fill="none" marker-end="url(#o)"/>
+  <text class="code" x="545" y="89" text-anchor="middle">exit()</text>
+  <path d="M665,120 L665,194" stroke="#14a37f" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <text class="lb" x="657" y="152" text-anchor="end">cha gọi</text>
+  <text class="code" x="657" y="168" text-anchor="end">wait()</text>
+
+  <text class="s" x="20" y="272">Zombie đã trả bộ nhớ và fd; kernel chỉ giữ PID, exit status, thống kê tài nguyên để cha đọc bằng wait().</text>
+  <text class="s" x="20" y="290">Chưa wait() thì zombie vẫn chiếm một slot trong bảng process; đầy bảng thì không tạo được process mới.</text>
+
+  <!-- Nhánh orphan -->
+  <rect class="grp" x="20" y="306" width="720" height="100" rx="12"/>
+  <text class="h" x="34" y="328">Nhánh orphan: cha chết trước con</text>
+  <rect class="st" x="34" y="340" width="188" height="44" rx="8"/>
+  <text class="c" x="128" y="358">cha exit, chưa wait()</text>
+  <text class="sc" x="128" y="375">con còn chạy hoặc đã là zombie</text>
+  <rect class="st" x="270" y="340" width="220" height="44" rx="8"/>
+  <text class="c" x="380" y="358">con được subreaper gần nhất</text>
+  <text class="c" x="380" y="375">hoặc init (PID 1) nhận làm con</text>
+  <rect class="ok" x="538" y="340" width="188" height="44" rx="8"/>
+  <text class="c" x="632" y="358">cha mới gọi wait()</text>
+  <text class="sc" x="632" y="375">init tự wait() để dọn zombie</text>
+  <g stroke="#3b7ff5" stroke-width="1.5" fill="none" marker-end="url(#b)">
+    <path d="M222,362 L268,362"/>
+    <path d="M490,362 L536,362"/>
+  </g>
+</svg>
