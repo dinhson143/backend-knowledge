@@ -190,6 +190,7 @@ window.GLOSSARY = [
     ["IDOR", "Insecure Direct Object Reference", "Lỗ hổng truy cập được dữ liệu người khác chỉ bằng cách đổi id trong URL."],
     ["DDoS", "Distributed Denial of Service", "Nhiều máy cùng bắn request làm sập dịch vụ."],
     ["SHA", "Secure Hash Algorithm", "Họ hàm hash mật mã (SHA-256)."],
+    ["ReDoS", "Regular expression Denial of Service", "Input xấu làm regex backtracking rất lâu, chặn CPU/event loop: một request thành tấn công từ chối dịch vụ."],
     ["mTLS", "Mutual TLS", "TLS mà cả client cũng gửi chứng chỉ, nên hai bên xác thực lẫn nhau."],
     ["SNI", "Server Name Indication", "Tên miền client gửi trong ClientHello để server chọn đúng chứng chỉ."],
     ["AEAD", "Authenticated Encryption with Associated Data", "Mã hoá kèm xác thực: vừa giấu nội dung vừa phát hiện bị sửa (AES-GCM, ChaCha20-Poly1305)."],

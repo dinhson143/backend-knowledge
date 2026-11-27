@@ -55,7 +55,7 @@ window.ROADMAP = [
       { id: "cs.thread", title: "Thread trong thực tế", topics: ["thr-io-vs-cpu-bound", "thr-thread-pool", "thr-green-threads"] },
       { id: "cs.io", title: "I/O & hệ điều hành", topics: ["io-blocking-models", "os-signals-shutdown"] },
       { id: "cs.concurrency", title: "Concurrency", topics: ["conc-race-condition", "concurrency", "conc-livelock-starvation", "conc-atomic-cas"] },
-      { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure"] },
+      { id: "cs.async", title: "Async Programming", topics: ["async-concurrency-models", "async-event-loop", "async-callback-promise-await", "async-coroutine", "async-cancellation-timeout", "async-backpressure", "async-blocking-in-loop"] },
       { id: "cs.net", title: "Mạng máy tính", topics: ["net-url-to-page", "net-tcp-deep", "net-http-versions", "net-tls"] },
     ] },
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
