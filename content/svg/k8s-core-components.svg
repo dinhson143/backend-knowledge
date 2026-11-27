@@ -61,8 +61,8 @@
   <text class="c" x="116" y="270">kubelet</text><text class="sc" x="116" y="287">chạy pod, chạy probe</text>
   <rect class="box" x="36" y="330" width="160" height="40" rx="7"/>
   <text class="c" x="116" y="346">container runtime</text><text class="sc" x="116" y="363">containerd, CRI-O…</text>
-  <path class="st" d="M116,296 L116,328" marker-end="url(#b)"/>
-  <text class="bl" x="124" y="316">CRI (gRPC)</text>
+  <path d="M116,296 L116,328" stroke="#64748b" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+  <text class="s" x="124" y="316">CRI (gRPC)</text>
   <g stroke="#64748b" stroke-width="1.2" fill="none" marker-end="url(#a)">
     <path d="M196,342 L238,286"/><path d="M196,354 L238,354"/>
   </g>
@@ -72,7 +72,7 @@
   <text class="c" x="305" y="350">Pod B</text><text class="sc" x="305" y="367">label app=web</text>
   <rect class="box" x="420" y="254" width="160" height="40" rx="7"/>
   <text class="c" x="500" y="270">kube-proxy</text><text class="sc" x="500" y="287">tuỳ chọn · cài luật</text>
-  <path class="st" d="M500,296 L500,328" marker-end="url(#b)" style="stroke-dasharray: 4 3"/>
+  <path d="M500,296 L500,328" stroke="#64748b" stroke-width="1.4" fill="none" stroke-dasharray="4 3" marker-end="url(#a)"/>
   <rect class="net" x="420" y="330" width="300" height="44" rx="7"/>
   <text class="c" x="570" y="348">luật mạng trong kernel (vd. iptables)</text>
   <text class="sc" x="570" y="365">IP của Service → IP của một pod</text>

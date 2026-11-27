@@ -58,6 +58,6 @@
   <text class="t" x="530" y="240">chỉ lưu và tải một lần.</text>
 
   <text class="t" x="20" y="334">Dữ liệu cần giữ (upload, database) đặt ở volume hoặc dịch vụ ngoài, không ghi vào layer của container.</text>
-  <text class="s" x="20" y="358">Docker Engine 29+ mặc định lưu image bằng containerd (snapshotter) thay cho storage driver cũ;</text>
+  <text class="s" x="20" y="358">Docker Engine 29+ cài mới mặc định lưu image bằng containerd (snapshotter) thay storage driver;</text>
   <text class="s" x="20" y="376">khái niệm layer chỉ đọc + layer ghi được vẫn như trên. Digest trong hình là minh hoạ.</text>
 </svg>

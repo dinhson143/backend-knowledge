@@ -187,7 +187,7 @@ BK.topic({
   diagrams: [
     {
       src: "content/svg/dockerfile-multi-stage.svg",
-      caption: "Multi-stage theo Dockerfile mẫu ở trên: stage build có source, npm, công cụ build; chỉ `node_modules` (đã prune dev dependency) và `dist/` được `COPY --from=build` sang stage distroless, chạy bằng `USER 10001:10001`.",
+      caption: "Multi-stage theo Dockerfile mẫu của bài: stage build có source, npm, công cụ build; chỉ `node_modules` (đã prune dev dependency) và `dist/` được `COPY --from=build` sang stage distroless, chạy bằng `USER 10001:10001`.",
       source: "https://docs.docker.com/build/building/multi-stage/",
     },
   ],

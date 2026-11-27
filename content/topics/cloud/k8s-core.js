@@ -227,8 +227,8 @@ BK.topic({
     },
     {
       src: "content/svg/k8s-core-deployment-service-gateway.svg",
-      caption: "Giữa rolling update: Deployment có hai ReplicaSet; Service chọn pod theo `app=web` nên gồm cả v1 lẫn v2, EndpointSlice chỉ giữ pod Ready. HTTPRoute gắn vào Gateway bằng `parentRefs` và trỏ tới Service bằng `backendRefs`.",
-      source: "https://kubernetes.io/docs/concepts/services-networking/gateway/",
+      caption: "Giữa rolling update: Deployment có hai ReplicaSet; Service chọn pod theo `app=web` nên gồm cả v1 lẫn v2; EndpointSlice liệt kê endpoint kèm điều kiện, chỉ endpoint ready (pod Ready, không đang dừng) nhận traffic. HTTPRoute gắn vào Gateway bằng `parentRefs` và trỏ tới Service bằng `backendRefs`.",
+      source: "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
     },
   ],
   cards: [
