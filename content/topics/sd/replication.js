@@ -23,7 +23,7 @@ BK.topic({
       },
       {
         cells: ["Multi-leader", "Nhiều leader, thường mỗi region một", "Ghi ở nhiều region với latency thấp, app offline-first", "Hai nơi sửa cùng một bản ghi → xung đột phải giải"],
-        why: "Mỗi region ghi vào leader gần nó rồi đồng bộ chéo bất đồng bộ, nên ghi nhanh và một region đứt vẫn ghi được. Nhưng hai leader có thể nhận hai thay đổi trái nhau cho cùng một dòng trước khi thấy nhau; không có thứ tự chung để biết cái nào \"sau\".",
+        why: "Mỗi region ghi vào leader gần nó rồi đồng bộ chéo bất đồng bộ, nên ghi nhanh và một region đứt vẫn ghi được. Nhưng hai leader có thể nhận hai thay đổi trái nhau cho cùng một dòng trước khi thấy nhau; không có thứ tự chung để biết cái nào \"sau\". Ví dụ PostgreSQL: hai node đăng ký logical replication của nhau (subscription đặt `origin = none` để không gửi vòng lại thay đổi vừa nhận); khi một `UPDATE` đến dòng vừa bị node kia sửa, PostgreSQL hiện **luôn áp** thay đổi đến và chỉ ghi nhận xung đột `update_origin_differs`, còn chèn trùng unique key thì dừng replication cho tới khi sửa tay (https://www.postgresql.org/docs/current/logical-replication-conflicts.html).",
       },
       {
         cells: ["Leaderless (kiểu Dynamo)", "Client ghi vào nhiều node cùng lúc", "Cần luôn ghi được, chịu node chết (Dynamo, Cassandra)", "Đọc phải hỏi nhiều node; xung đột giải bằng version hoặc LWW"],
@@ -41,7 +41,7 @@ BK.topic({
       why: "Mỗi mức chờ thêm một bước nên đảm bảo thêm một điều: `remote_write` sống sót khi process standby chết nhưng không sống sót khi OS standby sập; `on` chỉ mất dữ liệu khi cả primary lẫn mọi standby đồng bộ cùng hỏng ổ; `remote_apply` còn cho đọc từ standby thấy ngay, đổi lại commit chậm hơn nhiều vì chờ replay. Tham số đặt được theo từng transaction, nên có thể chỉ cho giao dịch tiền chạy đồng bộ.",
     },
     {
-      t: "**Replica lag sinh ra bất thường khi đọc**: user sửa xong reload không thấy thay đổi (vi phạm **read-your-writes**); hai lần đọc liên tiếp rơi vào hai replica trễ khác nhau làm dữ liệu \"quay ngược\" (vi phạm **monotonic reads**).",
+      t: "**Replica lag sinh ra bất thường khi đọc**: user sửa xong reload không thấy thay đổi (vi phạm **read-your-writes**); hai lần đọc liên tiếp rơi vào hai replica trễ khác nhau làm dữ liệu \"quay ngược\" (vi phạm **monotonic reads**: đọc sau không được thấy trạng thái cũ hơn đọc trước, tức \"đọc không đi lùi\", https://jepsen.io/consistency/models/monotonic-reads).",
       why: "Mỗi replica áp log tới một vị trí khác nhau tại cùng thời điểm, nên đọc ở đâu thì thấy trạng thái tại vị trí đó. Lỗi chỉ xuất hiện khi đọc ngay sau ghi hoặc khi lag tăng lúc tải cao, nên rất khó tái hiện khi test.",
     },
     {
