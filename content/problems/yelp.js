@@ -128,7 +128,7 @@ BK.problem({
       great: "Elasticsearch geo_point kết hợp text + filter trong một query (hoặc Quadtree/Geohash); dữ liệu ít đổi nên index ổn định.",
       why: {
         bad: "Mỗi search quét toàn bộ dữ liệu, mất hàng giây ở 100M DAU, vì phải tính khoảng cách tới 10M business cho mỗi query.",
-        good: "Geohash/PostGIS index chỉ xét business trong vùng lân cận nên nhanh hơn nhiều. Nhưng kết hợp với full-text search và filter (loại hình, giá, rating) trong Postgres khó tối ưu — query planner thường chỉ dùng tốt được một index.",
+        good: "Geohash/PostGIS index chỉ xét business trong vùng lân cận nên nhanh hơn nhiều. Nhưng kết hợp với full-text search và filter (loại hình, giá, rating) trong Postgres khó tối ưu: planner gộp được nhiều index bằng bitmap AND/OR (https://www.postgresql.org/docs/current/indexes-bitmap-scans.html), nhưng xếp hạng trộn độ liên quan của text với khoảng cách thì không index nào làm sẵn.",
         great: "Một query lọc theo khoảng cách, khớp text và filter cùng lúc rồi ranking, vì Elasticsearch giữ `geo_point` và inverted index trong cùng document. Dữ liệu business ít đổi nên index không phải rebuild liên tục, cache hiệu quả.",
       },
     },

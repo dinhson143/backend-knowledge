@@ -125,7 +125,7 @@ BK.problem({
               ["booking", "stripe", "PaymentIntent $250"],
               ["stripe", "booking", "webhook: succeeded", "ok"],
             ],
-            detail: "Booking tạo **PaymentIntent** $250 trên Stripe (kèm idempotency key để retry không trừ tiền hai lần) khi user xác nhận. Kết quả cuối lấy từ **webhook** Stripe gọi về server, không từ redirect của client — client có thể mất mạng hay đóng tab ngay sau khi trả tiền, còn webhook thì Stripe retry tới khi nhận được. Rủi ro cần nghĩ tới: thanh toán chậm quá 10 phút, lock đã hết và người khác đã giữ A1 — bước tiếp theo sẽ phát hiện và phải refund.",
+            detail: "Booking tạo **PaymentIntent** $250 trên Stripe (kèm idempotency key để retry không trừ tiền hai lần) khi user xác nhận. Kết quả cuối lấy từ **webhook** Stripe gọi về server, không từ redirect của client — client có thể mất mạng hay đóng tab ngay sau khi trả tiền, còn webhook thì Stripe retry với exponential backoff tới 3 ngày (https://docs.stripe.com/webhooks). Rủi ro cần nghĩ tới: thanh toán chậm quá 10 phút, lock đã hết và người khác đã giữ A1 — bước tiếp theo sẽ phát hiện và phải refund.",
           },
           {
             note: "Ghi DB bằng **conditional update** trong transaction, rồi xoá lock.",

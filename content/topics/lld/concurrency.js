@@ -40,7 +40,7 @@ BK.topic({
     },
     {
       t: "+ **Coordination** — cho các thread chờ và báo nhau: producer–consumer, blocking queue, condition variable, thread pool.",
-      why: "Producer và consumer chạy khác tốc độ → cần cơ chế cho bên nhanh chờ bên chậm, thay vì mất dữ liệu hay quay vòng vô ích. Blocking queue gói sẵn lock + condition: `put()` tự chờ khi đầy, `take()` tự chờ khi rỗng.",
+      why: "Producer và consumer chạy khác tốc độ → cần cơ chế cho bên nhanh chờ bên chậm, thay vì mất dữ liệu hay quay vòng vô ích. Blocking queue gói sẵn lock + condition: `put()` tự chờ khi đầy, `get()` tự chờ khi rỗng (`queue.Queue` của Python — https://docs.python.org/3/library/queue.html; Java `BlockingQueue` gọi là `put()`/`take()`).",
     },
     {
       t: "+ **Scarcity** — chia tài nguyên có hạn: semaphore, connection pool, rate limiting, backpressure.",

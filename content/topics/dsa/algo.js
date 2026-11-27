@@ -25,7 +25,7 @@ BK.topic({
       },
       {
         cells: ["DFS / Recursion", "Duyệt cây/graph, connected components, cycle", "O(V+E)"],
-        why: "DFS khớp tự nhiên với đệ quy và cấu trúc cây, vì nó đi sâu hết một nhánh rồi quay lui. Gặp lại đỉnh đang nằm trên stack đệ quy là dấu hiệu có cycle; mỗi đỉnh và cạnh được thăm một lần nên O(V+E).",
+        why: "DFS khớp tự nhiên với đệ quy và cấu trúc cây, vì nó đi sâu hết một nhánh rồi quay lui. Với đồ thị có hướng, gặp lại đỉnh đang nằm trên stack đệ quy là dấu hiệu có cycle (đồ thị vô hướng: gặp đỉnh đã thăm mà không phải cha); mỗi đỉnh và cạnh được thăm một lần nên O(V+E).",
       },
       {
         cells: ["Backtracking", "Liệt kê mọi subset / permutation / combination", "Mũ (2ⁿ, n!)"],

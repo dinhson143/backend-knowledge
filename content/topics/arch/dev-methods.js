@@ -117,7 +117,7 @@ BK.topic({
           ["Entity", "Đối tượng có danh tính, sống qua thời gian (Order #123)"],
           ["Value object", "Đối tượng định nghĩa bằng giá trị, bất biến (Money 50 USD, Address)"],
           {
-            cells: ["Aggregate", "Cụm entity sửa cùng nhau qua một gốc (aggregate root), là ranh giới transaction"],
+            cells: ["Aggregate", "Cụm đối tượng miền (entity, value object) sửa cùng nhau qua một gốc (aggregate root), là ranh giới transaction"],
             why: "Luật bất biến (tổng đơn = tổng item) luôn được kiểm tra, vì mọi thay đổi đi qua aggregate root; một transaction chỉ sửa một aggregate để giữ khoá nhỏ.",
           },
           {

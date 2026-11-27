@@ -16,7 +16,7 @@ BK.topic({
     head: ["Big-O", "Ví dụ", "n tối đa (~1s)"],
     rows: [
       {
-        cells: ["O(1)", "arr[i], push/pop stack, lấy root của heap, get/set hash map", "—"],
+        cells: ["O(1)", "arr[i], push/pop stack, lấy root của heap, get/set hash map (trung bình)", "—"],
         why: "Số bước không phụ thuộc n: mảng nằm liền kề nên `arr[i]` tính địa chỉ bằng `base + i × size` trong một phép tính. Stack push/pop chỉ chạm đỉnh, root heap luôn ở `arr[0]`, hash map tính hash rồi nhảy thẳng vào bucket.",
       },
       {
