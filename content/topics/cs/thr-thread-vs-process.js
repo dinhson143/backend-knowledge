@@ -53,8 +53,8 @@ BK.topic({
       why: "Stack được dành sẵn trong không gian địa chỉ ảo (RAM thật chỉ cấp khi chạm tới), nhưng nghìn thread vẫn là nghìn task cho scheduler và nghìn lần chuyển ngữ cảnh. Vượt giới hạn thì `pthread_create` trả `EAGAIN` (pthread_create(3) — https://man7.org/linux/man-pages/man3/pthread_create.3.html). Đây là lý do server nhiều kết nối dùng event loop hoặc green thread thay vì một thread mỗi kết nối.",
     },
     {
-      t: "**Ví dụ thật: process làm ranh giới, bên trong dùng mô hình nhẹ** — Nginx: một master đọc cấu hình, nhiều worker process (thường bằng số core), mỗi worker dùng event loop. PostgreSQL: mỗi kết nối một backend process, phối hợp qua shared memory và semaphore.",
-      why: "Nginx tách master/worker để reload cấu hình hay worker chết không làm rơi cả server (https://nginx.org/en/docs/beginners_guide.html). PostgreSQL chọn process-per-connection để một backend lỗi không làm hỏng bộ nhớ của backend khác; cái giá là mỗi kết nối nặng, nên app phải dùng connection pool (https://www.postgresql.org/docs/current/connect-estab.html).",
+      t: "**Ví dụ thật: process làm ranh giới, bên trong dùng mô hình nhẹ** — Nginx: một master đọc cấu hình và quản các worker, nhiều worker process (cố định hoặc bằng số core) xử lý request theo mô hình event. PostgreSQL: mỗi kết nối một backend process, phối hợp qua shared memory và semaphore.",
+      why: "Ở Nginx, master chỉ lo cấu hình và duy trì worker, còn worker làm việc thật (https://nginx.org/en/docs/beginners_guide.html); vì là process riêng nên master vẫn còn khi một worker gặp sự cố. PostgreSQL dùng mô hình \"process per user\": supervisor (postmaster) sinh một backend process cho mỗi kết nối, các backend phối hợp qua shared memory và semaphore (https://www.postgresql.org/docs/current/connect-estab.html). Cái giá là mỗi kết nối là cả một process, nên app phải dùng connection pool thay vì mở hàng nghìn kết nối.",
     },
     {
       t: "**`fork` một process nhiều thread** — process con chỉ có thread đã gọi `fork`; lock do thread khác giữ lúc fork sẽ bị giữ mãi trong con. Muốn chạy chương trình khác thì `exec` ngay sau `fork`.",

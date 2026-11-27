@@ -79,12 +79,12 @@ BK.topic({
             why: "Python đổi mặc định khỏi `fork` để giữ tốc độ mà tránh lỗi fork process nhiều thread nêu ở trên: forkserver là một process đơn luồng chuyên fork theo yêu cầu (https://docs.python.org/3/library/multiprocessing.html). Hệ quả thực tế: code chạy với `spawn`/`forkserver` phải để phần khởi tạo trong `if __name__ == \"__main__\":` và đối số truyền cho con phải pickle được.",
           },
           {
-            cells: ["Node.js", "`child_process.spawn/exec/fork` tạo process mới chạy chương trình khác hoặc một Node khác", "Cha phải nghe sự kiện `exit` / `close`; Node tự gọi wait nên không sinh zombie"],
-            why: "Runtime (libuv) thu exit status của con và phát thành sự kiện `exit`; việc của bạn là xử lý exit code và stdout/stderr để không bỏ sót lỗi của con.",
+            cells: ["Node.js", "`child_process.spawn/exec/fork` tạo process mới chạy chương trình khác hoặc một Node khác", "Nghe sự kiện `exit` (con đã kết thúc) hoặc `close` (con kết thúc và stdio đã đóng); đọc hoặc bỏ qua stdout"],
+            why: "Node trả exit code (hoặc tên signal) qua sự kiện `exit`; việc của bạn là kiểm tra nó để không bỏ sót lỗi của con. Pipe stdio giữa cha và con có dung lượng hữu hạn: con ghi quá giới hạn mà không ai đọc thì con bị chặn, giống pipe trong shell; không cần output thì dùng `{ stdio: 'ignore' }` (https://nodejs.org/api/child_process.html).",
           },
           {
-            cells: ["Go, Java", "`os/exec` (Go) và `ProcessBuilder` (Java) đều là fork + exec trong một lời gọi", "Phải gọi `cmd.Wait()` (Go) hoặc `process.waitFor()` (Java), và đọc hết stdout/stderr"],
-            why: "Không `Wait()` thì con thành zombie cho tới khi runtime dọn, và pipe stdout có dung lượng hữu hạn: cha không đọc thì pipe đầy, con bị chặn khi ghi, nên lệnh treo mà không báo lỗi.",
+            cells: ["Go, Java", "`os/exec` (Go) và `ProcessBuilder` (Java) đều là fork + exec trong một lời gọi", "Sau `cmd.Start()` phải gọi `cmd.Wait()` (Go) hoặc `process.waitFor()` (Java); đọc hết stdout trước khi `Wait`"],
+            why: "Tài liệu Go nói rõ: sau `Start` thành công phải gọi `Wait` để giải phóng tài nguyên hệ thống, và gọi `Wait` trước khi đọc xong `StdoutPipe` là sai (https://pkg.go.dev/os/exec). `Wait` là nơi exit status được thu về; bỏ qua nó thì con đã chết vẫn nằm lại như zombie, và nếu cha không đọc stdout thì pipe đầy làm con bị chặn khi ghi, lệnh treo mà không báo lỗi.",
           },
         ],
       },

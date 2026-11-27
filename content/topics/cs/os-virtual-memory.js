@@ -42,7 +42,7 @@ BK.topic({
   points: [
     {
       t: "**Page fault không phải lỗi** — đó là cơ chế: CPU không tìm được bản dịch hợp lệ thì ngắt, kernel chạy handler để quyết định. Ba trường hợp thường gặp: cấp trang lười lần đầu chạm vào, copy-on-write sau `fork`, và trang đã bị đẩy ra swap.",
-      why: "Kernel cố ý trì hoãn việc cấp RAM tới lúc thật sự cần, nên `malloc(1 GB)` trả về ngay mà RSS chưa tăng; mỗi trang chỉ nhận khung vật lý ở lần chạm đầu tiên. Chỉ khi truy cập không được phép (không map, sai quyền) thì kernel mới gửi `SIGSEGV` (https://docs.kernel.org/mm/page_tables.html).",
+      why: "Kernel cố ý trì hoãn việc cấp RAM tới lúc thật sự cần, nên `malloc(1 GB)` trả về ngay mà RSS chưa tăng; trang chưa dùng mà bị đọc thì được gắn vào một trang vật lý dùng chung toàn số 0, chỉ khi ghi lần đầu mới được cấp khung riêng (https://docs.kernel.org/admin-guide/mm/concepts.html). Chỉ khi truy cập không được phép (không map, sai quyền) thì kernel mới gửi `SIGSEGV` (https://docs.kernel.org/mm/page_tables.html).",
     },
     {
       t: "**Minor và major fault** — minor: xử lý không cần I/O (cấp trang mới, gắn trang đã có trong page cache). Major: phải đọc từ đĩa (swap, hoặc file được map chưa có trong page cache). Đếm bằng `ru_minflt` / `ru_majflt` trong `getrusage`, cột `min_flt`/`maj_flt` của `ps -o`, hoặc `/usr/bin/time -v`.",

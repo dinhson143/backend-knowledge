@@ -5,7 +5,7 @@ BK.topic({
   title: "Chọn ngôn ngữ phỏng vấn",
   goal: "Chọn ngôn ngữ và thuộc thư viện chuẩn cần cho vòng coding",
   tldr: {
-    t: "Chọn ngôn ngữ bạn viết **trôi chảy nhất**, không phải ngôn ngữ \"ấn tượng\" nhất. Python là lựa chọn phổ biến vì ngắn và có sẵn nhiều cấu trúc dữ liệu; Java, C++ ổn nhưng dài hơn; JavaScript thiếu heap và queue có sẵn; Go viết được nhưng thư viện chuẩn mỏng cho dạng bài thuật toán. Dù chọn gì, phải thuộc lòng 8 thứ: mảng động, hash map, hash set, deque, heap, sort có key, binary search, cây có thứ tự (nếu có).",
+    t: "Chọn ngôn ngữ bạn viết **trôi chảy nhất**, không phải ngôn ngữ \"ấn tượng\" nhất. Python là lựa chọn phổ biến vì ngắn và có sẵn nhiều cấu trúc dữ liệu; Java, C++ ổn nhưng dài hơn; JavaScript thiếu heap và queue có sẵn; Go viết được nhưng thư viện chuẩn mỏng cho dạng bài thuật toán. Dù chọn gì, phải thuộc lòng 8 thứ: mảng động, hash map, hash set, queue/deque, stack, heap, sort theo khoá, binary search và cấu trúc có thứ tự (nếu ngôn ngữ có).",
     why: "Trong 45 phút, nút thắt là suy nghĩ chứ không phải gõ phím; ngôn ngữ quen giúp bạn không phải nghĩ về cú pháp (Tech Interview Handbook — https://www.techinterviewhandbook.org/programming-languages-for-coding-interviews/). Thuộc thư viện chuẩn quan trọng vì mỗi lần phải tự cài heap hay tra tên hàm là mất vài phút và mất mạch trình bày.",
   },
   story: {

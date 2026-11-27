@@ -2,10 +2,10 @@ BK.sim({
   id: "addr-translate",
   title: "Dịch địa chỉ ảo: TLB, page table, page fault",
   topics: ["os-virtual-memory"],
-  scenario: "Chương trình đọc biến ở địa chỉ ảo `0x7f3a2c41` (trang ảo `0x7f3a2`, offset `0xc41`). Xem đường đi của một lần đọc trong bốn tình huống: TLB hit, TLB miss, trang chưa từng chạm, trang đã bị đẩy ra swap.",
+  scenario: "Chương trình truy cập biến ở địa chỉ ảo `0x7f3a2c41` (trang ảo `0x7f3a2`, offset `0xc41`). Xem đường đi của một lần truy cập trong bốn tình huống: TLB hit, TLB miss, ghi lần đầu vào trang chưa có khung, trang đã bị đẩy ra swap.",
   context: "Với trang 4 KB, 12 bit thấp (`0xc41`) là offset, giữ nguyên khi dịch; chỉ số trang ảo cần tra. **TLB** là cache bản dịch trong CPU; **Page table** nằm trong RAM, nhiều cấp; **Kernel** chỉ vào cuộc khi có page fault. Để ý số lần phải đi tới RAM hay đĩa trong mỗi tình huống: đó chính là chi phí.",
   nodes: [
-    { id: "CPU", x: 100, y: 70, label: "CPU (lệnh load)" },
+    { id: "CPU", x: 100, y: 70, label: "CPU (đọc/ghi)" },
     { id: "TLB", x: 330, y: 70, label: "TLB" },
     { id: "PT", x: 560, y: 70, label: "Page table (RAM)" },
     { id: "RAM", x: 330, y: 230, label: "RAM: khung trang" },
@@ -58,13 +58,13 @@ BK.sim({
       ],
     },
     {
-      name: "Page fault: chạm lần đầu",
+      name: "Page fault: ghi lần đầu",
       steps: [
         {
-          note: "Vừa `malloc` 1 GB. Đọc trang chưa từng chạm: TLB miss, PTE không present.",
+          note: "Vừa `malloc` 1 GB. **Ghi** vào trang chưa từng chạm: TLB miss, PTE không present.",
           msgs: [["CPU", "TLB", "0x7f3a2?"], ["TLB", "CPU", "miss", "warn"], ["CPU", "PT", "tra"], ["PT", "CPU", "không present", "err"]],
           set: { PT: "vùng hợp lệ, chưa có khung" },
-          detail: "`malloc` lớn chỉ map vùng ảo; kernel chưa cấp khung vật lý nào. RSS chưa tăng. Phần cứng không tự xử lý được, nên ngắt.",
+          detail: "`malloc` lớn chỉ map vùng ảo; kernel chưa cấp khung vật lý nào. RSS chưa tăng. Phần cứng không tự xử lý được, nên ngắt. (Nếu chỉ **đọc** trang này, Linux gắn nó vào một trang vật lý dùng chung toàn số 0 và chưa cấp khung riêng; chỉ khi ghi mới cấp — https://docs.kernel.org/admin-guide/mm/concepts.html.)",
         },
         {
           note: "CPU báo page fault. Kernel kiểm: địa chỉ thuộc vùng đã map, quyền đúng → cấp một khung trống.",
@@ -73,11 +73,11 @@ BK.sim({
           detail: "Đây là **minor fault**: không có I/O, chỉ tốn thời gian chạy handler trong kernel. Nếu địa chỉ không thuộc vùng nào đã map hoặc sai quyền, kernel gửi `SIGSEGV` thay vì cấp khung.",
         },
         {
-          note: "Kernel trả về; CPU chạy lại đúng lệnh load đó.",
-          msgs: [["K", "CPU", "chạy lại lệnh", "ok"], ["CPU", "RAM", "đọc"], ["RAM", "CPU", "0", "ok"]],
-          set: { CPU: "xong (chậm hơn: có fault)" },
+          note: "Kernel trả về; CPU chạy lại đúng lệnh ghi đó.",
+          msgs: [["K", "CPU", "chạy lại lệnh", "ok"], ["CPU", "RAM", "ghi 42", "ok"]],
+          set: { CPU: "xong (chậm hơn: có fault)", RAM: "khung 0x2c10: dirty" },
           good: ["CPU"],
-          lesson: "Page fault không phải lỗi: kernel cấp RAM lười, chỉ khi trang thật sự được chạm tới. RSS tăng theo trang được chạm, không theo `malloc`.",
+          lesson: "Page fault không phải lỗi: kernel cấp RAM lười, chỉ khi trang thật sự được ghi tới. RSS tăng theo trang được dùng, không theo `malloc`.",
           detail: "Chương trình không hề biết có fault. Cùng cơ chế này phục vụ copy-on-write sau `fork`: ghi vào trang chung thì fault, kernel chép trang rồi cho ghi tiếp.",
         },
       ],
