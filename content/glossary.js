@@ -47,6 +47,7 @@ window.GLOSSARY = [
     ["HTTP", "HyperText Transfer Protocol", "Giao thức request/response của web, chạy trên TCP (HTTP/3 chạy trên UDP)."],
     ["HTTPS", "HTTP Secure", "HTTP mã hoá bằng TLS."],
     ["TLS", "Transport Layer Security", "Mã hoá và xác thực kết nối mạng."],
+    ["mTLS", "Mutual TLS", "TLS hai chiều: cả client lẫn server đều trình certificate, dùng để service xác thực nhau."],
     ["HSTS", "HTTP Strict Transport Security", "Header bảo trình duyệt chỉ dùng HTTPS cho domain trong một thời gian."],
     ["TTFB", "Time To First Byte", "Thời gian từ lúc gửi request tới khi nhận byte đầu tiên của response."],
     ["DOM", "Document Object Model", "Cây đối tượng trình duyệt dựng từ HTML."],
