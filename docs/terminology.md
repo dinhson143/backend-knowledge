@@ -118,6 +118,15 @@ Cột "Không dùng trong nhãn" là cụm `check.mjs` chặn trong `title` (so 
 | Async Programming | async/await, event loop, coroutine, Promise | viết code không chặn thread khi chờ I/O | "Lập trình bất đồng bộ", "Bất đồng bộ" | `async-event-loop` (sắp viết) |
 | Deadlock | deadlock; lock ordering | các bên chờ nhau vòng tròn, không ai chạy tiếp | "Bế tắc", "Khoá chết" | `concurrency` |
 | Thread-safe | thread-safe (gạch nối) | dùng từ nhiều thread mà không sai | "An toàn luồng" | `concurrency` |
+| I/O-bound / CPU-bound | I/O-bound, CPU-bound (gạch nối) | việc chủ yếu chờ I/O / việc chủ yếu tính toán trên CPU | "Nặng I/O", "Nặng CPU" | `thr-io-vs-cpu-bound` |
+| Thread Pool | thread pool; worker, task queue, rejection policy | nhóm thread dựng sẵn, lấy task từ queue để chạy | "Nhóm luồng", "Bể luồng" | `thr-thread-pool` |
+| Green Thread / Virtual Thread | green thread, goroutine, virtual thread, platform thread; M:N scheduling, carrier thread, pinning | thread do runtime quản lý, nhiều cái chạy trên ít OS thread | "Luồng xanh", "Luồng ảo" | `thr-green-threads` |
+| Blocking / Non-blocking I/O | blocking I/O, non-blocking I/O, I/O multiplexing, async I/O; readiness, completion | lời gọi I/O chờ hay trả về ngay; một thread chờ nhiều fd cùng lúc | "I/O chặn", "Ghép kênh I/O", "Đa hợp I/O" | `io-blocking-models` |
+| Signal | signal; SIGTERM, SIGKILL, SIGINT; signal handler | thông báo kernel gửi tới process vào thời điểm bất kỳ | "Tín hiệu hệ điều hành" | `os-signals-shutdown` |
+| Graceful Shutdown | graceful shutdown; drain | dừng app sau khi làm xong việc đang dở, không rớt request | "Tắt nhẹ nhàng", "Dừng an toàn" | `os-signals-shutdown` |
+| Race Condition / Data Race | race condition, data race; check-then-act, read-modify-write, TOCTOU (glossary) | kết quả phụ thuộc thứ tự chạy / hai truy cập cùng ô nhớ không đồng bộ, ít nhất một ghi | "Điều kiện tranh chấp", "Tranh chấp dữ liệu" | `conc-race-condition` |
+| Livelock / Starvation | livelock, starvation, fairness, priority inversion | vẫn chạy mà không tiến / chờ mãi không tới lượt | "Khoá sống", "Chết đói", "Đảo ngược ưu tiên" | `conc-livelock-starvation` |
+| Atomic / CAS | atomic, compare-and-swap, CAS (glossary), lock-free; ABA | thao tác không bị chen ngang; chỉ ghi khi giá trị còn như lúc đọc | "So sánh và hoán đổi", "Không khoá" | `conc-atomic-cas` |
 | **LLD & kiến trúc** | | | | |
 | Design Principles | SOLID, KISS, DRY, YAGNI, SoC, LoD | nguyên tắc giữ code dễ đổi | "Nguyên tắc thiết kế", "Giữ thiết kế đơn giản" | `solid`, `principles-other` |
 | Design Patterns | Design Patterns (GoF); Creational, Structural, Behavioral | lời giải lặp lại cho vấn đề thiết kế class | "Mẫu thiết kế" | `patterns-gof` |
