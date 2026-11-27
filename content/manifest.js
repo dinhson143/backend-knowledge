@@ -48,6 +48,7 @@
     "content/topics/lld/concurrency.js",
     "content/topics/lld/lld-problems-list.js",
     "content/topics/beh/beh-star-stories.js",
+    "content/topics/beh/beh-common-questions.js",
     "content/topics/cloud/container-basics.js",
     "content/topics/cloud/dockerfile.js",
     "content/topics/cloud/k8s-core.js",
