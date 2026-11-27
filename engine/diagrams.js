@@ -346,10 +346,10 @@
     root.addEventListener("click", (e) => {
       const a = e.target.closest("[data-a]")?.dataset.a;
       if (a === "add") change(() => servers.push({ name: `S${next}`, c: PALETTE[(next++ - 1) % PALETTE.length] }),
-        `Thêm **${"S" + next}**: chỉ các key nằm ngay trước nó trên vòng đổi chủ — server khác không bị ảnh hưởng.`);
+        `Thêm **${"S" + next}**: chỉ các key nằm ngay trước các điểm của nó trên vòng đổi chủ (lấy từ server kế sau) — key còn lại giữ nguyên chủ.`);
       if (a === "del") {
         const victim = servers[Math.floor(servers.length / 2)];
-        change(() => (servers = servers.filter((s) => s !== victim)), `Xoá **${victim.name}** (server sập): key của nó chuyển sang server kế tiếp theo chiều kim đồng hồ.`);
+        change(() => (servers = servers.filter((s) => s !== victim)), `Xoá **${victim.name}** (server sập): key của nó chuyển sang server kế tiếp theo chiều kim đồng hồ (bật vnode thì được chia cho nhiều server).`);
       }
       if (a === "vn") change(() => (vn = vn > 1 ? 1 : 12), vn > 1 ? "Tắt virtual nodes: mỗi server chỉ 1 điểm → khoảng trên vòng lệch, tải không đều." : "Bật **12 virtual node** mỗi server: điểm rải đều hơn → tải cân bằng hơn. Thử xoá server để thấy tải của nó chia cho nhiều server.", false);
       if (a === "reset") reset();
@@ -585,12 +585,12 @@
       if (act === "add") {
         consumers.push(`C${next++}`);
         msg = consumers.length > P
-          ? `**Rebalance** xong: ${consumers.length} consumer nhưng chỉ có ${P} partition → consumer dư **ngồi rảnh**. Muốn song song hơn phải tăng partition.`
+          ? `**Rebalance** xong: ${consumers.length} consumer nhưng chỉ có ${P} partition → consumer dư **ngồi rảnh** (consumer group cổ điển). Muốn song song hơn phải tăng partition.`
           : `**Rebalance**: chia lại ${P} partition cho ${consumers.length} consumer → mỗi consumer gánh ít hơn, lag giảm dần.`;
       }
       if (act === "del" && consumers.length > 1) {
         const dead = consumers.splice(Math.floor(Math.random() * consumers.length), 1)[0];
-        msg = `**${dead} crash** → mất heartbeat → rebalance: partition của nó chuyển cho consumer còn lại và đọc tiếp từ **offset đã commit**, không mất message.`;
+        msg = `**${dead} crash** → mất heartbeat, sau \`session.timeout.ms\` mới bị coi là chết → rebalance: partition của nó chuyển cho consumer còn lại và đọc tiếp từ **offset đã commit** — không mất message, nhưng phần đã xử lý mà chưa commit sẽ bị xử lý lại.`;
       }
       if (act === "reset") { auto = false; clearInterval(timer); return reset(); }
       render();
@@ -635,7 +635,7 @@
       lock: [["A lấy lock", () => { sweep(); if (st.lock) run('SET lock:order7 "A-uuid" NX PX 6000', "(nil)"); else { st.lock = { owner: "A", exp: now() + 6000 }; run('SET lock:order7 "A-uuid" NX PX 6000', "OK"); } }],
         ["B lấy lock", () => { sweep(); if (st.lock) run('SET lock:order7 "B-uuid" NX PX 6000', "(nil)"); else { st.lock = { owner: "B", exp: now() + 6000 }; run('SET lock:order7 "B-uuid" NX PX 6000', "OK"); } }],
         ["B nhả bằng DEL (sai)", () => { sweep(); const had = st.lock; st.lock = null; run("DEL lock:order7", had ? `(integer) 1   ← xoá cả lock của ${had.owner}!` : "(integer) 0"); }],
-        ["B nhả bằng Lua (đúng)", () => { sweep(); const ok = st.lock && st.lock.owner === "B"; if (ok) st.lock = null; run('EVAL "if get==ARGV[1] then del" lock:order7 B-uuid', ok ? "(integer) 1" : "(integer) 0   ← không phải lock của B, giữ nguyên"); }]],
+        ["B nhả bằng Lua (đúng)", () => { sweep(); const ok = st.lock && st.lock.owner === "B"; if (ok) st.lock = null; run('EVAL "if get==ARGV[1] then del" 1 lock:order7 B-uuid', ok ? "(integer) 1" : "(integer) 0   ← không phải lock của B, giữ nguyên"); }]],
     };
     const NOTE = {
       zset: "Sorted set giữ phần tử **sắp xếp theo score**: cập nhật O(log N), lấy top K hoặc hạng của một người ngay lập tức — đúng thứ leaderboard cần.",
@@ -723,7 +723,7 @@
       yes.forEach((x) => { eks += x.eks || 0; ecs += x.ecs || 0; });
       const answered = Object.keys(ans).length;
       const pick = eks > ecs ? "EKS" : "ECS";
-      const compute = yes.some((x) => x.ec2) ? "node EC2 (managed node group + Karpenter)" : pick === "EKS" ? "Auto Mode hoặc Fargate nếu không cần tuỳ biến node" : "Fargate";
+      const compute = yes.some((x) => x.ec2) ? "máy EC2 (EKS: managed node group + Karpenter; ECS: capacity provider EC2 hoặc Managed Instances)" : pick === "EKS" ? "Auto Mode hoặc Fargate nếu không cần tuỳ biến node" : "Fargate";
       const lambda = yes.some((x) => x.lambda);
       root.querySelector(".dc-out").innerHTML = !answered
         ? `<div class="muted">Trả lời các câu bên trái để xem gợi ý.</div>`
