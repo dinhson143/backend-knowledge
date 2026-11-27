@@ -53,8 +53,8 @@ BK.topic({
       why: "Client lỡ dùng lại key (bug, copy code) cho thao tác khác sẽ nhận nhầm kết quả của thao tác cũ và tưởng thao tác mới đã chạy. Lưu hash của body (fingerprint) rồi so ở mỗi lần gặp key biến lỗi im lặng đó thành lỗi rõ ràng. Bản nháp IETF nói thẳng: server không dùng fingerprint thì không phát hiện được key bị dùng lại với payload khác.",
     },
     {
-      t: "**Hai request cùng key đến gần như cùng lúc**: request sau thấy key đang ở trạng thái \"đang xử lý\" thì trả `409 Conflict` (bản nháp IETF), client chờ rồi thử lại. Cài bằng `INSERT` key trước với unique constraint hoặc `SELECT … FOR UPDATE` trên dòng key.",
-      why: "Kiểm tra \"key đã có chưa\" rồi mới ghi là check-then-act: hai request cùng đọc thấy \"chưa có\" và cùng chạy thao tác. Unique constraint để DB chọn đúng một người thắng một cách atomic, người thua nhận lỗi trùng khoá và biết phải chờ.",
+      t: "**Hai request cùng key đến gần như cùng lúc**: unique constraint trên cột key chọn đúng một request chạy. Hai cách cài: (a) `INSERT` key **trong cùng transaction** với nghiệp vụ: request sau bị DB bắt chờ tới khi request đầu commit, rồi nhận lỗi trùng khoá và đọc lại response đã lưu; (b) commit trước một dòng key trạng thái \"đang xử lý\": request sau thấy dòng đó thì trả `409 Conflict` (bản nháp IETF), client chờ rồi thử lại.",
+      why: "Kiểm tra \"key đã có chưa\" rồi mới ghi là check-then-act: hai request cùng đọc thấy \"chưa có\" và cùng chạy thao tác. Unique constraint để DB chọn người thắng một cách atomic: PostgreSQL bắt transaction chèn trùng chờ transaction đang giữ key kết thúc rồi mới báo vi phạm (https://www.postgresql.org/docs/current/index-unique-checks.html). Cách (a) đơn giản nhưng giữ request sau chờ suốt thời gian xử lý; cách (b) trả lời ngay nhưng phải dọn dòng \"đang xử lý\" bị bỏ dở khi server chết giữa chừng (ví dụ cho hết hạn sau một khoảng thời gian).",
     },
     {
       t: "**Hết hạn key**: key không giữ mãi. Stripe API v1 có thể xoá key khi key đã ít nhất 24 giờ tuổi; gửi lại key đã bị xoá thì được coi là request mới. Bản nháp IETF yêu cầu server công bố chính sách hết hạn trong tài liệu.",
@@ -106,7 +106,7 @@ BK.topic({
     ],
     [
       "Hai request cùng key đến cách nhau 5ms. Server làm gì?",
-      "Request đầu insert key (trạng thái đang xử lý) và chạy. Request sau đụng unique constraint, thấy key chưa xong → trả 409, client chờ rồi thử lại và nhận response đã lưu.",
+      "Unique constraint trên key chọn một request chạy. Nếu key ghi cùng transaction với nghiệp vụ: request sau chờ request đầu commit, nhận lỗi trùng khoá rồi trả response đã lưu. Nếu dùng dòng \"đang xử lý\" commit trước: request sau trả 409, client chờ rồi thử lại.",
     ],
     [
       "Cùng key nhưng body khác thì sao? Vì sao không trả kết quả cũ?",

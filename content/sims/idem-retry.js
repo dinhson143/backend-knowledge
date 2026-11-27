@@ -64,21 +64,21 @@ BK.sim({
       name: "Key đúng cách",
       steps: [
         {
-          note: "Client gửi `POST` 100k kèm `key=k1`. API insert key trước (trạng thái **đang xử lý**).",
-          msgs: [["client", "api", "POST 100k · key=k1"], ["api", "db", "BEGIN; INSERT key k1 (processing)"]],
+          note: "Client gửi `POST` 100k kèm `key=k1`. API commit trước một dòng key trạng thái **đang xử lý**.",
+          msgs: [["client", "api", "POST 100k · key=k1"], ["api", "db", "INSERT key k1 (processing, hash body); COMMIT"]],
           set: { db: "keys: k1 processing" },
-          detail: "API mở transaction, `INSERT` key `k1` kèm hash body và trạng thái `processing`. Unique constraint trên `key` bảo đảm chỉ một request giành được key.",
+          detail: "API `INSERT` key `k1` kèm hash body và trạng thái `processing` rồi commit ngay, trước khi làm việc nghiệp vụ. Unique constraint trên `key` bảo đảm chỉ một request giành được key. Dòng này phải có hạn: server chết giữa chừng thì dòng `processing` bị bỏ dở, cần được dọn hoặc cho hết hạn để client thử lại được.",
         },
         {
           note: "Một bản retry đến trong lúc lần đầu chưa xong → `409`.",
-          msgs: [["client", "api", "POST 100k · key=k1 (retry sớm)", "warn"], ["api", "db", "INSERT key k1"], ["db", "api", "trùng khoá", "warn"], ["api", "client", "409 Conflict", "warn"]],
-          detail: "Request thứ hai đụng unique constraint (hoặc chờ lock dòng key rồi thấy `processing`). API trả `409`: \"thao tác đang chạy, thử lại sau\". Nhờ vậy hai request không cùng chạy thao tác trừ tiền.",
+          msgs: [["client", "api", "POST 100k · key=k1 (retry sớm)", "warn"], ["api", "db", "INSERT key k1"], ["db", "api", "trùng khoá: processing", "warn"], ["api", "client", "409 Conflict", "warn"]],
+          detail: "Request thứ hai đụng unique constraint và đọc thấy dòng `k1` đang `processing`. API trả `409` (\"thao tác đang chạy, thử lại sau\"), như bản nháp IETF đề xuất. Nhờ vậy hai request không cùng chạy thao tác trừ tiền. Cách khác: ghi key cùng transaction với nghiệp vụ; khi đó PostgreSQL bắt request sau **chờ** request đầu commit rồi mới báo trùng khoá, và request sau trả luôn response đã lưu.",
         },
         {
           note: "Lần đầu trừ tiền, lưu response, COMMIT cùng một transaction. Response vẫn mất.",
-          msgs: [["api", "db", "INSERT charge; UPDATE k1=201; COMMIT", "ok"], ["api", "client", "201 (mất)", "err"]],
+          msgs: [["api", "db", "BEGIN; INSERT charge; UPDATE k1=201; COMMIT", "ok"], ["api", "client", "201 (mất)", "err"]],
           set: { db: "charges: 1 · keys: k1→201" },
-          detail: "Charge và response `201` được ghi cùng transaction với key. Crash ở bất kỳ điểm nào trước `COMMIT` thì cả key lẫn charge đều không có, lần retry chạy lại từ đầu một cách an toàn. Response lại bị mất trên đường về.",
+          detail: "Charge và việc chuyển key sang `201` (kèm response) nằm trong **một transaction**. Crash trước `COMMIT` thì không có charge và key vẫn `processing`: hết hạn dòng này thì lần retry chạy lại từ đầu một cách an toàn. Response lại bị mất trên đường về.",
         },
         {
           note: "Client retry với **cùng key và cùng body** → nhận lại response đã lưu.",
