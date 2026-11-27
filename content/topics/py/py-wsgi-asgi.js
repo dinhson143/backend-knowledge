@@ -20,7 +20,7 @@ BK.topic({
     head: ["", "WSGI (PEP 3333)", "ASGI (spec 3.0)"],
     rows: [
       ["App là gì", "Callable `app(environ, start_response)` trả iterable bytes", "Coroutine `app(scope, receive, send)`"],
-      { cells: ["Một kết nối được giữ bởi", "Một thread (hoặc greenlet) từ đầu tới cuối request", "Một coroutine; trong lúc `await` I/O, event loop chạy coroutine khác"], why: "PEP 3333 chỉ có `wsgi.multithread`, `wsgi.multiprocess` để báo app có thể bị gọi đồng thời từ nhiều thread/process; không có cơ chế nhường chỗ khi chờ I/O (https://peps.python.org/pep-3333/). ASGI là coroutine nên `await` nhả event loop (https://asgi.readthedocs.io/en/latest/specs/main.html)." },
+      { cells: ["Một kết nối được giữ bởi", "Một thread (hoặc greenlet) từ đầu tới cuối request", "Một coroutine; trong lúc `await` I/O, event loop chạy coroutine khác"], why: "Trong PEP 3333, app là một callable thường trả về iterable, không phải coroutine; `wsgi.multithread`, `wsgi.multiprocess` chỉ báo app có thể bị gọi đồng thời từ nhiều thread/process (https://peps.python.org/pep-3333/). Không có `await` nên thread đang gọi app chờ luôn trong lúc app chờ I/O. ASGI là coroutine nên `await` nhả event loop (https://asgi.readthedocs.io/en/latest/specs/main.html)." },
       ["Giao thức", "HTTP request/response", "HTTP, HTTP/2, WebSocket, cùng sự kiện `lifespan` (startup/shutdown)"],
       ["Server hay gặp", "Gunicorn, uWSGI, mod_wsgi", "Uvicorn, Hypercorn, Daphne; Gunicorn với worker ASGI"],
       ["Framework", "Flask, Django (chế độ WSGI)", "FastAPI, Starlette, Django (chế độ ASGI)"],
@@ -32,7 +32,7 @@ BK.topic({
     rows: [
       { cells: ["Gunicorn `sync` (mặc định)", "1", "Request ngắn, phần lớn là CPU, có proxy đệm phía trước", "Client chậm giữ cả worker"], why: "Docs Gunicorn: worker sync xử lý một request mỗi lúc và cần proxy có đệm (nginx, HAProxy) khi chạy production, vì proxy nhận trọn request/response từ client chậm rồi mới chuyển, nên worker không bị giữ trong lúc client gửi chậm (https://gunicorn.org/design/)." },
       { cells: ["Gunicorn `gthread` (`--threads N`)", "N thread", "App WSGI có I/O vừa phải (gọi DB, gọi API)", "Thread dùng chung bộ nhớ: code phải thread-safe"], why: "`threads` lớn hơn 1 với worker sync thì Gunicorn tự chuyển sang `gthread` (https://gunicorn.org/reference/settings/). Thread nhả GIL khi chờ I/O nên vẫn có ích cho việc I/O-bound." },
-      { cells: ["Gunicorn `gevent`", "Hàng nghìn greenlet", "App WSGI cũ có rất nhiều kết nối chờ (long-polling)", "Monkey-patch thư viện I/O; thư viện C không được patch sẽ chặn"], why: "Docs Gunicorn mô tả worker greenlet xử lý được hàng nghìn kết nối đồng thời, hỗ trợ keep-alive, WebSocket, long-polling (https://gunicorn.org/design/)." },
+      { cells: ["Gunicorn `gevent`", "Hàng nghìn greenlet", "App WSGI cũ có rất nhiều kết nối chờ (long-polling)", "Một số thư viện cần bản vá riêng (ví dụ `psycogreen` cho Psycopg); code dựa vào hành vi blocking không hợp"], why: "Docs Gunicorn mô tả worker greenlet xử lý được hàng nghìn kết nối đồng thời, hỗ trợ keep-alive, WebSocket, long-polling, và ghi hai lưu ý ở cột bên (https://gunicorn.org/design/)." },
       { cells: ["Uvicorn (`--workers N`) hoặc Gunicorn + worker Uvicorn", "Hàng nghìn coroutine trên một event loop", "App ASGI, I/O-bound, WebSocket", "Một lệnh blocking chặn cả worker"], why: "Uvicorn có `--workers` để chạy nhiều process; mặc định lấy từ biến `WEB_CONCURRENCY`, không có thì 1 (https://uvicorn.dev/settings/). Gunicorn quản lý worker Uvicorn qua `-k uvicorn_worker.UvicornWorker` (gói `uvicorn-worker`); module `uvicorn.workers` cũ đã deprecated (https://uvicorn.dev/deployment/, https://pypi.org/project/uvicorn-worker/)." },
     ],
   },
@@ -117,11 +117,11 @@ BK.topic({
   points: [
     {
       t: "**Bao nhiêu worker?** Gunicorn gợi ý bắt đầu với `(2 × số core) + 1` rồi chỉnh theo tải đo được; thường 4–12 worker là đủ cho tải lớn. Quá nhiều worker làm tốn tài nguyên và có thể giảm throughput.",
-      why: "Theo docs Gunicorn (https://gunicorn.org/design/). Công thức có \"+1\" và \"× 2\" vì trong lúc một worker chờ I/O, worker khác dùng được core. Thêm worker vượt xa số core thì các process tranh nhau CPU (context switch, cache), và mỗi process tốn bộ nhớ cho một bản app riêng.",
+      why: "Công thức, con số 4–12 và cảnh báo lấy từ docs Gunicorn (https://gunicorn.org/design/); docs không giải thích công thức. Cách hiểu hợp lý: nhiều worker hơn số core để trong lúc một worker chờ I/O, worker khác dùng được core đó. Thêm worker vượt xa số core thì các process tranh nhau CPU (context switch, cache), và mỗi process tốn bộ nhớ cho một bản app riêng.",
     },
     {
       t: "**Trên Kubernetes: thường một process mỗi container**, scale bằng số replica, thay vì `--workers` trong container.",
-      why: "Docs FastAPI khuyên khi chạy trên Kubernetes thì thường chạy một process Uvicorn mỗi container, không dùng worker (https://fastapi.tiangolo.com/deployment/server-workers/). Orchestrator đã lo restart, health check, phân tải giữa replica; nhiều worker trong một container làm khó đặt CPU/memory limit và che process chết khỏi health check.",
+      why: "Docs FastAPI khuyên khi chạy trên Kubernetes thì thường chạy một process Uvicorn mỗi container, không dùng worker (https://fastapi.tiangolo.com/deployment/server-workers/). Lý do về cơ chế: orchestrator đã lo restart, health check, phân tải giữa replica; nhiều worker trong một container làm khó đặt CPU/memory limit và che process chết khỏi health check.",
     },
     {
       t: "**Worker treo bị giết**: Gunicorn giết và khởi động lại worker im lặng quá `timeout` (mặc định 30 giây). Khi deploy, worker có `graceful_timeout` (mặc định 30 giây) để làm xong request đang dở rồi mới bị giết.",

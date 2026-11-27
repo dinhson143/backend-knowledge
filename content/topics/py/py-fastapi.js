@@ -143,7 +143,7 @@ BK.topic({
           "",
           ["def test_create_order():", "Hàm test là `def` thường; `TestClient` (dựng trên HTTPX) tự chạy app async."],
           ["    app.dependency_overrides[get_conn] = fake_conn", "Khoá là hàm dependency gốc, giá trị là hàm thay thế."],
-          ["    with TestClient(app) as client:", "Dùng `with` thì lifespan mới chạy."],
+          ["    with TestClient(app) as client:", "Dùng `with` thì lifespan mới chạy, nghĩa là `create_pool` thật vẫn được gọi dù `get_conn` đã bị thay. Test không cần DB thì bỏ `with` (`client = TestClient(app)`) hoặc cho lifespan đọc cấu hình test."],
           "        r = client.post(\"/orders\", json={\"sku\": \"a\", \"qty\": 1})",
           "    assert r.status_code == 200",
           "    assert r.json() == {\"id\": 1, \"sku\": \"a\"}",

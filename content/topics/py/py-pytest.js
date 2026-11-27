@@ -1,4 +1,5 @@
-// Khối code theo D13. Phần unittest.mock đã chạy trên CPython 3.14.6; các khối dùng pytest chỉ được
+// Khối code theo D13. Khối unittest.mock đã chạy từng câu lệnh trên CPython 3.14.6 (khớp chú thích); khối
+// "patch đúng chỗ" kiểm bằng hai module dựng tay riêng; các khối dùng pytest chỉ được
 // compile (`python -I -m py_compile`) vì máy viết bài không cài pytest (D211).
 // Khái niệm test pyramid, test double: bài `code-testing-fundamentals`. Bài này chỉ dạy API pytest/mock.
 BK.topic({
@@ -9,7 +10,7 @@ BK.topic({
   goal: "Viết test pytest có fixture, parametrize và patch đúng chỗ bằng unittest.mock",
   needs: ["code-testing-fundamentals", "py-decorators"],
   tldr: {
-    t: "**pytest** chạy mọi hàm `test_*` trong file `test_*.py`, kiểm bằng `assert` thường. **Fixture** (hàm `@pytest.fixture` chuẩn bị và dọn dẹp dữ liệu cho test) được tiêm vào test theo **tên tham số**; phần trước `yield` là setup, phần sau là teardown; `scope` quyết định fixture được tạo lại mỗi test hay dùng chung cả module/session. `@pytest.mark.parametrize` chạy một test với nhiều bộ dữ liệu. Thay phụ thuộc bằng `monkeypatch` hoặc `unittest.mock.patch`, và **patch tên ở chỗ nó được tra cứu** (module đang dùng nó), không phải chỗ nó được định nghĩa.",
+    t: "**pytest** tự tìm và chạy các hàm `test*` trong file `test_*.py` hoặc `*_test.py` (https://docs.pytest.org/en/stable/explanation/goodpractices.html), kiểm bằng `assert` thường. **Fixture** (hàm `@pytest.fixture` chuẩn bị và dọn dẹp dữ liệu cho test) được tiêm vào test theo **tên tham số**; phần trước `yield` là setup, phần sau là teardown; `scope` quyết định fixture được tạo lại mỗi test hay dùng chung cả module/session. `@pytest.mark.parametrize` chạy một test với nhiều bộ dữ liệu. Thay phụ thuộc bằng `monkeypatch` hoặc `unittest.mock.patch`, và **patch tên ở chỗ nó được tra cứu** (module đang dùng nó), không phải chỗ nó được định nghĩa.",
     why: "pytest viết lại (rewrite) câu lệnh `assert` trước khi chạy để khi sai thì in được giá trị của từng vế, nên không cần `assertEqual`, `assertIn`… (https://docs.pytest.org/en/stable/how-to/assert.html). `patch` thay một **tên** trong một namespace; `from a import f` đã chép tên `f` vào module của bạn, nên patch `a.f` không đụng tới bản chép đó (https://docs.python.org/3/library/unittest.mock.html#where-to-patch).",
   },
   story: {
@@ -33,7 +34,7 @@ BK.topic({
       code: {
         lang: "python",
         lines: [
-          "# conftest.py: fixture ở đây dùng được cho mọi file test cùng thư mục và thư mục con",
+          "# conftest.py: fixture ở đây dùng được cho mọi file test trong thư mục này",
           "import pytest",
           "",
           "@pytest.fixture(scope=\"session\")",
@@ -187,11 +188,11 @@ BK.topic({
     },
     {
       t: "So sánh số thực bằng **`pytest.approx`**: `assert 0.1 + 0.2 == pytest.approx(0.3)`. Dùng được cho list, dict.",
-      why: "`0.1 + 0.2 == 0.3` là `False` do biểu diễn nhị phân; `approx` so trong một sai số tương đối (https://docs.pytest.org/en/stable/how-to/assert.html).",
+      why: "`0.1 + 0.2 == 0.3` là `False` do biểu diễn nhị phân; `approx` so hai số trong một khoảng sai số cho phép (https://docs.pytest.org/en/stable/how-to/assert.html).",
     },
     {
       t: "Fixture có sẵn hay dùng: **`tmp_path`** (thư mục tạm riêng cho mỗi test, kiểu `pathlib.Path`), **`tmp_path_factory`** (session-scoped, tạo thư mục dùng chung), **`capsys`** (đọc stdout/stderr bằng `capsys.readouterr()`), **`monkeypatch`**.",
-      why: "Mỗi test có thư mục riêng nên test ghi file không đè lên nhau và chạy song song được (https://docs.pytest.org/en/stable/how-to/tmp_path.html, https://docs.pytest.org/en/stable/how-to/capture-stdout-stderr.html).",
+      why: "Mỗi test có thư mục riêng nên test ghi file không đè lên file của test khác, và không phải tự dọn thư mục tạm (https://docs.pytest.org/en/stable/how-to/tmp_path.html, https://docs.pytest.org/en/stable/how-to/capture-stdout-stderr.html).",
     },
     {
       t: "pytest chạy được test viết bằng `unittest.TestCase`, nhưng trong class `TestCase` **không** dùng được fixture qua tham số (trừ autouse), `parametrize` và custom hook.",
