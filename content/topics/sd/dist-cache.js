@@ -15,7 +15,7 @@ BK.topic({
   points: [
     {
       t: "**Write strategy** — Write-Through, Write-Around (kèm invalidation / TTL ngắn), Write-Back.",
-      why: "Write-Through ghi cache và DB cùng lúc → cache luôn mới, nhưng mọi write chậm thêm và cache chứa cả dữ liệu không ai đọc. Write-Around chỉ ghi DB, cache lấp khi đọc miss → phải xoá key hoặc đặt TTL ngắn để bản cũ không sống lâu. Write-Back ghi cache rồi flush DB sau → write rất nhanh, nhưng cache chết trước khi flush là mất dữ liệu.",
+      why: "Write-Through ghi DB thành công rồi cập nhật cache trước khi trả lời (định nghĩa và so sánh đầy đủ ở chủ đề Caching) → cache luôn mới, nhưng mọi write chậm thêm và cache chứa cả dữ liệu không ai đọc. Write-Around chỉ ghi DB, cache lấp khi đọc miss → phải xoá key hoặc đặt TTL ngắn để bản cũ không sống lâu. Write-Back ghi cache rồi flush DB sau → write rất nhanh, nhưng cache chết trước khi flush là mất dữ liệu.",
     },
     {
       t: "**Invalidation strategy** — cách giữ cache khớp DB; DB đổi mà cache không biết thì user thấy stale data.",
