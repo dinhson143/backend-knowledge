@@ -19,7 +19,7 @@ BK.topic({
     rows: [
       {
         cells: ["Timeout / deadline", "Thread, connection bị giữ mãi bởi phụ thuộc treo", "Chọn theo percentile latency của phụ thuộc; truyền deadline tuyệt đối xuống các tầng dưới"],
-        why: "Không có timeout thì một lời gọi treo giữ thread và connection vô thời hạn, và chỉ cần đủ lời gọi treo là pool cạn. Amazon Builders' Library chọn timeout bằng cách chấp nhận một tỉ lệ timeout nhầm (ví dụ 0,1%) rồi lấy percentile tương ứng (p99.9) của latency phụ thuộc (https://builder.aws.com/content/3EumjoZascWd1oZiEgL8ORlv3qE/timeouts-retries-and-backoff-with-jitter). Google SRE khuyên đặt deadline ở tầng trên cùng và truyền **cùng** deadline tuyệt đối xuống mọi RPC phía dưới, để tầng dưới biết còn bao nhiêu thời gian thay vì tự đặt một timeout mới dài hơn.",
+        why: "Không có timeout thì một lời gọi treo giữ thread và connection vô thời hạn, và chỉ cần đủ lời gọi treo là pool cạn. Amazon Builders' Library chọn timeout bằng cách chấp nhận một tỉ lệ timeout nhầm (ví dụ 0.1%) rồi lấy percentile tương ứng (p99.9) của latency phụ thuộc (https://builder.aws.com/content/3EumjoZascWd1oZiEgL8ORlv3qE/timeouts-retries-and-backoff-with-jitter). Google SRE khuyên đặt deadline ở tầng trên cùng và truyền **cùng** deadline tuyệt đối xuống mọi RPC phía dưới, để tầng dưới biết còn bao nhiêu thời gian thay vì tự đặt một timeout mới dài hơn.",
       },
       {
         cells: ["Retry + backoff + jitter", "Lỗi thoáng qua (mất gói, một instance khởi động lại)", "Chỉ lỗi tạm thời; chờ tăng dần có ngẫu nhiên; giới hạn số lần và có retry budget"],
@@ -102,7 +102,7 @@ BK.topic({
     ],
     [
       "Đặt timeout cho lời gọi sang service khác thế nào?",
-      "Chọn tỉ lệ timeout nhầm chấp nhận được (ví dụ 0,1%) và lấy percentile tương ứng (p99.9) của latency phụ thuộc, cộng biên cho mạng xa. Truyền deadline tuyệt đối xuống các tầng dưới.",
+      "Chọn tỉ lệ timeout nhầm chấp nhận được (ví dụ 0.1%) và lấy percentile tương ứng (p99.9) của latency phụ thuộc, cộng biên cho mạng xa. Truyền deadline tuyệt đối xuống các tầng dưới.",
     ],
     [
       "Bulkhead giải bài gì mà circuit breaker không giải?",

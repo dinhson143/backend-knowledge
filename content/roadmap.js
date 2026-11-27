@@ -56,6 +56,10 @@ window.ROADMAP = [
     parts: [
       { id: "cloud.aws", title: "Trên AWS", topics: ["ecs", "eks", "ecs-vs-eks"] },
     ] },
+  { id: "ops", title: "Vận hành production", goal: "Học xong bạn đo được hệ thống đang chạy tốt tới đâu, tìm ra chỗ chậm và biết khi nào phải dừng lại sửa.", parallel: true,
+    parts: [
+      { id: "ops.observe", title: "Quan sát hệ thống", topics: ["observability"] },
+    ] },
   { id: "lld", title: "Low-Level Design", goal: "Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời.", parallel: true,
     parts: [
       { id: "lld.oop", title: "Khung & OOP", topics: ["lld-delivery", "oop-pillars"] },
