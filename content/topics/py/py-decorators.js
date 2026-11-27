@@ -1,5 +1,5 @@
-// Ví dụ code: một dòng chạy được, kết quả sau "→" (D161). Đã chạy trên CPython 3.14.6.
-// Decorator nhiều dòng được viết thành các dòng bảng liên tiếp, mỗi dòng một câu lệnh.
+// Ví dụ code ngắn: một dòng chạy được trong câu, kết quả sau "→" (D161). Đã chạy trên CPython 3.14.6.
+// Decorator nhiều dòng là khối code (D13, D201): thụt lề thật, "vì sao" thành chú thích dòng.
 BK.topic({
   id: "py-decorators",
   track: "py",
@@ -15,30 +15,6 @@ BK.topic({
     problem: "Team thêm decorator `@log_calls` cho mọi handler. Từ hôm đó dashboard metric gom hết thành một endpoint tên `wrapper`, tài liệu API sinh tự động mất docstring, và một framework định tuyến theo tên hàm báo trùng route.",
     idea: "Hàm thay thế là một object khác với `__name__ = \"wrapper\"`. `functools.wraps(fn)` chép `__name__`, `__qualname__`, `__doc__`, `__module__`, annotations sang wrapper và gắn `__wrapped__` trỏ về hàm gốc, nên công cụ nhìn vào thấy đúng hàm.",
     tradeoff: "Decorator gom logic cắt ngang (log, đo thời gian, retry, auth, cache) vào một chỗ, nhưng che mất luồng chạy: đọc `def` không thấy hết hàm làm gì, stack trace dài thêm một tầng, và decorator chạy lúc import nên lỗi trong nó làm hỏng cả module.",
-  },
-  table: {
-    head: ["Dòng · nằm trong", "Code (decorator đo thời gian)", "Vì sao viết vậy"],
-    rows: [
-      ["1 · module", "`def timed(fn):`", "Nhận hàm gốc làm tham số"],
-      {
-        cells: ["2 · thân `timed`", "`@functools.wraps(fn)`", "Chép metadata của `fn` sang wrapper"],
-        why: "`wraps` gán `__module__`, `__name__`, `__qualname__`, `__annotations__`, `__type_params__`, `__doc__`, cập nhật `__dict__` và thêm `__wrapped__` (https://docs.python.org/3/library/functools.html). Có nó: `add.__name__, add.__doc__` → `add cộng`; không có: → `wrapper None`.",
-      },
-      {
-        cells: ["3 · thân `timed`", "`def wrapper(*args, **kwargs):`", "Nhận mọi kiểu tham số để bọc được hàm bất kỳ"],
-        why: "Wrapper không biết chữ ký của hàm gốc, nên chuyển nguyên mọi tham số vị trí và tham số tên. Nhờ `__wrapped__`, `inspect.signature(add)` vẫn trả `(a, b)` của hàm gốc.",
-      },
-      ["4 · thân `wrapper`", "`t0 = time.perf_counter()`", "`perf_counter` là đồng hồ có độ phân giải cao nhất để đo khoảng thời gian ngắn; trên CPython nó là monotonic. `time.time()` có thể lùi khi đồng hồ hệ thống bị chỉnh (https://docs.python.org/3/library/time.html)"],
-      {
-        cells: ["5 · thân `wrapper`", "`try: return fn(*args, **kwargs)`", "Gọi hàm gốc và trả kết quả của nó"],
-        why: "Quên `return` là lỗi hay gặp nhất: hàm được bọc luôn trả `None`.",
-      },
-      {
-        cells: ["6 · thân `wrapper`, ngang `try`", "`finally: print(f\"{fn.__name__} {time.perf_counter() - t0:.4f}s\")`", "Đo cả khi hàm ném exception"],
-        why: "`finally` chạy cả khi `fn` lỗi, nên các lần gọi lỗi (thường là lần chậm, như timeout) không biến mất khỏi số đo.",
-      },
-      ["7 · thân `timed`", "`return wrapper`", "Trả hàm thay thế; `@timed` trên `def add` nghĩa là `add = timed(add)`"],
-    ],
   },
   points: [
     {
@@ -67,6 +43,34 @@ BK.topic({
     },
   ],
   sections: [
+    {
+      title: "Decorator đo thời gian",
+      code: {
+        lang: "python",
+        lines: [
+          "import functools",
+          "import time",
+          "",
+          ["def timed(fn):", "Nhận hàm gốc làm tham số."],
+          ["    @functools.wraps(fn)", "Chép metadata của `fn` sang wrapper: `wraps` gán `__module__`, `__name__`, `__qualname__`, `__annotations__`, `__type_params__`, `__doc__`, cập nhật `__dict__` và thêm `__wrapped__` (https://docs.python.org/3/library/functools.html). Có nó: `add.__name__, add.__doc__` → `add cộng`; không có: → `wrapper None`."],
+          ["    def wrapper(*args, **kwargs):", "Nhận mọi kiểu tham số để bọc được hàm bất kỳ. Wrapper không biết chữ ký của hàm gốc, nên chuyển nguyên mọi tham số vị trí và tham số tên. Nhờ `__wrapped__`, `inspect.signature(add)` vẫn trả `(a, b)` của hàm gốc."],
+          ["        t0 = time.perf_counter()", "`perf_counter` là đồng hồ có độ phân giải cao nhất để đo khoảng thời gian ngắn; trên CPython nó là monotonic. `time.time()` có thể lùi khi đồng hồ hệ thống bị chỉnh (https://docs.python.org/3/library/time.html)."],
+          "        try:",
+          ["            return fn(*args, **kwargs)", "Gọi hàm gốc và trả kết quả của nó. Quên `return` là lỗi hay gặp nhất: hàm được bọc luôn trả `None`."],
+          "        finally:",
+          ["            print(f\"{fn.__name__} {time.perf_counter() - t0:.4f}s\")", "Đo cả khi hàm ném exception: `finally` chạy cả khi `fn` lỗi, nên các lần gọi lỗi (thường là lần chậm, như timeout) không biến mất khỏi số đo."],
+          ["    return wrapper", "Trả hàm thay thế; `@timed` trên `def add` nghĩa là `add = timed(add)`."],
+          "",
+          "@timed",
+          "def add(a, b):",
+          "    \"\"\"cộng\"\"\"",
+          "    return a + b",
+          "",
+          ["print(add(1, 2))", "In dòng đo thời gian (`add 0.0000s`) rồi `3`."],
+          ["print(add.__name__, add.__doc__)", "`add cộng`: metadata của hàm gốc được giữ."],
+        ],
+      },
+    },
     {
       title: "functools.cache và lru_cache",
       table: {
