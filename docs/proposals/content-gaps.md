@@ -10,6 +10,15 @@ Phần A là kết quả review 39 topic và 13 problem: những gì đã sửa 
 
 ### A0. Bảng quyết định gộp (để hỏi người dùng một lần)
 
+**Trạng thái (2026-11-27, D31):** người dùng đã duyệt toàn bộ phương án mặc định.
+
+- **Đã áp dụng:** Q1–Q27 và Q30, mỗi nhóm một commit trên `sa/content-gaps`.
+- **Hoãn tới giai đoạn 2:** Q28 và Q29.
+- **Chưa làm:**
+  - Q25: hai chỗ phải sửa logic engine (thứ tự khi điểm bằng nhau trong `rplay`, cận `⌊log₂n⌋+1` trong `binary`). Commit Q25 chỉ đổi chuỗi để tránh xung đột với nhánh UX.
+  - Q26: nhãn node "Admin" trong sim `cache-write`, vì đổi nhãn kéo theo các bước khác.
+  - Q27: "Powersort", vì tài liệu Python vẫn ghi Timsort.
+
 Mỗi dòng gồm vấn đề và **đề xuất mặc định**: nếu người dùng không phản đối thì làm theo đề xuất. Chi tiết và nguồn nằm ở A1, A2, A4 và mục sim ở A3.
 
 | # | Chỗ | Vấn đề | Đề xuất mặc định |
