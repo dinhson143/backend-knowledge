@@ -310,6 +310,13 @@ BK.topic({
       why: "Client thứ hai có thể lấy được cùng lock, vì lock vừa set trên primary có thể chưa sang replica khi failover. Fencing token tăng dần buộc storage từ chối ghi từ token cũ hơn → hai người cùng giữ lock cũng không ghi đè nhau được.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/redis-cluster-slots.svg",
+      caption: "Redis Cluster chia keyspace thành 16384 hash slot, mỗi master giữ một dải slot; client tự tính slot của key và đi thẳng tới đúng node, gửi nhầm thì nhận `MOVED`.",
+      source: "https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/",
+    },
+  ],
   related: ["cache-aside", "stampede", "redlock", "token-bucket"],
   cards: [
     [

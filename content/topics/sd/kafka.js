@@ -282,6 +282,13 @@ BK.topic({
       why: "Chọn Kafka cho job queue là trả chi phí vận hành cho tính năng (replay, fan-out) không dùng tới. Job queue chỉ cần \"mỗi job một worker xử lý, lỗi thì retry\", và SQS có sẵn visibility timeout, DLQ, autoscale theo số message mà không phải quản broker hay partition.",
     },
   ],
+  diagrams: [
+    {
+      src: "content/svg/kafka-topic-partitions.svg",
+      caption: "Producer băm key để chọn partition; trong một consumer group mỗi partition chỉ có một consumer, còn các group khác nhau đọc cùng log độc lập với offset riêng.",
+      source: "https://kafka.apache.org/documentation/#intro_concepts_and_terms",
+    },
+  ],
   related: ["queue", "realtime", "long-task"],
   cards: [
     [

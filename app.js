@@ -75,6 +75,9 @@
       (r.why ? `<tr class="why-row"><td colspan="${cellsOf(r).length}">${whyLine(r.why)}</td></tr>` : "")).join("")}</tbody></table></div>`;
   const points = (ps) => !ps || !ps.length ? "" : `<div class="panel"><ul class="points">${ps.map((p) => `<li>${tagged(txt(p))}${whyLine(p.why)}</li>`).join("")}</ul></div>`;
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+  // Sơ đồ SVG tĩnh (content/svg/): <img> chạy được qua file://, nền sáng nằm sẵn trong file SVG (D11)
+  const figure = (d) => `<figure class="panel diagram"><div class="diagram-img"><img src="${esc(d.src)}" alt="${esc(d.caption.replace(/[*`]/g, ""))}" loading="lazy"></div>
+    <figcaption>${inline(d.caption)}${d.source ? ` <a href="${esc(d.source)}" target="_blank" rel="noopener">Nguồn ↗</a>` : ""}</figcaption></figure>`;
   const simBox = (sim) => `<div class="panel sim-box" id="sim-${sim.id}"></div>`;
   const mountAll = (sims) => sims.forEach((sim) => window.mountSim(document.getElementById(`sim-${sim.id}`), sim));
   const levelBadge = (l) => `<span class="lvl lvl-${l}">${LEVELS[l]}</span>`;
@@ -206,7 +209,7 @@
         <div class="panel"><b>Ý tưởng</b>${inline(t.story.idea)}</div>
         <div class="panel"><b>Đánh đổi</b>${inline(t.story.tradeoff)}</div></div>` : ""}
 
-      ${sims.length ? `${h("Hình dung")}${sims.map(simBox).join("")}` : ""}
+      ${sims.length || t.diagrams ? `${h("Hình dung")}${(t.diagrams || []).map(figure).join("")}${sims.map(simBox).join("")}` : ""}
 
       ${h("Kiến thức cốt lõi")}
       ${t.table ? `<div class="gap">${table(t.table)}</div>` : ""}
@@ -283,7 +286,7 @@
 
       <h2><span class="h-n">4</span>High-Level Design</h2>
       ${p.hldWhy ? `<div class="panel why-hld"><b>Vì sao kiến trúc như vậy</b>${inline(p.hldWhy)}</div>` : ""}
-      ${simBox(p.hld)}
+      ${(p.diagrams || []).map(figure).join("")}${simBox(p.hld)}
 
       <h2><span class="h-n">5</span>Deep Dives</h2>
       <p class="muted small">Trả lời từng câu trước, rồi mới mở 3 mức đáp án.</p>

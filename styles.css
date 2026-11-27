@@ -152,6 +152,11 @@ mark { background: var(--fix-soft); color: inherit; border-radius: 2px; }
 :root[data-theme="dark"] { --err: #ff7b7b; --err-soft: #3a1c1c; }
 
 .sim-box { margin-bottom: 16px; padding: 18px 20px 14px; }
+/* Sơ đồ SVG tĩnh: file SVG tự vẽ nền sáng nên đọc được ở cả hai theme (D11) */
+.diagram { margin: 0 0 16px; }
+.diagram-img { overflow-x: auto; }
+.diagram img { display: block; width: 100%; min-width: 560px; height: auto; border-radius: 10px; } /* màn hẹp: cuộn ngang thay vì chữ quá nhỏ */
+.diagram figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
 .sim-title { font-weight: 650; font-size: 16px; }
 .sim-scn { color: var(--muted); font-size: 14px; margin: 2px 0 10px; }
 .sim-variants { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Redis Cluster: 16384 hash slot chia cho 3 master, mỗi master có một replica</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .box { fill: #fff; stroke: #94a3b8; stroke-width: 1.2; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .w { font-size: 12px; fill: #ffffff; font-weight: 600; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="328" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <!-- Thanh slot -->
+  <text class="h" x="210" y="34">16384 hash slot</text>
+  <rect x="210" y="44" width="176" height="26" fill="#3b7ff5"/>
+  <rect x="386" y="44" width="176" height="26" fill="#14a37f"/>
+  <rect x="562" y="44" width="176" height="26" fill="#e08a00"/>
+  <text class="w" x="298" y="62">0 – 5460</text>
+  <text class="w" x="474" y="62">5461 – 10922</text>
+  <text class="w" x="650" y="62">10923 – 16383</text>
+
+  <!-- Client -->
+  <rect class="box" x="20" y="96" width="166" height="92" rx="10"/>
+  <text class="h" x="34" y="118">Client</text>
+  <text class="s" x="34" y="138">slot = CRC16(key)</text>
+  <text class="s" x="34" y="154">mod 16384</text>
+  <text class="s" x="34" y="174">giữ bảng slot → node</text>
+  <path d="M186,142 L224,142" stroke="#64748b" stroke-width="1.3" marker-end="url(#a)"/>
+
+  <!-- Master -->
+  <rect class="box" x="226" y="96" width="144" height="56" rx="10" stroke="#3b7ff5" stroke-width="2"/>
+  <text class="h" x="298" y="120" text-anchor="middle">Master A</text>
+  <text class="s" x="298" y="140" text-anchor="middle">slot 0 – 5460</text>
+  <rect class="box" x="402" y="96" width="144" height="56" rx="10" stroke="#14a37f" stroke-width="2"/>
+  <text class="h" x="474" y="120" text-anchor="middle">Master B</text>
+  <text class="s" x="474" y="140" text-anchor="middle">slot 5461 – 10922</text>
+  <rect class="box" x="578" y="96" width="144" height="56" rx="10" stroke="#e08a00" stroke-width="2"/>
+  <text class="h" x="650" y="120" text-anchor="middle">Master C</text>
+  <text class="s" x="650" y="140" text-anchor="middle">slot 10923 – 16383</text>
+
+  <!-- Replica -->
+  <g stroke="#64748b" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#a)">
+    <path d="M298,152 L298,190"/><path d="M474,152 L474,190"/><path d="M650,152 L650,190"/>
+  </g>
+  <text class="s" x="306" y="176">sao chép bất đồng bộ</text>
+  <rect class="box" x="226" y="192" width="144" height="44" rx="10"/>
+  <text class="t" x="298" y="219" text-anchor="middle">Replica A</text>
+  <rect class="box" x="402" y="192" width="144" height="44" rx="10"/>
+  <text class="t" x="474" y="219" text-anchor="middle">Replica B</text>
+  <rect class="box" x="578" y="192" width="144" height="44" rx="10"/>
+  <text class="t" x="650" y="219" text-anchor="middle">Replica C</text>
+
+  <text class="t" x="20" y="268">Gửi nhầm node → node trả MOVED &lt;slot&gt; &lt;host:port&gt;; client cập nhật bảng slot rồi gửi lại.</text>
+  <text class="t" x="20" y="290">Hash tag: {user:42}:cart và {user:42}:profile chỉ băm phần trong {…} → cùng slot, dùng được lệnh nhiều key.</text>
+  <text class="s" x="20" y="312">Cách chia slot ở đây là ví dụ chia đều cho 3 master; master sập thì replica của nó được bầu lên thay.</text>
+</svg>

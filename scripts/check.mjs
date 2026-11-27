@@ -145,6 +145,27 @@ const jsOnDisk = onDisk.filter((f) => f.endsWith(".js") && !NOT_LOADED.has(f));
 const inManifest = new Set(loaded.filter((f) => f.startsWith("content/") && f !== "content/manifest.js"));
 jsOnDisk.filter((f) => !inManifest.has(f)).forEach((f) => at(f, "", "file không có trong content/manifest.js"));
 jsOnDisk.forEach((f) => { const n = statSync(new URL(f, root)).size; if (n > MAX) at(f, "", `${Math.round(n / 1024)} KB > 40 KB — nên tách`); });
+// Sơ đồ SVG: diagrams: [{ src: "content/svg/<tên>.svg", caption, source? }] trên topic/problem
+const svgOnDisk = onDisk.filter((f) => f.startsWith("content/svg/"));
+const svgUsed = new Set();
+[...BK.topics, ...BK.problems].forEach((x) => (x.diagrams || []).forEach((d, i) => {
+  const path = `${x.id}.diagrams[${i}]`;
+  if (!/^content\/svg\/[a-z0-9-]+\.svg$/.test(d.src || "")) return E(x.id, path, `src "${d.src}" phải có dạng content/svg/<tên-thường>.svg`);
+  if (!svgOnDisk.includes(d.src)) E(x.id, path, `file "${d.src}" không tồn tại (so khớp cả hoa/thường)`);
+  if (!d.caption) E(x.id, path, "thiếu caption (dùng làm alt của ảnh)");
+  if (d.source && !/^https:\/\//.test(d.source)) E(x.id, path, "source phải là URL https");
+  svgUsed.add(d.src);
+}));
+svgOnDisk.forEach((f) => {
+  if (!f.endsWith(".svg")) return at(f, "", "content/svg/ chỉ chứa file .svg");
+  if (!svgUsed.has(f)) at(f, "", "file SVG không được topic/problem nào tham chiếu");
+  const s = read(f);
+  // Thiếu xmlns thì <img> không hiển thị; thiếu nền thì chữ tối chìm trong theme tối (D11)
+  if (!/<svg[^>]*xmlns="http:\/\/www\.w3\.org\/2000\/svg"/.test(s)) at(f, "", 'thẻ <svg> thiếu xmlns="http://www.w3.org/2000/svg"');
+  if (!/<svg[^>]*viewBox=/.test(s)) at(f, "", "thẻ <svg> thiếu viewBox");
+  if (!/<rect[^>]*fill="#fff(fff)?"/i.test(s)) at(f, "", 'thiếu rect nền sáng (fill="#ffffff") — xem D11');
+  if (statSync(new URL(f, root)).size > MAX) at(f, "", "SVG > 40 KB");
+});
 if (loaded.at(-1) !== "app.js") at("content/manifest.js", "FILES", "app.js phải là file nạp cuối cùng");
 
 // ── Kết quả ──
