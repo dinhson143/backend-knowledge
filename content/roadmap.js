@@ -37,6 +37,7 @@ window.ROADMAP = [
       { id: "s3.async", title: "Hàng đợi & luồng sự kiện", topics: ["queue", "streams", "kafka"] },
       { id: "s3.resilience", title: "Gọi nhau an toàn khi có lỗi", topics: ["resilience", "idempotency"] },
       { id: "s3.contention", title: "Tranh chấp tài nguyên", topics: ["dist-lock"] },
+      { id: "s3.workflow", title: "Quy trình nhiều bước đáng tin", topics: ["outbox-cdc"] },
     ] },
   { id: "s4", title: "Lưu trữ chuyên dụng", goal: "Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ.",
     parts: [
