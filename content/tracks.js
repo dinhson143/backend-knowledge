@@ -40,3 +40,5 @@ BK.section({ id: "cs-net", track: "cs", title: "Mạng máy tính" });
 
 BK.track({ id: "code", title: "Kỹ năng viết code", subtitle: "Vòng coding · Code sạch · Kiểm thử" });
 BK.section({ id: "code-interview", track: "code", title: "Vòng coding" });
+BK.section({ id: "code-clean", track: "code", title: "Clean Code" });
+BK.section({ id: "code-testing", track: "code", title: "Kiểm thử & debug" });

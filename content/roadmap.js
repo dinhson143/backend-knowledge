@@ -59,6 +59,8 @@ window.ROADMAP = [
   { id: "code", title: "Kỹ năng viết code", goal: "Học xong bạn đi trọn một vòng coding có nhịp rõ ràng và viết code đọc được, có tự test.", parallel: true,
     parts: [
       { id: "code.interview", title: "Vòng coding", topics: ["code-interview-communication", "code-language-choice"] },
+      { id: "code.clean", title: "Clean Code", topics: ["code-clean-naming", "code-error-handling"] },
+      { id: "code.testing", title: "Kiểm thử & debug", topics: ["code-testing-fundamentals", "code-debugging"] },
     ] },
   { id: "beh", title: "Behavioral", goal: "Học xong bạn kể được câu chuyện theo STAR và trình bày sâu một dự án đã làm, có trade-off và số liệu.", parallel: true,
     parts: [
@@ -91,8 +93,8 @@ window.ROADMAP = [
   { id: "dsa", title: "Coding · DSA", goal: "Học xong bạn nhận dạng pattern thuật toán từ ràng buộc đề bài.", parallel: true,
     parts: [
       { id: "dsa.complexity", title: "Độ phức tạp", topics: ["bigo"] },
-      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds"] },
-      { id: "dsa.algo", title: "Thuật toán", topics: ["algo"] },
+      { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees"] },
+      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs"] },
     ] },
 ];
 
