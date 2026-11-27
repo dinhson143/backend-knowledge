@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">Thang chi phí context switch: coroutine không qua kernel scheduler, thread cùng process vào kernel nhưng giữ page table, process khác vào kernel, đổi page table và TLB lạnh</title>
+  <!-- Nền sáng cố định: ảnh trong <img> không nhận theme của trang (D11) -->
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <style>
+      .row { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.2; }
+      .no { fill: #e4f5ef; stroke: #14a37f; stroke-width: 1.2; }
+      .mid { fill: #f1f5f9; stroke: #94a3b8; stroke-width: 1.2; }
+      .yes { fill: #fff3db; stroke: #e08a00; stroke-width: 1.4; }
+      .h { font-size: 14px; font-weight: 650; fill: #1f2937; }
+      .hd { font-size: 12.5px; font-weight: 650; fill: #475569; text-anchor: middle; }
+      .k { font-size: 13.5px; font-weight: 650; fill: #1f2937; }
+      .v { font-size: 13px; font-weight: 650; fill: #1f2937; text-anchor: middle; }
+      .sc { font-size: 11.5px; fill: #475569; text-anchor: middle; }
+      .t { font-size: 13px; fill: #1f2937; }
+      .s { font-size: 11.5px; fill: #64748b; }
+      .lo { font-size: 12px; font-weight: 650; fill: #0f7a5f; text-anchor: middle; }
+      .hi { font-size: 12px; font-weight: 650; fill: #b45309; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="758" height="388" rx="14" fill="#ffffff" stroke="#d6dde6"/>
+
+  <text class="h" x="20" y="30">Context switch: mỗi bậc trả thêm gì</text>
+
+  <!-- Tiêu đề cột -->
+  <text class="hd" x="294" y="62">Qua kernel?</text>
+  <text class="hd" x="420" y="62">Đổi page table?</text>
+  <text class="hd" x="546" y="62">TLB sau khi chuyển</text>
+  <text class="hd" x="672" y="62">Cache CPU</text>
+
+  <!-- Thang: rẻ ở trên, đắt ở dưới -->
+  <text class="lo" x="30" y="86">rẻ</text>
+  <path d="M30,94 L30,274" stroke="#64748b" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <text class="hi" x="30" y="294">đắt</text>
+
+  <!-- Hàng 1: coroutine -->
+  <rect class="row" x="48" y="74" width="184" height="62" rx="8"/>
+  <text class="k" x="60" y="98">Coroutine, goroutine,</text>
+  <text class="k" x="60" y="116">virtual thread</text>
+  <rect class="no" x="240" y="74" width="108" height="62" rx="8"/>
+  <text class="v" x="294" y="100">Không</text><text class="sc" x="294" y="118">runtime tự chọn</text>
+  <rect class="no" x="366" y="74" width="108" height="62" rx="8"/>
+  <text class="v" x="420" y="100">Không</text><text class="sc" x="420" y="118">cùng process</text>
+  <rect class="no" x="492" y="74" width="108" height="62" rx="8"/>
+  <text class="v" x="546" y="100">Còn dùng được</text><text class="sc" x="546" y="118">cùng bản dịch</text>
+  <rect class="mid" x="618" y="74" width="108" height="62" rx="8"/>
+  <text class="v" x="672" y="100">Tuỳ dữ liệu</text><text class="sc" x="672" y="118">việc mới đụng gì</text>
+
+  <!-- Hàng 2: thread cùng process -->
+  <rect class="row" x="48" y="146" width="184" height="62" rx="8"/>
+  <text class="k" x="60" y="170">Thread cùng process</text>
+  <text class="s" x="60" y="190">kernel scheduler chọn</text>
+  <rect class="yes" x="240" y="146" width="108" height="62" rx="8"/>
+  <text class="v" x="294" y="172">Có</text><text class="sc" x="294" y="190">trap, scheduler</text>
+  <rect class="no" x="366" y="146" width="108" height="62" rx="8"/>
+  <text class="v" x="420" y="172">Không</text><text class="sc" x="420" y="190">chung bộ nhớ</text>
+  <rect class="no" x="492" y="146" width="108" height="62" rx="8"/>
+  <text class="v" x="546" y="172">Còn dùng được</text><text class="sc" x="546" y="190">cùng bản dịch</text>
+  <rect class="mid" x="618" y="146" width="108" height="62" rx="8"/>
+  <text class="v" x="672" y="172">Lạnh nếu</text><text class="sc" x="672" y="190">dữ liệu khác</text>
+
+  <!-- Hàng 3: process khác -->
+  <rect class="row" x="48" y="218" width="184" height="62" rx="8"/>
+  <text class="k" x="60" y="242">Process khác</text>
+  <text class="s" x="60" y="262">kernel scheduler chọn</text>
+  <rect class="yes" x="240" y="218" width="108" height="62" rx="8"/>
+  <text class="v" x="294" y="244">Có</text><text class="sc" x="294" y="262">trap, scheduler</text>
+  <rect class="yes" x="366" y="218" width="108" height="62" rx="8"/>
+  <text class="v" x="420" y="244">Có</text><text class="sc" x="420" y="262">address space mới</text>
+  <rect class="yes" x="492" y="218" width="108" height="62" rx="8"/>
+  <text class="v" x="546" y="244">Flush, hoặc</text><text class="sc" x="546" y="262">tách bằng ASID</text>
+  <rect class="yes" x="618" y="218" width="108" height="62" rx="8"/>
+  <text class="v" x="672" y="244">Lạnh</text><text class="sc" x="672" y="262">dữ liệu chưa nạp</text>
+
+  <text class="t" x="20" y="318">Bậc nào cũng lưu và nạp thanh ghi, PC, con trỏ stack; khác nhau ở ai làm (kernel hay runtime)</text>
+  <text class="t" x="20" y="338">và có đổi address space không. Phần đắt nằm sau cú chuyển: TLB miss, cache miss tới khi "ấm" lại.</text>
+  <text class="s" x="20" y="370">Bậc tương đối, không phải số đo. OSTEP: cpu-mechanisms, threads-intro, vm-tlbs, cpu-sched-multi; Go FAQ; JEP 444.</text>
+</svg>

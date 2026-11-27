@@ -14,6 +14,13 @@ BK.topic({
     idea: "Thêm một tầng gián tiếp: chương trình chỉ thấy địa chỉ ảo, phần cứng dịch sang địa chỉ vật lý qua bảng do kernel quản lý. Kernel có thể map trang ở đâu tuỳ ý, chia sẻ trang (thư viện, copy-on-write), cấp trang lười (chỉ khi chạm vào), hoặc đẩy trang ít dùng ra đĩa.",
     tradeoff: "Mỗi lần truy cập bộ nhớ cần dịch địa chỉ; nếu không có TLB, mỗi lần đọc thành nhiều lần đọc RAM (đi qua page table). Khi bộ nhớ thật không đủ, swap biến truy cập RAM cỡ 100 ns thành truy cập đĩa cỡ mili giây, và hệ thống có thể thrash.",
   },
+  diagrams: [
+    {
+      src: "content/svg/os-virtual-memory-walk.svg",
+      caption: "TLB hit thì có ngay khung vật lý; miss thì MMU đi page table qua từng cấp PGD → P4D → PUD → PMD → PTE, mỗi cấp một lần đọc bộ nhớ. Mục không present hoặc sai quyền gây page fault: kernel cấp khung, đọc lại từ swap, hoặc gửi SIGSEGV. Độ rộng địa chỉ x86-64 theo https://docs.kernel.org/arch/x86/x86_64/mm.html; OSTEP vm-paging, vm-tlbs.",
+      source: "https://docs.kernel.org/mm/page_tables.html",
+    },
+  ],
   table: {
     head: ["Khái niệm", "Là gì", "Vì sao quan trọng"],
     rows: [

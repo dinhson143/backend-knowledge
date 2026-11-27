@@ -14,6 +14,13 @@ BK.topic({
     idea: "Mỗi lần chuyển ngữ cảnh có giá cố định và một giá ẩn (cache, TLB lạnh). Giảm số lần chuyển: ít thread hơn số core cho việc CPU-bound, dùng event loop hoặc coroutine cho việc I/O-bound để chờ I/O mà không cần một OS thread đứng chờ.",
     tradeoff: "Giảm thread thì mỗi lời gọi blocking chặn nhiều việc hơn; dùng async/coroutine thì code phức tạp hơn và một đoạn CPU nặng chặn cả event loop. Không có cấu hình đúng cho mọi loại tải.",
   },
+  diagrams: [
+    {
+      src: "content/svg/os-context-switch-cost.svg",
+      caption: "Thang chi phí tương đối, không phải số đo: coroutine do runtime đổi, không qua kernel scheduler; thread cùng process vào kernel nhưng giữ page table nên TLB còn dùng được; process khác đổi page table nên TLB bị flush hoặc phải tách bằng ASID (OSTEP vm-tlbs — https://pages.cs.wisc.edu/~remzi/OSTEP/vm-tlbs.pdf), cache cũng lạnh.",
+      source: "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-mechanisms.pdf",
+    },
+  ],
   table: {
     head: ["Chuyển giữa", "Phải làm gì", "Chi phí tương đối"],
     rows: [

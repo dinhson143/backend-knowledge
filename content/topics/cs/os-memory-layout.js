@@ -13,6 +13,13 @@ BK.topic({
     idea: "Biết mỗi loại dữ liệu nằm đâu và sống bao lâu. Stack cho dữ liệu sống trong một lời gọi hàm, kích thước biết trước; heap cho dữ liệu sống lâu hoặc lớn. Đệ quy không giới hạn độ sâu thì đổi sang vòng lặp với stack tường minh trên heap.",
     tradeoff: "Heap cấp phát chậm hơn (phải tìm khối trống, có thể phân mảnh) và phải được dọn: tự `free` thì dễ leak hoặc dùng sau khi giải phóng; GC thì có pause và tốn CPU. Stack nhanh nhưng giới hạn kích thước và không sống qua lời gọi hàm.",
   },
+  diagrams: [
+    {
+      src: "content/svg/os-memory-layout-regions.svg",
+      caption: "Từ địa chỉ thấp lên cao: text, data/BSS, heap mọc lên, vùng mmap (thư viện `.so`, stack thread phụ), stack thread chính mọc xuống, trên cùng là kernel space. Bên phải là các dòng `/proc/<pid>/maps` tương ứng, lấy từ ví dụ trong proc_pid_maps(5); kernel space theo OSTEP (Linux VM — https://pages.cs.wisc.edu/~remzi/OSTEP/vm-complete.pdf).",
+      source: "https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html",
+    },
+  ],
   table: {
     head: ["Vùng", "Chứa gì", "Sống bao lâu"],
     rows: [
