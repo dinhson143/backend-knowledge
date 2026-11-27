@@ -91,7 +91,7 @@ window.ROADMAP = [
     parts: [
       { id: "dsa.complexity", title: "Độ phức tạp", topics: ["bigo"] },
       { id: "dsa.ds", title: "Cấu trúc dữ liệu", topics: ["ds", "dsa-trees"] },
-      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window"] },
+      { id: "dsa.algo", title: "Thuật toán", topics: ["algo", "dsa-two-pointers", "dsa-sliding-window", "dsa-graphs"] },
     ] },
 ];
 
