@@ -9,7 +9,7 @@
 - Hiện site có **hai cách phân loại không khớp nhau**: `tracks.js` (track/section theo mục lục Hello Interview) và `ROADMAP` (giai đoạn học). `app.js` chỉ đọc `ROADMAP`, nên track/section không hiện ở đâu cả.
 - Điều hướng có lỗ hổng: nút "tiếp" sau chủ đề cuối của giai đoạn 4 nhảy sang nhánh Kiến trúc thay vì sang luyện bài, "Học tiếp" không bao giờ gợi ý bài luyện, chủ đề không nói "cần học gì trước" hay "học xong làm được gì".
 - Đề xuất:
-  1. `ROADMAP` là **nguồn duy nhất của cây học**: giai đoạn → **chặng** (section mới, nằm trong `roadmap.js`) → topic. Track chỉ còn là thư mục chứa file.
+  1. `ROADMAP` là **nguồn duy nhất của cây học**: giai đoạn → **chặng** (trường mới `parts`, nằm trong `roadmap.js`) → topic. Track chỉ còn là thư mục chứa file.
   2. Lộ trình chính 5 giai đoạn, mỗi giai đoạn kết thúc bằng một **chặng kiểm tra** gồm các bài luyện vừa đủ nền (tính tự động từ `problem.topics`).
   3. Hai trường topic mới, đều tuỳ chọn: `goal` (học xong làm được gì) và `needs` (tiên quyết, chỉ gợi ý, không khoá).
   4. Quy ước tiêu đề nhất quán, kèm bảng tiêu đề mới cho cả 39 topic.
@@ -18,7 +18,7 @@
 
 ## 1. Hiện trạng
 
-Số liệu lấy từ `node scripts/check.mjs` và registry `BK` ngày 2026-11-27: **39 topic, 13 problem, 35 sim** (check báo 48 vì đếm thêm 13 HLD trong problem), **179 thuật ngữ**.
+Số liệu lấy từ `node scripts/check.mjs` và registry `BK` ngày 2026-11-27: **39 topic, 13 problem, 35 sim** (check báo 48 vì `check.mjs` gộp thêm 13 `hld` của problem vào bảng sim, dòng 47–52), **179 thuật ngữ**.
 
 ### 1.1 Cây học hiện tại (`content/roadmap.js`)
 
@@ -36,7 +36,7 @@ Số liệu lấy từ `node scripts/check.mjs` và registry `BK` ngày 2026-11-
 
 ### 1.2 Phân loại thứ hai (`content/tracks.js`)
 
-5 track (`sd`, `lld`, `cloud`, `arch`, `dsa`) và 15 section đánh số ("1 · Delivery Framework", "2 · Core Concepts"…). Mỗi topic bắt buộc có `track` + `section` và `check.mjs` kiểm tra chúng khớp nhau, **nhưng `app.js` không đọc `BK.tracks` hay `BK.sections` ở bất kỳ đâu.** Hai cách phân loại lệch nhau, ví dụ:
+5 track (`sd`, `lld`, `cloud`, `arch`, `dsa`) và 16 section đánh số ("1 · Delivery Framework", "2 · Core Concepts"…). Mỗi topic bắt buộc có `track` + `section` và `check.mjs` kiểm tra chúng khớp nhau, **nhưng `app.js` không đọc `BK.tracks` hay `BK.sections` ở bất kỳ đâu.** Hai cách phân loại lệch nhau, ví dụ:
 
 | Topic | Section (tracks.js) | Giai đoạn (ROADMAP) |
 |---|---|---|
@@ -158,7 +158,7 @@ Thay đổi so với hiện tại:
 | Chặng kiểm tra cuối GĐ2 và GĐ4 | Luyện sớm bài vừa đủ nền (V5) |
 | Nhánh "Container trên AWS" thành "Vận hành production" | Có chỗ cho observability, bảo mật vận hành, triển khai (V11) |
 
-Tập topic của lộ trình chính không đổi (đã kiểm bằng script: cùng 21 id), chỉ đổi thứ tự và cách nhóm.
+Tập topic của lộ trình chính không đổi (đã kiểm bằng script: cùng 23 id), chỉ đổi thứ tự và cách nhóm.
 
 #### Quy tắc xếp chỗ cho chủ đề mới
 
@@ -205,7 +205,7 @@ Nhánh song song giữ thứ tự hiện tại.
 
 #### Trường mới `needs` (tuỳ chọn)
 
-`needs: ["id", …]` liệt kê **tiên quyết trực tiếp** (tối đa 3), không liệt kê bắc cầu. Đã kiểm bằng script: mọi tiên quyết trong lộ trình chính đứng trước topic cần nó, không có vòng.
+`needs: ["id", …]` liệt kê **tiên quyết trực tiếp** (tối đa 3), không liệt kê bắc cầu. Đã kiểm bằng script cho cả lộ trình chính lẫn 4 nhánh: trong cùng một nhóm, mọi tiên quyết đứng trước topic cần nó, nên không có vòng; mọi id đều tồn tại.
 
 | Topic | needs |
 |---|---|
@@ -230,13 +230,20 @@ Nhánh song song giữ thứ tự hiện tại.
 | bigdata-ds | numbers |
 | tech-cheatsheet | redis, kafka, search |
 | patterns | caching, queue, dist-lock, blob *(ngoại lệ 4 mục: pattern là phần ghép)* |
-| oop-pillars → solid → principles-other; patterns-gof ← solid; concurrency ← oop-pillars; lld-problems-list ← patterns-gof, concurrency | |
+| oop-pillars | lld-delivery |
+| solid | oop-pillars |
+| principles-other | solid |
+| patterns-gof | solid |
+| concurrency | oop-pillars |
+| lld-problems-list | patterns-gof, concurrency |
 | code-architecture | solid *(xuyên nhánh)* |
-| system-architecture | code-architecture, queue *(xuyên nhánh)* |
+| system-architecture | code-architecture, queue *(queue xuyên nhánh)* |
 | dev-methods | code-architecture |
 | ecs | lb-gateway-cdn *(xuyên nhánh)* |
-| eks → ecs; ecs-vs-eks → eks | |
-| ds → bigo; algo → ds | |
+| eks | ecs |
+| ecs-vs-eks | eks |
+| ds | bigo |
+| algo | ds |
 
 Quy ước: tiên quyết **xuyên nhánh** (nhánh song song cần topic của lộ trình chính hoặc ngược lại) chỉ hiển thị, không ảnh hưởng thứ tự. `check.mjs` chỉ bắt buộc "đứng trước" khi hai topic cùng nằm trong lộ trình chính hoặc cùng một nhánh.
 
@@ -293,13 +300,13 @@ Số đếm chỉ được dùng khi **cố định theo định nghĩa** (4 tí
 | s2 | Scale dữ liệu | **Scale dữ liệu** | Học xong bạn biết khi nào một database không đủ, mở rộng bằng cache, shard, replica và nói rõ mức nhất quán. |
 | s3 | Building blocks | **Bất đồng bộ & phối hợp** | Học xong bạn tách được việc chậm khỏi request, xử lý sự kiện tin cậy và chống tranh chấp giữa nhiều máy. |
 | s4 | Common patterns | **Lưu trữ chuyên dụng** | Học xong bạn chọn đúng kho cho file lớn, tìm kiếm full-text, đếm/lọc ở quy mô lớn, và so sánh nhanh các công nghệ. |
-| s5 | Luyện bài System Design | **Ghép pattern & luyện đề** | Học xong bạn nhận ra dạng bài, gọi đúng pattern, tự giải từ Khởi động tới Nâng cao trong 45 phút. |
+| s5 | Luyện bài System Design | **Ghép pattern & luyện đề** | Học xong bạn nhận ra dạng bài, gọi đúng pattern, tự giải từ Khởi động tới Nâng cao. |
 | arch | Kiến trúc phần mềm & phương pháp | **Kiến trúc & phương pháp** | Học xong bạn giải thích được code phụ thuộc theo hướng nào, khi nào tách service và cách TDD/DDD khớp với nhau. |
-| cloud | Container trên AWS: ECS & EKS | **Vận hành production** | Học xong bạn chọn được nền chạy container và (khi có nội dung) quan sát, bảo vệ, triển khai hệ thống. |
+| cloud | Container trên AWS: ECS & EKS | **Vận hành production** | Học xong bạn chọn được nền chạy container cho một hệ thống trên AWS. *(Mở rộng câu này khi có chặng Quan sát, Bảo mật.)* |
 | lld | Low-Level Design | **Low-Level Design** | Học xong bạn thiết kế lớp cho một bài LLD: entity, nguyên tắc, pattern, xử lý đồng thời. |
 | dsa | Coding · DSA | **Coding · DSA** | Học xong bạn nhận dạng pattern thuật toán từ ràng buộc đề bài. |
 
-Id chặng đề xuất: `s1-frame`, `s1-io`, `s1-data`, `s2-cache`, `s2-split`, `s2-consistency`, `s2-tech`, `s3-async`, `s3-contention`, `s4-stores`, `s4-choose`, `s5-patterns`; nhánh: `lld-oop`, `lld-principles`, `lld-patterns`, `lld-concurrency`, `lld-practice`, `arch-code`, `arch-system`, `arch-process`, `cloud-containers`, `dsa-complexity`, `dsa-ds`, `dsa-algo`. Tiêu đề chặng như cây ở §3.1.
+Id chặng đề xuất (dạng `<giai đoạn>.<tên>`, xem §3.5): `s1.frame`, `s1.io`, `s1.data`, `s2.cache`, `s2.split`, `s2.consistency`, `s2.tech`, `s3.async`, `s3.contention`, `s4.stores`, `s4.choose`, `s5.patterns`; nhánh: `lld.oop`, `lld.principles`, `lld.patterns`, `lld.concurrency`, `lld.practice`, `arch.code`, `arch.system`, `arch.process`, `cloud.containers`, `dsa.complexity`, `dsa.ds`, `dsa.algo`. Tiêu đề chặng như cây ở §3.1.
 
 #### Topic (39)
 
@@ -373,14 +380,14 @@ Tiêu đề section trong `tracks.js` (nếu giữ, xem câu hỏi Q1): bỏ s�
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ Lộ trình ôn System Design & Backend                                          │
-│ ┌──────────── Tiếp tục ──────────────────────┐ ┌──── Bài đã đủ nền ─────────┐ │
-│ │ GĐ2 · Scale dữ liệu › Chia dữ liệu ra …    │ │ URL Shortener  Khởi động → │ │
-│ │ Consistent Hashing                         │ │ Rate Limiter   Khởi động → │ │
-│ │ Làm được: thêm/bớt node mà chỉ dời ~1/N key│ │ (chưa có bài: hiện "Học    │ │
-│ │ Cần trước: ✓ Sharding & Partitioning       │ │  thêm X chủ đề để mở bài   │ │
-│ │ [ Học tiếp → ]                             │ │  đầu tiên")                │ │
+│ ┌──────────── Tiếp tục ──────────────────────┐ ┌──── Sắp mở bài luyện ──────┐ │
+│ │ GĐ2 · Scale dữ liệu › Chia dữ liệu ra …    │ │ URL Shortener  Khởi động   │ │
+│ │ Consistent Hashing                         │ │ Rate Limiter   Khởi động   │ │
+│ │ Làm được: thêm/bớt node mà chỉ dời ~1/N key│ │ Còn thiếu: Redis chuyên sâu│ │
+│ │ Cần trước: ✓ Sharding & Partitioning       │ │ (khi có bài đủ nền, thẻ đổi│ │
+│ │ [ Học tiếp → ]                             │ │  thành "Bài đã đủ nền")    │ │
 │ └────────────────────────────────────────────┘ └────────────────────────────┘ │
-│ Chủ đề 9/39 ▓▓▓░░░░░   Bài luyện 0/13 ░░░░░░░                                │
+│ Chủ đề 11/39 ▓▓▓░░░░░   Bài luyện 0/13 ░░░░░░░                               │
 │                                                                              │
 │ LỘ TRÌNH CHÍNH                                                               │
 │ (✓) 1  Nền móng                                   8/8  ▸                     │
@@ -417,11 +424,12 @@ Tiêu đề section trong `tracks.js` (nếu giữ, xem câu hỏi Q1): bỏ s�
 │ │ dời ~1/N key          │ │
 │ │ [   Học tiếp →    ]   │ │
 │ └───────────────────────┘ │
-│ ┌─ Bài đã đủ nền (2) ───┐ │
-│ │ URL Shortener       → │ │
-│ │ Rate Limiter        → │ │
+│ ┌─ Sắp mở bài luyện (2) ┐ │
+│ │ URL Shortener         │ │
+│ │ Rate Limiter          │ │
+│ │ Còn thiếu: Redis …    │ │
 │ └───────────────────────┘ │
-│ Chủ đề 9/39 ▓▓░░░         │
+│ Chủ đề 11/39 ▓▓░░░        │
 │ Bài    0/13 ░░░░░         │
 │ (✓) 1 Nền móng     8/8 ▸ │
 │ (●) 2 Scale dữ liệu 3/6 ▾│
@@ -452,7 +460,7 @@ Tiêu đề section trong `tracks.js` (nếu giữ, xem câu hỏi Q1): bỏ s�
 │ │ Tiếp: CAP & mô hình nhất quán                                │ │
 │ │       Chọn nhất quán hay sẵn sàng khi mạng chia cắt          │ │
 │ │ Bài này mở đường cho: Redis chuyên sâu                       │ │  ← đảo ngược needs (B3)
-│ │ Vừa đủ nền để luyện: URL Shortener · Khởi động               │ │  ← A3
+│ │ Sắp mở: URL Shortener · Khởi động (còn Redis chuyên sâu)     │ │  ← A3
 │ └──────────────────────────────────────────────────────────────┘ │
 │ ← Sharding & Partitioning           CAP & mô hình nhất quán →    │
 └──────────────────────────────────────────────────────────────────┘
@@ -493,6 +501,7 @@ NHÁNH SONG SONG
 
 ```text
 # Luyện bài System Design
+(trạng thái ví dụ: đã xong GĐ1 + GĐ2, chưa học GĐ3–5)
 [Tất cả] [Đã đủ nền (2)] [Chưa luyện]          ← lọc, nhớ trong URL #/problems/ready ? (xem Q5)
 Khởi động — ít thành phần, một pattern chính
 ┌ URL Shortener (Bitly) ─────────── ✓ Đủ nền ┐  ┌ Local Business Search ── Cần 1/3 ┐
@@ -529,9 +538,9 @@ Xếp hạng: khớp tiêu đề > khớp `tldr`/`goal` > khớp phần thân; t
 |---|---|---|---|
 | A1 | Pager theo **nhóm**: trong lộ trình chính đi hết các giai đoạn chính rồi sang `#/problems`; trong một nhánh song song chỉ đi trong nhánh, cuối nhánh về `#/`. Sửa V6. | `ORDER` (dòng 16), pager trong `viewTopic` (230–233) | — |
 | A2 | "Học tiếp" và `#/learn` chỉ xét lộ trình chính; xong hết thì trỏ bài đủ nền đầu tiên chưa luyện. | `viewHome` (146, 154), `route` `/learn` (383) | — |
-| A3 | Tính "đủ nền" cho mỗi bài từ `p.topics` + `done`. Thẻ "Bài đã đủ nền" ở trang chủ; huy hiệu "✓ Đủ nền / Cần k/n" và lọc ở trang Luyện bài; chip "Cần nắm trước" có ✓/○ ở trang bài. | helper mới `readiness(p)`; `viewHome`, `viewProblems`, `viewProblem` (264–271) | `.ready`, `.need-chip.ok` |
+| A3 | Tính "đủ nền" cho mỗi bài từ `p.topics` + `done`. Thẻ "Bài đã đủ nền" ở trang chủ (chưa có bài nào thì hiện "Sắp mở": bài chỉ còn thiếu 1 chủ đề, kèm tên chủ đề còn thiếu); huy hiệu "✓ Đủ nền / Cần k/n" và lọc ở trang Luyện bài; chip "Cần nắm trước" có ✓/○ ở trang bài. | helper mới `readiness(p)`; `viewHome`, `viewProblems`, `viewProblem` (264–271) | `.ready`, `.need-chip.ok` |
 | A4 | Khối "Tiếp theo" cuối trang topic, nút một chạm "Đã nắm, sang bài tiếp" (đánh dấu rồi chuyển). Giữ nút đánh dấu riêng. | `viewTopic` (229–236) | `.next-card` |
-| A5 | Chặng kiểm tra: bài có topic muộn nhất (theo `ORDER`) thuộc giai đoạn N hiện ở cuối GĐ N trên trang chủ và trong khối "Hết giai đoạn" của topic cuối GĐ. | helper `checkpoint(stage)`; `viewHome`, `viewTopic` | `.rm-check` |
+| A5 | Chặng kiểm tra: bài có topic muộn nhất (theo `ORDER`) thuộc giai đoạn N hiện ở cuối GĐ N trên trang chủ và trong khối "Hết giai đoạn" của topic cuối GĐ. **Lưu ý:** với `roadmap.js` hiện tại kết quả khác bảng §3.2 (4 bài mở ở GĐ3 cũ, 9 bài ở GĐ4 cũ vì `patterns`); bảng §3.2 chỉ đúng sau bước 3. Đó là hành vi đúng, không phải lỗi. | helper `checkpoint(stage)`; `viewHome`, `viewTopic` | `.rm-check` |
 | A6 | Trang chủ: tách "Lộ trình chính" và "Nhánh song song"; chỉ mở sẵn GĐ hiện tại (`<details>`), gập "Cách ôn" và "Nguồn & phạm vi". | `viewHome` (157–188) | `.rm-stage` dạng `details` |
 | A7 | Sidebar: mỗi giai đoạn là `<details>`, chỉ mở GĐ chứa topic đang xem; hiện `d/n`. | `sideKnowledge` (119–126) | `.sb-track` summary |
 | A8 | Tìm kiếm thêm sim (`title`, `scenario`, `context`) và thuật ngữ (`k`, `full`, `vi`); nhãn loại; xếp hạng tiêu đề trước. | `viewSearch` (361–377) | `.type-badge` |
@@ -541,10 +550,11 @@ Xếp hạng: khớp tiêu đề > khớp `tldr`/`goal` > khớp phần thân; t
 
 | # | Thay đổi | Hàm | Dữ liệu cần |
 |---|---|---|---|
-| B1 | Hiển thị chặng: tiêu đề chặng trong sidebar (`.sb-section`), trang chủ, crumb "GĐ › chặng · i/n", nhóm trên trang Mô phỏng, đường dẫn trong kết quả tìm kiếm. **Phải hỗ trợ cả `stage.sections` lẫn `stage.topics` cũ** để có thể merge trước khi `roadmap.js` đổi. | đầu file (dòng 10–16: suy `s.topics` từ `s.sections`), `sideKnowledge`, `viewHome`, `viewTopic`, `viewSims`, `viewSearch` | `ROADMAP[].sections` |
+| B1 | Hiển thị chặng: tiêu đề chặng trong sidebar (`.sb-section`), trang chủ, crumb "GĐ › chặng · i/n", nhóm trên trang Mô phỏng, đường dẫn trong kết quả tìm kiếm. **Phải hỗ trợ cả `stage.parts` lẫn `stage.topics` cũ** để có thể merge trước khi `roadmap.js` đổi. | đầu file (dòng 10–16: suy `s.topics` từ `s.parts`), `sideKnowledge`, `viewHome`, `viewTopic`, `viewSims`, `viewSearch` | `ROADMAP[].parts` |
+| B0 | **Giai đoạn vừa có topic vừa có `problems: true`** (GĐ5 mới). Hiện `stageKeys` (dòng 84) chỉ đếm bài, `sideKnowledge` (120) và `viewSims` (314) bỏ qua giai đoạn có `problems`, chip trang chủ (165–167) chỉ hiện bài. Nếu không sửa, sau bước 3 `patterns` biến khỏi sidebar và trang chủ, sim `seat`, `saga` biến khỏi trang Mô phỏng. Cần: `stageKeys` = topic + `p:<id>`; sidebar/sims vẫn hiện phần topic; trang chủ hiện cả chip topic lẫn chặng "Luyện đề". | `stageKeys`, `sideKnowledge`, `viewHome`, `viewSims` | GĐ có cả `parts` và `problems` |
 | B2 | Dòng "Làm được: …" dưới H1, trong thẻ "Tiếp tục" và khối "Tiếp theo". Không có `goal` thì ẩn. | `viewTopic`, `viewHome` | `topic.goal` |
 | B3 | "Cần trước" (đầu trang topic) và "Bài này mở đường cho" (đảo ngược `needs`, trong khối "Tiếp theo"). | `viewTopic` | `topic.needs` |
-| B4 | Chặng `optional: true` có nhãn "Đào sâu", bị "Học tiếp" bỏ qua, vẫn nằm trong pager. | `ORDER`, `viewHome`, `sideKnowledge` | `section.optional` |
+| B4 | Chặng `optional: true` có nhãn "Đào sâu", bị "Học tiếp" bỏ qua, vẫn nằm trong pager. | `ORDER`, `viewHome`, `sideKnowledge` | `part.optional` |
 | B5 | Dòng `goal` của giai đoạn đổi theo câu "Học xong bạn …". | `viewHome` (đã render `s.goal`, không cần sửa code) | `ROADMAP[].goal` |
 
 Không đổi: router và các URL (`#/t/`, `#/p/`, `#/sim/`, `#/problems`, `#/sims`, `#/glossary`, `#/search/`), key `ip.done`, `ip.theme`, cơ chế nạp file.
@@ -554,23 +564,28 @@ Không đổi: router và các URL (`#/t/`, `#/p/`, `#/sim/`, `#/problems`, `#/s
 ```js
 // content/roadmap.js — giai đoạn có chặng; `topics` cũ vẫn được đọc trong thời gian chuyển
 { id: "s2", title: "Scale dữ liệu", goal: "Học xong bạn …",
-  sections: [
-    { id: "s2-cache", title: "Đọc nhanh hơn với cache", topics: ["caching", "dist-cache"] },
-    { id: "s2-split", title: "Chia dữ liệu ra nhiều máy", topics: ["sharding", "consistent-hashing"] },
-    // { id: "s2-deep", title: "Đào sâu", optional: true, topics: [...] }  ← chỉ thêm khi có topic
+  parts: [
+    { id: "s2.cache", title: "Đọc nhanh hơn với cache", topics: ["caching", "dist-cache"] },
+    { id: "s2.split", title: "Chia dữ liệu ra nhiều máy", topics: ["sharding", "consistent-hashing"] },
+    // { id: "s2.deep", title: "Đào sâu", optional: true, topics: [...] }  ← chỉ thêm khi có topic
   ] },
+// GĐ5 vừa có chặng topic vừa có bài luyện:
+{ id: "s5", title: "Ghép pattern & luyện đề", goal: "…", problems: true,
+  parts: [{ id: "s5.patterns", title: "Common patterns", topics: ["patterns"] }] },
 
 // content/topics/<track>/<id>.js — hai trường tuỳ chọn
 goal: "Thêm/bớt node mà chỉ dời khoảng 1/N số key",
 needs: ["sharding"],
 ```
 
+Tên trường là `parts` (không phải `sections`) và id chặng có dấu chấm (`s2.cache`) để không lẫn với hai thứ đã tên "section": `topic.section` / `BK.section` (mục lục Hello Interview trong `tracks.js`, id dạng `sd-core`) và `topic.sections` (mục phụ trong nội dung một topic). Trong tài liệu và giao diện vẫn gọi là "chặng".
+
 Kiểm tra mới trong `scripts/check.mjs`:
 
 | Kiểm tra | Bắt lỗi gì |
 |---|---|
 | Id chặng duy nhất; chặng không rỗng; mỗi topic nằm đúng một chặng | Chặng giữ chỗ quên xoá, topic lặp hai nơi |
-| Giai đoạn có `sections` thì không có `topics` (và ngược lại) | Hai nguồn thứ tự lệch nhau |
+| Giai đoạn có `parts` thì không có `topics` (và ngược lại); id chặng có dạng `<id giai đoạn>.<tên>` | Hai nguồn thứ tự lệch nhau; id chặng trùng id `BK.section` |
 | `needs[]` trỏ tới topic có thật, không vòng, ≤ 3 mục (trừ `patterns`) | Link chết, vòng tiên quyết |
 | Cùng lộ trình chính hoặc cùng nhánh: `needs` phải đứng trước trong `ORDER` | Thứ tự ngược tiên quyết (V3) |
 | `title` ≤ 40 ký tự; `goal` ≤ 90 ký tự, không trùng `title` | Sidebar tràn dòng, goal lặp tiêu đề |
@@ -593,8 +608,8 @@ Mỗi bước một commit (hoặc vài commit nhỏ), chạy `node scripts/chec
 |---|---|---|---|---|
 | 0 | Người dùng | Trả lời các câu hỏi §6; ghi D20–D2x vào `docs/decisions.md` | `docs/decisions.md` | — |
 | 1 | UI | Nhóm A: A1 + A2 (điều hướng), rồi A3 + A5 (đủ nền, chặng kiểm tra), A4, A6 + A7, A8, A9 — mỗi cụm một commit | `app.js`, `styles.css` | — |
-| 2 | UI | B1 phần đọc dữ liệu: `app.js` suy `topics` từ `sections` nếu có; `check.mjs` chấp nhận cả hai dạng | `app.js`, `scripts/check.mjs` | 1 |
-| 3 | ND | `roadmap.js`: thứ tự mới + `sections` + tiêu đề/goal giai đoạn (một commit, file dùng chung — báo trước các agent khác) | `content/roadmap.js` | 2 |
+| 2 | UI | B0 (giai đoạn vừa có topic vừa có bài) + B1 phần đọc dữ liệu: `app.js` suy `topics` từ `parts` nếu có; `check.mjs` chấp nhận cả hai dạng. **Bắt buộc trước bước 3.** | `app.js`, `scripts/check.mjs` | 1 |
+| 3 | ND | `roadmap.js`: thứ tự mới + `parts` + tiêu đề/goal giai đoạn (một commit, file dùng chung — báo trước các agent khác) | `content/roadmap.js` | 2 |
 | 4 | UI | B1 phần hiển thị (sidebar, crumb, trang chủ, sims, search), B5 | `app.js`, `styles.css` | 3 |
 | 5 | ND | Đổi `title` 39 topic theo §3.3, mỗi track một commit; bỏ số thứ tự trong tiêu đề section `tracks.js` (nếu Q1 giữ) | `content/topics/**`, `content/tracks.js` | — (độc lập) |
 | 6 | ND | Thêm kiểm tra `goal`/`needs` vào `check.mjs` + `_TEMPLATE.js`; điền `goal` và `needs` theo §3.2–3.3, mỗi track một commit | `scripts/check.mjs`, `content/_TEMPLATE.js`, `content/topics/**` | 3 |
