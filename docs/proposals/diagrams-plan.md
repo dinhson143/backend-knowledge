@@ -32,14 +32,24 @@
 | `dev-methods` | `tdd-codewalk` |
 | Problem còn lại | HLD sim của từng bài đã vẽ thành phần; không có cấu trúc dữ liệu riêng nào cần hình ngoài các mục trên |
 
+## Đã xem, không cần hình (nội dung là danh sách/khung, hình không thêm gì)
+
+| Topic | Lý do |
+|---|---|
+| `delivery`, `lld-delivery`, `lld-problems-list`, `tech-cheatsheet` | Khung trả lời và danh sách; bảng đã đủ |
+| `oop-pillars`, `solid`, `principles-other` | Nguyên tắc thiết kế; ví dụ code giải thích tốt hơn hình |
+| `algo` | Nhận dạng pattern từ đề; sim `binary-search` đã có cho phần có thể vẽ |
+| `dist-cache` | Topic tự trỏ về `caching`; sơ đồ 4 tầng cache + `redis-cluster-slots` đã phủ |
+| `api-design`, `search` | `token-bucket`, `n-plus-one`, `inverted-index` đã phủ phần cơ chế |
+
 ## Đề xuất, chưa vẽ
 
 | Topic | Sơ đồ | Ghi chú |
 |---|---|---|
 | `numbers` | Thang latency (L1 → RAM → SSD → mạng cùng DC → xuyên lục địa) trên trục log | Cần nguồn chính thức cho từng con số; số liệu phổ biến không đến từ tài liệu vendor |
-| `core-db` | B-Tree vs LSM-tree (memtable, SSTable, compaction) | Topic hiện chưa nói LSM; chờ nội dung |
+| `core-db` | B-Tree ghi tại chỗ vs LSM-Tree (memtable → flush tuần tự ra SSTable → compaction) | Topic đã có một câu "vì sao" về LSM-Tree (Cassandra, RocksDB); ưu tiên cao nhất cho đợt sau. Nguồn: tài liệu RocksDB/Cassandra |
 | `ds` | Heap dạng cây ↔ mảng (`i → 2i+1, 2i+2`) | Hữu ích cho DSA, ưu tiên thấp |
 | `bigdata-ds` | Count-Min Sketch (d hàng × w cột, lấy min) | Dùng cho problem `top-k` |
-| `data-modeling` | Normalize vs denormalize một bảng đơn hàng | Chờ xem nội dung topic |
+| `data-modeling` | Normalize vs denormalize một bảng đơn hàng (join khi đọc vs ghi nhiều chỗ) | Topic có bước "cân nhắc denormalize" theo tỉ lệ đọc/ghi; hình giúp thấy cái giá khi ghi |
 | `eks` | Control plane (AWS quản lý) vs data plane (node của bạn) | `eks-flow` + `container-stack` đã gần đủ |
 | problem `web-crawler` | Bloom filter "URL đã thấy" | Dùng lại hình Bloom filter bằng cách thêm vào `diagrams` của problem nếu cần |

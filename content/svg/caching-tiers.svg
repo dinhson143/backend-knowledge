@@ -26,8 +26,8 @@
   <!-- Client -->
   <rect class="cache" x="20" y="62" width="124" height="76" rx="10"/>
   <text class="hc" x="82" y="86">Client</text>
-  <text class="c" x="82" y="106"><tspan class="n">①</tspan> browser cache</text>
-  <text class="sc" x="82" y="124">LocalStorage, Cache API</text>
+  <text class="c" x="82" y="106"><tspan class="n">①</tspan> browser</text>
+  <text class="sc" x="82" y="124">HTTP cache, Storage</text>
 
   <!-- CDN -->
   <rect class="cache" x="166" y="62" width="124" height="76" rx="10"/>
